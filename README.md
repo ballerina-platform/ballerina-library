@@ -3,11 +3,6 @@ The Ballerina standard library
 
 ## Status Dashboard
 
-# ballerina-standard-library
-The Ballerina standard library
-
-## Status Dashboard
-
 |Level| Modules | Latest Version | Build | Last Commit | Open Issues | Open Pull Requests |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 |1|[math](https://github.com/ballerina-platform/module-ballerina-math)| [![GitHub Release](https://img.shields.io/github/release/ballerina-platform/module-ballerina-math.svg?label=)](https://github.com/ballerina-platform/module-ballerina-math/releases)| [![Build](https://github.com/ballerina-platform/module-ballerina-math/workflows/Build/badge.svg)](https://github.com/ballerina-platform/module-ballerina-math/actions?query=workflow%3ABuild)| [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerina-math.svg?label=)](https://github.com/ballerina-platform/module-ballerina-math/commits/master)| [![Github issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-standard-library/module/math.svg?label=)](https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2Fmath) | [![GitHub pull-requests](https://img.shields.io/github/issues-pr/ballerina-platform/module-ballerina-math.svg?label=)](https://github.com/ballerina-platform/module-ballerina-math/pulls)|
