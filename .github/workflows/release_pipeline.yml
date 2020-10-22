@@ -15,5 +15,5 @@ jobs:
                     args:
                         run release
                 env:
-                    WORKING_DIR: ./stdlib/release
+                    WORKING_DIR: ./release
                     GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
