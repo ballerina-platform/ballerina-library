@@ -21,7 +21,7 @@ jobs:
                     args:
                         run publish
                 env:
-                    WORKING_DIR: ./stdlib/release
+                    WORKING_DIR: ./release
                     GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
                     EVENT_TYPE: 'ballerina-lang-push'
 
