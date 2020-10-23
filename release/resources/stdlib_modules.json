@@ -38,7 +38,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-system",
-                "module-ballerina-xslt"
+                "module-ballerina-xslt",
+                "module-ballerina-ftp"
             ]
         },
         {
@@ -109,7 +110,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-cache",
-                "module-ballerina-email"
+                "module-ballerina-email",
+                "module-ballerina-ftp"
             ]
         },
 
@@ -120,7 +122,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-log",
-                "module-ballerina-reflect"
+                "module-ballerina-reflect",
+                "module-ballerina-ftp"
             ]
         },
         {
