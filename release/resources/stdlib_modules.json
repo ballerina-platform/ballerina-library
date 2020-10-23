@@ -159,6 +159,7 @@
                 "module-ballerina-cache",
                 "module-ballerina-filepath",
                 "module-ballerina-mime",
+                "module-ballerina-ftp",
                 "module-ballerina-socket",
                 "module-ballerinax-nats",
                 "module-ballerinax-rabbitmq"
@@ -203,6 +204,13 @@
             "dependents": [
                 "module-ballerina-auth"
             ]
+        },
+        {
+            "name": "module-ballerina-ftp",
+            "version": "1.0.1-SNAPSHOT",
+            "level": 5,
+            "release": true,
+            "dependents": []
         },
         {
             "name": "module-ballerina-socket",
