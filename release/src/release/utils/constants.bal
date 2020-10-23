@@ -13,4 +13,4 @@ const OPERATION_RELEASE = "releasing";
 const OPERATION_VALIDATE = "validating release of";
 
 const SLEEP_INTERVAL = 60000;
-const MAX_WAIT_CYCLES = 20; // Max wait time is 20 minutes
+const MAX_WAIT_CYCLES = 30; // Max wait time is 30 minutes
