@@ -38,7 +38,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-system",
-                "module-ballerina-xslt"
+                "module-ballerina-xslt",
+                "module-ballerina-ftp"
             ]
         },
         {
@@ -109,7 +110,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-cache",
-                "module-ballerina-email"
+                "module-ballerina-email",
+                "module-ballerina-ftp"
             ]
         },
 
@@ -156,6 +158,7 @@
                 "module-ballerina-cache",
                 "module-ballerina-filepath",
                 "module-ballerina-mime",
+                "module-ballerina-ftp",
                 "module-ballerina-socket",
                 "module-ballerinax-nats",
                 "module-ballerinax-rabbitmq"
@@ -203,7 +206,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "version": "1.0.0-SNAPSHOT",
+            "version": "1.0.1-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": []
