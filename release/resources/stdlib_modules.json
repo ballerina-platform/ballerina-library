@@ -202,6 +202,13 @@
             ]
         },
         {
+            "name": "module-ballerina-ftp",
+            "version": "1.0.0-SNAPSHOT",
+            "level": 5,
+            "release": true,
+            "dependents": []
+        },
+        {
             "name": "module-ballerina-socket",
             "version": "0.6.9-SNAPSHOT",
             "level": 5,
