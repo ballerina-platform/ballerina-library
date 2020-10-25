@@ -11,6 +11,5 @@ const AUTH_HEADER_KEY = "Authorization";
 
 public const RETRY_COUNT = 3;
 public const RETRY_INTERVAL = 10000;
-public const RETRY_BRACKOFF_FACTOR = 2.0;
+public const RETRY_BACKOFF_FACTOR = 2.0;
 public const RETRY_MAX_WAIT_TIME = 2;
-

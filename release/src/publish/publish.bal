@@ -9,7 +9,7 @@ http:ClientConfiguration clientConfig = {
     retryConfig: {
         count: commons:RETRY_COUNT,
 		intervalInMillis: commons:RETRY_INTERVAL,
-		backOffFactor: commons:RETRY_BRACKOFF_FACTOR,
+		backOffFactor: commons:RETRY_BACKOFF_FACTOR,
 		maxWaitIntervalInMillis: commons:RETRY_MAX_WAIT_TIME
     }
 };
