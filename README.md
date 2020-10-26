@@ -1,5 +1,37 @@
-# ballerina-standard-library
-The Ballerina standard library
+# The Ballerina Standard Library
+ 
+The [Ballerina](https://ballerina.io/) standard library includes a vast array of standard libraries and it is often described as coming with "Batteries included". It includes a clean set of building blocks and APIs to rapidly build applications. Some of the included standard libraries are HTTP1.1/2, WebSocket, gRPC, File, Filepath, etc and the full list of standard libraries are listed under the `Status Dashboard` section.
+ 
+All the Ballerina standard libraries are made available on [Ballerina Central](https://central.ballerina.io/). Therefore, Ballerina standard library fixes and improvements will be made available instantly to Ballerina users without waiting for every six month release cycle of the Ballerina language.
+ 
+## Repository Organization
+ 
+This is the Parent repository of the Ballerina standard library and used to report bugs, request new features, start new discussions, view project boards, etc.
+ 
+However, to enable instant releases of each standard library, each standard library code is separated into a child repository. Therefore, in order to go through the code, please refer to the relevant child repository.
+ 
+Both Parent and Child repositories are owned and maintained by the Ballerina standard library team who is responsible for governing, ensuring security and quality, doing timely releases, maintaining backward compatibility, etc.
+
+## Contributing to Ballerina
+
+As an open source project, Ballerina welcomes contributions from the community. To start contributing, read these [contribution guidelines](https://github.com/ballerina-platform/ballerina-lang/blob/master/CONTRIBUTING.md) for information on how you should go about contributing to our project.
+
+Check the issue tracker for open issues that interest you. We look forward to receiving your contributions.
+
+## Code of Conduct
+
+All contributors are encouraged to read the [Ballerina Code of Conduct](https://ballerina.io/code-of-conduct).
+
+## License
+
+Ballerina code is distributed under [Apache license 2.0](https://github.com/ballerina-platform/ballerina-lang/blob/master/LICENSE).
+
+## Useful links
+
+* The ballerina-dev@googlegroups.com mailing list is for discussing code changes to the Ballerina project.
+* Chat live with us on our [Slack channel](https://ballerina.io/community/slack/).
+* Technical questions should be posted on Stack Overflow with the [#ballerina](https://stackoverflow.com/questions/tagged/ballerina) tag.
+* Ballerina performance test results are available [here](performance/benchmarks/summary.md).
 
 ## Status Dashboard
 
