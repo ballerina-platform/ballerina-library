@@ -5,7 +5,15 @@ import ballerina/runtime;
 import ballerina/stringutils;
 import ballerina_stdlib/commons;
 
-http:Client httpClient = new (commons:API_PATH);
+http:ClientConfiguration clientConfig = {
+    retryConfig: {
+        count: commons:RETRY_COUNT,
+		intervalInMillis: commons:RETRY_INTERVAL,
+		backOffFactor: commons:RETRY_BACKOFF_FACTOR,
+		maxWaitIntervalInMillis: commons:RETRY_MAX_WAIT_TIME
+    }
+};
+http:Client httpClient = new (commons:API_PATH, clientConfig);
 string accessToken = config:getAsString(commons:ACCESS_TOKEN_ENV);
 string accessTokenHeaderValue = "Bearer " + accessToken;
 
