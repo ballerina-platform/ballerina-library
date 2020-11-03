@@ -34,9 +34,9 @@ function handleRelease(commons:Module[] modules) {
             currentModules.removeAll();
         }
         if (module.release) {
-            boolean releaseInProgress = releaseModule(module);
-            if (releaseInProgress) {
-                module.releaseInProgress = releaseInProgress;
+            boolean inProgress = releaseModule(module);
+            if (inProgress) {
+                module.inProgress = inProgress;
                 currentModules.push(module);
                 log:printInfo("Module " + module.name + " release triggerred successfully.");
             } else {
@@ -68,18 +68,18 @@ function releaseModule(commons:Module module) returns boolean {
         commons:logAndPanicError("Error occurred while releasing the module: " + moduleName, result);
     }
     http:Response response = <http:Response>result;
-    return commons:validateResponse(response, moduleName);
+    return commons:validateResponse(response);
 }
 
 function waitForCurrentModuleReleases(commons:Module[] modules, int level) {
-    if (modules.length() == 0 || level < 1) {
+    if (modules.length() == 0) {
         return;
     }
     commons:logNewLine();
     log:printInfo("Waiting for level " + level.toString() + " module builds");
     commons:Module[] unreleasedModules = modules.filter(
         function (commons:Module m) returns boolean {
-            return m.releaseInProgress;
+            return m.inProgress;
         }
     );
     commons:Module[] releasedModules = [];
@@ -88,14 +88,14 @@ function waitForCurrentModuleReleases(commons:Module[] modules, int level) {
     int waitCycles = 0;
     while (!allModulesReleased) {
         foreach commons:Module module in modules {
-            if (module.releaseInProgress) {
-                checkReleaseInprogressModules(module, unreleasedModules, releasedModules);
+            if (module.inProgress) {
+                checkInProgressModules(module, unreleasedModules, releasedModules);
             }
         }
         if (releasedModules.length() == modules.length()) {
             allModulesReleased = true;
-        } else if (waitCycles < MAX_WAIT_CYCLES) {
-            runtime:sleep(SLEEP_INTERVAL);
+        } else if (waitCycles < commons:MAX_WAIT_CYCLES) {
+            runtime:sleep(commons:SLEEP_INTERVAL);
             waitCycles += 1;
         } else {
             break;
@@ -109,10 +109,10 @@ function waitForCurrentModuleReleases(commons:Module[] modules, int level) {
     }
 }
 
-function checkReleaseInprogressModules(commons:Module module, commons:Module[] unreleased, commons:Module[] released) {
+function checkInProgressModules(commons:Module module, commons:Module[] unreleased, commons:Module[] released) {
     boolean releaseCompleted = checkModuleRelease(module);
     if (releaseCompleted) {
-        module.releaseInProgress = !releaseCompleted;
+        module.inProgress = !releaseCompleted;
         var moduleIndex = unreleased.indexOf(module);
         if (moduleIndex is int) {
             commons:Module releasedModule = unreleased.remove(moduleIndex);
@@ -124,23 +124,27 @@ function checkReleaseInprogressModules(commons:Module module, commons:Module[] u
 
 function checkModuleRelease(commons:Module module) returns boolean {
     // Don't wait for level 0 modules
-    if (!module.releaseInProgress || module.level < 1) {
+    if (!module.inProgress || module.level < 1) {
         return true;
     }
-    log:printInfo("Validating " + module.name + " release");
     http:Request request = commons:createRequest(accessTokenHeaderValue);
     string moduleName = module.name.toString();
     string 'version = module.'version.toString();
     string expectedReleaseTag = "v" + 'version;
 
     string modulePath = "/" + moduleName + RELEASES + TAGS + "/v" + 'version;
-    var result = httpClient->get(modulePath, request);
-    if (result is error) {
+    // Hack for type casting error in HTTP Client
+    // https://github.com/ballerina-platform/ballerina-standard-library/issues/566
+    var result = trap httpClient->get(modulePath, request);
+    if (result is http:ClientError) {
         commons:logAndPanicError("Error occurred while checking the release status for module: " + moduleName, result);
+    } else if (result is error) {
+        log:printWarn("HTTP Client panicked while checking the release status for module: " + moduleName);
+        return false;
     }
     http:Response response = <http:Response>result;
 
-    if(!commons:validateResponse(response, moduleName)) {
+    if(!commons:validateResponse(response)) {
         return false;
     } else {
         map<json> payload = <map<json>>response.getJsonPayload();
