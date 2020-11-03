@@ -19,5 +19,5 @@ url = 'https://api.github.com/repos/TharindaDilshan/module-ballerina-io/contents
 file = urllib.request.urlopen(url)
 
 for line in file:
-	decoded_line = ase64.b64decode(line.encode('ascii')).decode('ascii')
+	decoded_line = base64.b64decode(line.encode('ascii')).decode('ascii')
 	print(decoded_line)
