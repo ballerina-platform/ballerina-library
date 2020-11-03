@@ -1,0 +1,20 @@
+name: Stdlib module dependencies
+
+on: [push]
+jobs:
+    build:
+        name: Derive module dependencies
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v2
+
+            -   name: Generate Dependencies
+                uses: actions/setup-python@v2
+                with:
+                    python-version: '3.x'
+                run: |
+                    pip install PyGithub
+                    python ./release/src/dependencies/main.py
+                env:
+                    packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+                    packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
