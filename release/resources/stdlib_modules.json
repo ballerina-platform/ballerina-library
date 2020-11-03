@@ -12,95 +12,49 @@
             "version": "0.5.1-SNAPSHOT",
             "level": 1,
             "release": true,
-            "dependents": [
-                "module-ballerina-system",
-                "module-ballerina-config",
-                "module-ballerina-log",
-                "module-ballerina-ftp",
-                "module-ballerina-system",
-                "module-ballerina-config",
-                "module-ballerina-log",
-                "module-ballerina-ftp",
-                "module-ballerina-system",
-                "module-ballerina-config",
-                "module-ballerina-log",
-                "module-ballerina-ftp"
-            ]
+            "dependents": []
         },
         {
             "name": "module-ballerina-stringutils",
             "version": "0.5.1-SNAPSHOT",
             "level": 1,
             "release": true,
-            "dependents": [
-                "module-ballerina-config",
-                "module-ballerina-log",
-                "module-ballerina-config",
-                "module-ballerina-log",
-                "module-ballerina-config",
-                "module-ballerina-log"
-            ]
+            "dependents": []
         },
         {
             "name": "module-ballerina-runtime",
             "version": "0.5.1-SNAPSHOT",
             "level": 1,
             "release": true,
-            "dependents": [
-                "module-ballerina-task",
-                "module-ballerina-ftp",
-                "module-ballerina-task",
-                "module-ballerina-ftp",
-                "module-ballerina-task",
-                "module-ballerina-ftp"
-            ]
+            "dependents": []
         },
         {
             "name": "module-ballerina-system",
             "version": "0.6.1-SNAPSHOT",
             "level": 2,
             "release": true,
-            "dependents": [
-                "module-ballerina-config",
-                "module-ballerina-log",
-                "module-ballerina-config",
-                "module-ballerina-log",
-                "module-ballerina-config",
-                "module-ballerina-log"
-            ]
+            "dependents": []
         },
         {
             "name": "module-ballerina-task",
             "version": "1.1.1-SNAPSHOT",
             "level": 2,
             "release": true,
-            "dependents": [
-                "module-ballerina-ftp",
-                "module-ballerina-ftp",
-                "module-ballerina-ftp"
-            ]
+            "dependents": []
         },
         {
             "name": "module-ballerina-config",
             "version": "1.0.1-SNAPSHOT",
             "level": 3,
             "release": true,
-            "dependents": [
-                "module-ballerina-log",
-                "module-ballerina-log",
-                "module-ballerina-log"
-            ]
+            "dependents": []
         },
         {
             "name": "module-ballerina-log",
             "version": "1.0.1-SNAPSHOT",
             "level": 4,
             "release": true,
-            "dependents": [
-                "module-ballerina-ftp",
-                "module-ballerina-ftp",
-                "module-ballerina-ftp"
-            ]
+            "dependents": []
         },
         {
             "name": "module-ballerina-ftp",
