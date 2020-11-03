@@ -15,6 +15,7 @@ jobs:
             -   name: Generate Dependency Graph
                 run: |
                     pip install PyGithub
+                    pip install requests
                     python ./release/src/dependencies/main.py
                 env:
                     packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
