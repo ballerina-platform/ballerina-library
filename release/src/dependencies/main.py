@@ -4,8 +4,6 @@ from github import Github
 # using username and password
 g = Github(os.environ["packageUser"], os.environ["packagePAT"])
 
-for repo in g.get_user().get_repos():
-    print(repo.name)
-    repo.edit(has_wiki=False)
-    # to see all the available attributes and methods
-    print(dir(repo))
+repo = g.get_repo("TharindaDilshan/module-ballerina-io")
+contents = repo.get_contents("README.md")
+print(contents)
