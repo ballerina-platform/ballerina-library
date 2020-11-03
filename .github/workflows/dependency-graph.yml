@@ -23,8 +23,13 @@ jobs:
                 env:
                     packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
                     packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
-            -   name: Commit & Push changes
-                uses: actions-js/push@master
+            -   name: Commit files
+                run: |
+                    git config --local user.email "action@github.com"
+                    git config --local user.name "GitHub Action"
+                    git commit -m "Add changes" -a
+            -   name: Push changes
+                uses: ad-m/github-push-action@master
                 with:
                     github_token: ${{ secrets.ACCESS_TOKEN }}
-                    branch: 'main'
+                    branch: ${{ github.ref }}
