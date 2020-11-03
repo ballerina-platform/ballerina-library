@@ -27,7 +27,7 @@ def getDependencies( bal_module ):
 # returns: a list containing an array of standard library module names and a json string of the file content 
 def getModulesFromJSON():
 
-	with open('./stdlib_modules.JSON') as f:
+	with open('./release/resources/stdlib_modules.json') as f:
   		fileContent = json.load(f)
 
 	stdlib_modules = []
@@ -41,7 +41,7 @@ def getModulesFromJSON():
 # Updates the stdlib_modules.JSON file with dependents of each standard library module
 def updateJSONFile(updatedJSON):
 
-	with open('./stdlib_modules.JSON', 'w') as jsonFile:
+	with open('./release/resources/stdlib_modules.json', 'w') as jsonFile:
 		jsonFile.seek(0) 
 		json.dump(updatedJSON, jsonFile, indent=4)
 		jsonFile.truncate()
