@@ -44,6 +44,7 @@ def updateJSONFile(updatedJSON):
 		jsonFile.seek(0) 
 		json.dump(updatedJSON, jsonFile, indent=4)
 		jsonFile.truncate()
+	print(updatedJson)
 
 stdlib_modules, JSONContent = getModulesFromJSON()
 
