@@ -68,9 +68,6 @@ function waitForCurrentLevelModuleBuild(commons:Module[] modules, int level) {
     commons:logNewLine();
     log:printInfo("Waiting for level " + level.toString() + " module builds");
     runtime:sleep(commons:SLEEP_INTERVAL); // sleep first to make sure we get the latest workflow triggered by this job
-    if (modules.length() == 0) {
-        return;
-    }
     commons:Module[] unpublishedModules = modules.filter(
         function (commons:Module m) returns boolean {
             return m.inProgress;
