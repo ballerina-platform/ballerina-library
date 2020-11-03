@@ -72,6 +72,10 @@
                 "module-ballerina-system",
                 "module-ballerina-config",
                 "module-ballerina-log",
+                "module-ballerina-ftp",
+                "module-ballerina-system",
+                "module-ballerina-config",
+                "module-ballerina-log",
                 "module-ballerina-ftp"
             ]
         },
@@ -81,6 +85,8 @@
             "level": 1,
             "release": true,
             "dependents": [
+                "module-ballerina-config",
+                "module-ballerina-log",
                 "module-ballerina-config",
                 "module-ballerina-log",
                 "module-ballerina-config",
@@ -148,6 +154,8 @@
                 "module-ballerina-task",
                 "module-ballerina-ftp",
                 "module-ballerina-task",
+                "module-ballerina-ftp",
+                "module-ballerina-task",
                 "module-ballerina-ftp"
             ]
         },
@@ -157,6 +165,8 @@
             "level": 2,
             "release": true,
             "dependents": [
+                "module-ballerina-config",
+                "module-ballerina-log",
                 "module-ballerina-config",
                 "module-ballerina-log",
                 "module-ballerina-config",
@@ -209,6 +219,7 @@
                 "module-ballerina-ftp",
                 "module-ballerina-ftp",
                 "module-ballerina-ftp",
+                "module-ballerina-ftp",
                 "module-ballerina-ftp"
             ]
         },
@@ -232,6 +243,7 @@
                 "module-ballerina-log",
                 "module-ballerina-log",
                 "module-ballerina-log",
+                "module-ballerina-log",
                 "module-ballerina-log"
             ]
         },
@@ -241,6 +253,7 @@
             "level": 4,
             "release": true,
             "dependents": [
+                "module-ballerina-ftp",
                 "module-ballerina-ftp",
                 "module-ballerina-ftp",
                 "module-ballerina-ftp",
