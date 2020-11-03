@@ -9,7 +9,7 @@ if req.status_code == requests.codes.ok:
     req = req.json()  # the response is a JSON
     # req is now a dict with keys: name, encoding, url, size ...
     # and content. But it is encoded with base64.
-    content = base64.decodestring(req['content'])
+    content = base64.b64decode(req['content'].encode('ascii')).decode('ascii')
     print(content)
 else:
     print('Content was not found.')
