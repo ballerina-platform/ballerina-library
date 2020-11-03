@@ -1,6 +1,8 @@
 name: Stdlib module dependencies
 
-on: [push]
+on: 
+    schedule:
+        - cron: '15 14 * * *'
 jobs:
     build:
         name: Derive module dependencies
