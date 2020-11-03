@@ -1,3 +1,3 @@
 import os
 
-print("Hello World", os.environ['packageUser'])
+print("Hello World", os.environ)
