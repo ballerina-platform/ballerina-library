@@ -3,7 +3,7 @@ import base64
 import requests
 
 
-url = 'https://api.github.com/repos/TharindaDilshan/module-ballerina-io/contents/README.md'
+url = 'https://api.github.com/repos/TharindaDilshan/module-ballerina-io/contents/build.gradle'
 req = requests.get(url)
 if req.status_code == requests.codes.ok:
     req = req.json()  # the response is a JSON
