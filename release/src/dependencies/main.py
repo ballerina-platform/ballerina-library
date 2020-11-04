@@ -33,6 +33,7 @@ def getModulesFromJSON():
 	stdlib_modules = []
 
 	for module in fileContent['modules']:
+		fileContent['modules'][fileContent['modules'].index(module)]['dependents'] = []
 		stdlib_modules.append(module['name'])
 
 	return stdlib_modules, fileContent
@@ -44,7 +45,6 @@ def updateJSONFile(updatedJSON):
 		jsonFile.seek(0) 
 		json.dump(updatedJSON, jsonFile, indent=4)
 		jsonFile.truncate()
-	print(updatedJSON)
 
 stdlib_modules, JSONContent = getModulesFromJSON()
 
@@ -60,6 +60,3 @@ for stdlib_module in stdlib_modules:
 				break
 
 updateJSONFile(updatedJSON)
-			
-
-
