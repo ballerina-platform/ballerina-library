@@ -2,7 +2,7 @@ name: Stdlib module dependencies
 
 on: 
     schedule:
-        - cron: '21 9 * * *'
+        - cron: '32 9 * * *'
 jobs:
     dependency:
         name: Derive module dependencies
@@ -18,7 +18,7 @@ jobs:
             -   name: Get Dependencies
                 run: |
                     pip install requests
-                    python ./release/src/dependencies/main.py
+                    python ./release/src/module_dependencies/main.py
                 env:
                     packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
                     packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
