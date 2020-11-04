@@ -4,32 +4,31 @@ on:
     schedule:
         - cron: '30 14 * * *'
 jobs:
-    build:
+    dependency:
         name: Derive module dependencies
         runs-on: ubuntu-latest
         steps:
             -   uses: actions/checkout@v2
-                with:
-                    persist-credentials: false 
-                    fetch-depth: 0
-
+        
             -   name: Setup Python
                 uses: actions/setup-python@v2
                 with:
                     python-version: '3.x'
-            -   name: Generate Dependency Graph
+            
+            -   name: Get Dependencies
                 run: |
-                    pip install PyGithub
                     pip install requests
                     python ./release/src/dependencies/main.py
                 env:
                     packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
                     packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+            
             -   name: Commit files
                 run: |
                     git config --local user.email "action@github.com"
                     git config --local user.name "GitHub Action"
-                    git commit -m "Add changes" -a
+                    git commit -m "stdlib_modules.json updated" -a
+            
             -   name: Push changes
                 uses: ad-m/github-push-action@master
                 with:
