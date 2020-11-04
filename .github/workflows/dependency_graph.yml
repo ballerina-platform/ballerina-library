@@ -2,7 +2,7 @@ name: Stdlib module dependencies
 
 on: 
     schedule:
-        - cron: '48 5 * * *'
+        - cron: '00 6 * * *'
 jobs:
     dependency:
         name: Derive module dependencies
@@ -29,7 +29,7 @@ jobs:
                     git config --local user.email "action@github.com"
                     git config --local user.name "GitHub Action"
                     git add --all
-                    if [-z "$(git status --porcelain)"]; then
+                    if [ -z "$(git status --porcelain)" ]; then
                         echo "::set-output name=push::false"
                     else
                         git commit -m "stdlib_modules.json updated" -a
