@@ -2,7 +2,7 @@ name: Stdlib module dependencies
 
 on: 
     schedule:
-        - cron: '35 4 * * *'
+        - cron: '22 5 * * *'
 jobs:
     dependency:
         name: Derive module dependencies
@@ -24,12 +24,19 @@ jobs:
                     packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
             
             -   name: Commit files
+                id: commit
                 run: |
                     git config --local user.email "action@github.com"
                     git config --local user.name "GitHub Action"
-                    git commit -m "stdlib_modules.json updated" -a
+                    if [-z "$(git status --porcelain)"]; then
+                        echo "::set-output name=push::false"
+                    else
+                        git commit -m "stdlib_modules.json updated" -a
+                        echo "::set-output name=push::true"
+                    fi
             
             -   name: Push changes
+                if: steps.commit.outputs.push == 'true'
                 uses: ad-m/github-push-action@master
                 with:
                     github_token: ${{ secrets.ACCESS_TOKEN }}
