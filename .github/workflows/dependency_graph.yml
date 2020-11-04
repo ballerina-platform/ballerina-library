@@ -41,5 +41,5 @@ jobs:
                 if: steps.commit.outputs.push == 'true'
                 uses: ad-m/github-push-action@master
                 with:
-                    github_token: ${{ secrets.ACCESS_TOKEN }}
+                    github_token: ${{ secrets.BALLERINA_BOT_TOKEN }}
                     branch: ${{ github.ref }}
