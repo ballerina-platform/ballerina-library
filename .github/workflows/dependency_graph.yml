@@ -2,7 +2,7 @@ name: Stdlib module dependencies
 
 on: 
     schedule:
-        - cron: '22 5 * * *'
+        - cron: '25 5 * * *'
 jobs:
     dependency:
         name: Derive module dependencies
@@ -34,6 +34,7 @@ jobs:
                         git commit -m "stdlib_modules.json updated" -a
                         echo "::set-output name=push::true"
                     fi
+                shell: bash
             
             -   name: Push changes
                 if: steps.commit.outputs.push == 'true'
