@@ -7,7 +7,7 @@ import base64
 # returns: list of dependencies
 def getDependencies( bal_module ):
 	
-	for files in urllib.request.urlopen("https://api.github.com/repos/TharindaDilshan/" + bal_module + '/contents/build.gradle'):
+	for files in urllib.request.urlopen("https://api.github.com/repos/ballerina-platform/" + bal_module + "/contents/build.gradle"):
 
 		content = json.loads(files.decode('utf-8'))['content']
 		lines = base64.b64decode(content.encode('ascii')).decode('ascii').split('\n')
