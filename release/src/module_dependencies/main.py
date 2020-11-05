@@ -1,13 +1,14 @@
 import urllib.request
 import json
 import base64
+import os
 
 # Gets dependencies of ballerina standard library module
 # build.gradle file is accessed through the github search api and decoded to locate the dependencies
 # returns: list of dependencies
 def getDependencies( bal_module ):
 	
-	for files in urllib.request.urlopen("https://api.github.com/repos/ballerina-platform/" + bal_module + "/contents/build.gradle"):
+	for files in urllib.request.urlopen(urllib.request.Request("https://api.github.com/repos/ballerina-platform/" + bal_module + "/contents/build.gradle", headers={'Authorization': 'token ' + os.environ['packagePAT']})):
 
 		content = json.loads(files.decode('utf-8'))['content']
 		lines = base64.b64decode(content.encode('ascii')).decode('ascii').split('\n')
@@ -27,7 +28,7 @@ def getDependencies( bal_module ):
 # gradle.properties file is accessed through the github search api and decoded to find the version
 # returns: current version of the module
 def getVersion(bal_module):
-	for files in urllib.request.urlopen("https://api.github.com/repos/ballerina-platform/" + bal_module + '/contents/gradle.properties'):
+	for files in urllib.request.urlopen(urllib.request.Request("https://api.github.com/repos/ballerina-platform/" + bal_module + "/contents/gradle.properties", headers={'Authorization': 'token ' + os.environ['packagePAT']})):
 
 		content = json.loads(files.decode('utf-8'))['content']
 		lines = base64.b64decode(content.encode('ascii')).decode('ascii').split('\n')
