@@ -9,7 +9,7 @@ import networkx as nx
 # returns: list of dependencies
 def getDependencies( bal_module ):
 	
-	for files in urllib.request.urlopen(urllib.request.Request("https://api.github.com/repos/ballerina-platform/" + bal_module + "/contents/build.gradle", headers={'Authorization': 'token 6d627d30a3127903466bbff5a51dd621987f8c87'})):
+	for files in urllib.request.urlopen(urllib.request.Request("https://api.github.com/repos/ballerina-platform/" + bal_module + "/contents/build.gradle", headers={'Authorization': 'token ' + os.environ['packagePAT']})):
 
 		content = json.loads(files.decode('utf-8'))['content']
 		lines = base64.b64decode(content.encode('ascii')).decode('ascii').split('\n')
@@ -29,7 +29,7 @@ def getDependencies( bal_module ):
 # gradle.properties file is accessed through the github search api and decoded to find the version
 # returns: current version of the module
 def getVersion(bal_module):
-	for files in urllib.request.urlopen(urllib.request.Request("https://api.github.com/repos/ballerina-platform/" + bal_module + "/contents/gradle.properties", headers={'Authorization': 'token 6d627d30a3127903466bbff5a51dd621987f8c87'})):
+	for files in urllib.request.urlopen(urllib.request.Request("https://api.github.com/repos/ballerina-platform/" + bal_module + "/contents/gradle.properties", headers={'Authorization': 'token ' + os.environ['packagePAT']})):
 
 		content = json.loads(files.decode('utf-8'))['content']
 		lines = base64.b64decode(content.encode('ascii')).decode('ascii').split('\n')
