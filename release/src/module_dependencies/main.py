@@ -2,7 +2,7 @@ import urllib.request
 import json
 import base64
 
-# Get dependencies of each ballerina standard library module
+# Gets dependencies of ballerina standard library module
 # build.gradle file is accessed through the github search api and decoded to locate the dependencies
 # returns: list of dependencies
 def getDependencies( bal_module ):
@@ -23,20 +23,29 @@ def getDependencies( bal_module ):
 
 		return dependencies
 
-# access the stdlib_modules.json file
-# returns: a list containing an array of standard library module names and a json string of the file content 
-def getModulesFromJSON():
+# Gets the version of the ballerina standard library module
+# gradle.properties file is accessed through the github search api and decoded to find the version
+# returns: current version of the module
+def getVersion(bal_module):
+	for files in urllib.request.urlopen("https://api.github.com/repos/ballerina-platform/" + bal_module + '/contents/gradle.properties'):
 
-	with open('./release/resources/stdlib_modules.json') as f:
+		content = json.loads(files.decode('utf-8'))['content']
+		lines = base64.b64decode(content.encode('ascii')).decode('ascii').split('\n')
+
+		for line in lines:
+			if 'version' in line:
+				version = line.split('=')[-1]
+
+		return version 
+
+# access the module_list.json file
+# returns: a list containing an array of standard library module names
+def getModuleNameList():
+
+	with open('./release/resources/module_list.json') as f:
   		fileContent = json.load(f)
 
-	stdlib_modules = []
-
-	for module in fileContent['modules']:
-		fileContent['modules'][fileContent['modules'].index(module)]['dependents'] = []
-		stdlib_modules.append(module['name'])
-
-	return stdlib_modules, fileContent
+	return fileContent['modules']
 
 # Updates the stdlib_modules.JSON file with dependents of each standard library module
 def updateJSONFile(updatedJSON):
@@ -46,17 +55,25 @@ def updateJSONFile(updatedJSON):
 		json.dump(updatedJSON, jsonFile, indent=4)
 		jsonFile.truncate()
 
-stdlib_modules, JSONContent = getModulesFromJSON()
 
-updatedJSON = JSONContent
+moduleNameList = getModuleNameList()
+moduleDetailsJSON = {'modules':[]}
 
-for stdlib_module in stdlib_modules:
+for moduleName in moduleNameList:
+	version = getVersion(moduleName)
+	moduleDetailsJSON['modules'].append({
+		'name': moduleName, 
+		'version':version,
+		'level': 0,
+		'release': True, 
+		'dependents': [] })
 
-	dependencies = getDependencies(stdlib_module)
+for moduleName in moduleNameList:
+	dependencies = getDependencies(moduleName)
 	for dependency in dependencies:
-		for module in JSONContent['modules']:
+		for module in moduleDetailsJSON['modules']:
 			if module['name'] == dependency:
-				updatedJSON['modules'][JSONContent['modules'].index(module)]['dependents'].append(stdlib_module)
+				moduleDetailsJSON['modules'][moduleDetailsJSON['modules'].index(module)]['dependents'].append(moduleName)
 				break
 
-updateJSONFile(updatedJSON)
+print(moduleDetailsJSON)
