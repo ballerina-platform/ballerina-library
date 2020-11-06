@@ -38,29 +38,7 @@
             "dependents": [
                 "module-ballerina-encoding",
                 "module-ballerina-system",
-                "module-ballerina-xslt",
-                "module-ballerina-config",
-                "module-ballerina-log",
-                "module-ballerina-reflect",
-                "module-ballerina-mime",
-                "module-ballerina-filepath",
-                "module-ballerina-cache",
-                "module-ballerina-ftp",
-                "module-ballerina-socket",
-                "module-ballerinax-nats",
-                "module-ballerinax-rabbitmq",
-                "module-ballerina-email",
-                "module-ballerinax-kafka",
-                "module-ballerina-auth",
-                "module-ballerina-sql",
-                "module-ballerina-ldap",
-                "module-ballerina-http",
-                "module-ballerina-java.jdbc",
-                "module-ballerinax-mysql",
-                "module-ballerina-websub",
-                "module-ballerina-jwt",
-                "module-ballerina-oauth2",
-                "module-ballerina-grpc"
+                "module-ballerina-xslt"
             ]
         },
         {
@@ -71,25 +49,7 @@
             "dependents": [
                 "module-ballerina-time",
                 "module-ballerina-xslt",
-                "module-ballerina-config",
-                "module-ballerina-file",
-                "module-ballerina-log",
-                "module-ballerina-reflect",
-                "module-ballerina-mime",
-                "module-ballerina-filepath",
-                "module-ballerina-cache",
-                "module-ballerina-email",
-                "module-ballerinax-kafka",
-                "module-ballerina-auth",
-                "module-ballerina-sql",
-                "module-ballerina-ldap",
-                "module-ballerina-http",
-                "module-ballerina-java.jdbc",
-                "module-ballerinax-mysql",
-                "module-ballerina-websub",
-                "module-ballerina-jwt",
-                "module-ballerina-oauth2",
-                "module-ballerina-grpc"
+                "module-ballerina-config"
             ]
         },
         {
@@ -100,8 +60,6 @@
             "dependents": [
                 "module-ballerina-task",
                 "module-ballerina-file",
-                "module-ballerina-cache",
-                "module-ballerina-ftp",
                 "module-ballerinax-nats",
                 "module-ballerinax-rabbitmq",
                 "module-ballerina-email",
@@ -161,22 +119,7 @@
             "dependents": [
                 "module-ballerina-file",
                 "module-ballerina-crypto",
-                "module-ballerina-filepath",
-                "module-ballerina-cache",
-                "module-ballerinax-nats",
-                "module-ballerinax-rabbitmq",
-                "module-ballerina-email",
-                "module-ballerinax-kafka",
-                "module-ballerina-auth",
-                "module-ballerina-sql",
-                "module-ballerina-ldap",
-                "module-ballerina-http",
-                "module-ballerina-java.jdbc",
-                "module-ballerinax-mysql",
-                "module-ballerina-websub",
-                "module-ballerina-jwt",
-                "module-ballerina-oauth2",
-                "module-ballerina-grpc"
+                "module-ballerina-cache"
             ]
         },
         {
@@ -194,14 +137,7 @@
             "dependents": [
                 "module-ballerina-cache",
                 "module-ballerina-ftp",
-                "module-ballerina-email",
-                "module-ballerina-auth",
-                "module-ballerina-ldap",
-                "module-ballerina-http",
-                "module-ballerina-websub",
-                "module-ballerina-jwt",
-                "module-ballerina-oauth2",
-                "module-ballerina-grpc"
+                "module-ballerina-email"
             ]
         },
         {
@@ -211,20 +147,7 @@
             "release": true,
             "dependents": [
                 "module-ballerina-log",
-                "module-ballerina-reflect",
-                "module-ballerina-cache",
-                "module-ballerina-email",
-                "module-ballerinax-kafka",
-                "module-ballerina-auth",
-                "module-ballerina-sql",
-                "module-ballerina-ldap",
-                "module-ballerina-http",
-                "module-ballerina-java.jdbc",
-                "module-ballerinax-mysql",
-                "module-ballerina-websub",
-                "module-ballerina-jwt",
-                "module-ballerina-oauth2",
-                "module-ballerina-grpc"
+                "module-ballerina-reflect"
             ]
         },
         {
@@ -235,12 +158,7 @@
             "dependents": [
                 "module-ballerina-filepath",
                 "module-ballerina-email",
-                "module-ballerinax-kafka",
-                "module-ballerina-http",
-                "module-ballerina-websub",
-                "module-ballerina-jwt",
-                "module-ballerina-oauth2",
-                "module-ballerina-grpc"
+                "module-ballerina-http"
             ]
         },
         {
@@ -252,13 +170,7 @@
                 "module-ballerinax-nats",
                 "module-ballerinax-rabbitmq",
                 "module-ballerina-auth",
-                "module-ballerina-ldap",
-                "module-ballerina-http",
-                "module-ballerinax-mysql",
-                "module-ballerina-websub",
-                "module-ballerina-jwt",
-                "module-ballerina-oauth2",
-                "module-ballerina-grpc"
+                "module-ballerinax-mysql"
             ]
         },
         {
@@ -323,8 +235,6 @@
             "dependents": [
                 "module-ballerinax-kafka",
                 "module-ballerina-sql",
-                "module-ballerina-java.jdbc",
-                "module-ballerinax-mysql",
                 "module-ballerina-grpc"
             ]
         },
@@ -392,11 +302,7 @@
             "release": true,
             "dependents": [
                 "module-ballerina-ldap",
-                "module-ballerina-http",
-                "module-ballerina-websub",
-                "module-ballerina-jwt",
-                "module-ballerina-oauth2",
-                "module-ballerina-grpc"
+                "module-ballerina-http"
             ]
         },
         {
