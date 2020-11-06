@@ -1,7 +1,6 @@
 import urllib.request
 import json
 import base64
-import os
 import networkx as nx
 
 # Gets dependencies of ballerina standard library module
