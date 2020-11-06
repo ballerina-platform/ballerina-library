@@ -2,7 +2,7 @@
     "modules": [
         {
             "name": "module-ballerina-java.arrays",
-            "version": "0.9.1-SNAPSHOT",
+            "version": "0.9.2-SNAPSHOT",
             "level": 0,
             "release": true,
             "dependents": []
@@ -44,7 +44,22 @@
                 "module-ballerina-mime",
                 "module-ballerina-filepath",
                 "module-ballerina-cache",
-                "module-ballerina-ftp"
+                "module-ballerina-ftp",
+                "module-ballerina-socket",
+                "module-ballerinax-nats",
+                "module-ballerinax-rabbitmq",
+                "module-ballerina-email",
+                "module-ballerinax-kafka",
+                "module-ballerina-auth",
+                "module-ballerina-sql",
+                "module-ballerina-ldap",
+                "module-ballerina-http",
+                "module-ballerina-java.jdbc",
+                "module-ballerinax-mysql",
+                "module-ballerina-websub",
+                "module-ballerina-jwt",
+                "module-ballerina-oauth2",
+                "module-ballerina-grpc"
             ]
         },
         {
