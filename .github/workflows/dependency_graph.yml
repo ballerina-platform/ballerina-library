@@ -2,7 +2,7 @@ name: Stdlib module dependencies
 
 on: 
     schedule:
-        - cron: '50 6 * * *'
+        - cron: '47 3 * * *'
 jobs:
     dependency:
         name: Derive module dependencies
@@ -18,7 +18,8 @@ jobs:
             -   name: Get Dependencies
                 run: |
                     pip install requests
-                    python ./release/src/dependencies/main.py
+                    pip install networkx
+                    python ./release/src/module_dependencies/main.py
                 env:
                     packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
                     packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
@@ -26,8 +27,8 @@ jobs:
             -   name: Commit files
                 id: commit
                 run: |
-                    git config --local user.email "action@github.com"
-                    git config --local user.name "GitHub Action"
+                    git config --local user.email "tharindad7@gmail.com"
+                    git config --local user.name "TharindaDilshan"
                     git add --all
                     if [ -z "$(git status --porcelain)" ]; then
                         echo "::set-output name=push::false"
@@ -41,5 +42,5 @@ jobs:
                 if: steps.commit.outputs.push == 'true'
                 uses: ad-m/github-push-action@master
                 with:
-                    github_token: ${{ secrets.ACCESS_TOKEN }}
+                    github_token: ${{ secrets.BALLERINA_BOT_TOKEN }}
                     branch: ${{ github.ref }}
