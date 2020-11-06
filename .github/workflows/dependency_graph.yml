@@ -27,8 +27,8 @@ jobs:
             -   name: Commit files
                 id: commit
                 run: |
-                    git config --local user.email "tharindad7@gmail.com"
-                    git config --local user.name "TharindaDilshan"
+                    git config user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
+                    git config user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
                     git add --all
                     if [ -z "$(git status --porcelain)" ]; then
                         echo "::set-output name=push::false"
