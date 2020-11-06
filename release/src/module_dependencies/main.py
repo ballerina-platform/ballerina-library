@@ -1,151 +1,172 @@
 import urllib.request
 import json
 import base64
-import os
 import networkx as nx
 
-# Gets dependencies of ballerina standard library module
-# build.gradle file is accessed through the github search api and decoded to locate the dependencies
+# Sorts the ballerina standard library module list in ascending order
+def sortModuleNameList():
+    with open('./release/resources/module_list.json') as f:
+          nameList = json.load(f)
+
+    nameList['modules'].sort()
+    
+    with open('./release/resources/module_list.json', 'w') as jsonFile:
+        jsonFile.seek(0) 
+        json.dump(nameList, jsonFile, indent=4)
+        jsonFile.truncate()
+
+# Gets dependencies of ballerina standard library module from build.gradle file in module repository
 # returns: list of dependencies
-def getDependencies( bal_module ):
-	
-	for files in urllib.request.urlopen(urllib.request.Request("https://api.github.com/repos/ballerina-platform/" + bal_module + "/contents/build.gradle", headers={'Authorization': 'token ' + os.environ['packagePAT']})):
+def getDependencies( balModule ):
 
-		content = json.loads(files.decode('utf-8'))['content']
-		lines = base64.b64decode(content.encode('ascii')).decode('ascii').split('\n')
+    data = urllib.request.urlopen("https://raw.githubusercontent.com/ballerina-platform/" + balModule + "/master/build.gradle")
 
-		dependencies = []
+    dependencies = []
 
-		for line in lines:
-			if 'ballerina-platform/module' in line:
-				module = line.split('/')[-1]
-				if module[:-1] == bal_module:
-					continue
-				dependencies.append(module[:-1])
+    for line in data:
 
-		return dependencies
+        processedLine = line.decode("utf-8")
 
-# Gets the version of the ballerina standard library module
-# gradle.properties file is accessed through the github search api and decoded to find the version
+        if 'ballerina-platform/module' in processedLine:
+            module = processedLine.split('/')[-1]
+            if module[:-2] == balModule:
+                continue
+            dependencies.append(module[:-2])
+
+    return dependencies
+
+# Gets the version of the ballerina standard library module from gradle.properties file in module repository
 # returns: current version of the module
-def getVersion(bal_module):
-	for files in urllib.request.urlopen(urllib.request.Request("https://api.github.com/repos/ballerina-platform/" + bal_module + "/contents/gradle.properties", headers={'Authorization': 'token ' + os.environ['packagePAT']})):
+def getVersion(balModule):
 
-		content = json.loads(files.decode('utf-8'))['content']
-		lines = base64.b64decode(content.encode('ascii')).decode('ascii').split('\n')
+    data = urllib.request.urlopen("https://raw.githubusercontent.com/ballerina-platform/" + balModule + "/master/gradle.properties")
 
-		for line in lines:
-			if 'version' in line:
-				version = line.split('=')[-1]
+    for line in data:
 
-		return version 
+        processedLine = line.decode("utf-8")
+
+        if 'version' in processedLine:
+            version = processedLine.split('=')[-1][:-1]
+
+    return version 
 
 # access the module_list.json file
 # returns: a list containing an array of standard library module names
 def getModuleNameList():
+    with open('./release/resources/module_list.json') as f:
+          fileContent = json.load(f)
 
-	with open('./release/resources/module_list.json') as f:
-  		fileContent = json.load(f)
+    return fileContent['modules']
 
-	return fileContent['modules']
+# Calculates the longest path between source and destination modules and replaces dependents that have intermediates
+def removeModulesInIntermediatePaths(G, source, destination, successors, moduleDetailsJSON):
+
+    longestPath = max(nx.all_simple_paths(G, source, destination), key=lambda x: len(x))
+
+    for n in longestPath[1:-1]:
+        if n in successors:
+            for module in moduleDetailsJSON['modules']:
+                if module['name'] == source:
+                    if destination in module['dependents']:
+                        module['dependents'].remove(destination)
+                    break
 
 # Generates a directed graph using the dependencies of the modules
 # Level of each module is calculated by traversing the graph 
 # Returns a json string with updated level of each module
 def calculateLevels(moduleNameList, moduleDetailsJSON):
 
-	G = nx.DiGraph()
+    G = nx.DiGraph()
 
-	# Module names are used to create the nodes and the level attribute of the node is initialized to 0
-	for module in moduleNameList:
-		G.add_node(module, level=0)
+    # Module names are used to create the nodes and the level attribute of the node is initialized to 0
+    for module in moduleNameList:
+        G.add_node(module, level=0)
 
-	# Edges are created considering the dependents of each module
-	for module in moduleDetailsJSON['modules']:
-		for dependent in module['dependents']:
-			G.add_edge(module['name'], dependent)
+    # Edges are created considering the dependents of each module
+    for module in moduleDetailsJSON['modules']:
+        for dependent in module['dependents']:
+            G.add_edge(module['name'], dependent)
 
-	processingList = []
+    processingList = []
 
-	# Nodes with no in degrees = 0 and out degrees != 0 are marked as level 1 and the node is appended to the processing list
-	for root in [node for node in G if G.in_degree(node) == 0 and G.out_degree(node) != 0]:
-		G.nodes[root]['level'] = 1
-		processingList.append(root)
+    # Nodes with no in degrees = 0 and out degrees != 0 are marked as level 1 and the node is appended to the processing list
+    for root in [node for node in G if G.in_degree(node) == 0 and G.out_degree(node) != 0]:
+        G.nodes[root]['level'] = 1
+        processingList.append(root)
 
-	# While the processing list is not empty, successors of each node in the current level are determined
-	# For each successor of the node, 
-	# 			longest path from node to successor is considered and intermediate nodes are removed from dependent list
-	# 			the level is updated and the successor is appended to a temporary array
-	# After all nodes are processed in the current level the processing list is updated with the temporary array
-	level = 2
-	while len(processingList) > 0:
-		temp = []
-		for node in processingList:
-			successors = []
-			for i in G.successors(node):
-				successors.append(i)
+    # While the processing list is not empty, successors of each node in the current level are determined
+    # For each successor of the node, 
+    # 			longest path from node to successor is considered and intermediate nodes are removed from dependent list - removeModulesInIntermediatePaths
+    # 			the level is updated and the successor is appended to a temporary array
+    # After all nodes are processed in the current level the processing list is updated with the temporary array
+    level = 2
+    while len(processingList) > 0:
+        temp = []
+        for node in processingList:
+            successors = []
+            for i in G.successors(node):
+                successors.append(i)
 
-			for successor in successors:
-				
-				longestPath = max(nx.all_simple_paths(G, node, successor), key=lambda x: len(x))
-				for n in longestPath[1:-1]:
-					if n in successors:
-						for module in moduleDetailsJSON['modules']:
-							if module['name'] == node:
-								if successor in module['dependents']:
-									module['dependents'].remove(successor)
-								break
+            for successor in successors:
+                
+                removeModulesInIntermediatePaths(G, node, successor, successors, moduleDetailsJSON)
 
-				G.nodes[successor]['level'] = level
-				if successor not in temp:
-					temp.append(successor)
-		processingList = temp
-		level = level + 1
+                G.nodes[successor]['level'] = level
+                if successor not in temp:
+                    temp.append(successor)
+        processingList = temp
+        level = level + 1
 
-	for module in moduleDetailsJSON['modules']:
-		module['level'] = G.nodes[module['name']]['level']
+    for module in moduleDetailsJSON['modules']:
+        module['level'] = G.nodes[module['name']]['level']
 
-	return moduleDetailsJSON
+    return moduleDetailsJSON
 
 
 # Updates the stdlib_modules.JSON file with dependents of each standard library module
 def updateJSONFile(updatedJSON):
-
-	with open('./release/resources/stdlib_modules.json', 'w') as jsonFile:
-		jsonFile.seek(0) 
-		json.dump(updatedJSON, jsonFile, indent=4)
-		jsonFile.truncate()
+    with open('./release/resources/stdlib_modules.json', 'w') as jsonFile:
+        jsonFile.seek(0) 
+        json.dump(updatedJSON, jsonFile, indent=4)
+        jsonFile.truncate()
 
 # Creates a JSON string to store module information
 # returns: JSON with module details
 def initializeModuleDetails(moduleNameList):
 
-	moduleDetailsJSON = {'modules':[]}
+    moduleDetailsJSON = {'modules':[]}
 
-	for moduleName in moduleNameList:
-		version = getVersion(moduleName)						
-		moduleDetailsJSON['modules'].append({
-			'name': moduleName, 
-			'version':version,
-			'level': 0,
-			'release': True, 
-			'dependents': [] })
+    for moduleName in moduleNameList:
+        version = getVersion(moduleName)						
+        moduleDetailsJSON['modules'].append({
+            'name': moduleName, 
+            'version':version,
+            'level': 0,
+            'release': True, 
+            'dependents': [] })
 
-	return moduleDetailsJSON
+    return moduleDetailsJSON
 
+# Gets all the dependents of each module to generate the dependency graph
+# returns: module details JSON with updated dependent details
+def getImmediateDependents(moduleNameList, moduleDetailsJSON):
+    for moduleName in moduleNameList:
+    
+        dependencies = getDependencies(moduleName)
 
-moduleNameList = getModuleNameList()
-moduleDetailsJSON = initializeModuleDetails(moduleNameList)
+        for dependency in dependencies:
+            for module in moduleDetailsJSON['modules']:
+                if module['name'] == dependency:
+                    moduleDetailsJSON['modules'][moduleDetailsJSON['modules'].index(module)]['dependents'].append(moduleName)
+                    break
+    return moduleDetailsJSON
 
-for moduleName in moduleNameList:
-	
-	dependencies = getDependencies(moduleName)
+def main():
+    sortModuleNameList()
+    moduleNameList = getModuleNameList()
+    moduleDetailsJSON = initializeModuleDetails(moduleNameList)
+    moduleDetailsJSON = getImmediateDependents(moduleNameList, moduleDetailsJSON)
+    moduleDetailsJSON = calculateLevels(moduleNameList, moduleDetailsJSON)
+    updateJSONFile(moduleDetailsJSON)
 
-	for dependency in dependencies:
-		for module in moduleDetailsJSON['modules']:
-			if module['name'] == dependency:
-				moduleDetailsJSON['modules'][moduleDetailsJSON['modules'].index(module)]['dependents'].append(moduleName)
-				break
-
-moduleDetailsJSON = calculateLevels(moduleNameList, moduleDetailsJSON)
-updateJSONFile(moduleDetailsJSON)
+main()
