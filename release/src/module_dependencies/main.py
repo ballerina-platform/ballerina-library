@@ -73,14 +73,29 @@ def calculateLevels(moduleNameList, moduleDetailsJSON):
 		processingList.append(root)
 
 	# While the processing list is not empty, successors of each node in the current level are determined
-	# For each successor of the node, the level is updated and the successor is appended to a temporary array
+	# For each successor of the node, 
+	# 			longest path from node to successor is considered and intermediate nodes are removed from dependent list
+	# 			the level is updated and the successor is appended to a temporary array
 	# After all nodes are processed in the current level the processing list is updated with the temporary array
 	level = 2
 	while len(processingList) > 0:
 		temp = []
 		for node in processingList:
-			successors = G.successors(node)
+			successors = []
+			for i in G.successors(node):
+				successors.append(i)
+
 			for successor in successors:
+				
+				longestPath = max(nx.all_simple_paths(G, node, successor), key=lambda x: len(x))
+				for n in longestPath[1:-1]:
+					if n in successors:
+						for module in moduleDetailsJSON['modules']:
+							if module['name'] == node:
+								if successor in module['dependents']:
+									module['dependents'].remove(successor)
+								break
+
 				G.nodes[successor]['level'] = level
 				if successor not in temp:
 					temp.append(successor)
