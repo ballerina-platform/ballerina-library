@@ -5,5 +5,5 @@ public type Module record {|
     boolean release;
     string[] dependents;
     Module[] dependentModules = [];
-    boolean releaseInProgress = false;
+    boolean inProgress = false;
 |};

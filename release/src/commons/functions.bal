@@ -7,6 +7,14 @@ public function sortModules(Module[] modules) returns Module[] {
     return modules.sort(compareModules);
 }
 
+public function getJsonPayload(http:Response response) returns map<json> {
+    var result = response.getJsonPayload();
+    if (result is error) {
+        logAndPanicError("Error occurred while retriving the JSON payload", result);
+    }
+    return <@untainted map<json>>result;
+}
+
 public function removeDuplicates(Module[] modules) returns Module[] {
     int length = modules.length();
     if (length < 2) {
@@ -81,7 +89,7 @@ function closeReadChannel(io:ReadableCharacterChannel rc) {
     }
 }
 
-public function validateResponse(http:Response response, string moduleName) returns boolean {
+public function validateResponse(http:Response response) returns boolean {
     int statusCode = response.statusCode;
     if (statusCode != 200 && statusCode != 201 && statusCode != 202 && statusCode != 204) {
         return false;
