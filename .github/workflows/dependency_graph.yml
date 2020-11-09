@@ -2,7 +2,7 @@ name: Stdlib module dependencies
 
 on: 
     schedule:
-        - cron: '32 13 * * *'
+        - cron: '30 18 * * *'
 jobs:
     dependency:
         name: Derive module dependencies
