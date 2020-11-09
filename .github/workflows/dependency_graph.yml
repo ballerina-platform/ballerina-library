@@ -1,0 +1,46 @@
+name: Stdlib module dependencies
+
+on: 
+    schedule:
+        - cron: '32 13 * * *'
+jobs:
+    dependency:
+        name: Derive module dependencies
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v2
+        
+            -   name: Setup Python
+                uses: actions/setup-python@v2
+                with:
+                    python-version: '3.x'
+            
+            -   name: Get Dependencies
+                run: |
+                    pip install requests
+                    pip install networkx
+                    python ./release/src/module_dependencies/main.py
+                env:
+                    packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+                    packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+            
+            -   name: Commit files
+                id: commit
+                run: |
+                    git config user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
+                    git config user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
+                    git add --all
+                    if [ -z "$(git status --porcelain)" ]; then
+                        echo "::set-output name=push::false"
+                    else
+                        git commit -m "stdlib_modules.json updated" -a
+                        echo "::set-output name=push::true"
+                    fi
+                shell: bash
+            
+            -   name: Push changes
+                if: steps.commit.outputs.push == 'true'
+                uses: ad-m/github-push-action@master
+                with:
+                    github_token: ${{ secrets.BALLERINA_BOT_TOKEN }}
+                    branch: ${{ github.ref }}
