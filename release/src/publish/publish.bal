@@ -18,7 +18,6 @@ string accessToken = config:getAsString(commons:ACCESS_TOKEN_ENV);
 string accessTokenHeaderValue = "Bearer " + accessToken;
 
 public function main() {
-    log:printInfo("Publish Snapshots");
     string eventType = config:getAsString(CONFIG_EVENT_TYPE);
     json[] modulesJson = commons:getModuleJsonArray();
     commons:Module[] modules = commons:getModuleArray(modulesJson);
@@ -27,6 +26,7 @@ public function main() {
     if (eventType == EVENT_TYPE_MODULE_PUSH) {
         string moduleFullName = config:getAsString(CONFIG_SOURCE_MODULE);
         string moduleName = stringutils:split(moduleFullName, "/")[1];
+        log:printInfo("Publishing snapshots of the dependents of the module: " + moduleName);
         commons:Module? module = commons:getModuleFromModuleArray(modules, moduleName);
         if (module is commons:Module) {
             commons:Module[] toBePublished = getModulesToBePublished(module);
@@ -35,6 +35,7 @@ public function main() {
             log:printWarn("Module '" + moduleName + "' not found in module array");
         }
     } else if (eventType == EVENT_TYPE_LANG_PUSH) {
+        log:printInfo("Publishing all the standard library snapshots");
         handlePublish(modules);
     }
 }
