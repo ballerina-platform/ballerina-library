@@ -14,6 +14,8 @@ def sortModuleNameList():
         jsonFile.seek(0) 
         json.dump(nameList, jsonFile, indent=4)
         jsonFile.truncate()
+        
+    return nameList['modules'] 
 
 # Gets dependencies of ballerina standard library module from build.gradle file in module repository
 # returns: list of dependencies
@@ -162,8 +164,7 @@ def getImmediateDependents(moduleNameList, moduleDetailsJSON):
     return moduleDetailsJSON
 
 def main():
-    sortModuleNameList()
-    moduleNameList = getModuleNameList()
+    moduleNameList = sortModuleNameList()
     moduleDetailsJSON = initializeModuleDetails(moduleNameList)
     moduleDetailsJSON = getImmediateDependents(moduleNameList, moduleDetailsJSON)
     moduleDetailsJSON = calculateLevels(moduleNameList, moduleDetailsJSON)
