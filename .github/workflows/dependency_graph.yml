@@ -1,6 +1,7 @@
 name: Stdlib module dependencies
 
 on: 
+    workflow_dispatch:
     schedule:
         - cron: '30 18 * * *'
 jobs:
