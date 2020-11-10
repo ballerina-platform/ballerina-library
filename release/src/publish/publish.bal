@@ -147,18 +147,11 @@ function isWorkflowCompleted(map<json> payload) returns boolean {
 function isWorkflowRunSuccess(map<json> payload, commons:Module module) returns boolean {
     map<json> workflowRun = getWorkflowJsonObject(payload);
     string conclusion = workflowRun.conclusion.toString();
-    if (conclusion == CONCLUSION_SUCCSESS) {
-        return true;
-    }
-    string message = "Module " + module.name + " build did not successfully completed.";
-    error e = error("Unsuccessfull", message = "Workflow run conclusion: " + conclusion);
-    if (module.dependentModules.length() > 0) {
-        commons:logAndPanicError(message, e);
-    } else {
+    if (conclusion != CONCLUSION_SUCCSESS) {
+        string message = "Module " + module.name + " build did not successfully completed.";
         log:printWarn(message + " Conclusion: " + conclusion);
-        return true; // Returning true, since we don't want these builds succeed to continue to the next level.
     }
-    return false;
+    return true;
 }
 
 function getWorkflowJsonObject(map<json> payload) returns map<json> {
