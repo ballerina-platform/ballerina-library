@@ -3,6 +3,13 @@ import json
 import base64
 import networkx as nx
 
+def main():
+    moduleNameList = sortModuleNameList()
+    moduleDetailsJSON = initializeModuleDetails(moduleNameList)
+    moduleDetailsJSON = getImmediateDependents(moduleNameList, moduleDetailsJSON)
+    moduleDetailsJSON = calculateLevels(moduleNameList, moduleDetailsJSON)
+    updateJSONFile(moduleDetailsJSON)
+
 # Sorts the ballerina standard library module list in ascending order
 def sortModuleNameList():
     with open('./release/resources/module_list.json') as f:
@@ -21,14 +28,13 @@ def sortModuleNameList():
 # returns: list of dependencies
 def getDependencies( balModule ):
 
-    data = urllib.request.urlopen("https://raw.githubusercontent.com/ballerina-platform/" + balModule + "/master/build.gradle")
+    data = urllib.request.urlopen("https://raw.githubusercontent.com/ballerina-platform/" 
+                                  + balModule + "/master/build.gradle")
 
     dependencies = []
 
     for line in data:
-
         processedLine = line.decode("utf-8")
-
         if 'ballerina-platform/module' in processedLine:
             module = processedLine.split('/')[-1]
             if module[:-2] == balModule:
@@ -41,24 +47,15 @@ def getDependencies( balModule ):
 # returns: current version of the module
 def getVersion(balModule):
 
-    data = urllib.request.urlopen("https://raw.githubusercontent.com/ballerina-platform/" + balModule + "/master/gradle.properties")
+    data = urllib.request.urlopen("https://raw.githubusercontent.com/ballerina-platform/" 
+                                  + balModule + "/master/gradle.properties")
 
     for line in data:
-
         processedLine = line.decode("utf-8")
-
         if 'version' in processedLine:
             version = processedLine.split('=')[-1][:-1]
 
     return version 
-
-# access the module_list.json file
-# returns: a list containing an array of standard library module names
-def getModuleNameList():
-    with open('./release/resources/module_list.json') as f:
-          fileContent = json.load(f)
-
-    return fileContent['modules']
 
 # Calculates the longest path between source and destination modules and replaces dependents that have intermediates
 def removeModulesInIntermediatePaths(G, source, destination, successors, moduleDetailsJSON):
@@ -91,15 +88,15 @@ def calculateLevels(moduleNameList, moduleDetailsJSON):
 
     processingList = []
 
-    # Nodes with no in degrees = 0 and out degrees != 0 are marked as level 1 and the node is appended to the processing list
+    # Nodes with in degrees=0 and out degrees!=0 are marked as level 1 and the node is appended to the processing list
     for root in [node for node in G if G.in_degree(node) == 0 and G.out_degree(node) != 0]:
         G.nodes[root]['level'] = 1
         processingList.append(root)
 
     # While the processing list is not empty, successors of each node in the current level are determined
     # For each successor of the node, 
-    # 			longest path from node to successor is considered and intermediate nodes are removed from dependent list - removeModulesInIntermediatePaths
-    # 			the level is updated and the successor is appended to a temporary array
+    # 	-longest path from node to successor is considered and intermediate nodes are removed from dependent list
+    # 	-the level is updated and the successor is appended to a temporary array
     # After all nodes are processed in the current level the processing list is updated with the temporary array
     level = 2
     while len(processingList) > 0:
@@ -108,11 +105,8 @@ def calculateLevels(moduleNameList, moduleDetailsJSON):
             successors = []
             for i in G.successors(node):
                 successors.append(i)
-
-            for successor in successors:
-                
+            for successor in successors:        
                 removeModulesInIntermediatePaths(G, node, successor, successors, moduleDetailsJSON)
-
                 G.nodes[successor]['level'] = level
                 if successor not in temp:
                     temp.append(successor)
@@ -123,7 +117,6 @@ def calculateLevels(moduleNameList, moduleDetailsJSON):
         module['level'] = G.nodes[module['name']]['level']
 
     return moduleDetailsJSON
-
 
 # Updates the stdlib_modules.JSON file with dependents of each standard library module
 def updateJSONFile(updatedJSON):
@@ -153,20 +146,11 @@ def initializeModuleDetails(moduleNameList):
 # returns: module details JSON with updated dependent details
 def getImmediateDependents(moduleNameList, moduleDetailsJSON):
     for moduleName in moduleNameList:
-    
         dependencies = getDependencies(moduleName)
-
         for module in moduleDetailsJSON['modules']:
             if module['name'] in dependencies:
                 moduleDetailsJSON['modules'][moduleDetailsJSON['modules'].index(module)]['dependents'].append(moduleName)
                     
     return moduleDetailsJSON
-
-def main():
-    moduleNameList = sortModuleNameList()
-    moduleDetailsJSON = initializeModuleDetails(moduleNameList)
-    moduleDetailsJSON = getImmediateDependents(moduleNameList, moduleDetailsJSON)
-    moduleDetailsJSON = calculateLevels(moduleNameList, moduleDetailsJSON)
-    updateJSONFile(moduleDetailsJSON)
 
 main()
