@@ -125,7 +125,6 @@ def updateJSONFile(updatedJSON):
 # Creates a JSON string to store module information
 # returns: JSON with module details
 def initializeModuleDetails(moduleNameList):
-
     moduleDetailsJSON = {'modules':[]}
 
     for moduleName in moduleNameList:
