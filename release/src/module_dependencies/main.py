@@ -94,8 +94,8 @@ def calculateLevels(moduleNameList, moduleDetailsJSON):
 
     # While the processing list is not empty, successors of each node in the current level are determined
     # For each successor of the node, 
-    # 	-longest path from node to successor is considered and intermediate nodes are removed from dependent list
-    # 	-the level is updated and the successor is appended to a temporary array
+    #    - Longest path from node to successor is considered and intermediate nodes are removed from dependent list
+    #    - The level is updated and the successor is appended to a temporary array
     # After all nodes are processed in the current level the processing list is updated with the temporary array
     level = 2
     while len(processingList) > 0:
