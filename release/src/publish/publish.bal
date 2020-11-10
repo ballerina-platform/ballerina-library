@@ -156,6 +156,7 @@ function isWorkflowRunSuccess(map<json> payload, commons:Module module) returns 
         commons:logAndPanicError(message, e);
     } else {
         log:printWarn(message + " Conclusion: " + conclusion);
+        return true; // Returning true, since we don't want these builds succeed to continue to the next level.
     }
     return false;
 }
