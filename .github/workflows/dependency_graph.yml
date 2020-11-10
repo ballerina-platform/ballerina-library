@@ -43,4 +43,4 @@ jobs:
                 uses: ad-m/github-push-action@master
                 with:
                     github_token: ${{ secrets.BALLERINA_BOT_TOKEN }}
-                    branch: ${{ github.ref }}
+                    branch: main
