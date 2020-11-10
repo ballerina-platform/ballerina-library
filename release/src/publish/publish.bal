@@ -148,7 +148,7 @@ function isWorkflowRunSuccess(map<json> payload, commons:Module module) returns 
     map<json> workflowRun = getWorkflowJsonObject(payload);
     string conclusion = workflowRun.conclusion.toString();
     if (conclusion != CONCLUSION_SUCCSESS) {
-        string message = "Module " + module.name + " build did not successfully completed.";
+        string message = "Module '" + module.name + "' build has not completed successfully.";
         log:printWarn(message + " Conclusion: " + conclusion);
     }
     return true;
