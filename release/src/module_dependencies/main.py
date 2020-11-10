@@ -45,7 +45,6 @@ def getDependencies(balModule):
 # Gets the version of the ballerina standard library module from gradle.properties file in module repository
 # returns: current version of the module
 def getVersion(balModule):
-
     data = urllib.request.urlopen("https://raw.githubusercontent.com/ballerina-platform/" 
                                   + balModule + "/master/gradle.properties")
 
