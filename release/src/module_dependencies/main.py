@@ -156,11 +156,10 @@ def getImmediateDependents(moduleNameList, moduleDetailsJSON):
     
         dependencies = getDependencies(moduleName)
 
-        for dependency in dependencies:
-            for module in moduleDetailsJSON['modules']:
-                if module['name'] == dependency:
-                    moduleDetailsJSON['modules'][moduleDetailsJSON['modules'].index(module)]['dependents'].append(moduleName)
-                    break
+        for module in moduleDetailsJSON['modules']:
+            if module['name'] in dependencies:
+                moduleDetailsJSON['modules'][moduleDetailsJSON['modules'].index(module)]['dependents'].append(moduleName)
+                    
     return moduleDetailsJSON
 
 def main():
