@@ -59,7 +59,6 @@ def getVersion(balModule):
 
 # Calculates the longest path between source and destination modules and replaces dependents that have intermediates
 def removeModulesInIntermediatePaths(G, source, destination, successors, moduleDetailsJSON):
-
     longestPath = max(nx.all_simple_paths(G, source, destination), key=lambda x: len(x))
 
     for n in longestPath[1:-1]:
