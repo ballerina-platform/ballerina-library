@@ -109,7 +109,6 @@ function checkInProgressModules(commons:Module module, commons:Module[] unpublis
         if (moduleIndex is int) {
             commons:Module publishedModule = unpublished.remove(moduleIndex);
             published.push(publishedModule);
-            log:printInfo(publishedModule.name + " is published");
         }
     }
 }
@@ -148,9 +147,10 @@ function isWorkflowCompleted(map<json> payload) returns boolean {
 function checkWorkflowRun(map<json> payload, commons:Module module) {
     map<json> workflowRun = getWorkflowJsonObject(payload);
     string conclusion = workflowRun.conclusion.toString();
-    if (conclusion != CONCLUSION_SUCCSESS) {
-        string message = "Module '" + module.name + "' build has not completed successfully.";
-        log:printWarn(message + " Conclusion: " + conclusion);
+    if (conclusion == CONCLUSION_SUCCSESS) {
+        log:printInfo("Module '" + module.name + "' build has completed successfully.");
+    } else {
+        log:printWarn("Module '" + module.name + "' build has not completed successfully. Conclusion: " + conclusion);
     }
 }
 
