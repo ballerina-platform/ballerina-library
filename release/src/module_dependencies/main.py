@@ -72,7 +72,6 @@ def removeModulesInIntermediatePaths(G, source, destination, successors, moduleD
 # Level of each module is calculated by traversing the graph 
 # Returns a json string with updated level of each module
 def calculateLevels(moduleNameList, moduleDetailsJSON):
-
     G = nx.DiGraph()
 
     # Module names are used to create the nodes and the level attribute of the node is initialized to 0
