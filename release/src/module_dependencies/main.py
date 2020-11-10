@@ -26,8 +26,7 @@ def sortModuleNameList():
 
 # Gets dependencies of ballerina standard library module from build.gradle file in module repository
 # returns: list of dependencies
-def getDependencies( balModule ):
-
+def getDependencies(balModule):
     data = urllib.request.urlopen("https://raw.githubusercontent.com/ballerina-platform/" 
                                   + balModule + "/master/build.gradle")
 
