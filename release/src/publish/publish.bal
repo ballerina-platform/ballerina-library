@@ -132,7 +132,8 @@ function checkModulePublish(commons:Module module) returns boolean {
     if (isValid) {
         map<json> payload = commons:getJsonPayload(response);
         if (isWorkflowCompleted(payload)) {
-            return isWorkflowRunSuccess(payload, module);
+            checkWorkflowRun(payload, module);
+            return true;
         }
     }
     return false;
@@ -144,14 +145,13 @@ function isWorkflowCompleted(map<json> payload) returns boolean {
     return status == STATUS_COMPLETED;
 }
 
-function isWorkflowRunSuccess(map<json> payload, commons:Module module) returns boolean {
+function checkWorkflowRun(map<json> payload, commons:Module module) {
     map<json> workflowRun = getWorkflowJsonObject(payload);
     string conclusion = workflowRun.conclusion.toString();
     if (conclusion != CONCLUSION_SUCCSESS) {
         string message = "Module '" + module.name + "' build has not completed successfully.";
         log:printWarn(message + " Conclusion: " + conclusion);
     }
-    return true;
 }
 
 function getWorkflowJsonObject(map<json> payload) returns map<json> {
