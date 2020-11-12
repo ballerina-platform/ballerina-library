@@ -4,11 +4,17 @@ import base64
 import networkx as nx
 
 def main():
+    print('Running main.py')
     moduleNameList = sortModuleNameList()
+    print('Fetched module name list')
     moduleDetailsJSON = initializeModuleDetails(moduleNameList)
+    print('Initialized module details and fetched latest module versions')
     moduleDetailsJSON = getImmediateDependents(moduleNameList, moduleDetailsJSON)
+    print('Fetched immediate dependents of each module')
     moduleDetailsJSON = calculateLevels(moduleNameList, moduleDetailsJSON)
+    print('Generated module dependency graph and updated module levels')
     updateJSONFile(moduleDetailsJSON)
+    print('Updated module details successfully')
 
 # Sorts the ballerina standard library module list in ascending order
 def sortModuleNameList():
