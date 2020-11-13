@@ -2,6 +2,8 @@ import urllib.request
 import json
 import base64
 import networkx as nx
+import sys
+from retry import retry
 
 def main():
     print('Running main.py')
@@ -38,11 +40,17 @@ def sortModuleNameList():
         
     return nameList['modules'] 
 
+# Returns the file in the given url
+# Retry decorator will retry the function 3 times, doubling the backoff delay if URLError is raised 
+@retry(urllib.error.URLError, tries=3, delay=2, backoff=2)
+def urlOpenWithRetry(url):
+    return urllib.request.urlopen(url)
+
 # Gets dependencies of ballerina standard library module from build.gradle file in module repository
 # returns: list of dependencies
 def getDependencies(balModule):
     try:
-        data = urllib.request.urlopen("https://raw.githubusercontent.com/ballerina-platform/" 
+        data = urlOpenWithRetry("https://raw.githubusercontent.com/ballerina-platform/" 
                                     + balModule + "/master/build.gradle")
     except:
         print('Failed to read build.gradle file of ' + balModule)
@@ -64,7 +72,7 @@ def getDependencies(balModule):
 # returns: current version of the module
 def getVersion(balModule):
     try:
-        data = urllib.request.urlopen("https://raw.githubusercontent.com/ballerina-platform/" 
+        data = urlOpenWithRetry("https://raw.githubusercontent.com/ballerina-platform/" 
                                     + balModule + "/master/gradle.properties")
     except:
         print('Failed to read gradle.properties file of ' + balModule)

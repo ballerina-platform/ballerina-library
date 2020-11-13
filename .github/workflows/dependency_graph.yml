@@ -20,6 +20,7 @@ jobs:
                 run: |
                     pip install requests
                     pip install networkx
+                    pip install retry
                     python ./release/src/module_dependencies/main.py
                 env:
                     packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
