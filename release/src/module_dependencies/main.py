@@ -18,23 +18,35 @@ def main():
 
 # Sorts the ballerina standard library module list in ascending order
 def sortModuleNameList():
-    with open('./release/resources/module_list.json') as f:
-          nameList = json.load(f)
+    try:
+        with open('./release/resources/module_list.json') as f:
+            nameList = json.load(f)
+    except:
+        print('Failed to read module_list.json')
+        sys.exit()
 
     nameList['modules'].sort()
     
-    with open('./release/resources/module_list.json', 'w') as jsonFile:
-        jsonFile.seek(0) 
-        json.dump(nameList, jsonFile, indent=4)
-        jsonFile.truncate()
+    try:
+        with open('./release/resources/module_list.json', 'w') as jsonFile:
+            jsonFile.seek(0) 
+            json.dump(nameList, jsonFile, indent=4)
+            jsonFile.truncate()
+    except:
+        print('Failed to write to file module_list.json')
+        sys.exit()
         
     return nameList['modules'] 
 
 # Gets dependencies of ballerina standard library module from build.gradle file in module repository
 # returns: list of dependencies
 def getDependencies(balModule):
-    data = urllib.request.urlopen("https://raw.githubusercontent.com/ballerina-platform/" 
-                                  + balModule + "/master/build.gradle")
+    try:
+        data = urllib.request.urlopen("https://raw.githubusercontent.com/ballerina-platform/" 
+                                    + balModule + "/master/build.gradle")
+    except:
+        print('Failed to read build.gradle file of ' + balModule)
+        sys.exit()
 
     dependencies = []
 
@@ -51,13 +63,21 @@ def getDependencies(balModule):
 # Gets the version of the ballerina standard library module from gradle.properties file in module repository
 # returns: current version of the module
 def getVersion(balModule):
-    data = urllib.request.urlopen("https://raw.githubusercontent.com/ballerina-platform/" 
-                                  + balModule + "/master/gradle.properties")
+    try:
+        data = urllib.request.urlopen("https://raw.githubusercontent.com/ballerina-platform/" 
+                                    + balModule + "/master/gradle.properties")
+    except:
+        print('Failed to read gradle.properties file of ' + balModule)
+        sys.exit()
 
+    version = ''
     for line in data:
         processedLine = line.decode("utf-8")
         if 'version' in processedLine:
             version = processedLine.split('=')[-1][:-1]
+
+    if version == '':
+        print('Version not defined for ' + balModule)
 
     return version 
 
@@ -77,7 +97,11 @@ def removeModulesInIntermediatePaths(G, source, destination, successors, moduleD
 # Level of each module is calculated by traversing the graph 
 # Returns a json string with updated level of each module
 def calculateLevels(moduleNameList, moduleDetailsJSON):
-    G = nx.DiGraph()
+    try:
+        G = nx.DiGraph()
+    except:
+        print('Error generating graph')
+        sys.exit()
 
     # Module names are used to create the nodes and the level attribute of the node is initialized to 0
     for module in moduleNameList:
@@ -122,10 +146,14 @@ def calculateLevels(moduleNameList, moduleDetailsJSON):
 
 # Updates the stdlib_modules.JSON file with dependents of each standard library module
 def updateJSONFile(updatedJSON):
-    with open('./release/resources/stdlib_modules.json', 'w') as jsonFile:
-        jsonFile.seek(0) 
-        json.dump(updatedJSON, jsonFile, indent=4)
-        jsonFile.truncate()
+    try:
+        with open('./release/resources/stdlib_modules.json', 'w') as jsonFile:
+            jsonFile.seek(0) 
+            json.dump(updatedJSON, jsonFile, indent=4)
+            jsonFile.truncate()
+    except:
+        print('Failed to write to stdlib_modules.json')
+        sys.exit()
 
 # Creates a JSON string to store module information
 # returns: JSON with module details
