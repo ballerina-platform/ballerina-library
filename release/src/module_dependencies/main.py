@@ -5,6 +5,10 @@ import networkx as nx
 import sys
 from retry import retry
 
+HTTP_REQUEST_RETRIES = 3
+HTTP_REQUEST_DELAY_IN_SECONDS = 2
+HTTP_REQUEST_DELAY_MULTIPLIER = 2
+
 def main():
     print('Running main.py')
     moduleNameList = sortModuleNameList()
@@ -42,7 +46,8 @@ def sortModuleNameList():
 
 # Returns the file in the given url
 # Retry decorator will retry the function 3 times, doubling the backoff delay if URLError is raised 
-@retry(urllib.error.URLError, tries=3, delay=2, backoff=2)
+@retry(urllib.error.URLError, tries=HTTP_REQUEST_RETRIES, delay=HTTP_REQUEST_DELAY_IN_SECONDS, 
+                                    backoff=HTTP_REQUEST_DELAY_MULTIPLIER)
 def urlOpenWithRetry(url):
     return urllib.request.urlopen(url)
 

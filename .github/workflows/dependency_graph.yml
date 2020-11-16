@@ -2,6 +2,8 @@ name: Stdlib module dependencies
 
 on: 
     workflow_dispatch:
+    repository_dispatch:
+        types: [dependency-trigger]
     schedule:
         - cron: '30 18 * * *'
 jobs:
@@ -42,7 +44,5 @@ jobs:
             
             -   name: Push changes
                 if: steps.commit.outputs.push == 'true'
-                uses: ad-m/github-push-action@master
-                with:
-                    github_token: ${{ secrets.BALLERINA_BOT_TOKEN }}
-                    branch: main
+                run: |
+                    git push origin main
