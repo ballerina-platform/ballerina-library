@@ -144,7 +144,6 @@
             "release": true,
             "dependents": [
                 "module-ballerina-http",
-                "module-ballerinax-mysql",
                 "module-ballerinax-nats",
                 "module-ballerinax-rabbitmq"
             ]
@@ -258,17 +257,6 @@
                 "module-ballerina-ldap"
             ]
         },
-
-        {
-            "name": "module-ballerina-sql",
-            "version": "0.5.1-SNAPSHOT",
-            "level": 7,
-            "release": true,
-            "dependents": [
-                "module-ballerina-java.jdbc",
-                "module-ballerinax-mysql"
-            ]
-        },
         {
             "name": "module-ballerina-ldap",
             "version": "1.0.1-SNAPSHOT",
@@ -285,24 +273,9 @@
                 "module-ballerina-grpc",
                 "module-ballerina-jwt",
                 "module-ballerina-oauth2",
-                "module-ballerina-websub"
+                "module-ballerina-websub",
+                "module-ballerina-sql"
             ]
-        },
-
-
-        {
-            "name": "module-ballerina-java.jdbc",
-            "version": "0.5.1-SNAPSHOT",
-            "level": 8,
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerinax-mysql",
-            "version": "0.6.1-SNAPSHOT",
-            "level": 8,
-            "release": true,
-            "dependents": []
         },
         {
             "name": "module-ballerina-websub",
@@ -329,6 +302,30 @@
             "name": "module-ballerina-grpc",
             "version": "0.7.1-SNAPSHOT",
             "level": 8,
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerina-sql",
+            "version": "0.5.1-SNAPSHOT",
+            "level": 8,
+            "release": true,
+            "dependents": [
+                "module-ballerina-java.jdbc",
+                "module-ballerinax-mysql"
+            ]
+        },
+        {
+            "name": "module-ballerina-java.jdbc",
+            "version": "0.5.1-SNAPSHOT",
+            "level": 9,
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerinax-mysql",
+            "version": "0.6.1-SNAPSHOT",
+            "level": 9,
             "release": true,
             "dependents": []
         }
