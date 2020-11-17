@@ -12,6 +12,21 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             -   uses: actions/checkout@v2
+
+            -   name : Configure GitHub and create branch
+                env:
+                    GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+                run: |
+                    git config user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
+                    git config user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
+                    echo "BRANCH_EXISTS=0" >> $GITHUB_ENV
+                    if git ls-remote --heads origin dependency-graph | grep dependency-graph; then
+                        echo "BRANCH_EXISTS=1" >> $GITHUB_ENV
+                        git fetch
+                        git checkout dependency-graph
+                    else
+                        git checkout -b dependency-graph
+                    fi
         
             -   name: Setup Python
                 uses: actions/setup-python@v2
@@ -28,21 +43,21 @@ jobs:
                     packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
                     packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
             
-            -   name: Commit files
-                id: commit
+            -   name : Commit files and raise PR
+                env:
+                    GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
                 run: |
-                    git config user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
-                    git config user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
-                    git add --all
-                    if [ -z "$(git status --porcelain)" ]; then
-                        echo "::set-output name=push::false"
-                    else
-                        git commit -m "stdlib_modules.json updated" -a
-                        echo "::set-output name=push::true"
+                    git update-index -q --refresh
+                    if ! git diff-index --quiet HEAD --;then
+                        git remote set-url origin https://${{ secrets.BALLERINA_BOT_USERNAME }}:${{ secrets.BALLERINA_BOT_TOKEN }}@github.com/ballerina-platform/ballerina-standard-library.git
+                        git add .
+                        git commit -m "stdlib_modules.json updated" || echo "No changes to commit"
+                        git push origin dependency-graph
+                        if hub pr list | grep 'StdLib Module Dependencies Updated'; then    
+                            echo "PR already exists"
+                        else
+                            echo "Creating PR"
+                            curl -fsSL https://github.com/github/hub/raw/master/script/get | bash -s 2.14.1
+                            bin/hub pull-request -m "StdLib Module Dependencies Updated"
+                        fi
                     fi
-                shell: bash
-            
-            -   name: Push changes
-                if: steps.commit.outputs.push == 'true'
-                run: |
-                    git push origin main
