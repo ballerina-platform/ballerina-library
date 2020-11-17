@@ -254,8 +254,25 @@
             "release": true,
             "dependents": [
                 "module-ballerina-http",
+                "module-ballerina-jwt",
+                "module-ballerina-oauth2",
                 "module-ballerina-ldap"
             ]
+        },
+
+        {
+            "name": "module-ballerina-jwt",
+            "version": "1.0.3-SNAPSHOT",
+            "level": 7,
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerina-oauth2",
+            "version": "1.0.1-SNAPSHOT",
+            "level": 7,
+            "release": true,
+            "dependents": []
         },
         {
             "name": "module-ballerina-ldap",
@@ -271,29 +288,14 @@
             "release": true,
             "dependents": [
                 "module-ballerina-grpc",
-                "module-ballerina-jwt",
-                "module-ballerina-oauth2",
                 "module-ballerina-websub",
                 "module-ballerina-sql"
             ]
         },
+
         {
             "name": "module-ballerina-websub",
             "version": "1.0.3-SNAPSHOT",
-            "level": 8,
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerina-jwt",
-            "version": "1.0.3-SNAPSHOT",
-            "level": 8,
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerina-oauth2",
-            "version": "1.0.1-SNAPSHOT",
             "level": 8,
             "release": true,
             "dependents": []
@@ -315,6 +317,7 @@
                 "module-ballerinax-mysql"
             ]
         },
+
         {
             "name": "module-ballerina-java.jdbc",
             "version": "0.5.1-SNAPSHOT",
