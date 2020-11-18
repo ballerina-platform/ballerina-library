@@ -1,6 +1,6 @@
 import urllib.request
 import json
-import base64
+import re
 import networkx as nx
 import sys
 from retry import retry
@@ -86,7 +86,7 @@ def getVersion(balModule):
     version = ''
     for line in data:
         processedLine = line.decode("utf-8")
-        if 'version' in processedLine:
+        if re.match('version=', processedLine):
             version = processedLine.split('=')[-1][:-1]
 
     if version == '':
