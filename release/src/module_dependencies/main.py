@@ -159,6 +159,8 @@ def calculateLevels(moduleNameList, moduleDetailsJSON):
 
 # Updates the stdlib_modules.JSON file with dependents of each standard library module
 def updateJSONFile(updatedJSON):
+    updatedJSON['modules'].sort(key=lambda s: s['level'])
+
     try:
         with open('./release/resources/stdlib_modules.json', 'w') as jsonFile:
             jsonFile.seek(0) 
