@@ -3,7 +3,7 @@ name: Stdlib module dependencies
 on: 
     workflow_dispatch:
     repository_dispatch:
-        types: [dependency-trigger]
+        types: [dependency-update]
     schedule:
         - cron: '30 18 * * *'
 jobs:
@@ -16,10 +16,10 @@ jobs:
             -   name : Configure GitHub and create branch
                 env:
                     GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+                    BRANCH_EXISTS: 0
                 run: |
                     git config user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
                     git config user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
-                    echo "BRANCH_EXISTS=0" >> $GITHUB_ENV
                     if git ls-remote --heads origin dependency-graph | grep dependency-graph; then
                         echo "BRANCH_EXISTS=1" >> $GITHUB_ENV
                         git fetch
