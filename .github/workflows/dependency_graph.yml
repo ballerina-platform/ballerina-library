@@ -53,11 +53,10 @@ jobs:
                         git add .
                         git commit -m "stdlib_modules.json updated" || echo "No changes to commit"
                         git push origin dependency-graph
-                        if hub pr list | grep 'Update stdlib module dependencies'; then    
+                        if gh pr list --state "open" --label "area/build" | grep "dependency-graph"; then    
                             echo "PR already exists"
                         else
                             echo "Creating PR"
-                            curl -fsSL https://github.com/github/hub/raw/master/script/get | bash -s 2.14.1
-                            bin/hub pull-request -m "[Automated] Update stdlib module dependencies"
+                            gh pr create --title "[Automated] Update stdlib module dependencies" --body "$subject" --label "area/build"
                         fi
                     fi
