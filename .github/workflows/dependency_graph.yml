@@ -53,7 +53,7 @@ jobs:
                         git add .
                         git commit -m "stdlib_modules.json updated" || echo "No changes to commit"
                         git push origin dependency-graph
-                        if hub pr list | grep 'StdLib Module Dependencies Updated'; then    
+                        if hub pr list | grep 'Update stdlib module dependencies'; then    
                             echo "PR already exists"
                         else
                             echo "Creating PR"
