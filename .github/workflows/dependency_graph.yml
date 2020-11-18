@@ -58,6 +58,6 @@ jobs:
                         else
                             echo "Creating PR"
                             curl -fsSL https://github.com/github/hub/raw/master/script/get | bash -s 2.14.1
-                            bin/hub pull-request -m "StdLib Module Dependencies Updated"
+                            bin/hub pull-request -m "[Automated] Update stdlib module dependencies"
                         fi
                     fi
