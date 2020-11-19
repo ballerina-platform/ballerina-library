@@ -19,8 +19,11 @@ def main():
     print('Fetched immediate dependents of each module')
     moduleDetailsJSON = calculateLevels(moduleNameList, moduleDetailsJSON)
     print('Generated module dependency graph and updated module levels')
+    moduleDetailsJSON['modules'].sort(key=lambda s: s['level'])
     updateJSONFile(moduleDetailsJSON)
     print('Updated module details successfully')
+    updateStdlibDashboard(moduleDetailsJSON)
+    print('Updated README file successfully')
 
 # Sorts the ballerina standard library module list in ascending order
 def sortModuleNameList():
@@ -159,8 +162,6 @@ def calculateLevels(moduleNameList, moduleDetailsJSON):
 
 # Updates the stdlib_modules.JSON file with dependents of each standard library module
 def updateJSONFile(updatedJSON):
-    updatedJSON['modules'].sort(key=lambda s: s['level'])
-
     try:
         with open('./release/resources/stdlib_modules.json', 'w') as jsonFile:
             jsonFile.seek(0) 
@@ -196,5 +197,56 @@ def getImmediateDependents(moduleNameList, moduleDetailsJSON):
                 moduleDetailsJSON['modules'][moduleDetailsJSON['modules'].index(module)]['dependents'].append(moduleName)
                     
     return moduleDetailsJSON
+
+# Updates the stdlib dashboard in README.md
+def updateStdlibDashboard(moduleDetailsJSON):
+    try:
+        readMeFile = urlOpenWithRetry("https://raw.githubusercontent.com/ballerina-platform/ballerina-standard-library/main/README.md")
+    except:
+        print('Failed to read README.md file')
+        sys.exit()
+
+    updatedReadMeFile = ''
+
+    for line in readMeFile:
+        processedLine = line.decode("utf-8")
+        updatedReadMeFile += processedLine
+        if "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|" in processedLine:
+            break
+
+    # Modules in levels 0 and 1 are categorized under level 1
+    # A single row in the table is created for each module in the module list    
+    levelColumn = 1
+    tempLevel = 0
+    for module in moduleDetailsJSON['modules']:
+        if tempLevel != module['level'] and module['level'] != 1:
+            levelColumn = module['level']
+            tempLevel = module['level']
+
+        row = ("|" + str(levelColumn) + "|[" + module['name'].split('-')[-1] + "](https://github.com/ballerina-platform/" 
+        + module['name'] + ")| [![GitHub Release](https://img.shields.io/github/release/ballerina-platform/"
+        + module['name'] + ".svg?label=)](https://github.com/ballerina-platform/" 
+        + module['name'] + "/releases)| [![Build](https://github.com/ballerina-platform/" 
+        + module['name'] + "/workflows/Build/badge.svg)](https://github.com/ballerina-platform/" 
+        + module['name'] + "/actions?query=workflow%3ABuild)| [![GitHub Last Commit](https://img.shields.io/github" + 
+        "/last-commit/ballerina-platform/" + module['name'] + ".svg?label=)](https://github.com/ballerina-platform/" 
+        + module['name'] + "/commits/master)| [![Github issues](https://img.shields.io/github/issues" + 
+        "/ballerina-platform/ballerina-standard-library/module/" + module['name'].split('-')[-1] + ".svg?label=)]" + 
+        "(https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2F" 
+        + module['name'].split('-')[-1] + ")| [![GitHub pull-requests](https://img.shields.io/github/issues-pr" + 
+        "/ballerina-platform/" + module['name'] + ".svg?label=)](https://github.com/ballerina-platform/" 
+        + module['name'] + "/pulls)|\n")
+        
+        updatedReadMeFile += row
+        levelColumn = ''
+
+    try:
+        with open('./README.md', 'w') as README:
+            README.seek(0) 
+            README.write(updatedReadMeFile)
+            README.truncate()
+    except:
+        print('Failed to write to README.md')
+        sys.exit()
 
 main()
