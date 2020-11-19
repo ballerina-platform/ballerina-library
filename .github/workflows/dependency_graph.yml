@@ -1,4 +1,4 @@
-name: Stdlib module dependencies
+name: stdlib module dependencies
 
 on: 
     workflow_dispatch:
@@ -11,22 +11,15 @@ jobs:
         name: Derive module dependencies
         runs-on: ubuntu-latest
         steps:
-            -   uses: actions/checkout@v2
-
-            -   name : Configure GitHub and create branch
+            -   name : Configure GitHub
                 env:
                     GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
-                    BRANCH_EXISTS: 0
                 run: |
                     git config user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
                     git config user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
-                    if git ls-remote --heads origin dependency-graph | grep dependency-graph; then
-                        echo "BRANCH_EXISTS=1" >> $GITHUB_ENV
-                        git fetch
-                        git checkout dependency-graph
-                    else
-                        git checkout -b dependency-graph
-                    fi
+                    git clone https://github.com/ballerina-platform/ballerina-standard-library.git
+                    cd ballerina-standard-library
+                    git checkout -b dependency-graph
         
             -   name: Setup Python
                 uses: actions/setup-python@v2
@@ -43,20 +36,18 @@ jobs:
                     packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
                     packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
             
-            -   name : Commit files and raise PR
+            -   name : Commit files
                 env:
                     GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
                 run: |
+                    cd ballerina-standard-library
                     git update-index -q --refresh
                     if ! git diff-index --quiet HEAD --;then
                         git remote set-url origin https://${{ secrets.BALLERINA_BOT_USERNAME }}:${{ secrets.BALLERINA_BOT_TOKEN }}@github.com/ballerina-platform/ballerina-standard-library.git
                         git add .
-                        git commit -m "stdlib_modules.json updated" || echo "No changes to commit"
-                        git push origin dependency-graph
-                        if gh pr list --state "open" --label "area/build" | grep "dependency-graph"; then    
-                            echo "PR already exists"
-                        else
-                            echo "Creating PR"
-                            gh pr create --title "[Automated] Update stdlib module dependencies" --body "$subject" --label "area/build"
-                        fi
+                        git commit -m "stdlib_modules.json updated"
+                        curl -fsSL https://github.com/github/hub/raw/master/script/get | bash -s 2.14.1
+                        bin/hub push origin dependency-graph
+                    else
+                        echo "No changes to commit"
                     fi
