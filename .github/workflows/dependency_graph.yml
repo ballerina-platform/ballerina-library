@@ -15,8 +15,8 @@ jobs:
                 env:
                     GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
                 run: |
-                    git config user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
-                    git config user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
+                    git config --global user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
+                    git config --global user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
                     git clone https://${{ secrets.BALLERINA_BOT_USERNAME }}:${{ secrets.BALLERINA_BOT_TOKEN }}@github.com/ballerina-platform/ballerina-standard-library.git
                     cd ballerina-standard-library
                     git checkout -b dependency-graph
