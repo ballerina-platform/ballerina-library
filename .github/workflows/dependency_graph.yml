@@ -31,9 +31,10 @@ jobs:
                     pip install requests
                     pip install networkx
                     pip install retry
+                    cd ballerina-standard-library
                     echo $(pwd)
                     echo $(ls)
-                    python ../release/src/module_dependencies/main.py
+                    python release/src/module_dependencies/main.py
                 env:
                     packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
                     packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
