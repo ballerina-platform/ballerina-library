@@ -7,7 +7,6 @@
         "module-ballerina-email",
         "module-ballerina-encoding",
         "module-ballerina-file",
-        "module-ballerina-filepath",
         "module-ballerina-ftp",
         "module-ballerina-grpc",
         "module-ballerina-http",
