@@ -31,7 +31,9 @@ jobs:
                     pip install requests
                     pip install networkx
                     pip install retry
-                    python ./release/src/module_dependencies/main.py
+                    python ../release/src/module_dependencies/main.py
+                    echo $(pwd)
+                    echo $(ls)
                 env:
                     packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
                     packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
