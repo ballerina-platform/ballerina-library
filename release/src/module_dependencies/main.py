@@ -1,6 +1,6 @@
 import urllib.request
 import json
-import base64
+import re
 import networkx as nx
 import sys
 from retry import retry
@@ -8,6 +8,9 @@ from retry import retry
 HTTP_REQUEST_RETRIES = 3
 HTTP_REQUEST_DELAY_IN_SECONDS = 2
 HTTP_REQUEST_DELAY_MULTIPLIER = 2
+BALLERINA_ORG_NAME = "ballerina-platform"
+BALLERINA_ORG_URL = "https://github.com/ballerina-platform/"
+GITHUB_BADGE_URL = "https://img.shields.io/github/"
 
 def main():
     print('Running main.py')
@@ -19,8 +22,11 @@ def main():
     print('Fetched immediate dependents of each module')
     moduleDetailsJSON = calculateLevels(moduleNameList, moduleDetailsJSON)
     print('Generated module dependency graph and updated module levels')
+    moduleDetailsJSON['modules'].sort(key=lambda s: s['level'])
     updateJSONFile(moduleDetailsJSON)
     print('Updated module details successfully')
+    updateStdlibDashboard(moduleDetailsJSON)
+    print('Updated README file successfully')
 
 # Sorts the ballerina standard library module list in ascending order
 def sortModuleNameList():
@@ -86,7 +92,7 @@ def getVersion(balModule):
     version = ''
     for line in data:
         processedLine = line.decode("utf-8")
-        if 'version' in processedLine:
+        if re.match('version=', processedLine):
             version = processedLine.split('=')[-1][:-1]
 
     if version == '':
@@ -159,8 +165,6 @@ def calculateLevels(moduleNameList, moduleDetailsJSON):
 
 # Updates the stdlib_modules.JSON file with dependents of each standard library module
 def updateJSONFile(updatedJSON):
-    updatedJSON['modules'].sort(key=lambda s: s['level'])
-
     try:
         with open('./release/resources/stdlib_modules.json', 'w') as jsonFile:
             jsonFile.seek(0) 
@@ -196,5 +200,62 @@ def getImmediateDependents(moduleNameList, moduleDetailsJSON):
                 moduleDetailsJSON['modules'][moduleDetailsJSON['modules'].index(module)]['dependents'].append(moduleName)
                     
     return moduleDetailsJSON
+
+# Updates the stdlib dashboard in README.md
+def updateStdlibDashboard(moduleDetailsJSON):
+    try:
+        readMeFile = urlOpenWithRetry("https://raw.githubusercontent.com/ballerina-platform/ballerina-standard-library/main/README.md")
+    except:
+        print('Failed to read README.md file')
+        sys.exit()
+
+    updatedReadMeFile = ''
+
+    for line in readMeFile:
+        processedLine = line.decode("utf-8")
+        updatedReadMeFile += processedLine
+        if "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|" in processedLine:
+            break
+
+    # Modules in levels 0 and 1 are categorized under level 1
+    # A single row in the table is created for each module in the module list    
+    levelColumn = 1
+    currentLevel = 0
+    for module in moduleDetailsJSON['modules']:
+        if module['level'] > currentLevel:
+            levelColumn = module['level']
+            currentLevel = module['level']
+
+        row = ("|" + str(levelColumn) + "|" + 
+        "[" + module['name'].split('-')[-1] + "](" + BALLERINA_ORG_URL + module['name'] + ")| " + 
+
+        "[![GitHub Release](" + GITHUB_BADGE_URL + "release/" + BALLERINA_ORG_NAME + "/" + module['name'] + ".svg?label=)]" + 
+        "(" + BALLERINA_ORG_URL + module['name'] + "/releases)| " + 
+
+        "[![Build](" + BALLERINA_ORG_URL + module['name'] + "/workflows/Build/badge.svg)]" + 
+        "(" + BALLERINA_ORG_URL + module['name'] + "/actions?query=workflow%3ABuild)| " + 
+
+        "[![GitHub Last Commit](" + GITHUB_BADGE_URL + "last-commit/" + BALLERINA_ORG_NAME + "/" + module['name'] + ".svg?label=)]" +
+        "(" + BALLERINA_ORG_URL + module['name'] + "/commits/master)| " + 
+        
+        "[![Github issues](" + GITHUB_BADGE_URL + "issues" + "/" + BALLERINA_ORG_NAME + "/ballerina-standard-library/module/" 
+        + module['name'].split('-')[-1] + ".svg?label=)]" + 
+        "(" + BALLERINA_ORG_URL + "ballerina-standard-library/labels/module%2F" + module['name'].split('-')[-1] + ")| " + 
+
+        "[![GitHub pull-requests](" + GITHUB_BADGE_URL + "issues-pr" + "/" + BALLERINA_ORG_NAME + "/" + module['name'] + ".svg?label=)]" + 
+        "(" + BALLERINA_ORG_URL + module['name'] + "/pulls)|\n")
+        
+        updatedReadMeFile += row
+
+        levelColumn = ''
+
+    try:
+        with open('./README.md', 'w') as README:
+            README.seek(0) 
+            README.write(updatedReadMeFile)
+            README.truncate()
+    except:
+        print('Failed to write to README.md')
+        sys.exit()
 
 main()
