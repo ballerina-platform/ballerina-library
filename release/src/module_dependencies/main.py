@@ -8,6 +8,7 @@ from retry import retry
 HTTP_REQUEST_RETRIES = 3
 HTTP_REQUEST_DELAY_IN_SECONDS = 2
 HTTP_REQUEST_DELAY_MULTIPLIER = 2
+BALLERINA_ORG_NAME = "ballerina-platform"
 BALLERINA_ORG_URL = "https://github.com/ballerina-platform/"
 GITHUB_BADGE_URL = "https://img.shields.io/github/"
 
@@ -228,20 +229,20 @@ def updateStdlibDashboard(moduleDetailsJSON):
         row = ("|" + str(levelColumn) + "|" + 
         "[" + module['name'].split('-')[-1] + "](" + BALLERINA_ORG_URL + module['name'] + ")| " + 
 
-        "[![GitHub Release](" + GITHUB_BADGE_URL + "release/ballerina-platform/" + module['name'] + ".svg?label=)]" + 
+        "[![GitHub Release](" + GITHUB_BADGE_URL + "release/" + BALLERINA_ORG_NAME + "/" + module['name'] + ".svg?label=)]" + 
         "(" + BALLERINA_ORG_URL + module['name'] + "/releases)| " + 
 
         "[![Build](" + BALLERINA_ORG_URL + module['name'] + "/workflows/Build/badge.svg)]" + 
         "(" + BALLERINA_ORG_URL + module['name'] + "/actions?query=workflow%3ABuild)| " + 
 
-        "[![GitHub Last Commit](" + GITHUB_BADGE_URL + "last-commit/ballerina-platform/" + module['name'] + ".svg?label=)]" +
+        "[![GitHub Last Commit](" + GITHUB_BADGE_URL + "last-commit/" + BALLERINA_ORG_NAME + "/" + module['name'] + ".svg?label=)]" +
         "(" + BALLERINA_ORG_URL + module['name'] + "/commits/master)| " + 
         
-        "[![Github issues](" + GITHUB_BADGE_URL + "issues" + "/ballerina-platform/ballerina-standard-library/module/" 
+        "[![Github issues](" + GITHUB_BADGE_URL + "issues" + "/" + BALLERINA_ORG_NAME + "/ballerina-standard-library/module/" 
         + module['name'].split('-')[-1] + ".svg?label=)]" + 
         "(" + BALLERINA_ORG_URL + "ballerina-standard-library/labels/module%2F" + module['name'].split('-')[-1] + ")| " + 
 
-        "[![GitHub pull-requests](" + GITHUB_BADGE_URL + "issues-pr" + "/ballerina-platform/" + module['name'] + ".svg?label=)]" + 
+        "[![GitHub pull-requests](" + GITHUB_BADGE_URL + "issues-pr" + "/" + BALLERINA_ORG_NAME + "/" + module['name'] + ".svg?label=)]" + 
         "(" + BALLERINA_ORG_URL + module['name'] + "/pulls)|\n")
         
         updatedReadMeFile += row
