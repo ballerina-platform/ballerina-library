@@ -19,7 +19,6 @@ jobs:
                     git config --global user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
                     git clone https://${{ secrets.BALLERINA_BOT_USERNAME }}:${{ secrets.BALLERINA_BOT_TOKEN }}@github.com/ballerina-platform/ballerina-standard-library.git
                     cd ballerina-standard-library
-                    git checkout -b dependency-graph
         
             -   name: Setup Python
                 uses: actions/setup-python@v2
@@ -32,8 +31,6 @@ jobs:
                     pip install networkx
                     pip install retry
                     cd ballerina-standard-library
-                    echo $(pwd)
-                    echo $(ls)
                     python release/src/module_dependencies/main.py
                 env:
                     packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
@@ -50,7 +47,7 @@ jobs:
                         git add .
                         git commit -m "stdlib_modules.json updated"
                         curl -fsSL https://github.com/github/hub/raw/master/script/get | bash -s 2.14.1
-                        bin/hub push origin dependency-graph
+                        bin/hub push origin main
                     else
                         echo "No changes to commit"
                     fi
