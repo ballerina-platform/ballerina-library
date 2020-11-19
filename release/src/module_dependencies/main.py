@@ -8,6 +8,8 @@ from retry import retry
 HTTP_REQUEST_RETRIES = 3
 HTTP_REQUEST_DELAY_IN_SECONDS = 2
 HTTP_REQUEST_DELAY_MULTIPLIER = 2
+BALLERINA_ORG_URL = "https://github.com/ballerina-platform/"
+GITHUB_BADGE_URL = "https://img.shields.io/github/"
 
 def main():
     print('Running main.py')
@@ -217,27 +219,33 @@ def updateStdlibDashboard(moduleDetailsJSON):
     # Modules in levels 0 and 1 are categorized under level 1
     # A single row in the table is created for each module in the module list    
     levelColumn = 1
-    tempLevel = 0
+    currentLevel = 0
     for module in moduleDetailsJSON['modules']:
-        if tempLevel != module['level'] and module['level'] != 1:
+        if module['level'] > currentLevel:
             levelColumn = module['level']
-            tempLevel = module['level']
+            currentLevel = module['level']
 
-        row = ("|" + str(levelColumn) + "|[" + module['name'].split('-')[-1] + "](https://github.com/ballerina-platform/" 
-        + module['name'] + ")| [![GitHub Release](https://img.shields.io/github/release/ballerina-platform/"
-        + module['name'] + ".svg?label=)](https://github.com/ballerina-platform/" 
-        + module['name'] + "/releases)| [![Build](https://github.com/ballerina-platform/" 
-        + module['name'] + "/workflows/Build/badge.svg)](https://github.com/ballerina-platform/" 
-        + module['name'] + "/actions?query=workflow%3ABuild)| [![GitHub Last Commit](https://img.shields.io/github" + 
-        "/last-commit/ballerina-platform/" + module['name'] + ".svg?label=)](https://github.com/ballerina-platform/" 
-        + module['name'] + "/commits/master)| [![Github issues](https://img.shields.io/github/issues" + 
-        "/ballerina-platform/ballerina-standard-library/module/" + module['name'].split('-')[-1] + ".svg?label=)]" + 
-        "(https://github.com/ballerina-platform/ballerina-standard-library/labels/module%2F" 
-        + module['name'].split('-')[-1] + ")| [![GitHub pull-requests](https://img.shields.io/github/issues-pr" + 
-        "/ballerina-platform/" + module['name'] + ".svg?label=)](https://github.com/ballerina-platform/" 
-        + module['name'] + "/pulls)|\n")
+        row = ("|" + str(levelColumn) + "|" + 
+        "[" + module['name'].split('-')[-1] + "](" + BALLERINA_ORG_URL + module['name'] + ")| " + 
+
+        "[![GitHub Release](" + GITHUB_BADGE_URL + "release/ballerina-platform/" + module['name'] + ".svg?label=)]" + 
+        "(" + BALLERINA_ORG_URL + module['name'] + "/releases)| " + 
+
+        "[![Build](" + BALLERINA_ORG_URL + module['name'] + "/workflows/Build/badge.svg)]" + 
+        "(" + BALLERINA_ORG_URL + module['name'] + "/actions?query=workflow%3ABuild)| " + 
+
+        "[![GitHub Last Commit](" + GITHUB_BADGE_URL + "last-commit/ballerina-platform/" + module['name'] + ".svg?label=)]" +
+        "(" + BALLERINA_ORG_URL + module['name'] + "/commits/master)| " + 
+        
+        "[![Github issues](" + GITHUB_BADGE_URL + "issues" + "/ballerina-platform/ballerina-standard-library/module/" 
+        + module['name'].split('-')[-1] + ".svg?label=)]" + 
+        "(" + BALLERINA_ORG_URL + "ballerina-standard-library/labels/module%2F" + module['name'].split('-')[-1] + ")| " + 
+
+        "[![GitHub pull-requests](" + GITHUB_BADGE_URL + "issues-pr" + "/ballerina-platform/" + module['name'] + ".svg?label=)]" + 
+        "(" + BALLERINA_ORG_URL + module['name'] + "/pulls)|\n")
         
         updatedReadMeFile += row
+
         levelColumn = ''
 
     try:
