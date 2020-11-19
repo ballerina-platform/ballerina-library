@@ -19,6 +19,7 @@ jobs:
                     git config user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
                     git clone https://github.com/ballerina-platform/ballerina-standard-library.git
                     cd ballerina-standard-library
+                    git checkout -b dependency-graph
         
             -   name: Setup Python
                 uses: actions/setup-python@v2
@@ -46,7 +47,7 @@ jobs:
                         git add .
                         git commit -m "stdlib_modules.json updated"
                         curl -fsSL https://github.com/github/hub/raw/master/script/get | bash -s 2.14.1
-                        bin/hub push origin main
+                        bin/hub push origin dependency-graph
                     else
                         echo "No changes to commit"
                     fi
