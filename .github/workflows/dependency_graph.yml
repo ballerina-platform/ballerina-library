@@ -24,12 +24,15 @@ jobs:
                 uses: actions/setup-python@v2
                 with:
                     python-version: '3.x'
-            
-            -   name: Get Dependencies
+
+            -   name: Install Python packages
                 run: |
                     pip install requests
                     pip install networkx
                     pip install retry
+            
+            -   name: Get Dependencies and update files
+                run: |
                     cd ballerina-standard-library
                     python release/src/module_dependencies/main.py
                 env:
