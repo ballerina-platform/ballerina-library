@@ -124,7 +124,7 @@ def calculateLevels(moduleNameList, moduleDetailsJSON):
 
     # Module names are used to create the nodes and the level attribute of the node is initialized to 0
     for module in moduleNameList:
-        G.add_node(module, level=0)
+        G.add_node(module, level=1)
 
     # Edges are created considering the dependents of each module
     for module in moduleDetailsJSON['modules']:
@@ -135,7 +135,6 @@ def calculateLevels(moduleNameList, moduleDetailsJSON):
 
     # Nodes with in degrees=0 and out degrees!=0 are marked as level 1 and the node is appended to the processing list
     for root in [node for node in G if G.in_degree(node) == 0 and G.out_degree(node) != 0]:
-        G.nodes[root]['level'] = 1
         processingList.append(root)
 
     # While the processing list is not empty, successors of each node in the current level are determined
@@ -220,7 +219,7 @@ def updateStdlibDashboard(moduleDetailsJSON):
     # Modules in levels 0 and 1 are categorized under level 1
     # A single row in the table is created for each module in the module list    
     levelColumn = 1
-    currentLevel = 0
+    currentLevel = 1
     for module in moduleDetailsJSON['modules']:
         if module['level'] > currentLevel:
             levelColumn = module['level']
