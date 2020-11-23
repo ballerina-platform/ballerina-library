@@ -48,7 +48,7 @@ jobs:
                     if ! git diff-index --quiet HEAD --;then
                         git remote set-url origin https://${{ secrets.BALLERINA_BOT_USERNAME }}:${{ secrets.BALLERINA_BOT_TOKEN }}@github.com/ballerina-platform/ballerina-standard-library.git
                         git add .
-                        git commit -m "stdlib_modules.json updated"
+                        git commit -m "[Automated] Update the dependency order"
                         curl -fsSL https://github.com/github/hub/raw/master/script/get | bash -s 2.14.1
                         bin/hub push origin main
                     else
