@@ -39,9 +39,7 @@
             "version": "1.0.2-SNAPSHOT",
             "level": 1,
             "release": true,
-            "dependents": [
-                "module-ballerinax-mysql"
-            ]
+            "dependents": []
         },
         {
             "name": "module-ballerina-runtime",
