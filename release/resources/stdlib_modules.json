@@ -178,7 +178,7 @@
             "name": "module-ballerina-ftp",
             "version": "1.0.1-SNAPSHOT",
             "level": 5,
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
