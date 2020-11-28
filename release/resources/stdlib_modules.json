@@ -2,7 +2,7 @@
     "modules": [
         {
             "name": "module-ballerina-encoding",
-            "version": "1.0.4-SNAPSHOT",
+            "version": "1.0.5-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": [
@@ -121,7 +121,7 @@
         },
         {
             "name": "module-ballerina-crypto",
-            "version": "1.0.2-SNAPSHOT",
+            "version": "1.0.3-SNAPSHOT",
             "level": 3,
             "release": true,
             "dependents": [
