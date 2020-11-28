@@ -200,7 +200,7 @@
         },
         {
             "name": "module-ballerinax-nats",
-            "version": "1.0.3-SNAPSHOT",
+            "version": "1.0.4-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": []
@@ -251,21 +251,21 @@
         },
         {
             "name": "module-ballerina-jwt",
-            "version": "1.0.4-SNAPSHOT",
+            "version": "1.0.5-SNAPSHOT",
             "level": 7,
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerina-ldap",
-            "version": "1.0.2-SNAPSHOT",
+            "version": "1.0.3-SNAPSHOT",
             "level": 7,
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerina-oauth2",
-            "version": "1.0.2-SNAPSHOT",
+            "version": "1.0.3-SNAPSHOT",
             "level": 7,
             "release": true,
             "dependents": []
