@@ -4,8 +4,6 @@ on:
     workflow_dispatch:
     repository_dispatch:
         types: [dependency-update]
-    schedule:
-        - cron: '30 18 * * *'
 jobs:
     dependency:
         name: Derive module dependencies
