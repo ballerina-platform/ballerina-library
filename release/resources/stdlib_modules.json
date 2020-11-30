@@ -165,7 +165,7 @@
         },
         {
             "name": "module-ballerina-file",
-            "version": "0.6.0-SNAPSHOT",
+            "version": "0.6.1-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": [
