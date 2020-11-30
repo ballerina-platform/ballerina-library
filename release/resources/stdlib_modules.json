@@ -272,7 +272,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "version": "0.7.2-SNAPSHOT",
+            "version": "0.7.3-SNAPSHOT",
             "level": 8,
             "release": true,
             "dependents": []
