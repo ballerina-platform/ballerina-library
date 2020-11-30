@@ -289,7 +289,7 @@
         },
         {
             "name": "module-ballerina-websub",
-            "version": "1.0.6-SNAPSHOT",
+            "version": "1.0.7-SNAPSHOT",
             "level": 8,
             "release": true,
             "dependents": []
