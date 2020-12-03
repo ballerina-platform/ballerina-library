@@ -200,7 +200,7 @@
         },
         {
             "name": "module-ballerinax-nats",
-            "version": "1.0.4-SNAPSHOT",
+            "version": "1.0.5-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": []
@@ -209,7 +209,7 @@
             "name": "module-ballerinax-rabbitmq",
             "version": "1.0.5-SNAPSHOT",
             "level": 5,
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
@@ -235,7 +235,7 @@
             "name": "module-ballerinax-kafka",
             "version": "2.0.2-SNAPSHOT",
             "level": 6,
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
@@ -281,7 +281,7 @@
             "name": "module-ballerina-sql",
             "version": "0.5.2-SNAPSHOT",
             "level": 8,
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-java.jdbc",
                 "module-ballerinax-mysql"
@@ -298,14 +298,14 @@
             "name": "module-ballerina-java.jdbc",
             "version": "0.5.2-SNAPSHOT",
             "level": 9,
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerinax-mysql",
             "version": "0.6.2-SNAPSHOT",
             "level": 9,
-            "release": false,
+            "release": true,
             "dependents": []
         }
     ]
