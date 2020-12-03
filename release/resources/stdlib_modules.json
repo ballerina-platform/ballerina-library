@@ -233,7 +233,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "version": "2.0.2-SNAPSHOT",
+            "version": "2.0.3-SNAPSHOT",
             "level": 6,
             "release": true,
             "dependents": []
