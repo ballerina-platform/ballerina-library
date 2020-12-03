@@ -200,14 +200,14 @@
         },
         {
             "name": "module-ballerinax-nats",
-            "version": "1.0.5-SNAPSHOT",
+            "version": "1.0.6-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "version": "1.0.5-SNAPSHOT",
+            "version": "1.0.6-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": []
