@@ -15,5 +15,5 @@ public const RETRY_INTERVAL = 10000;
 public const RETRY_BACKOFF_FACTOR = 2.0;
 public const RETRY_MAX_WAIT_TIME = 2;
 
-public const SLEEP_INTERVAL = 60000;
-public const MAX_WAIT_CYCLES = 30; // Max wait time is 30 minutes
+public const SLEEP_INTERVAL = 30000; // Sleep for 30 seconds between checks
+public const MAX_WAIT_CYCLES = 80; // Max wait time is 40 minutes
