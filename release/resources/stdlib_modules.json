@@ -147,7 +147,7 @@
         },
         {
             "name": "module-ballerina-reflect",
-            "version": "0.5.3-SNAPSHOT",
+            "version": "0.5.4-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": [
@@ -183,7 +183,7 @@
         },
         {
             "name": "module-ballerina-mime",
-            "version": "1.0.3-SNAPSHOT",
+            "version": "1.0.4-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": [
