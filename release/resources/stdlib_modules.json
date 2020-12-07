@@ -66,7 +66,7 @@
         },
         {
             "name": "module-ballerina-xmlutils",
-            "version": "1.0.3-SNAPSHOT",
+            "version": "1.0.4-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": []
@@ -132,7 +132,7 @@
         },
         {
             "name": "module-ballerina-log",
-            "version": "1.0.3-SNAPSHOT",
+            "version": "1.0.4-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": [
