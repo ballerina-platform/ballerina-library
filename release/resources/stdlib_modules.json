@@ -43,7 +43,7 @@
         },
         {
             "name": "module-ballerina-runtime",
-            "version": "0.5.3-SNAPSHOT",
+            "version": "0.5.4-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": [
