@@ -303,7 +303,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "version": "0.6.2-SNAPSHOT",
+            "version": "0.6.3-SNAPSHOT",
             "level": 9,
             "release": true,
             "dependents": []
