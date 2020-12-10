@@ -53,9 +53,9 @@ function handlePublish(commons:Module[] modules) {
     foreach commons:Module module in modules {
         int nextLevel = module.level;
         if (nextLevel > currentLevel) {
+            waitForCurrentLevelModuleBuild(currentModules, currentLevel);
             commons:logNewLine();
             log:printInfo("Publishing level " + nextLevel.toString() + " modules");
-            waitForCurrentLevelModuleBuild(currentModules, currentLevel);
             currentModules.removeAll();
         }
         boolean inProgress = publishModule(module);
