@@ -17,6 +17,8 @@ http:Client httpClient = new (commons:API_PATH, clientConfig);
 string accessToken = config:getAsString(commons:ACCESS_TOKEN_ENV);
 string accessTokenHeaderValue = "Bearer " + accessToken;
 
+boolean isFailure = false;
+
 public function main() {
     string eventType = config:getAsString(CONFIG_EVENT_TYPE);
     json[] modulesJson = commons:getModuleJsonArray();
@@ -38,6 +40,11 @@ public function main() {
         log:printInfo("Publishing all the standard library snapshots");
         handlePublish(modules);
     }
+
+    if (isFailure) {
+        error err = error("PublishFailed", message = "Some module builds are failing");
+        commons:logAndPanicError("Publishing Failed.", err);
+    }
 }
 
 function handlePublish(commons:Module[] modules) {
@@ -47,6 +54,8 @@ function handlePublish(commons:Module[] modules) {
         int nextLevel = module.level;
         if (nextLevel > currentLevel) {
             waitForCurrentLevelModuleBuild(currentModules, currentLevel);
+            commons:logNewLine();
+            log:printInfo("Publishing level " + nextLevel.toString() + " modules");
             currentModules.removeAll();
         }
         boolean inProgress = publishModule(module);
@@ -97,7 +106,7 @@ function waitForCurrentLevelModuleBuild(commons:Module[] modules, int level) {
         log:printWarn("Following modules not published after the max wait time");
         commons:printModules(unpublishedModules);
         error err = error("Unpublished", message = "There are modules not published after max wait time");
-        commons:logAndPanicError("Release Failed.", err);
+        commons:logAndPanicError("Publishing Failed.", err);
     }
 }
 
@@ -120,10 +129,8 @@ function checkModulePublish(commons:Module module) returns boolean {
     // Hack for type casting error in HTTP Client
     // https://github.com/ballerina-platform/ballerina-standard-library/issues/566
     var result = trap httpClient->get(apiPath, request);
-    if (result is http:ClientError) {
-        commons:logAndPanicError("Error occurred while releasing the module: " + moduleName, result);
-    } else if (result is error) {
-        log:printWarn("HTTP Client panicked while checking the publish status for module: " + moduleName);
+    if (result is error) {
+        log:printWarn("Error occurred while checking the publish status for module: " + moduleName);
         return false;
     }
     http:Response response = <http:Response>result;
@@ -150,6 +157,7 @@ function checkWorkflowRun(map<json> payload, commons:Module module) {
     if (conclusion == CONCLUSION_SUCCSESS) {
         log:printInfo("Module '" + module.name + "' build has completed successfully.");
     } else {
+        isFailure = true;
         log:printWarn("Module '" + module.name + "' build has not completed successfully. Conclusion: " + conclusion);
     }
 }
@@ -160,8 +168,6 @@ function getWorkflowJsonObject(map<json> payload) returns map<json> {
 }
 
 function publishModule(commons:Module module) returns boolean {
-    commons:logNewLine();
-    log:printInfo("Publishing " + module.name + " Version " + module.'version);
     http:Request request = commons:createRequest(accessTokenHeaderValue);
     string moduleName = module.name.toString();
     string 'version = module.'version.toString();
