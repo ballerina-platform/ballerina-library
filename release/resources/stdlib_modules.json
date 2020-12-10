@@ -140,7 +140,8 @@
                 "module-ballerina-file",
                 "module-ballerina-ftp",
                 "module-ballerina-mime",
-                "module-ballerina-socket",
+                "module-ballerina-tcp",
+                "module-ballerina-udp",
                 "module-ballerinax-nats",
                 "module-ballerinax-rabbitmq"
             ]
@@ -192,20 +193,6 @@
             ]
         },
         {
-            "name": "module-ballerinax-nats",
-            "version": "1.0.6-SNAPSHOT",
-            "level": 5,
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerinax-rabbitmq",
-            "version": "1.0.6-SNAPSHOT",
-            "level": 5,
-            "release": true,
-            "dependents": []
-        },
-        {
             "name": "module-ballerina-tcp",
             "version": "0.7.2-SNAPSHOT",
             "level": 5,
@@ -215,6 +202,20 @@
         {
             "name": "module-ballerina-udp",
             "version": "0.8.0-SNAPSHOT",
+            "level": 5,
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerinax-nats",
+            "version": "1.0.6-SNAPSHOT",
+            "level": 5,
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerinax-rabbitmq",
+            "version": "1.0.6-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": []
