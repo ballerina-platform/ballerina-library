@@ -2,6 +2,7 @@ import ballerina/http;
 import ballerina/io;
 import ballerina/lang.'string;
 import ballerina/log;
+import ballerina/stringutils;
 
 public function sortModules(Module[] modules) returns Module[] {
     return modules.sort(compareModules);
@@ -102,6 +103,11 @@ public function logAndPanicError(string message, error e) {
     panic e;
 }
 
+public function getModuleName(Module module) returns string {
+    string moduleFullName = module.name;
+    return stringutils:split(moduleFullName, "-")[2];
+}
+
 public function printModules(Module[] modules) {
     foreach Module module in modules {
         printModule(module);
@@ -109,7 +115,7 @@ public function printModules(Module[] modules) {
 }
 
 public function printModule (Module module) {
-    log:printInfo(module.name + " " + module.'version);
+    log:printInfo(getModuleName(module) + " " + module.'version);
 }
 
 public function logNewLine() {
