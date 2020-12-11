@@ -265,6 +265,7 @@
                 "module-ballerina-graphql",
                 "module-ballerina-grpc",
                 "module-ballerina-sql",
+                "module-ballerina-websocket",
                 "module-ballerina-websub"
             ]
         },
@@ -312,6 +313,13 @@
                 "module-ballerina-java.jdbc",
                 "module-ballerinax-mysql"
             ]
+        },
+        {
+            "name": "module-ballerina-websocket",
+            "version": "1.0.4-SNAPSHOT",
+            "level": 8,
+            "release": true,
+            "dependents": []
         },
         {
             "name": "module-ballerina-websub",
