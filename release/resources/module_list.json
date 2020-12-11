@@ -31,6 +31,7 @@
         "module-ballerina-time",
         "module-ballerina-udp",
         "module-ballerina-websub",
+        "module-ballerina-websocket",
         "module-ballerina-xmlutils",
         "module-ballerina-xslt",
         "module-ballerinax-kafka",
