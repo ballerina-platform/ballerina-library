@@ -35,7 +35,7 @@
         "module-ballerinax-kafka",
         "module-ballerinax-mysql",
         "module-ballerinax-nats",
-        "module-ballerinax-stan",
-        "module-ballerinax-rabbitmq"
+        "module-ballerinax-rabbitmq",
+        "module-ballerinax-stan"
     ]
 }

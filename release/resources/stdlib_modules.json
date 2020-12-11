@@ -50,7 +50,8 @@
                 "module-ballerina-file",
                 "module-ballerina-task",
                 "module-ballerinax-nats",
-                "module-ballerinax-rabbitmq"
+                "module-ballerinax-rabbitmq",
+                "module-ballerinax-stan"
             ]
         },
         {
@@ -127,7 +128,8 @@
             "dependents": [
                 "module-ballerina-auth",
                 "module-ballerinax-nats",
-                "module-ballerinax-rabbitmq"
+                "module-ballerinax-rabbitmq",
+                "module-ballerinax-stan"
             ]
         },
         {
@@ -143,7 +145,8 @@
                 "module-ballerina-tcp",
                 "module-ballerina-udp",
                 "module-ballerinax-nats",
-                "module-ballerinax-rabbitmq"
+                "module-ballerinax-rabbitmq",
+                "module-ballerinax-stan"
             ]
         },
         {
@@ -216,6 +219,13 @@
         {
             "name": "module-ballerinax-rabbitmq",
             "version": "1.0.6-SNAPSHOT",
+            "level": 5,
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerinax-stan",
+            "version": "1.0.0-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": []
