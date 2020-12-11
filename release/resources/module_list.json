@@ -38,6 +38,7 @@
         "module-ballerinax-mysql",
         "module-ballerinax-nats",
         "module-ballerinax-rabbitmq",
-        "module-ballerinax-stan"
+        "module-ballerinax-stan",
+        "module-ballerina-transaction"
     ]
 }
