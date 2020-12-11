@@ -29,6 +29,7 @@
         "module-ballerina-task",
         "module-ballerina-tcp",
         "module-ballerina-time",
+        "module-ballerina-transaction",
         "module-ballerina-udp",
         "module-ballerina-websocket",
         "module-ballerina-websub",
@@ -38,7 +39,6 @@
         "module-ballerinax-mysql",
         "module-ballerinax-nats",
         "module-ballerinax-rabbitmq",
-        "module-ballerinax-stan",
-        "module-ballerina-transaction"
+        "module-ballerinax-stan"
     ]
 }
