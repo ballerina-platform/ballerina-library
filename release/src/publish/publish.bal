@@ -26,8 +26,9 @@ public function main() {
     addDependentModules(modules);
 
     if (eventType == EVENT_TYPE_MODULE_PUSH) {
-        string moduleFullName = config:getAsString(CONFIG_SOURCE_MODULE);
-        string moduleName = stringutils:split(moduleFullName, "/")[1];
+        string moduleNameWithOrg = config:getAsString(CONFIG_SOURCE_MODULE);
+        string moduleFullName = stringutils:split(moduleNameWithOrg, "/")[1];
+        string moduleName = stringutils:split(moduleFullName, "/")[2];
         log:printInfo("Publishing snapshots of the dependents of the module: " + moduleName);
         commons:Module? module = commons:getModuleFromModuleArray(modules, moduleName);
         if (module is commons:Module) {
@@ -42,6 +43,7 @@ public function main() {
     }
 
     if (isFailure) {
+        commons:logNewLine();
         error err = error("PublishFailed", message = "Some module builds are failing");
         commons:logAndPanicError("Publishing Failed.", err);
     }
@@ -62,9 +64,9 @@ function handlePublish(commons:Module[] modules) {
         if (inProgress) {
             module.inProgress = inProgress;
             currentModules.push(module);
-            log:printInfo("Module " + module.name + " publish workflow triggerred successfully.");
+            log:printInfo("Successfully triggerred the module \"" + commons:getModuleName(module) + "\"");
         } else {
-            log:printWarn("Module " + module.name + " publish workflow did not triggerred successfully.");
+            log:printWarn("Failed to trigger the module \"" + commons:getModuleName(module) + "\"");
         }
         currentLevel = nextLevel;
     }
@@ -130,7 +132,7 @@ function checkModulePublish(commons:Module module) returns boolean {
     // https://github.com/ballerina-platform/ballerina-standard-library/issues/566
     var result = trap httpClient->get(apiPath, request);
     if (result is error) {
-        log:printWarn("Error occurred while checking the publish status for module: " + moduleName);
+        log:printWarn("Error occurred while checking the publish status for module: " + commons:getModuleName(module));
         return false;
     }
     http:Response response = <http:Response>result;
@@ -153,12 +155,12 @@ function isWorkflowCompleted(map<json> payload) returns boolean {
 
 function checkWorkflowRun(map<json> payload, commons:Module module) {
     map<json> workflowRun = getWorkflowJsonObject(payload);
-    string conclusion = workflowRun.conclusion.toString();
-    if (conclusion == CONCLUSION_SUCCSESS) {
-        log:printInfo("Module '" + module.name + "' build has completed successfully.");
+    string status = workflowRun.conclusion.toString();
+    if (status == CONCLUSION_SUCCSESS) {
+        log:printInfo("Succcessfully published the module \"" + commons:getModuleName(module) + "\"");
     } else {
         isFailure = true;
-        log:printWarn("Module '" + module.name + "' build has not completed successfully. Conclusion: " + conclusion);
+        log:printWarn("Failed to publish the module \"" + commons:getModuleName(module) + "\". Conclusion: " + status);
     }
 }
 
@@ -182,7 +184,7 @@ function publishModule(commons:Module module) returns boolean {
     request.setJsonPayload(payload);
     var result = httpClient->post(apiPath, request);
     if (result is error) {
-        commons:logAndPanicError("Error occurred while releasing the module: " + moduleName, result);
+        commons:logAndPanicError("Failed to publish the module \"" + commons:getModuleName(module) + "\"", result);
     }
     http:Response response = <http:Response>result;
     return commons:validateResponse(response);
