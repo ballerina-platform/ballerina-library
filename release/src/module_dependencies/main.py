@@ -37,7 +37,7 @@ def sortModuleNameList():
         print('Failed to read module_list.json')
         sys.exit()
 
-    nameList['modules'].sort()
+    nameList['modules'].sort(key=lambda x: x.split('-')[-1])
     
     try:
         with open('./release/resources/module_list.json', 'w') as jsonFile:
