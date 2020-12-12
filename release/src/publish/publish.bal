@@ -30,7 +30,7 @@ public function main() {
         string moduleFullName = stringutils:split(moduleNameWithOrg, "/")[1];
         string moduleName = stringutils:split(moduleFullName, "-")[2];
         log:printInfo("Publishing snapshots of the dependents of the module: " + moduleName);
-        commons:Module? module = commons:getModuleFromModuleArray(modules, moduleName);
+        commons:Module? module = commons:getModuleFromModuleArray(modules, moduleFullName);
         if (module is commons:Module) {
             commons:Module[] toBePublished = getModulesToBePublished(module);
             handlePublish(toBePublished);
