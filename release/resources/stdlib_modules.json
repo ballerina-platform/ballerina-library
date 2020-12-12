@@ -48,9 +48,9 @@
             "release": true,
             "dependents": [
                 "module-ballerina-file",
-                "module-ballerina-task",
                 "module-ballerinax-nats",
-                "module-ballerinax-stan"
+                "module-ballerinax-stan",
+                "module-ballerina-task"
             ]
         },
         {
@@ -140,10 +140,10 @@
                 "module-ballerina-file",
                 "module-ballerina-ftp",
                 "module-ballerina-mime",
-                "module-ballerina-tcp",
-                "module-ballerina-udp",
                 "module-ballerinax-nats",
-                "module-ballerinax-stan"
+                "module-ballerinax-stan",
+                "module-ballerina-tcp",
+                "module-ballerina-udp"
             ]
         },
         {
@@ -192,20 +192,6 @@
             ]
         },
         {
-            "name": "module-ballerina-tcp",
-            "version": "0.7.2-SNAPSHOT",
-            "level": 5,
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerina-udp",
-            "version": "0.8.0-SNAPSHOT",
-            "level": 5,
-            "release": true,
-            "dependents": []
-        },
-        {
             "name": "module-ballerinax-nats",
             "version": "1.0.6-SNAPSHOT",
             "level": 5,
@@ -215,6 +201,20 @@
         {
             "name": "module-ballerinax-stan",
             "version": "1.0.0-SNAPSHOT",
+            "level": 5,
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerina-tcp",
+            "version": "0.7.2-SNAPSHOT",
+            "level": 5,
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerina-udp",
+            "version": "0.8.0-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": []
@@ -246,9 +246,9 @@
             "dependents": [
                 "module-ballerina-graphql",
                 "module-ballerina-grpc",
+                "module-ballerinai-transaction",
                 "module-ballerina-websocket",
-                "module-ballerina-websub",
-                "module-ballerinai-transaction"
+                "module-ballerina-websub"
             ]
         },
         {
@@ -287,6 +287,17 @@
             "dependents": []
         },
         {
+            "name": "module-ballerinai-transaction",
+            "version": "1.0.3-SNAPSHOT",
+            "level": 8,
+            "release": true,
+            "dependents": [
+                "module-ballerinax-kafka",
+                "module-ballerinax-rabbitmq",
+                "module-ballerina-sql"
+            ]
+        },
+        {
             "name": "module-ballerina-websocket",
             "version": "1.0.4-SNAPSHOT",
             "level": 8,
@@ -301,27 +312,6 @@
             "dependents": []
         },
         {
-            "name": "module-ballerinai-transaction",
-            "version": "1.0.3-SNAPSHOT",
-            "level": 8,
-            "release": true,
-            "dependents": [
-                "module-ballerina-sql",
-                "module-ballerinax-kafka",
-                "module-ballerinax-rabbitmq"
-            ]
-        },
-        {
-            "name": "module-ballerina-sql",
-            "version": "0.5.3-SNAPSHOT",
-            "level": 9,
-            "release": true,
-            "dependents": [
-                "module-ballerina-java.jdbc",
-                "module-ballerinax-mysql"
-            ]
-        },
-        {
             "name": "module-ballerinax-kafka",
             "version": "2.0.3-SNAPSHOT",
             "level": 9,
@@ -334,6 +324,16 @@
             "level": 9,
             "release": true,
             "dependents": []
+        },
+        {
+            "name": "module-ballerina-sql",
+            "version": "0.5.3-SNAPSHOT",
+            "level": 9,
+            "release": true,
+            "dependents": [
+                "module-ballerina-java.jdbc",
+                "module-ballerinax-mysql"
+            ]
         },
         {
             "name": "module-ballerina-java.jdbc",
