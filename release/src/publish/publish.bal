@@ -28,7 +28,7 @@ public function main() {
     if (eventType == EVENT_TYPE_MODULE_PUSH) {
         string moduleNameWithOrg = config:getAsString(CONFIG_SOURCE_MODULE);
         string moduleFullName = stringutils:split(moduleNameWithOrg, "/")[1];
-        string moduleName = stringutils:split(moduleFullName, "/")[2];
+        string moduleName = stringutils:split(moduleFullName, "-")[2];
         log:printInfo("Publishing snapshots of the dependents of the module: " + moduleName);
         commons:Module? module = commons:getModuleFromModuleArray(modules, moduleName);
         if (module is commons:Module) {
