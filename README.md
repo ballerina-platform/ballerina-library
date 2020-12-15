@@ -1,5 +1,6 @@
 # The Ballerina Standard Library
- 
+[![Build](https://github.com/ballerina-platform/ballerina-standard-library/workflows/Publish%20Snapshots/badge.svg)](https://github.com/ballerina-platform/ballerina-standard-library/actions?query=workflow%3A%22Publish+Snapshots%22)
+
 The [Ballerina](https://ballerina.io/) standard library includes a vast array of standard libraries and it is often described as coming with "Batteries included". It includes a clean set of building blocks and APIs to rapidly build applications. Some of the included standard libraries are HTTP1.1/2, WebSocket, gRPC, File, Filepath, etc and the full list of standard libraries are listed under the `Status Dashboard` section.
  
 All the Ballerina standard libraries are made available on [Ballerina Central](https://central.ballerina.io/). Therefore, Ballerina standard library fixes and improvements will be made available instantly to Ballerina users without waiting for every six month release cycle of the Ballerina language.
