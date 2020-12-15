@@ -109,8 +109,11 @@ function checkModulePublish(Module module, WorkflowStatus workflowStatus) return
     if (isValid) {
         map<json> payload = getJsonPayload(response);
         if (isWorkflowCompleted(payload)) {
-            workflowStatus.isFailure = !isRunSuccess(payload, module);
-            workflowStatus.failedModules[workflowStatus.failedModules.length()] = getModuleName(module);
+            boolean success = isRunSuccess(payload, module);
+            if (!success) {
+                workflowStatus.isFailure = true;
+                workflowStatus.failedModules[workflowStatus.failedModules.length()] = getModuleName(module);
+            }
             return true;
         }
     }
@@ -181,6 +184,38 @@ public function publishModule(Module module, string accessToken, http:Client htt
     }
     http:Response response = <http:Response>result;
     return validateResponse(response);
+}
+
+public function checkCurrentPublishWorkflows() {
+    log:printInfo("Checking for already running workflows");
+    http:Request request = createRequest();
+    string apiPath = "/ballerina-standard-library/actions/workflows/publish_snapshots.yml/runs?per_page=1";
+    var result = trap httpClient->get(apiPath, request);
+    if (result is error) {
+        log:printWarn("Error occurred while checking the current workflow status");
+    }
+    http:Response response = <http:Response>result;
+    boolean isValid = validateResponse(response);
+    if (isValid) {
+        map<json> payload = getJsonPayload(response);
+        if (!isWorkflowCompleted(payload)) {
+            map<json> workflow = getWorkflowJsonObject(payload);
+            cancelWorkflow(workflow.id.toString());
+        } else {
+            log:printInfo("No workflows running");
+        }
+    }
+}
+
+function cancelWorkflow(string id) {
+    string path = "/ballerina-standard-library/actions/runs/" + id + "/cancel";
+    http:Request request = createRequest();
+    var result = trap httpClient->post(path, request);
+    if (result is error) {
+        log:printWarn("Error occurred while cancelling the current workflow status");
+    } else {
+        log:printInfo("Cancelled the already running job.");
+    }
 }
 
 public function sortModules(Module[] modules) returns Module[] {
