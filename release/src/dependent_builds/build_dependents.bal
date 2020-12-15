@@ -2,9 +2,8 @@ import ballerina/config;
 import ballerina/http;
 import ballerina/log;
 import ballerina/runtime;
+import ballerina/stringutils;
 import ballerina_stdlib/commons;
-
-import ballerina/io;
 
 http:ClientConfiguration clientConfig = {
     retryConfig: {
@@ -21,13 +20,20 @@ string accessTokenHeaderValue = "Bearer " + accessToken;
 boolean isFailure = false;
 
 public function main() {
-    json[] modulesJson = commons:getModuleJsonArray();
-    commons:Module[] modules = commons:getModuleArray(modulesJson);
+    string moduleFullName = stringutils:split(config:getAsString(CONFIG_SOURCE_MODULE), "/")[1];
+    string moduleName = stringutils:split(moduleFullName, "-")[2];
+    log:printInfo("Publishing snapshots of the dependents of the module \"" + moduleName + "\"");
+
+    commons:Module[] modules = commons:getModuleArray(commons:getModuleJsonArray());
     commons:addDependentModules(modules);
 
-    log:printInfo("Publishing all the standard library snapshots");
-    checkCurrentPublishWorkflows();
-    handlePublish(modules);
+    commons:Module? module = commons:getModuleFromModuleArray(modules, moduleFullName);
+    if (module is commons:Module) {
+        commons:Module[] toBePublished = getModulesToBePublished(module);
+        handlePublish(toBePublished);
+    } else {
+        log:printWarn("Module '" + moduleName + "' not found in module array");
+    }
 
     if (isFailure) {
         commons:logNewLine();
@@ -134,37 +140,6 @@ function checkModulePublish(commons:Module module) returns boolean {
     return false;
 }
 
-function checkCurrentPublishWorkflows() {
-    io:println("Checking for already running workflows");
-    http:Request request = commons:createRequest(accessTokenHeaderValue);
-    string apiPath = "/ballerina-standard-library/actions/workflows/publish_snapshots.yml/runs?per_page=1";
-    var result = trap httpClient->get(apiPath, request);
-    if (result is error) {
-        log:printWarn("Error occurred while checking the current workflow status");
-    }
-    io:println("Response Received");
-    http:Response response = <http:Response>result;
-    boolean isValid = commons:validateResponse(response);
-    if (isValid) {
-        map<json> payload = commons:getJsonPayload(response);
-        if (!commons:isWorkflowCompleted(payload)) {
-            map<json> workflow = commons:getWorkflowJsonObject(payload);
-            io:println(workflow.id);
-            string cancelPath = "/ballerina-standard-library/actions/runs/" + workflow.id.toString() + "/cancel";
-            var cancelResult = trap httpClient->post(cancelPath, request);
-            if (cancelResult is error) {
-                log:printWarn("Error occurred while cancelling the current workflow status");
-            } else {
-                io:println(cancelResult.getJsonPayload());
-                io:println(cancelResult.statusCode);
-                log:printInfo("Cancelled the already running job.");
-            }
-        } else {
-            io:println("No workflows running");
-        }
-    }
-}
-
 function checkWorkflowRun(map<json> payload, commons:Module module) {
     map<json> workflowRun = commons:getWorkflowJsonObject(payload);
     string status = workflowRun.conclusion.toString();
@@ -174,4 +149,15 @@ function checkWorkflowRun(map<json> payload, commons:Module module) {
         isFailure = true;
         log:printWarn("Failed to publish the module \"" + commons:getModuleName(module) + "\". Conclusion: " + status);
     }
+}
+
+function getModulesToBePublished(commons:Module module) returns commons:Module[] {
+    commons:Module[] toBePublished = [];
+    commons:populteToBePublishedModules(module, toBePublished);
+    toBePublished = commons:sortModules(toBePublished);
+    toBePublished = commons:removeDuplicates(toBePublished);
+    // Removing the parent module
+    int parentModuleIndex = <int>toBePublished.indexOf(module);
+    _ = toBePublished.remove(parentModuleIndex);
+    return toBePublished;
 }

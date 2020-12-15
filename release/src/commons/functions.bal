@@ -4,6 +4,60 @@ import ballerina/lang.'string;
 import ballerina/log;
 import ballerina/stringutils;
 
+public function isWorkflowCompleted(map<json> payload) returns boolean {
+    map<json> workflowRun = getWorkflowJsonObject(payload);
+    string status = workflowRun.status.toString();
+    return status == STATUS_COMPLETED;
+}
+
+public function getWorkflowJsonObject(map<json> payload) returns map<json> {
+    json[] workflows = <json[]>payload[WORKFLOW_RUNS];
+    return <map<json>>workflows[0];
+}
+
+public function addDependentModules(Module[] modules) {
+    foreach Module module in modules {
+        Module[] dependentModules = [];
+        string[] dependentModuleNames = module.dependents;
+        foreach string dependentModuleName in dependentModuleNames {
+            Module? dependentModule = getModuleFromModuleArray(modules, dependentModuleName);
+            if (dependentModule is Module) {
+                dependentModules.push(dependentModule);
+            }
+        }
+        dependentModules = sortModules(dependentModules);
+        module.dependentModules = dependentModules;
+    }
+}
+
+public function populteToBePublishedModules(Module module, Module[] toBePublished) {
+    toBePublished.push(module);
+    foreach Module dependentModule in module.dependentModules {
+        populteToBePublishedModules(dependentModule, toBePublished);
+    }
+}
+
+public function publishModule(Module module, string accessToken, http:Client httpClient) returns boolean {
+    http:Request request = createRequest(accessToken);
+    string moduleName = module.name.toString();
+    string 'version = module.'version.toString();
+    string apiPath = "/" + moduleName + DISPATCHES;
+
+    json payload = {
+        event_type: PUBLISH_SNAPSHOT_EVENT,
+        client_payload: {
+            'version: 'version
+        }
+    };
+    request.setJsonPayload(payload);
+    var result = httpClient->post(apiPath, request);
+    if (result is error) {
+        logAndPanicError("Failed to publish the module \"" + getModuleName(module) + "\"", result);
+    }
+    http:Response response = <http:Response>result;
+    return validateResponse(response);
+}
+
 public function sortModules(Module[] modules) returns Module[] {
     return modules.sort(compareModules);
 }

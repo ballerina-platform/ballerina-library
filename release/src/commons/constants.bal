@@ -6,6 +6,8 @@ public const DISPATCHES = "/dispatches";
 
 public const ACCESS_TOKEN_ENV = "GITHUB_TOKEN";
 
+const WORKFLOW_RUNS = "workflow_runs";
+
 const ACCEPT_HEADER_KEY = "Accept";
 const ACCEPT_HEADER_VALUE = "application/vnd.github.v3+json";
 const AUTH_HEADER_KEY = "Authorization";
@@ -17,3 +19,8 @@ public const RETRY_MAX_WAIT_TIME = 2;
 
 public const SLEEP_INTERVAL = 30000; // Sleep for 30 seconds between checks
 public const MAX_WAIT_CYCLES = 80; // Max wait time is 40 minutes
+
+const STATUS_IN_PROGRESS = "in_progress";
+const STATUS_COMPLETED = "completed";
+
+const PUBLISH_SNAPSHOT_EVENT = "stdlib-publish-snapshot";
