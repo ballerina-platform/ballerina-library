@@ -94,7 +94,7 @@ function checkInProgressModules(Module module, Module[] unpublished, Module[] pu
 }
 
 function checkModulePublish(Module module, WorkflowStatus workflowStatus) returns boolean {
-    http:Request request = createRequest(accessTokenHeaderValue);
+    http:Request request = createRequest();
     string moduleName = module.name.toString();
     string apiPath = "/" + moduleName + "/" + WORKFLOW_STATUS_PATH;
     // Hack for type casting error in HTTP Client
@@ -163,7 +163,7 @@ public function populteToBePublishedModules(Module module, Module[] toBePublishe
 }
 
 public function publishModule(Module module, string accessToken, http:Client httpClient) returns boolean {
-    http:Request request = createRequest(accessToken);
+    http:Request request = createRequest();
     string moduleName = module.name.toString();
     string 'version = module.'version.toString();
     string apiPath = "/" + moduleName + DISPATCHES;
@@ -247,7 +247,7 @@ public function getModuleArray(json[] modulesJson) returns Module[] {
     return sortModules(modules);
 }
 
-public function createRequest(string accessTokenHeaderValue) returns http:Request {
+public function createRequest() returns http:Request {
     http:Request request = new;
     request.setHeader(ACCEPT_HEADER_KEY, ACCEPT_HEADER_VALUE);
     request.setHeader(AUTH_HEADER_KEY, accessTokenHeaderValue);

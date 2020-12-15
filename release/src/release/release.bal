@@ -51,7 +51,7 @@ function handleRelease(commons:Module[] modules) {
 function releaseModule(commons:Module module) returns boolean {
     commons:logNewLine();
     log:printInfo("Releasing " + module.name + " Version " + module.'version);
-    http:Request request = commons:createRequest(accessTokenHeaderValue);
+    http:Request request = commons:createRequest();
     string moduleName = module.name.toString();
     string 'version = module.'version.toString();
     string apiPath = "/" + moduleName + commons:DISPATCHES;
@@ -127,7 +127,7 @@ function checkModuleRelease(commons:Module module) returns boolean {
     if (!module.inProgress || module.level < 1) {
         return true;
     }
-    http:Request request = commons:createRequest(accessTokenHeaderValue);
+    http:Request request = commons:createRequest();
     string moduleName = module.name.toString();
     string 'version = module.'version.toString();
     string expectedReleaseTag = "v" + 'version;

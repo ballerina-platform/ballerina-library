@@ -1,20 +1,7 @@
 import ballerina/config;
-import ballerina/http;
 import ballerina/log;
 import ballerina/stringutils;
 import ballerina_stdlib/commons;
-
-http:ClientConfiguration clientConfig = {
-    retryConfig: {
-        count: commons:RETRY_COUNT,
-		intervalInMillis: commons:RETRY_INTERVAL,
-		backOffFactor: commons:RETRY_BACKOFF_FACTOR,
-		maxWaitIntervalInMillis: commons:RETRY_MAX_WAIT_TIME
-    }
-};
-http:Client httpClient = new (commons:API_PATH, clientConfig);
-string accessToken = config:getAsString(commons:ACCESS_TOKEN_ENV);
-string accessTokenHeaderValue = "Bearer " + accessToken;
 
 public function main() {
     string moduleFullName = stringutils:split(config:getAsString(CONFIG_SOURCE_MODULE), "/")[1];
