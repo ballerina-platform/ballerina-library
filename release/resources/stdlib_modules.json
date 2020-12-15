@@ -128,7 +128,8 @@
             "dependents": [
                 "module-ballerina-auth",
                 "module-ballerinax-nats",
-                "module-ballerinax-stan"
+                "module-ballerinax-stan",
+                "module-ballerina-uuid"
             ]
         },
         {
@@ -155,6 +156,13 @@
             "dependents": [
                 "module-ballerina-http"
             ]
+        },
+        {
+            "name": "module-ballerina-uuid",
+            "version": "0.9.0-SNAPSHOT",
+            "level": 4,
+            "release": true,
+            "dependents": []
         },
         {
             "name": "module-ballerina-cache",
