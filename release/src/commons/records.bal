@@ -7,3 +7,8 @@ public type Module record {|
     Module[] dependentModules = [];
     boolean inProgress = false;
 |};
+
+public type WorkflowStatus record {|
+    boolean isFailure;
+    string[] failedModules;
+|};

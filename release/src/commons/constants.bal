@@ -24,3 +24,5 @@ const STATUS_IN_PROGRESS = "in_progress";
 const STATUS_COMPLETED = "completed";
 
 const PUBLISH_SNAPSHOT_EVENT = "stdlib-publish-snapshot";
+
+const CONCLUSION_SUCCSESS = "success";
