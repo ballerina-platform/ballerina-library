@@ -36,6 +36,7 @@
         "module-ballerina-time",
         "module-ballerinai-transaction",
         "module-ballerina-udp",
+        "module-ballerina-uuid",
         "module-ballerina-websocket",
         "module-ballerina-websub",
         "module-ballerina-xmlutils",
