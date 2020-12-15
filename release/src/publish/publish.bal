@@ -35,8 +35,12 @@ public function main() {
 
     if (isFailure) {
         commons:logNewLine();
-        error err = error("PublishFailed", message = "Some module builds are failing");
-        commons:logAndPanicError("Publishing Failed.", err);
+        log:printWarn("Following module builds failed");
+        foreach string name in workflowStatus.failedModules {
+            log:printWarn(name);
+        }
+        error err = error("Failed", message = "Some module builds are failing");
+        panic err;
     }
 }
 

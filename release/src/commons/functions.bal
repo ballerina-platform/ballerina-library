@@ -110,7 +110,7 @@ function checkModulePublish(Module module, WorkflowStatus workflowStatus) return
         map<json> payload = getJsonPayload(response);
         if (isWorkflowCompleted(payload)) {
             workflowStatus.isFailure = !isRunSuccess(payload, module);
-            workflowStatus.failedModules[workflowStatus.failedModules.length()] = module.name;
+            workflowStatus.failedModules[workflowStatus.failedModules.length()] = getModuleName(module);
             return true;
         }
     }

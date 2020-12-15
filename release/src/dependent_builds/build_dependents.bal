@@ -16,8 +16,6 @@ http:Client httpClient = new (commons:API_PATH, clientConfig);
 string accessToken = config:getAsString(commons:ACCESS_TOKEN_ENV);
 string accessTokenHeaderValue = "Bearer " + accessToken;
 
-boolean isFailure = false;
-
 public function main() {
     string moduleFullName = stringutils:split(config:getAsString(CONFIG_SOURCE_MODULE), "/")[1];
     string moduleName = stringutils:split(moduleFullName, "-")[2];
@@ -39,10 +37,14 @@ public function main() {
         log:printWarn("Module '" + moduleName + "' not found in module array");
     }
 
-    if (isFailure) {
+    if (workflowStatus.isFailure) {
         commons:logNewLine();
-        error err = error("PublishFailed", message = "Some module builds are failing");
-        commons:logAndPanicError("Publishing Failed.", err);
+        log:printWarn("Following module builds failed");
+        foreach string name in workflowStatus.failedModules {
+            log:printWarn(name);
+        }
+        error err = error("Failed", message = "Some module builds are failing");
+        panic err;
     }
 }
 
