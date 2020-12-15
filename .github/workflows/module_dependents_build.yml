@@ -1,9 +1,8 @@
-name: Publish Snapshots
+name: Build Dependents
 
 on:
     repository_dispatch:
-        types: [ ballerina-lang-push ]
-    workflow_dispatch:
+        types: [ stdlib-module-push ]
 
 jobs:
     publish-stdlib-modules:
@@ -14,12 +13,12 @@ jobs:
             -   name: Checkout Repository
                 uses: actions/checkout@v2
 
-            -   name: Trigger the Standard Library Module Builds
-                if: github.event.action != 'stdlib-module-push'
+            -   name: Trigger Dependent Modules for Module Build
                 uses: ballerina-platform/ballerina-action@master
                 with:
                     args:
-                        run publish
+                        run dependent_builds
                 env:
                     WORKING_DIR: ./release
                     GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+                    SOURCE_MODULE: ${{ github.event.client_payload.module }}
