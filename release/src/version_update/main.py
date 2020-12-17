@@ -13,6 +13,7 @@ packageEmail =  os.environ["packageEmail"]
 organization = 'ballerina-platform'
 
 def main():
+    print("Checking Ballerina Distribution for stdlib version updates")
     moduleList = getStdlibModules()
     repo = configureGithubRepository()
     propertiesFile = fetchPropertiesFile(repo)
@@ -20,6 +21,9 @@ def main():
     if commitFlag:
         commitChanges(modifiedPropertiesFile, repo)
         createPullRequest(repo)
+        print("Updated gradle.properties file in Ballerina Distribution Successfully")
+    else:
+        print("Stdlib versions in gradle.properties file is up to date")
 
 def getStdlibModules():
     try:
@@ -65,7 +69,7 @@ def updatePropertiesFile(data, modules):
         line += '\n'
         modifiedData += line
     modifiedData = modifiedData[0:-1]
-    
+
     level = 1
     for module in modules:
         if module['level'] == level:
@@ -103,6 +107,7 @@ def updatePropertiesFile(data, modules):
 
     return modifiedData, commitFlag
 
+# Commit changes made to the gradle.properties file
 def commitChanges(data, repo):
     author = InputGitAuthor(packageUser, packageEmail)
 
