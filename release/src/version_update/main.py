@@ -13,23 +13,23 @@ packageEmail =  os.environ["packageEmail"]
 organization = 'ballerina-platform'
 
 def main():
-    mod = getStdlibModules()
+    moduleList = getStdlibModules()
     repo = configureGithubRepository()
     propertiesFile = fetchPropertiesFile(repo)
-    modifiedData, commitFlag = updatePropertiesFile(propertiesFile, mod)
+    modifiedPropertiesFile, commitFlag = updatePropertiesFile(propertiesFile, moduleList)
     if commitFlag:
-        commitChanges(modifiedData, repo)
+        commitChanges(modifiedPropertiesFile, repo)
         createPullRequest(repo)
 
 def getStdlibModules():
     try:
-        with open('./stdlib_modules.JSON') as f:
-            nameList = json.load(f)
+        with open('./release/resources/stdlib_modules.json') as f:
+            moduleList = json.load(f)
     except:
         print('Failed to read stdlib_modules.json')
         sys.exit()
 
-    return nameList['modules']
+    return moduleList['modules']
 
 def configureGithubRepository():
     g = Github(packagePAT)
@@ -56,17 +56,16 @@ def updatePropertiesFile(data, modules):
     pointer = ''
     commitFlag = False
 
-    splitLine = data.splitlines()
-    # print(type(splitLine[5]))
+    lineList = data.splitlines()
 
-    for line in splitLine:
+    for line in lineList:
         if 'stdlib' in line.lower():
             pointer = line
             break 
         line += '\n'
         modifiedData += line
-
     modifiedData = modifiedData[0:-1]
+    
     level = 1
     for module in modules:
         if module['level'] == level:
@@ -86,14 +85,14 @@ def updatePropertiesFile(data, modules):
 
         modifiedData += line
 
-    for line in splitLine[splitLine.index(pointer):len(splitLine)]:
+    for line in lineList[lineList.index(pointer):len(lineList)]:
         if 'stdlib' not in line.lower() and line != '':
             pointer = line
             break
 
     modifiedData += "\n"
 
-    for line in splitLine[splitLine.index(pointer):len(splitLine)]:
+    for line in lineList[lineList.index(pointer):len(lineList)]:
         if 'stdlib' not in line.lower():
             line += "\n"
             modifiedData += line
