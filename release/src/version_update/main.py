@@ -132,7 +132,7 @@ def commitChanges(data, repo, updatedModules):
     contents = repo.get_contents("gradle.properties", ref="automated-stdlib-version-update")
 
     if len(updatedModules) > 0:
-        commitMessage = "Bump stdlib module - "
+        commitMessage = "Bump the version of stdlib module(s) - "
         for updatedModule in updatedModules:
             commitMessage += updatedModule
             commitMessage += " "
