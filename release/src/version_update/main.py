@@ -17,14 +17,15 @@ def main():
     moduleList = getStdlibModules()
     repo = configureGithubRepository()
     propertiesFile = fetchPropertiesFile(repo)
-    modifiedPropertiesFile, commitFlag = updatePropertiesFile(propertiesFile, moduleList)
+    modifiedPropertiesFile, commitFlag, updatedModules = updatePropertiesFile(propertiesFile, moduleList)
     if commitFlag:
-        commitChanges(modifiedPropertiesFile, repo)
+        commitChanges(modifiedPropertiesFile, repo, updatedModules)
         createPullRequest(repo)
         print("Updated gradle.properties file in Ballerina Distribution Successfully")
     else:
         print("Stdlib versions in gradle.properties file is up to date")
 
+# Get stdlib module details from stdlib_modules.json file
 def getStdlibModules():
     try:
         with open('./release/resources/stdlib_modules.json') as f:
@@ -35,6 +36,7 @@ def getStdlibModules():
 
     return moduleList['modules']
 
+# Fetch ballerina-distribution repository with GitHub credentials
 def configureGithubRepository():
     g = Github(packagePAT)
     try:
@@ -44,10 +46,11 @@ def configureGithubRepository():
 
     return repo
 
+# Fetch the gradle.properties file from the ballerina-distribution repo
 def fetchPropertiesFile(repo):
     try:
-        branch = repo.get_branch(branch="automated-version-update")
-        file = repo.get_contents("gradle.properties", ref="automated-version-update")
+        branch = repo.get_branch(branch="automated-stdlib-version-update")
+        file = repo.get_contents("gradle.properties", ref="automated-stdlib-version-update")
     except GithubException:
         file = repo.get_contents("gradle.properties")
 
@@ -55,8 +58,10 @@ def fetchPropertiesFile(repo):
 
     return data
 
+# Update stdlib module versions in the gradle.properties file with module details fetched from stdlib_modules.json
 def updatePropertiesFile(data, modules):
     modifiedData = ''
+    updatedModules = []
     pointer = ''
     commitFlag = False
 
@@ -87,11 +92,13 @@ def updatePropertiesFile(data, modules):
         else:
             line = "stdlib" + moduleName.capitalize() + "Version=" + version + "\n"
 
+        if line[0:-1] not in lineList:
+            updatedModules.append(moduleName)
         modifiedData += line
 
     for line in lineList[lineList.index(pointer):len(lineList)]:
+        pointer = line
         if 'stdlib' not in line.lower() and line != '':
-            pointer = line
             break
 
     modifiedData += "\n"
@@ -101,38 +108,47 @@ def updatePropertiesFile(data, modules):
             line += "\n"
             modifiedData += line
 
-    modifiedData = modifiedData[0:-1]
+    # modifiedData = modifiedData[0:-1]
     if modifiedData != data:
         commitFlag = True
 
-    return modifiedData, commitFlag
+    return modifiedData, commitFlag, updatedModules
 
 # Commit changes made to the gradle.properties file
-def commitChanges(data, repo):
+def commitChanges(data, repo, updatedModules):
     author = InputGitAuthor(packageUser, packageEmail)
 
     # If branch already exists checkout and commit else create new branch from master branch and commit
     try:
-        source = repo.get_branch(branch="automated-version-update")
+        source = repo.get_branch(branch="automated-stdlib-version-update")
     except GithubException:
         try:
             source = repo.get_branch("main")
         except GithubException:
             source = repo.get_branch("master")
 
-        repo.create_git_ref(ref=f"refs/heads/automated-version-update", sha=source.commit.sha)
+        repo.create_git_ref(ref=f"refs/heads/automated-stdlib-version-update", sha=source.commit.sha)
 
-    contents = repo.get_contents("gradle.properties", ref="automated-version-update")
+    contents = repo.get_contents("gradle.properties", ref="automated-stdlib-version-update")
+
+    if len(updatedModules) > 0:
+        commitMessage = "Bump stdlib module - "
+        for updatedModule in updatedModules:
+            commitMessage += updatedModule
+            commitMessage += " "
+    else:
+        commitMessage = "Update gradle.properties"
+
     repo.update_file(contents.path, 
-                    "[Automated] Update Standard Library module versions", 
+                    commitMessage, 
                     data, 
                     contents.sha, 
-                    branch="automated-version-update", 
+                    branch="automated-stdlib-version-update", 
                     author=author)
 
 # Create a PR from the branch created
 def createPullRequest(repo):
-    pulls = repo.get_pulls(state='open', head="automated-version-update")
+    pulls = repo.get_pulls(state='open', head="automated-stdlib-version-update")
 
     PRExists = 0
 
@@ -146,12 +162,12 @@ def createPullRequest(repo):
         try:
             repo.create_pull(title="[Automated] Update Stdlib module versions", 
                             body='$subject', 
-                            head="automated-version-update", 
+                            head="automated-stdlib-version-update", 
                             base="main")
         except GithubException:
             repo.create_pull(title="[Automated] Update Stdlib module versions", 
                             body='$subject', 
-                            head="automated-version-update", 
+                            head="automated-stdlib-version-update", 
                             base="master")
 
 main()
