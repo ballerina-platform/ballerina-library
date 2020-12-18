@@ -23,7 +23,7 @@ def main():
         createPullRequest(repo)
         print("Updated gradle.properties file in Ballerina Distribution Successfully")
     else:
-        print("Stdlib versions in gradle.properties file is up to date")
+        print("Stdlib versions in gradle.properties file are up to date")
 
 # Get stdlib module details from stdlib_modules.json file
 def getStdlibModules():
