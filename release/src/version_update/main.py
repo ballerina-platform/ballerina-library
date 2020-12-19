@@ -15,7 +15,7 @@ organization = 'ballerina-platform'
 def main():
     print("Checking Ballerina Distribution for stdlib version updates")
     moduleList = getStdlibModules()
-    repo = configureGithubRepository()
+    repo = fetchBallerinaDistributionRepo()
     propertiesFile = fetchPropertiesFile(repo)
     modifiedPropertiesFile, commitFlag, updatedModules = updatePropertiesFile(propertiesFile, moduleList)
     if commitFlag:
@@ -37,7 +37,7 @@ def getStdlibModules():
     return moduleList['modules']
 
 # Fetch ballerina-distribution repository with GitHub credentials
-def configureGithubRepository():
+def fetchBallerinaDistributionRepo():
     g = Github(packagePAT)
     try:
         repo = g.get_repo(organization + "/" + 'ballerina-distribution')
@@ -62,14 +62,14 @@ def fetchPropertiesFile(repo):
 def updatePropertiesFile(data, modules):
     modifiedData = ''
     updatedModules = []
-    pointer = ''
+    currentLine = ''
     commitFlag = False
 
     lineList = data.splitlines()
 
     for line in lineList:
         if 'stdlib' in line.lower():
-            pointer = line
+            currentLine = line
             break 
         line += '\n'
         modifiedData += line
@@ -96,14 +96,14 @@ def updatePropertiesFile(data, modules):
             updatedModules.append(moduleName)
         modifiedData += line
 
-    for line in lineList[lineList.index(pointer):len(lineList)]:
-        pointer = line
+    for line in lineList[lineList.index(currentLine):len(lineList)]:
+        currentLine = line
         if 'stdlib' not in line.lower() and line != '':
             break
 
     modifiedData += "\n"
 
-    for line in lineList[lineList.index(pointer):len(lineList)]:
+    for line in lineList[lineList.index(currentLine):len(lineList)]:
         if 'stdlib' not in line.lower():
             line += "\n"
             modifiedData += line
