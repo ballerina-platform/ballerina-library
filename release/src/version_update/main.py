@@ -38,9 +38,9 @@ def getStdlibModules():
 
 # Fetch ballerina-distribution repository with GitHub credentials
 def fetchBallerinaDistributionRepo():
-    g = Github(packagePAT)
+    github = Github(packagePAT)
     try:
-        repo = g.get_repo(organization + "/" + 'ballerina-distribution')
+        repo = github.get_repo(organization + "/" + 'ballerina-distribution')
     except:
         print("Error fetching repository ballerina-distribution")
 
