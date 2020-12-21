@@ -3,6 +3,7 @@ import json
 import sys
 import os
 from retry import retry
+from github import Github, GithubException, InputGitAuthor
 
 HTTP_REQUEST_RETRIES = 3
 HTTP_REQUEST_DELAY_IN_SECONDS = 2
