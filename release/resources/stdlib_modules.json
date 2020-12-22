@@ -216,7 +216,7 @@
         },
         {
             "name": "module-ballerina-tcp",
-            "version": "0.7.2-SNAPSHOT",
+            "version": "0.7.3-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": []
