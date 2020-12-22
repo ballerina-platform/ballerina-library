@@ -2,7 +2,7 @@ name: Publish Snapshots
 
 on:
     repository_dispatch:
-        types: [ stdlib-module-push, ballerina-lang-push ]
+        types: [ ballerina-lang-push ]
     workflow_dispatch:
 
 jobs:
@@ -23,16 +23,3 @@ jobs:
                 env:
                     WORKING_DIR: ./release
                     GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
-                    EVENT_TYPE: 'ballerina-lang-push'
-
-            -   name: Trigger Dependent Modules for Module Build
-                if: github.event.action == 'stdlib-module-push'
-                uses: ballerina-platform/ballerina-action@master
-                with:
-                    args:
-                        run publish
-                env:
-                    WORKING_DIR: ./release
-                    GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
-                    EVENT_TYPE: ${{ github.event.action }}
-                    SOURCE_MODULE: ${{ github.event.client_payload.module }}

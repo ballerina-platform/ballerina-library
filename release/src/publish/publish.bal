@@ -1,224 +1,27 @@
-import ballerina/config;
-import ballerina/http;
 import ballerina/log;
-import ballerina/runtime;
-import ballerina/stringutils;
 import ballerina_stdlib/commons;
 
-http:ClientConfiguration clientConfig = {
-    retryConfig: {
-        count: commons:RETRY_COUNT,
-		intervalInMillis: commons:RETRY_INTERVAL,
-		backOffFactor: commons:RETRY_BACKOFF_FACTOR,
-		maxWaitIntervalInMillis: commons:RETRY_MAX_WAIT_TIME
-    }
-};
-http:Client httpClient = new (commons:API_PATH, clientConfig);
-string accessToken = config:getAsString(commons:ACCESS_TOKEN_ENV);
-string accessTokenHeaderValue = "Bearer " + accessToken;
-
-boolean isFailure = false;
-
 public function main() {
-    string eventType = config:getAsString(CONFIG_EVENT_TYPE);
     json[] modulesJson = commons:getModuleJsonArray();
     commons:Module[] modules = commons:getModuleArray(modulesJson);
-    addDependentModules(modules);
+    commons:addDependentModules(modules);
 
-    if (eventType == EVENT_TYPE_MODULE_PUSH) {
-        string moduleNameWithOrg = config:getAsString(CONFIG_SOURCE_MODULE);
-        string moduleFullName = stringutils:split(moduleNameWithOrg, "/")[1];
-        string moduleName = stringutils:split(moduleFullName, "-")[2];
-        log:printInfo("Publishing snapshots of the dependents of the module: " + moduleName);
-        commons:Module? module = commons:getModuleFromModuleArray(modules, moduleFullName);
-        if (module is commons:Module) {
-            commons:Module[] toBePublished = getModulesToBePublished(module);
-            handlePublish(toBePublished);
-        } else {
-            log:printWarn("Module '" + moduleName + "' not found in module array");
-        }
-    } else if (eventType == EVENT_TYPE_LANG_PUSH) {
-        log:printInfo("Publishing all the standard library snapshots");
-        handlePublish(modules);
-    }
-
-    if (isFailure) {
-        commons:logNewLine();
-        error err = error("PublishFailed", message = "Some module builds are failing");
-        commons:logAndPanicError("Publishing Failed.", err);
-    }
-}
-
-function handlePublish(commons:Module[] modules) {
-    int currentLevel = -1;
-    commons:Module[] currentModules = [];
-    foreach commons:Module module in modules {
-        int nextLevel = module.level;
-        if (nextLevel > currentLevel) {
-            waitForCurrentLevelModuleBuild(currentModules, currentLevel);
-            commons:logNewLine();
-            log:printInfo("Publishing level " + nextLevel.toString() + " modules");
-            currentModules.removeAll();
-        }
-        boolean inProgress = publishModule(module);
-        if (inProgress) {
-            module.inProgress = inProgress;
-            currentModules.push(module);
-            log:printInfo("Successfully triggerred the module \"" + commons:getModuleName(module) + "\"");
-        } else {
-            log:printWarn("Failed to trigger the module \"" + commons:getModuleName(module) + "\"");
-        }
-        currentLevel = nextLevel;
-    }
-    waitForCurrentLevelModuleBuild(currentModules, currentLevel);
-}
-
-function waitForCurrentLevelModuleBuild(commons:Module[] modules, int level) {
-    if (modules.length() == 0) {
-        return;
-    }
-    commons:logNewLine();
-    log:printInfo("Waiting for level " + level.toString() + " module builds");
-    runtime:sleep(commons:SLEEP_INTERVAL); // sleep first to make sure we get the latest workflow triggered by this job
-    commons:Module[] unpublishedModules = modules.filter(
-        function (commons:Module m) returns boolean {
-            return m.inProgress;
-        }
-    );
-    commons:Module[] publishedModules = [];
-
-    boolean allModulesPublished = false;
-    int waitCycles = 0;
-    while (!allModulesPublished) {
-        foreach commons:Module module in modules {
-            if (module.inProgress) {
-                checkInProgressModules(module, unpublishedModules, publishedModules);
-            }
-        }
-        if (publishedModules.length() == modules.length()) {
-            allModulesPublished = true;
-        } else if (waitCycles < commons:MAX_WAIT_CYCLES) {
-            runtime:sleep(commons:SLEEP_INTERVAL);
-            waitCycles += 1;
-        } else {
-            break;
-        }
-    }
-    if (unpublishedModules.length() > 0) {
-        log:printWarn("Following modules not published after the max wait time");
-        commons:printModules(unpublishedModules);
-        error err = error("Unpublished", message = "There are modules not published after max wait time");
-        commons:logAndPanicError("Publishing Failed.", err);
-    }
-}
-
-function checkInProgressModules(commons:Module module, commons:Module[] unpublished, commons:Module[] published) {
-    boolean publishCompleted = checkModulePublish(module);
-    if (publishCompleted) {
-        module.inProgress = !publishCompleted;
-        var moduleIndex = unpublished.indexOf(module);
-        if (moduleIndex is int) {
-            commons:Module publishedModule = unpublished.remove(moduleIndex);
-            published.push(publishedModule);
-        }
-    }
-}
-
-function checkModulePublish(commons:Module module) returns boolean {
-    http:Request request = commons:createRequest(accessTokenHeaderValue);
-    string moduleName = module.name.toString();
-    string apiPath = "/" + moduleName + "/" + commons:WORKFLOW_STATUS_PATH;
-    // Hack for type casting error in HTTP Client
-    // https://github.com/ballerina-platform/ballerina-standard-library/issues/566
-    var result = trap httpClient->get(apiPath, request);
-    if (result is error) {
-        log:printWarn("Error occurred while checking the publish status for module: " + commons:getModuleName(module));
-        return false;
-    }
-    http:Response response = <http:Response>result;
-    boolean isValid = commons:validateResponse(response);
-    if (isValid) {
-        map<json> payload = commons:getJsonPayload(response);
-        if (isWorkflowCompleted(payload)) {
-            checkWorkflowRun(payload, module);
-            return true;
-        }
-    }
-    return false;
-}
-
-function isWorkflowCompleted(map<json> payload) returns boolean {
-    map<json> workflowRun = getWorkflowJsonObject(payload);
-    string status = workflowRun.status.toString();
-    return status == STATUS_COMPLETED;
-}
-
-function checkWorkflowRun(map<json> payload, commons:Module module) {
-    map<json> workflowRun = getWorkflowJsonObject(payload);
-    string status = workflowRun.conclusion.toString();
-    if (status == CONCLUSION_SUCCSESS) {
-        log:printInfo("Succcessfully published the module \"" + commons:getModuleName(module) + "\"");
-    } else {
-        isFailure = true;
-        log:printWarn("Failed to publish the module \"" + commons:getModuleName(module) + "\". Conclusion: " + status);
-    }
-}
-
-function getWorkflowJsonObject(map<json> payload) returns map<json> {
-    json[] workflows = <json[]>payload[WORKFLOW_RUNS];
-    return <map<json>>workflows[0];
-}
-
-function publishModule(commons:Module module) returns boolean {
-    http:Request request = commons:createRequest(accessTokenHeaderValue);
-    string moduleName = module.name.toString();
-    string 'version = module.'version.toString();
-    string apiPath = "/" + moduleName + commons:DISPATCHES;
-
-    json payload = {
-        event_type: PUBLISH_SNAPSHOT_EVENT,
-        client_payload: {
-            'version: 'version
-        }
+    commons:WorkflowStatus workflowStatus = {
+        isFailure: false,
+        failedModules: []
     };
-    request.setJsonPayload(payload);
-    var result = httpClient->post(apiPath, request);
-    if (result is error) {
-        commons:logAndPanicError("Failed to publish the module \"" + commons:getModuleName(module) + "\"", result);
-    }
-    http:Response response = <http:Response>result;
-    return commons:validateResponse(response);
-}
 
-function getModulesToBePublished(commons:Module module) returns commons:Module[] {
-    commons:Module[] toBePublished = [];
-    populteToBePublishedModules(module, toBePublished);
-    toBePublished = commons:sortModules(toBePublished);
-    toBePublished = commons:removeDuplicates(toBePublished);
-    // Removing the parent module
-    int parentModuleIndex = <int>toBePublished.indexOf(module);
-    _ = toBePublished.remove(parentModuleIndex);
-    return toBePublished;
-}
+    log:printInfo("Publishing all the standard library snapshots");
+    commons:checkCurrentPublishWorkflows();
+    commons:handlePublish(modules, workflowStatus);
 
-function populteToBePublishedModules(commons:Module module, commons:Module[] toBePublished) {
-    toBePublished.push(module);
-    foreach commons:Module dependentModule in module.dependentModules {
-        populteToBePublishedModules(dependentModule, toBePublished);
-    }
-}
-
-function addDependentModules(commons:Module[] modules) {
-    foreach commons:Module module in modules {
-        commons:Module[] dependentModules = [];
-        string[] dependentModuleNames = module.dependents;
-        foreach string dependentModuleName in dependentModuleNames {
-            commons:Module? dependentModule = commons:getModuleFromModuleArray(modules, dependentModuleName);
-            if (dependentModule is commons:Module) {
-                dependentModules.push(dependentModule);
-            }
+    if (workflowStatus.isFailure) {
+        commons:logNewLine();
+        log:printWarn("Following module builds failed");
+        foreach string name in workflowStatus.failedModules {
+            log:printWarn(name);
         }
-        dependentModules = commons:sortModules(dependentModules);
-        module.dependentModules = dependentModules;
+        error err = error("Failed", message = "Some module builds are failing");
+        panic err;
     }
 }

@@ -1,0 +1,24 @@
+name: Build Dependents
+
+on:
+    repository_dispatch:
+        types: [ stdlib-module-push ]
+
+jobs:
+    publish-stdlib-modules:
+        name: Publish Standard Library Modules
+        runs-on: ubuntu-latest
+        if: github.repository_owner == 'ballerina-platform'
+        steps:
+            -   name: Checkout Repository
+                uses: actions/checkout@v2
+
+            -   name: Trigger Dependent Modules for Module Build
+                uses: ballerina-platform/ballerina-action@master
+                with:
+                    args:
+                        run dependent_builds
+                env:
+                    WORKING_DIR: ./release
+                    GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+                    SOURCE_MODULE: ${{ github.event.client_payload.module }}

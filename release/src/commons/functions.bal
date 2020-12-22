@@ -1,8 +1,222 @@
+import ballerina/config;
 import ballerina/http;
 import ballerina/io;
 import ballerina/lang.'string;
 import ballerina/log;
+import ballerina/runtime;
 import ballerina/stringutils;
+
+http:ClientConfiguration clientConfig = {
+    retryConfig: {
+        count: RETRY_COUNT,
+		intervalInMillis: RETRY_INTERVAL,
+		backOffFactor: RETRY_BACKOFF_FACTOR,
+		maxWaitIntervalInMillis: RETRY_MAX_WAIT_TIME
+    }
+};
+http:Client httpClient = new (API_PATH, clientConfig);
+string accessToken = config:getAsString(ACCESS_TOKEN_ENV);
+string accessTokenHeaderValue = "Bearer " + accessToken;
+
+public function handlePublish(Module[] modules, WorkflowStatus workflowStatus) {
+    int currentLevel = -1;
+    Module[] currentModules = [];
+    foreach Module module in modules {
+        int nextLevel = module.level;
+        if (nextLevel > currentLevel) {
+            waitForCurrentLevelModuleBuild(currentModules, currentLevel, workflowStatus);
+            logNewLine();
+            log:printInfo("Publishing level " + nextLevel.toString() + " modules");
+            currentModules.removeAll();
+        }
+        boolean inProgress = publishModule(module, accessTokenHeaderValue, httpClient);
+        if (inProgress) {
+            module.inProgress = inProgress;
+            currentModules.push(module);
+            log:printInfo("Successfully triggerred the module \"" + getModuleName(module) + "\"");
+        } else {
+            log:printWarn("Failed to trigger the module \"" + getModuleName(module) + "\"");
+        }
+        currentLevel = nextLevel;
+    }
+    waitForCurrentLevelModuleBuild(currentModules, currentLevel, workflowStatus);
+}
+
+function waitForCurrentLevelModuleBuild(Module[] modules, int level, WorkflowStatus workflowStatus) {
+    if (modules.length() == 0) {
+        return;
+    }
+    logNewLine();
+    log:printInfo("Waiting for level " + level.toString() + " module builds");
+    runtime:sleep(SLEEP_INTERVAL); // sleep first to make sure we get the latest workflow triggered by this job
+    Module[] unpublishedModules = modules.filter(
+        function (Module m) returns boolean {
+            return m.inProgress;
+        }
+    );
+    Module[] publishedModules = [];
+
+    boolean allModulesPublished = false;
+    int waitCycles = 0;
+    while (!allModulesPublished) {
+        foreach Module module in modules {
+            if (module.inProgress) {
+                checkInProgressModules(module, unpublishedModules, publishedModules, workflowStatus);
+            }
+        }
+        if (publishedModules.length() == modules.length()) {
+            allModulesPublished = true;
+        } else if (waitCycles < MAX_WAIT_CYCLES) {
+            runtime:sleep(SLEEP_INTERVAL);
+            waitCycles += 1;
+        } else {
+            break;
+        }
+    }
+    if (unpublishedModules.length() > 0) {
+        log:printWarn("Following modules not published after the max wait time");
+        printModules(unpublishedModules);
+        error err = error("Unpublished", message = "There are modules not published after max wait time");
+        logAndPanicError("Publishing Failed.", err);
+    }
+}
+
+function checkInProgressModules(Module module, Module[] unpublished, Module[] published, WorkflowStatus status) {
+    boolean publishCompleted = checkModulePublish(module, status);
+    if (publishCompleted) {
+        module.inProgress = !publishCompleted;
+        var moduleIndex = unpublished.indexOf(module);
+        if (moduleIndex is int) {
+            Module publishedModule = unpublished.remove(moduleIndex);
+            published.push(publishedModule);
+        }
+    }
+}
+
+function checkModulePublish(Module module, WorkflowStatus workflowStatus) returns boolean {
+    http:Request request = createRequest();
+    string moduleName = module.name.toString();
+    string apiPath = "/" + moduleName + "/" + WORKFLOW_STATUS_PATH;
+    // Hack for type casting error in HTTP Client
+    // https://github.com/ballerina-platform/ballerina-standard-library/issues/566
+    var result = trap httpClient->get(apiPath, request);
+    if (result is error) {
+        log:printWarn("Error occurred while checking the publish status for module: " + getModuleName(module));
+        return false;
+    }
+    http:Response response = <http:Response>result;
+    boolean isValid = validateResponse(response);
+    if (isValid) {
+        map<json> payload = getJsonPayload(response);
+        if (isWorkflowCompleted(payload)) {
+            boolean success = isRunSuccess(payload, module);
+            if (!success) {
+                workflowStatus.isFailure = true;
+                workflowStatus.failedModules[workflowStatus.failedModules.length()] = getModuleName(module);
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+public function isWorkflowCompleted(map<json> payload) returns boolean {
+    map<json> workflowRun = getWorkflowJsonObject(payload);
+    string status = workflowRun.status.toString();
+    return status == STATUS_COMPLETED;
+}
+
+function isRunSuccess(map<json> payload, Module module) returns boolean {
+    map<json> workflowRun = getWorkflowJsonObject(payload);
+    string status = workflowRun.conclusion.toString();
+    if (status == CONCLUSION_SUCCSESS) {
+        log:printInfo("Succcessfully published the module \"" + getModuleName(module) + "\"");
+        return true;
+    } else {
+        log:printWarn("Failed to publish the module \"" + getModuleName(module) + "\". Conclusion: " + status);
+        return false;
+    }
+}
+
+public function getWorkflowJsonObject(map<json> payload) returns map<json> {
+    json[] workflows = <json[]>payload[WORKFLOW_RUNS];
+    return <map<json>>workflows[0];
+}
+
+public function addDependentModules(Module[] modules) {
+    foreach Module module in modules {
+        Module[] dependentModules = [];
+        string[] dependentModuleNames = module.dependents;
+        foreach string dependentModuleName in dependentModuleNames {
+            Module? dependentModule = getModuleFromModuleArray(modules, dependentModuleName);
+            if (dependentModule is Module) {
+                dependentModules.push(dependentModule);
+            }
+        }
+        dependentModules = sortModules(dependentModules);
+        module.dependentModules = dependentModules;
+    }
+}
+
+public function populteToBePublishedModules(Module module, Module[] toBePublished) {
+    toBePublished.push(module);
+    foreach Module dependentModule in module.dependentModules {
+        populteToBePublishedModules(dependentModule, toBePublished);
+    }
+}
+
+public function publishModule(Module module, string accessToken, http:Client httpClient) returns boolean {
+    http:Request request = createRequest();
+    string moduleName = module.name.toString();
+    string 'version = module.'version.toString();
+    string apiPath = "/" + moduleName + DISPATCHES;
+
+    json payload = {
+        event_type: PUBLISH_SNAPSHOT_EVENT,
+        client_payload: {
+            'version: 'version
+        }
+    };
+    request.setJsonPayload(payload);
+    var result = httpClient->post(apiPath, request);
+    if (result is error) {
+        logAndPanicError("Failed to publish the module \"" + getModuleName(module) + "\"", result);
+    }
+    http:Response response = <http:Response>result;
+    return validateResponse(response);
+}
+
+public function checkCurrentPublishWorkflows() {
+    log:printInfo("Checking for already running workflows");
+    http:Request request = createRequest();
+    string apiPath = "/ballerina-standard-library/actions/workflows/publish_snapshots.yml/runs?per_page=1";
+    var result = trap httpClient->get(apiPath, request);
+    if (result is error) {
+        log:printWarn("Error occurred while checking the current workflow status");
+    }
+    http:Response response = <http:Response>result;
+    boolean isValid = validateResponse(response);
+    if (isValid) {
+        map<json> payload = getJsonPayload(response);
+        if (!isWorkflowCompleted(payload)) {
+            map<json> workflow = getWorkflowJsonObject(payload);
+            cancelWorkflow(workflow.id.toString());
+        } else {
+            log:printInfo("No workflows running");
+        }
+    }
+}
+
+function cancelWorkflow(string id) {
+    string path = "/ballerina-standard-library/actions/runs/" + id + "/cancel";
+    http:Request request = createRequest();
+    var result = trap httpClient->post(path, request);
+    if (result is error) {
+        log:printWarn("Error occurred while cancelling the current workflow status");
+    } else {
+        log:printInfo("Cancelled the already running job.");
+    }
+}
 
 public function sortModules(Module[] modules) returns Module[] {
     return modules.sort(compareModules);
@@ -68,7 +282,7 @@ public function getModuleArray(json[] modulesJson) returns Module[] {
     return sortModules(modules);
 }
 
-public function createRequest(string accessTokenHeaderValue) returns http:Request {
+public function createRequest() returns http:Request {
     http:Request request = new;
     request.setHeader(ACCEPT_HEADER_KEY, ACCEPT_HEADER_VALUE);
     request.setHeader(AUTH_HEADER_KEY, accessTokenHeaderValue);
