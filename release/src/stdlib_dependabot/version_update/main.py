@@ -61,7 +61,7 @@ def getLatestVersions(moduleList):
 
     return latestModuleVersions
 
-# Update the module_list.json file with the latest version of each standard library module
+# Update the stdlib_latest_versions.json file with the latest version of each standard library module
 def updateFile(latestVersions):
     try:
         with open('./release/resources/stdlib_latest_versions.json', 'w') as jsonFile:
