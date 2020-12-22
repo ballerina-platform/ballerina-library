@@ -2,7 +2,7 @@
     "modules": [
         {
             "name": "module-ballerina-encoding",
-            "version": "1.0.6-SNAPSHOT",
+            "version": "1.0.7-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": [
@@ -105,7 +105,7 @@
         },
         {
             "name": "module-ballerina-xslt",
-            "version": "1.0.5-SNAPSHOT",
+            "version": "1.0.6-SNAPSHOT",
             "level": 2,
             "release": true,
             "dependents": []
