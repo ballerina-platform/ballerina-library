@@ -5,8 +5,8 @@ on:
         types: [ stdlib-module-push ]
 
 jobs:
-    publish-stdlib-modules:
-        name: Publish Standard Library Modules
+    publish-dependent-modules:
+        name: Publish Dependent Stdlib Modules
         runs-on: ubuntu-latest
         if: github.repository_owner == 'ballerina-platform'
         steps:
