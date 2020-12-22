@@ -197,10 +197,10 @@ public function checkCurrentPublishWorkflows() {
     http:Response response = <http:Response>result;
     boolean isValid = validateResponse(response);
     if (isValid) {
-        json[] workflows = <json[]>payload[WORKFLOW_RUNS];
-        map<json> payload = <map<json>>workflows[1];
+        map<json> payload = getJsonPayload(response);
         if (!isWorkflowCompleted(payload)) {
-            map<json> workflow = getWorkflowJsonObject(payload);
+            json[] workflows = <json[]>payload[WORKFLOW_RUNS];
+            map<json> workflow = <map<json>>workflows[1];
             cancelWorkflow(workflow.id.toString());
         } else {
             log:printInfo("No workflows running");
