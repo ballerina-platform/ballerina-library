@@ -163,7 +163,8 @@
             "level": 4,
             "release": true,
             "dependents": [
-                "module-ballerina-sql"
+                "module-ballerina-sql",
+                "module-ballerina-websub"
             ]
         },
         {
