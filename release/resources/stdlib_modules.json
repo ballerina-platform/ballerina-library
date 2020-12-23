@@ -192,7 +192,7 @@
         },
         {
             "name": "module-ballerina-mime",
-            "version": "1.0.4-SNAPSHOT",
+            "version": "1.0.5-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": [
