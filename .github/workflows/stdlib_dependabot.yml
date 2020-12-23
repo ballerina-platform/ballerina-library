@@ -33,7 +33,7 @@ jobs:
             -   name: Get module list and latest versions
                 run: |
                     cd ballerina-standard-library
-                    python release/src/stdlib_dependabot/version_update/main.py
+                    python dependabot/version_update.py
                 env:
                     packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
                     packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
@@ -61,7 +61,7 @@ jobs:
                 run : |
                     echo ${{steps.commit.outputs.updates}}
                     cd ballerina-standard-library
-                    python release/src/stdlib_dependabot/file_update/main.py 
+                    python dependabot/file_update.py 
                 env : 
                     modules: ${{steps.commit.outputs.updates}}
                     packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}

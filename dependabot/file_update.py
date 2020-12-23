@@ -37,16 +37,16 @@ def preprocessString():
     except:
         print("Failed to update files")
         print("Input String: " + os.environ["modules"])
-        sys.exit()
+        sys.exit(1)
 
 # Fetch list of stdlib modules from stdlib_latest_versions.json 
 def getModuleListFromFile():
     try:
-        with open('./release/resources/stdlib_latest_versions.json') as f:
+        with open('./dependabot/resources/stdlib_latest_versions.json') as f:
             moduleList = json.load(f)
     except:
         print('Failed to read stdlib_latest_versions.json')
-        sys.exit()
+        sys.exit(1)
 
     stdlibModules = []
     for module in moduleList['modules']:
@@ -92,7 +92,7 @@ def getDependencies(balModule):
                                     + balModule + "/master/build.gradle")
     except:
         print('Failed to read build.gradle file of ' + balModule)
-        sys.exit()
+        sys.exit(1)
 
     dependencies = []
 
@@ -199,18 +199,18 @@ def commitChanges(data, currentVersion, repo, module, latestVersion):
 def createPullRequest(repo, currentVersion, module, latestVersion):
     pulls = repo.get_pulls(state='open', head='dependabot/' + module)
 
-    PRExists = 0
+    prExists = 0
 
     # Check if a PR already exists for the module
     for pull in pulls:
         if "Bump " + module in pull.title:
-            PRExists = pull.number
+            prExists = pull.number
             minVersion = pull.title.split()[3]
 
     # If PR exists update the title else create a new PR
-    if PRExists:
-        existingPR = repo.get_pull(PRExists)
-        existingPR.edit(title="Bump " + module + " from " + minVersion + " to " + latestVersion)
+    if prExists:
+        existingPr = repo.get_pull(prExists)
+        existingPr.edit(title="Bump " + module + " from " + minVersion + " to " + latestVersion)
     else:
         try:
             repo.create_pull(title="Bump " + module + " from " + currentVersion + " to " + latestVersion, 

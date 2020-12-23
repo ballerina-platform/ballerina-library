@@ -29,7 +29,7 @@ def fetchModuleList():
                                     + "/main/release/resources/stdlib_modules.json")
     except:
         print('Failed to read module_list.json file in ballerina stdlib')
-        sys.exit()
+        sys.exit(1)
 
     dataToString = data.read().decode("utf-8")
     moduleList = json.loads(dataToString)['modules']
@@ -64,12 +64,12 @@ def getLatestVersions(moduleList):
 # Update the stdlib_latest_versions.json file with the latest version of each standard library module
 def updateFile(latestVersions):
     try:
-        with open('./release/resources/stdlib_latest_versions.json', 'w') as jsonFile:
+        with open('./dependabot/resources/stdlib_latest_versions.json', 'w') as jsonFile:
             jsonFile.seek(0) 
             json.dump(latestVersions, jsonFile, indent=4)
             jsonFile.truncate()
     except:
         print('Failed to write to stdlib_latest_versions.json')
-        sys.exit()
+        sys.exit(1)
 
 main()
