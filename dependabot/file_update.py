@@ -25,8 +25,7 @@ def main():
 def preprocessString():
     try:
         # String is in the form -> '"module": "version" "module": "version"'
-        updatedModules = os.environ["modules"]
-        updatedModules = updatedModules.split()
+        updatedModules = os.environ["modules"].split()
 
         latestVersion = []
         for i in range(0, len(updatedModules)-1, 2):
