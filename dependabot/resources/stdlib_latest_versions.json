@@ -58,7 +58,7 @@
             "module-ballerina-file": "0.6.3"
         },
         {
-            "module-ballerina-ftp": "1.0.3"
+            "module-ballerina-ftp": "1.0.4"
         },
         {
             "module-ballerina-mime": "1.0.5"
@@ -79,7 +79,7 @@
             "module-ballerina-auth": "1.0.5"
         },
         {
-            "module-ballerina-email": "1.0.4"
+            "module-ballerina-email": "1.0.5"
         },
         {
             "module-ballerina-http": "1.0.5"
@@ -97,7 +97,7 @@
             "module-ballerina-graphql": "0.1.1"
         },
         {
-            "module-ballerina-grpc": "0.7.4"
+            "module-ballerina-grpc": "0.7.5"
         },
         {
             "module-ballerinai-transaction": "1.0.4"
