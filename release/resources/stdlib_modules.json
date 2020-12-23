@@ -162,7 +162,9 @@
             "version": "0.9.1-SNAPSHOT",
             "level": 4,
             "release": true,
-            "dependents": []
+            "dependents": [
+                "module-ballerina-sql"
+            ]
         },
         {
             "name": "module-ballerina-cache",
