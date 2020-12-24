@@ -4,6 +4,7 @@ import sys
 from retry import retry
 import os
 import semver
+import time
 from github import Github, InputGitAuthor, GithubException
 
 HTTP_REQUEST_RETRIES = 3
@@ -119,6 +120,7 @@ def updateFiles(modules):
             if commitFlag:
                 commitChanges(updatedData, currentVersion, repo, module['name'], module['version'])
                 createPullRequest(repo, currentVersion, module['name'], module['version'])
+            time.sleep(2)
 
 # Fetch repository of a given stdlib module
 def configureGithubRepository(module):
@@ -188,7 +190,7 @@ def commitChanges(data, currentVersion, repo, module, latestVersion):
 
     contents = repo.get_contents("gradle.properties", ref="dependabot/" + module)
     repo.update_file(contents.path, 
-                    "[Automated] Bump " + module + " from " + currentVersion + " to " + latestVersion, 
+                    "[Dependabot] Bump " + module + " from " + currentVersion + " to " + latestVersion, 
                     data, 
                     contents.sha, 
                     branch="dependabot/" + module, 

@@ -50,7 +50,7 @@ jobs:
                         echo ::set-output name=updates::$(git diff HEAD | grep + | grep module-ballerina | sed 's/^.............//')
                         git remote set-url origin https://${{ secrets.BALLERINA_BOT_USERNAME }}:${{ secrets.BALLERINA_BOT_TOKEN }}@github.com/ballerina-platform/ballerina-standard-library.git
                         git add .
-                        git commit -m "[Automated] Update module versions"
+                        git commit -m "[Dependabot] Update module versions"
                         curl -fsSL https://github.com/github/hub/raw/master/script/get | bash -s 2.14.1
                         bin/hub push origin main
                     else
