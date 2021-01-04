@@ -214,7 +214,7 @@
         },
         {
             "name": "module-ballerinax-stan",
-            "version": "1.0.0-SNAPSHOT",
+            "version": "1.0.1-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": []
