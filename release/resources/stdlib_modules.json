@@ -163,6 +163,7 @@
             "level": 4,
             "release": true,
             "dependents": [
+                "module-ballerinax-kafka",
                 "module-ballerinax-rabbitmq",
                 "module-ballerina-sql",
                 "module-ballerina-websub"
