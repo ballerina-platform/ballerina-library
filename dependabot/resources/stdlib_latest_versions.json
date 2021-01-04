@@ -67,7 +67,7 @@
             "module-ballerinax-nats": "1.0.7"
         },
         {
-            "module-ballerinax-stan": "1.0.0"
+            "module-ballerinax-stan": "1.0.1"
         },
         {
             "module-ballerina-tcp": "0.7.3"
