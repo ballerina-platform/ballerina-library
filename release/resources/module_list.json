@@ -17,7 +17,6 @@
         "module-ballerina-jsonutils",
         "module-ballerina-jwt",
         "module-ballerinax-kafka",
-        "module-ballerina-ldap",
         "module-ballerina-log",
         "module-ballerina-math",
         "module-ballerina-mime",
