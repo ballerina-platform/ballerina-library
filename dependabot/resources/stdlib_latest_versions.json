@@ -25,7 +25,10 @@
             "module-ballerina-xmlutils": "1.0.5"
         },
         {
-            "module-ballerina-system": "0.6.5"
+            "module-ballerina-config": "1.0.5"
+        },
+        {
+            "module-ballerina-os": "0.6.5"
         },
         {
             "module-ballerina-task": "1.1.5"
@@ -37,9 +40,6 @@
             "module-ballerina-xslt": "1.0.6"
         },
         {
-            "module-ballerina-config": "1.0.5"
-        },
-        {
             "module-ballerina-crypto": "1.0.5"
         },
         {
@@ -47,9 +47,6 @@
         },
         {
             "module-ballerina-reflect": "0.5.5"
-        },
-        {
-            "module-ballerina-uuid": "0.9.1"
         },
         {
             "module-ballerina-cache": "2.0.5"
@@ -76,22 +73,25 @@
             "module-ballerina-udp": "0.8.1"
         },
         {
+            "module-ballerina-uuid": "0.9.1"
+        },
+        {
             "module-ballerina-auth": "1.0.5"
         },
         {
             "module-ballerina-email": "1.0.5"
         },
         {
-            "module-ballerina-http": "1.0.5"
-        },
-        {
             "module-ballerina-jwt": "1.0.7"
         },
         {
-            "module-ballerina-ldap": "1.0.5"
+            "module-ballerina-oauth2": "1.0.5"
         },
         {
-            "module-ballerina-oauth2": "1.0.5"
+            "module-ballerina-http": "1.0.5"
+        },
+        {
+            "module-ballerina-ldap": "1.0.5"
         },
         {
             "module-ballerina-graphql": "0.1.1"
