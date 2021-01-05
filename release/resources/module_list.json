@@ -30,7 +30,7 @@
         "module-ballerina-sql",
         "module-ballerinax-stan",
         "module-ballerina-stringutils",
-        "module-ballerina-system",
+        "module-ballerina-os",
         "module-ballerina-task",
         "module-ballerina-tcp",
         "module-ballerina-time",
