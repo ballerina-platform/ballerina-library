@@ -85,7 +85,7 @@
         },
         {
             "name": "module-ballerina-os",
-            "version": "0.6.5-SNAPSHOT",
+            "version": "0.7.0-SNAPSHOT",
             "level": 2,
             "release": true,
             "dependents": []
