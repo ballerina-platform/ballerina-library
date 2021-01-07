@@ -6,9 +6,7 @@
             "level": 1,
             "release": true,
             "dependents": [
-                "module-ballerina-graphql",
-                "module-ballerina-jwt",
-                "module-ballerina-websub"
+                "module-ballerina-jwt"
             ]
         },
         {
@@ -155,7 +153,11 @@
             "level": 4,
             "release": true,
             "dependents": [
-                "module-ballerina-http"
+                "module-ballerina-graphql",
+                "module-ballerina-grpc",
+                "module-ballerinai-transaction",
+                "module-ballerina-websocket",
+                "module-ballerina-websub"
             ]
         },
         {
@@ -164,11 +166,7 @@
             "level": 4,
             "release": true,
             "dependents": [
-                "module-ballerina-jwt",
-                "module-ballerinax-kafka",
-                "module-ballerinax-rabbitmq",
-                "module-ballerina-sql",
-                "module-ballerina-websub"
+                "module-ballerina-jwt"
             ]
         },
         {
@@ -258,14 +256,18 @@
             "version": "1.0.7-SNAPSHOT",
             "level": 6,
             "release": true,
-            "dependents": []
+            "dependents": [
+                "module-ballerina-http"
+            ]
         },
         {
             "name": "module-ballerina-oauth2",
             "version": "1.0.5-SNAPSHOT",
             "level": 6,
             "release": true,
-            "dependents": []
+            "dependents": [
+                "module-ballerina-http"
+            ]
         },
         {
             "name": "module-ballerina-http",
