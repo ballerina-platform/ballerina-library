@@ -243,8 +243,7 @@
             "level": 6,
             "release": true,
             "dependents": [
-                "module-ballerina-http",
-                "module-ballerina-ldap"
+                "module-ballerina-http"
             ]
         },
         {
@@ -280,13 +279,6 @@
                 "module-ballerina-websocket",
                 "module-ballerina-websub"
             ]
-        },
-        {
-            "name": "module-ballerina-ldap",
-            "version": "1.0.5-SNAPSHOT",
-            "level": 7,
-            "release": true,
-            "dependents": []
         },
         {
             "name": "module-ballerina-graphql",
