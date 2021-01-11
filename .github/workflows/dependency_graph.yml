@@ -29,6 +29,7 @@ jobs:
                     pip install networkx
                     pip install retry
                     pip install PyGithub
+                    pip install semver
             
             -   name: Get Dependencies and update files
                 run: |

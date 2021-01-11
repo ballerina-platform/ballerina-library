@@ -4,6 +4,7 @@ import sys
 from retry import retry
 import os
 import semver
+import time
 from github import Github, InputGitAuthor, GithubException
 
 HTTP_REQUEST_RETRIES = 3
@@ -119,6 +120,7 @@ def updateFiles(modules):
             if commitFlag:
                 commitChanges(updatedData, currentVersion, repo, module['name'], module['version'])
                 createPullRequest(repo, currentVersion, module['name'], module['version'])
+            time.sleep(30)
 
 # Fetch repository of a given stdlib module
 def configureGithubRepository(module):

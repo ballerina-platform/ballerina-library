@@ -2,6 +2,7 @@ import urllib.request
 import json
 import sys
 import os
+import semver
 from retry import retry
 from github import Github, GithubException, InputGitAuthor
 
@@ -18,7 +19,8 @@ def main():
     moduleList = getStdlibModules()
     repo = fetchBallerinaDistributionRepo()
     propertiesFile = fetchPropertiesFile(repo)
-    modifiedPropertiesFile, commitFlag, updatedModules = updatePropertiesFile(propertiesFile, moduleList)
+    currentVersions = getCurrentModuleVersions(propertiesFile)
+    modifiedPropertiesFile, commitFlag, updatedModules = updatePropertiesFile(propertiesFile, moduleList, currentVersions)
     if commitFlag:
         commitChanges(modifiedPropertiesFile, repo, updatedModules)
         createPullRequest(repo)
@@ -59,8 +61,30 @@ def fetchPropertiesFile(repo):
 
     return data
 
+# Get current versions of stdlib modules from gradle.properties file
+def getCurrentModuleVersions(propertiesFile):
+    currentVersions = {}
+
+    for line in propertiesFile.splitlines():
+        if 'stdlib' in line and 'Version=' in line:
+            moduleName = line.split('=')[0]
+            version = line.split('=')[1]
+            currentVersions[moduleName] = version
+
+    return currentVersions
+
+# Compare latest version with current version
+# Return 1 if latest version > current version
+# Return 0 if latest version = current version
+# Return -1 if latest version < current version
+def compareVersion(latestVersion, currentVersion):
+    if semver.compare(latestVersion.split('-')[0], currentVersion.split('-')[0]) == 1:
+        return latestVersion
+    else:
+        return currentVersion
+
 # Update stdlib module versions in the gradle.properties file with module details fetched from stdlib_modules.json
-def updatePropertiesFile(data, modules):
+def updatePropertiesFile(data, modules, currentVersions):
     modifiedData = ''
     updatedModules = []
     currentLine = ''
@@ -84,13 +108,16 @@ def updatePropertiesFile(data, modules):
             level += 1
 
         moduleName = module['name'].split('-')[-1]
-        version = module['version']
+        latestVersion = module['version']
 
         if moduleName == 'java.arrays':
+            version = compareVersion(latestVersion, currentVersions['stdlibJarraysVersion'])
             line = "stdlibJarraysVersion=" + version + "\n"
         elif moduleName == 'java.jdbc':
+            version = compareVersion(latestVersion, currentVersions['stdlibJdbcVersion'])
             line = "stdlibJdbcVersion=" + version + "\n"
         else:
+            version = compareVersion(latestVersion, currentVersions['stdlib' + moduleName.capitalize() + 'Version'])
             line = "stdlib" + moduleName.capitalize() + "Version=" + version + "\n"
 
         if line[0:-1] not in lineList:
