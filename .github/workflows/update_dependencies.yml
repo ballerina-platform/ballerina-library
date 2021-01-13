@@ -1,4 +1,4 @@
-name: Stdlib Module Dependencies
+name: Update Stdlib Dependencies
 
 on: 
     workflow_dispatch:
