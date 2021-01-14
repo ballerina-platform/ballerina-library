@@ -46,8 +46,8 @@
             "level": 1,
             "release": true,
             "dependents": [
-                "module-ballerina-file",
-                "module-ballerina-task"
+                "module-ballerina-cache",
+                "module-ballerina-file"
             ]
         },
         {
@@ -59,6 +59,17 @@
                 "module-ballerina-config",
                 "module-ballerina-time",
                 "module-ballerina-xslt"
+            ]
+        },
+        {
+            "name": "module-ballerina-task",
+            "version": "1.1.5-SNAPSHOT",
+            "level": 1,
+            "release": true,
+            "dependents": [
+                "module-ballerina-cache",
+                "module-ballerina-email",
+                "module-ballerina-ftp"
             ]
         },
         {
@@ -75,17 +86,6 @@
             "release": true,
             "dependents": [
                 "module-ballerina-config"
-            ]
-        },
-        {
-            "name": "module-ballerina-task",
-            "version": "1.1.5-SNAPSHOT",
-            "level": 2,
-            "release": true,
-            "dependents": [
-                "module-ballerina-cache",
-                "module-ballerina-email",
-                "module-ballerina-ftp"
             ]
         },
         {
