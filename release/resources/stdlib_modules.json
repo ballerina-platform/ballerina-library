@@ -34,8 +34,8 @@
             "dependents": []
         },
         {
-            "name": "module-ballerina-math",
-            "version": "1.0.5-SNAPSHOT",
+            "name": "module-ballerina-random",
+            "version": "1.1.0-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": []
