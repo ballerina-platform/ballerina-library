@@ -13,7 +13,7 @@
             "module-ballerina-jsonutils": "1.0.5"
         },
         {
-            "module-ballerina-math": "1.0.5"
+            "module-ballerina-random": "1.1.0"
         },
         {
             "module-ballerina-runtime": "0.5.5"
@@ -22,13 +22,13 @@
             "module-ballerina-stringutils": "0.5.5"
         },
         {
+            "module-ballerina-task": "1.1.5"
+        },
+        {
             "module-ballerina-xmlutils": "1.0.5"
         },
         {
             "module-ballerina-os": "0.7.0"
-        },
-        {
-            "module-ballerina-task": "1.1.5"
         },
         {
             "module-ballerina-time": "1.0.6"
