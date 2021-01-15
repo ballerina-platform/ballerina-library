@@ -46,8 +46,7 @@
             "level": 1,
             "release": true,
             "dependents": [
-                "module-ballerina-cache",
-                "module-ballerina-file"
+                "module-ballerina-cache"
             ]
         },
         {
