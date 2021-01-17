@@ -57,7 +57,8 @@
             "level": 1,
             "release": true,
             "dependents": [
-                "module-ballerina-config",
+                "module-ballerina-log",
+                "module-ballerina-reflect",
                 "module-ballerina-uuid",
                 "module-ballerina-xslt"
             ]
