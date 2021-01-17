@@ -38,6 +38,7 @@
         "module-ballerina-uuid",
         "module-ballerina-websocket",
         "module-ballerina-websub",
+        "module-ballerina-websubhub",
         "module-ballerina-xmlutils",
         "module-ballerina-xslt"
     ]
