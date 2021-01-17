@@ -58,7 +58,6 @@
             "release": true,
             "dependents": [
                 "module-ballerina-log",
-                "module-ballerina-reflect",
                 "module-ballerina-uuid",
                 "module-ballerina-xslt"
             ]
@@ -111,7 +110,8 @@
             "level": 2,
             "release": true,
             "dependents": [
-                "module-ballerina-config"
+                "module-ballerina-config",
+                "module-ballerina-reflect"
             ]
         },
         {
@@ -127,8 +127,21 @@
             "level": 3,
             "release": true,
             "dependents": [
-                "module-ballerina-log",
-                "module-ballerina-reflect"
+                "module-ballerina-log"
+            ]
+        },
+        {
+            "name": "module-ballerina-reflect",
+            "version": "0.5.5-SNAPSHOT",
+            "level": 3,
+            "release": true,
+            "dependents": [
+                "module-ballerina-graphql",
+                "module-ballerina-grpc",
+                "module-ballerinai-transaction",
+                "module-ballerina-websocket",
+                "module-ballerina-websub",
+                "module-ballerina-websubhub"
             ]
         },
         {
@@ -154,20 +167,6 @@
                 "module-ballerinax-stan",
                 "module-ballerina-tcp",
                 "module-ballerina-udp"
-            ]
-        },
-        {
-            "name": "module-ballerina-reflect",
-            "version": "0.5.5-SNAPSHOT",
-            "level": 4,
-            "release": true,
-            "dependents": [
-                "module-ballerina-graphql",
-                "module-ballerina-grpc",
-                "module-ballerinai-transaction",
-                "module-ballerina-websocket",
-                "module-ballerina-websub",
-                "module-ballerina-websubhub"
             ]
         },
         {
