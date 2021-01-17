@@ -58,7 +58,7 @@
             "release": true,
             "dependents": [
                 "module-ballerina-email",
-                "module-ballerina-jwt"
+                "module-ballerina-http"
             ]
         },
         {
