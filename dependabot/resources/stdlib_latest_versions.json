@@ -25,13 +25,16 @@
             "module-ballerina-task": "1.1.5"
         },
         {
+            "module-ballerina-time": "1.0.6"
+        },
+        {
             "module-ballerina-xmlutils": "1.0.5"
         },
         {
-            "module-ballerina-os": "0.7.0"
+            "module-ballerina-crypto": "1.0.5"
         },
         {
-            "module-ballerina-time": "1.0.6"
+            "module-ballerina-os": "0.7.0"
         },
         {
             "module-ballerina-xslt": "1.0.6"
@@ -40,16 +43,13 @@
             "module-ballerina-config": "1.0.5"
         },
         {
-            "module-ballerina-crypto": "1.0.5"
-        },
-        {
-            "module-ballerina-log": "1.0.5"
-        },
-        {
             "module-ballerina-reflect": "0.5.5"
         },
         {
             "module-ballerina-uuid": "0.9.1"
+        },
+        {
+            "module-ballerina-log": "1.0.5"
         },
         {
             "module-ballerina-cache": "2.0.5"
@@ -103,7 +103,10 @@
             "module-ballerina-websocket": "1.1.1"
         },
         {
-            "module-ballerina-websub": "1.0.9"
+            "module-ballerina-websub": "1.1.0"
+        },
+        {
+            "module-ballerina-websubhub": "0.1.0"
         },
         {
             "module-ballerinax-kafka": "2.0.4"
