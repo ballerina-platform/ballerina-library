@@ -56,7 +56,7 @@
             "release": true,
             "dependents": [
                 "module-ballerina-config",
-                "module-ballerina-time",
+                "module-ballerina-uuid",
                 "module-ballerina-xslt"
             ]
         },
@@ -72,11 +72,35 @@
             ]
         },
         {
+            "name": "module-ballerina-time",
+            "version": "1.0.6-SNAPSHOT",
+            "level": 1,
+            "release": true,
+            "dependents": [
+                "module-ballerina-cache",
+                "module-ballerina-crypto",
+                "module-ballerina-file"
+            ]
+        },
+        {
             "name": "module-ballerina-xmlutils",
             "version": "1.0.5-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": []
+        },
+        {
+            "name": "module-ballerina-crypto",
+            "version": "1.0.5-SNAPSHOT",
+            "level": 2,
+            "release": true,
+            "dependents": [
+                "module-ballerina-auth",
+                "module-ballerinax-nats",
+                "module-ballerina-oauth2",
+                "module-ballerinax-stan",
+                "module-ballerina-uuid"
+            ]
         },
         {
             "name": "module-ballerina-os",
@@ -85,17 +109,6 @@
             "release": true,
             "dependents": [
                 "module-ballerina-config"
-            ]
-        },
-        {
-            "name": "module-ballerina-time",
-            "version": "1.0.6-SNAPSHOT",
-            "level": 2,
-            "release": true,
-            "dependents": [
-                "module-ballerina-cache",
-                "module-ballerina-crypto",
-                "module-ballerina-file"
             ]
         },
         {
@@ -116,16 +129,12 @@
             ]
         },
         {
-            "name": "module-ballerina-crypto",
-            "version": "1.0.5-SNAPSHOT",
+            "name": "module-ballerina-uuid",
+            "version": "0.9.1-SNAPSHOT",
             "level": 3,
             "release": true,
             "dependents": [
-                "module-ballerina-auth",
-                "module-ballerinax-nats",
-                "module-ballerina-oauth2",
-                "module-ballerinax-stan",
-                "module-ballerina-uuid"
+                "module-ballerina-jwt"
             ]
         },
         {
@@ -156,15 +165,6 @@
                 "module-ballerina-websocket",
                 "module-ballerina-websub",
                 "module-ballerina-websubhub"
-            ]
-        },
-        {
-            "name": "module-ballerina-uuid",
-            "version": "0.9.1-SNAPSHOT",
-            "level": 4,
-            "release": true,
-            "dependents": [
-                "module-ballerina-jwt"
             ]
         },
         {
