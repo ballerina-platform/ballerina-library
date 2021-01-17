@@ -58,7 +58,12 @@
             "release": true,
             "dependents": [
                 "module-ballerina-email",
-                "module-ballerina-http"
+                "module-ballerina-graphql",
+                "module-ballerina-grpc",
+                "module-ballerinai-transaction",
+                "module-ballerina-websocket",
+                "module-ballerina-websub",
+                "module-ballerina-websubhub"
             ]
         },
         {
