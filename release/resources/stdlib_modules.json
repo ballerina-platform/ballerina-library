@@ -46,9 +46,8 @@
             "level": 1,
             "release": true,
             "dependents": [
-                "module-ballerina-auth",
-                "module-ballerina-jwt",
-                "module-ballerina-oauth2"
+                "module-ballerina-grpc",
+                "module-ballerina-websocket"
             ]
         },
         {
