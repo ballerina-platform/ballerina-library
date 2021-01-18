@@ -117,7 +117,11 @@ def updatePropertiesFile(data, modules, currentVersions):
             version = compareVersion(latestVersion, currentVersions['stdlibJdbcVersion'])
             line = "stdlibJdbcVersion=" + version + "\n"
         else:
-            version = compareVersion(latestVersion, currentVersions['stdlib' + moduleName.capitalize() + 'Version'])
+            moduleNameInNamingConvention = 'stdlib' + moduleName.capitalize() + 'Version'
+            if moduleNameInNamingConvention in currentVersions:
+                version = compareVersion(latestVersion, currentVersions[moduleNameInNamingConvention])
+            else:
+                version = latestVersion
             line = "stdlib" + moduleName.capitalize() + "Version=" + version + "\n"
 
         if line[0:-1] not in lineList:
