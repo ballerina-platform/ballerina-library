@@ -56,8 +56,7 @@
             "level": 1,
             "release": true,
             "dependents": [
-                "module-ballerina-websocket",
-                "module-ballerina-websubhub"
+                "module-ballerina-websocket"
             ]
         },
         {
