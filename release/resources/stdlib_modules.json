@@ -57,12 +57,10 @@
             "release": true,
             "dependents": [
                 "module-ballerina-email",
-                "module-ballerina-grpc",
                 "module-ballerinax-kafka",
                 "module-ballerinax-rabbitmq",
                 "module-ballerina-sql",
                 "module-ballerina-websocket",
-                "module-ballerina-websub",
                 "module-ballerina-websubhub"
             ]
         },
