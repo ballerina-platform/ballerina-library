@@ -56,7 +56,6 @@
             "level": 1,
             "release": true,
             "dependents": [
-                "module-ballerina-email",
                 "module-ballerina-websocket",
                 "module-ballerina-websubhub"
             ]
