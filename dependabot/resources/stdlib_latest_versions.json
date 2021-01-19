@@ -16,10 +16,10 @@
             "module-ballerina-random": "0.9.0"
         },
         {
-            "module-ballerina-runtime": "0.5.5"
+            "module-ballerina-regex": "0.6.0"
         },
         {
-            "module-ballerina-stringutils": "0.5.5"
+            "module-ballerina-runtime": "0.5.5"
         },
         {
             "module-ballerina-task": "1.1.5"
