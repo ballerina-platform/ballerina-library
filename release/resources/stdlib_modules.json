@@ -41,21 +41,23 @@
             "dependents": []
         },
         {
+            "name": "module-ballerina-regex",
+            "version": "0.6.0-SNAPSHOT",
+            "level": 1,
+            "release": true,
+            "dependents": [
+                "module-ballerina-config",
+                "module-ballerina-reflect",
+                "module-ballerina-uuid"
+            ]
+        },
+        {
             "name": "module-ballerina-runtime",
             "version": "0.5.5-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": [
                 "module-ballerina-grpc",
-                "module-ballerina-websocket"
-            ]
-        },
-        {
-            "name": "module-ballerina-stringutils",
-            "version": "0.5.5-SNAPSHOT",
-            "level": 1,
-            "release": true,
-            "dependents": [
                 "module-ballerina-websocket"
             ]
         },
