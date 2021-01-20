@@ -43,13 +43,13 @@
             "module-ballerina-config": "1.0.5"
         },
         {
+            "module-ballerina-log": "1.0.5"
+        },
+        {
             "module-ballerina-reflect": "0.5.5"
         },
         {
             "module-ballerina-uuid": "0.9.1"
-        },
-        {
-            "module-ballerina-log": "1.0.5"
         },
         {
             "module-ballerina-cache": "2.0.5"
