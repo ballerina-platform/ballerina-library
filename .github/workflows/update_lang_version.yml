@@ -1,0 +1,28 @@
+name: Update Stdlibs on Version Update
+
+on:
+    workflow_dispatch:
+    repository_dispatch:
+        types: [ lang-version-update ]
+
+jobs:
+    update-lang-version:
+        name: Update Ballerina Lang Version
+        if: github.repository_owner == 'ballerina-platform'
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Setup Python
+                uses: actions/setup-python@v2
+                with:
+                    python-version: '3.x'
+
+            -   name: Install Python Packages
+                run: |
+                    pip install requests
+                    pip install retry
+                    pip install PyGithub
+
+            -   name: Update Ballerina Language Version
+                run: |
+                    cd ballerina-standard-library
+                    python dependabot/update_lang_version.py
