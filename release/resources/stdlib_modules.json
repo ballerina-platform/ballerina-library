@@ -128,7 +128,6 @@
             "level": 3,
             "release": true,
             "dependents": [
-                "module-ballerina-graphql",
                 "module-ballerina-websocket"
             ]
         },
