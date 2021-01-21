@@ -128,7 +128,10 @@
             "level": 3,
             "release": true,
             "dependents": [
-                "module-ballerina-http"
+                "module-ballerina-graphql",
+                "module-ballerinax-kafka",
+                "module-ballerina-websocket",
+                "module-ballerina-websubhub"
             ]
         },
         {
