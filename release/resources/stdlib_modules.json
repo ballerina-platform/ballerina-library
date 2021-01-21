@@ -130,8 +130,7 @@
             "dependents": [
                 "module-ballerina-graphql",
                 "module-ballerinax-kafka",
-                "module-ballerina-websocket",
-                "module-ballerina-websubhub"
+                "module-ballerina-websocket"
             ]
         },
         {
