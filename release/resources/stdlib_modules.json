@@ -128,8 +128,8 @@
             "level": 3,
             "release": true,
             "dependents": [
-                "module-ballerina-auth",
-                "module-ballerina-email"
+                "module-ballerina-email",
+                "module-ballerina-http"
             ]
         },
         {
