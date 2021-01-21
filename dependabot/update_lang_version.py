@@ -50,8 +50,7 @@ def get_lang_version():
     for line in properties:
         line = line.decode(ENCODING).strip()
         if line.startswith(VERSION_KEY):
-            # return line.split("=")[-1]
-            return "2.0.0-m9-SNAPSHOT"
+            return line.split("=")[-1]
 
 
 @retry(

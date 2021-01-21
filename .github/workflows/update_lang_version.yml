@@ -26,3 +26,7 @@ jobs:
                 run: |
                     cd ballerina-standard-library
                     python dependabot/update_lang_version.py
+                env:
+                    packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+                    packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+                    packageEmail: ${{ secrets.BALLERINA_BOT_EMAIL }}
