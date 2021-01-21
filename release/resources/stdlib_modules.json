@@ -129,7 +129,6 @@
             "release": true,
             "dependents": [
                 "module-ballerina-graphql",
-                "module-ballerinax-kafka",
                 "module-ballerina-websocket"
             ]
         },
