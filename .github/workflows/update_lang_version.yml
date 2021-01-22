@@ -25,6 +25,7 @@ jobs:
             -   name: Update Ballerina Language Version
                 run: |
                     echo $pwd
+                    ls -la
                     cd ballerina-standard-library/ballerina-standard-library
                     python dependabot/update_lang_version.py
                 env:
