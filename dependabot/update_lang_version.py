@@ -79,7 +79,7 @@ def get_module_list_json():
 def check_and_update_lang_version(module_list_json, lang_version):
     for module_name in module_list_json[MODULES]:
         update_module(module_name, lang_version)
-        time.sleep(2)
+        time.sleep(30)
 
 
 def update_module(module_name, lang_version):
