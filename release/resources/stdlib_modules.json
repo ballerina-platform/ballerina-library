@@ -46,7 +46,6 @@
             "level": 1,
             "release": true,
             "dependents": [
-                "module-ballerina-config",
                 "module-ballerina-log",
                 "module-ballerina-reflect",
                 "module-ballerina-uuid"
@@ -109,7 +108,6 @@
             "level": 2,
             "release": true,
             "dependents": [
-                "module-ballerina-config",
                 "module-ballerina-log",
                 "module-ballerina-reflect"
             ]
@@ -118,13 +116,6 @@
             "name": "module-ballerina-xslt",
             "version": "1.0.6-SNAPSHOT",
             "level": 2,
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerina-config",
-            "version": "1.0.5-SNAPSHOT",
-            "level": 3,
             "release": true,
             "dependents": []
         },
