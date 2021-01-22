@@ -58,8 +58,7 @@
             "level": 1,
             "release": true,
             "dependents": [
-                "module-ballerina-grpc",
-                "module-ballerina-websocket"
+                "module-ballerina-grpc"
             ]
         },
         {
@@ -127,9 +126,7 @@
             "version": "1.0.5-SNAPSHOT",
             "level": 3,
             "release": true,
-            "dependents": [
-                "module-ballerina-websocket"
-            ]
+            "dependents": []
         },
         {
             "name": "module-ballerina-log",
