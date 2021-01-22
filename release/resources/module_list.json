@@ -2,7 +2,6 @@
     "modules": [
         "module-ballerina-auth",
         "module-ballerina-cache",
-        "module-ballerina-config",
         "module-ballerina-crypto",
         "module-ballerina-email",
         "module-ballerina-encoding",
