@@ -40,9 +40,6 @@
             "module-ballerina-xslt": "1.0.6"
         },
         {
-            "module-ballerina-config": "1.0.5"
-        },
-        {
             "module-ballerina-log": "1.0.5"
         },
         {
