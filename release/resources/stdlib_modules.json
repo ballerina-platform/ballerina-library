@@ -155,7 +155,7 @@
         },
         {
             "name": "module-ballerina-cache",
-            "version": "2.0.5-SNAPSHOT",
+            "version": "2.0.6-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": [
@@ -166,7 +166,7 @@
         },
         {
             "name": "module-ballerina-file",
-            "version": "0.6.3-SNAPSHOT",
+            "version": "0.6.4-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": [
@@ -176,7 +176,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "version": "1.0.4-SNAPSHOT",
+            "version": "1.0.5-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": []
