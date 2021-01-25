@@ -137,7 +137,7 @@
         },
         {
             "name": "module-ballerina-reflect",
-            "version": "0.5.5-SNAPSHOT",
+            "version": "0.5.6-SNAPSHOT",
             "level": 3,
             "release": true,
             "dependents": [
@@ -146,7 +146,7 @@
         },
         {
             "name": "module-ballerina-uuid",
-            "version": "0.9.1-SNAPSHOT",
+            "version": "0.9.2-SNAPSHOT",
             "level": 3,
             "release": true,
             "dependents": [
