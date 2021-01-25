@@ -1,121 +1,121 @@
 {
     "modules": [
         {
-            "module-ballerina-encoding": "1.0.7"
+            "module-ballerina-encoding": "1.0.8"
         },
         {
-            "module-ballerina-io": "0.5.5"
+            "module-ballerina-io": "0.5.6"
         },
         {
-            "module-ballerina-java.arrays": "0.9.5"
+            "module-ballerina-java.arrays": "0.9.6"
         },
         {
-            "module-ballerina-jsonutils": "1.0.5"
+            "module-ballerina-jsonutils": "1.0.6"
         },
         {
-            "module-ballerina-random": "0.9.0"
+            "module-ballerina-random": "0.9.1"
         },
         {
-            "module-ballerina-regex": "0.6.0"
+            "module-ballerina-regex": "0.6.1"
         },
         {
-            "module-ballerina-runtime": "0.5.5"
+            "module-ballerina-runtime": "0.5.6"
         },
         {
-            "module-ballerina-task": "1.1.5"
+            "module-ballerina-task": "1.1.6"
         },
         {
-            "module-ballerina-time": "1.0.6"
+            "module-ballerina-time": "1.0.7"
         },
         {
-            "module-ballerina-xmlutils": "1.0.5"
+            "module-ballerina-xmlutils": "1.0.6"
         },
         {
-            "module-ballerina-crypto": "1.0.5"
+            "module-ballerina-crypto": "1.0.6"
         },
         {
-            "module-ballerina-os": "0.7.0"
+            "module-ballerina-os": "0.7.1"
         },
         {
-            "module-ballerina-xslt": "1.0.6"
+            "module-ballerina-xslt": "1.0.7"
         },
         {
-            "module-ballerina-log": "1.0.5"
+            "module-ballerina-log": "1.0.6"
         },
         {
-            "module-ballerina-reflect": "0.5.5"
+            "module-ballerina-reflect": "0.5.6"
         },
         {
-            "module-ballerina-uuid": "0.9.1"
+            "module-ballerina-uuid": "0.9.2"
         },
         {
-            "module-ballerina-cache": "2.0.5"
+            "module-ballerina-cache": "2.0.6"
         },
         {
-            "module-ballerina-file": "0.6.3"
+            "module-ballerina-file": "0.6.4"
         },
         {
-            "module-ballerina-ftp": "1.0.4"
+            "module-ballerina-ftp": "1.0.5"
         },
         {
-            "module-ballerina-mime": "1.0.5"
+            "module-ballerina-mime": "1.0.6"
         },
         {
-            "module-ballerinax-nats": "1.0.7"
+            "module-ballerinax-nats": "1.0.8"
         },
         {
-            "module-ballerinax-stan": "1.0.1"
+            "module-ballerinax-stan": "1.0.2"
         },
         {
-            "module-ballerina-tcp": "0.7.3"
+            "module-ballerina-tcp": "0.7.4"
         },
         {
-            "module-ballerina-udp": "0.8.1"
+            "module-ballerina-udp": "0.8.2"
         },
         {
-            "module-ballerina-auth": "1.0.5"
+            "module-ballerina-auth": "1.0.6"
         },
         {
-            "module-ballerina-email": "1.0.5"
+            "module-ballerina-email": "1.0.6"
         },
         {
-            "module-ballerina-jwt": "1.0.7"
+            "module-ballerina-jwt": "1.0.8"
         },
         {
-            "module-ballerina-oauth2": "1.0.5"
+            "module-ballerina-oauth2": "1.0.6"
         },
         {
-            "module-ballerina-http": "1.0.5"
+            "module-ballerina-http": "1.0.6"
         },
         {
-            "module-ballerina-graphql": "0.1.1"
+            "module-ballerina-graphql": "0.1.2"
         },
         {
-            "module-ballerina-grpc": "0.7.5"
+            "module-ballerina-grpc": "0.7.6"
         },
         {
-            "module-ballerinai-transaction": "1.0.4"
+            "module-ballerinai-transaction": "1.0.5"
         },
         {
-            "module-ballerina-websocket": "1.1.1"
+            "module-ballerina-websocket": "1.1.2"
         },
         {
-            "module-ballerina-websub": "1.1.0"
+            "module-ballerina-websub": "1.1.1"
         },
         {
-            "module-ballerina-websubhub": "0.1.0"
+            "module-ballerina-websubhub": "0.1.1"
         },
         {
-            "module-ballerinax-kafka": "2.0.4"
+            "module-ballerinax-kafka": "2.0.5"
         },
         {
-            "module-ballerinax-rabbitmq": "1.0.7"
+            "module-ballerinax-rabbitmq": "1.0.8"
         },
         {
-            "module-ballerina-sql": "0.5.4"
+            "module-ballerina-sql": "0.5.5"
         },
         {
-            "module-ballerina-java.jdbc": "0.5.4"
+            "module-ballerina-java.jdbc": "0.5.5"
         },
         {
             "module-ballerinax-mysql": "0.6.4"
