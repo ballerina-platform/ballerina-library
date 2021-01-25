@@ -2,7 +2,7 @@
     "modules": [
         {
             "name": "module-ballerina-encoding",
-            "version": "1.0.7-SNAPSHOT",
+            "version": "1.0.8-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": [
@@ -11,7 +11,7 @@
         },
         {
             "name": "module-ballerina-io",
-            "version": "0.5.5-SNAPSHOT",
+            "version": "0.5.6-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": [
@@ -21,21 +21,21 @@
         },
         {
             "name": "module-ballerina-java.arrays",
-            "version": "0.9.5-SNAPSHOT",
+            "version": "0.9.6-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerina-jsonutils",
-            "version": "1.0.5-SNAPSHOT",
+            "version": "1.0.6-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerina-random",
-            "version": "0.9.0-SNAPSHOT",
+            "version": "0.9.1-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": []
@@ -62,7 +62,7 @@
         },
         {
             "name": "module-ballerina-task",
-            "version": "1.1.5-SNAPSHOT",
+            "version": "1.1.6-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": [
