@@ -283,7 +283,7 @@
         },
         {
             "name": "module-ballerinai-transaction",
-            "version": "1.0.4-SNAPSHOT",
+            "version": "1.0.5-SNAPSHOT",
             "level": 7,
             "release": true,
             "dependents": [
@@ -315,14 +315,14 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "version": "2.0.4-SNAPSHOT",
+            "version": "2.0.5-SNAPSHOT",
             "level": 8,
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "version": "1.0.7-SNAPSHOT",
+            "version": "1.0.8-SNAPSHOT",
             "level": 8,
             "release": true,
             "dependents": []
