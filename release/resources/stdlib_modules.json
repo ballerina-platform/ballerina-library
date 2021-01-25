@@ -237,7 +237,7 @@
         },
         {
             "name": "module-ballerina-jwt",
-            "version": "1.0.7-SNAPSHOT",
+            "version": "1.0.8-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": [
@@ -246,7 +246,7 @@
         },
         {
             "name": "module-ballerina-oauth2",
-            "version": "1.0.5-SNAPSHOT",
+            "version": "1.0.6-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": [
