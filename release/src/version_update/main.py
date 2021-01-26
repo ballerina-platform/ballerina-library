@@ -13,6 +13,9 @@ packageUser =  os.environ["packageUser"]
 packagePAT = os.environ["packagePAT"]
 packageEmail =  os.environ["packageEmail"]
 organization = 'ballerina-platform'
+standardLibrary = 'stdlib'
+javaArraysModuleName = 'stdlibJavaArraysVersion'
+javaJdbcModuleName = 'stdlibJdbcVersion'
 
 def main():
     print("Checking Ballerina Distribution for stdlib version updates")
@@ -66,7 +69,7 @@ def getCurrentModuleVersions(propertiesFile):
     currentVersions = {}
 
     for line in propertiesFile.splitlines():
-        if 'stdlib' in line and 'Version=' in line:
+        if standardLibrary in line and 'Version=' in line:
             moduleName = line.split('=')[0]
             version = line.split('=')[1]
             currentVersions[moduleName] = version
@@ -93,7 +96,7 @@ def updatePropertiesFile(data, modules, currentVersions):
     lineList = data.splitlines()
 
     for line in lineList:
-        if 'stdlib' in line.lower():
+        if standardLibrary in line.lower():
             currentLine = line
             break 
         line += '\n'
@@ -111,18 +114,18 @@ def updatePropertiesFile(data, modules, currentVersions):
         latestVersion = module['version']
 
         if moduleName == 'java.arrays':
-            version = compareVersion(latestVersion, currentVersions['stdlibJavaArraysVersion'])
-            line = "stdlibJavaArraysVersion=" + version + "\n"
+            version = compareVersion(latestVersion, currentVersions[javaArraysModuleName])
+            line = javaArraysModuleName + "=" + version + "\n"
         elif moduleName == 'java.jdbc':
-            version = compareVersion(latestVersion, currentVersions['stdlibJdbcVersion'])
-            line = "stdlibJdbcVersion=" + version + "\n"
+            version = compareVersion(latestVersion, currentVersions[javaJdbcModuleName])
+            line = javaJdbcModuleName + "=" + version + "\n"
         else:
-            moduleNameInNamingConvention = 'stdlib' + moduleName.capitalize() + 'Version'
+            moduleNameInNamingConvention = standardLibrary + moduleName.capitalize() + 'Version'
             if moduleNameInNamingConvention in currentVersions:
                 version = compareVersion(latestVersion, currentVersions[moduleNameInNamingConvention])
             else:
                 version = latestVersion
-            line = "stdlib" + moduleName.capitalize() + "Version=" + version + "\n"
+            line = standardLibrary + moduleName.capitalize() + "Version=" + version + "\n"
 
         if line[0:-1] not in lineList:
             updatedModules.append(moduleName)
@@ -130,13 +133,13 @@ def updatePropertiesFile(data, modules, currentVersions):
 
     for line in lineList[lineList.index(currentLine):len(lineList)]:
         currentLine = line
-        if 'stdlib' not in line.lower() and line != '':
+        if standardLibrary not in line.lower() and line != '':
             break
 
     modifiedData += "\n"
 
     for line in lineList[lineList.index(currentLine):len(lineList)]:
-        if 'stdlib' not in line.lower():
+        if standardLibrary not in line.lower():
             line += "\n"
             modifiedData += line
 
