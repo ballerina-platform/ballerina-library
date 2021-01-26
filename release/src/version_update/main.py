@@ -111,8 +111,8 @@ def updatePropertiesFile(data, modules, currentVersions):
         latestVersion = module['version']
 
         if moduleName == 'java.arrays':
-            version = compareVersion(latestVersion, currentVersions['stdlibJarraysVersion'])
-            line = "stdlibJarraysVersion=" + version + "\n"
+            version = compareVersion(latestVersion, currentVersions['stdlibJavaArraysVersion'])
+            line = "stdlibJavaArraysVersion=" + version + "\n"
         elif moduleName == 'java.jdbc':
             version = compareVersion(latestVersion, currentVersions['stdlibJdbcVersion'])
             line = "stdlibJdbcVersion=" + version + "\n"
