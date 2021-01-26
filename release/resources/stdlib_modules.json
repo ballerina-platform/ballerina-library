@@ -346,7 +346,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "version": "0.6.4-SNAPSHOT",
+            "version": "0.6.5-SNAPSHOT",
             "level": 9,
             "release": true,
             "dependents": []
