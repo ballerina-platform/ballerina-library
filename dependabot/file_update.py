@@ -33,6 +33,7 @@ def preprocessString():
             latestVersion.append(updatedModules[i][1:-2] + ':' + updatedModules[i+1][1:-1]) 
 
         # Processed string -> ["module:version", ",module:version"]
+        print("Modules with version updates: ", latestVersion)
         return latestVersion
     except:
         print("Failed to update files")
@@ -148,6 +149,7 @@ def fetchPropertiesFile(repo, module):
 def updatePropertiesFile(data, module, latestVersion):
     modifiedData = ''
     commitFlag = False
+    currentVersion = ''
 
     for line in data.splitlines():
         if 'stdlib' + module.split('-')[-1].capitalize() + 'Version' in line:
@@ -163,6 +165,9 @@ def updatePropertiesFile(data, module, latestVersion):
         else:
             modifiedLine = line + '\n'
             modifiedData += modifiedLine
+    
+    if currentVersion == '':
+        print("Inconsistent module name: ", module)
     
     return modifiedData, currentVersion, commitFlag
 
