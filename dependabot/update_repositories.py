@@ -162,6 +162,15 @@ def updatePropertiesFile(data, module, latestVersion):
                     modifiedLine = 'stdlib' + module.split('-')[-1].capitalize() + 'Version=' + latestVersion + "\n"
                 modifiedData += modifiedLine
                 commitFlag = True
+        elif module.split('-')[-1] == 'oauth2' and 'stdlibOAuth2Version' in line:
+            currentVersion = line.split('=')[-1].split('-')[0]
+            if compareVersion(latestVersion, currentVersion) == 1:
+                if 'SNAPSHOT' in line:
+                    modifiedLine = 'stdlibOAuth2Version=' + latestVersion + "-SNAPSHOT\n"
+                else:
+                    modifiedLine = 'stdlibOAuth2Version=' + latestVersion + "\n"
+                modifiedData += modifiedLine
+                commitFlag = True
         else:
             modifiedLine = line + '\n'
             modifiedData += modifiedLine
