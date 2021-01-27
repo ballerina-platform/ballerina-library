@@ -16,6 +16,7 @@ organization = 'ballerina-platform'
 standardLibrary = 'stdlib'
 javaArraysModuleName = 'stdlibJavaArraysVersion'
 javaJdbcModuleName = 'stdlibJdbcVersion'
+OAuth2ModuleName = 'stdlibOAuth2Version'
 
 def main():
     print("Checking Ballerina Distribution for stdlib version updates")
@@ -119,6 +120,9 @@ def updatePropertiesFile(data, modules, currentVersions):
         elif moduleName == 'java.jdbc':
             version = compareVersion(latestVersion, currentVersions[javaJdbcModuleName])
             line = javaJdbcModuleName + "=" + version + "\n"
+        elif moduleName == 'oauth2':
+            version = compareVersion(latestVersion, currentVersions[OAuth2ModuleName])
+            line = OAuth2ModuleName + "=" + version + "\n"
         else:
             moduleNameInNamingConvention = standardLibrary + moduleName.capitalize() + 'Version'
             if moduleNameInNamingConvention in currentVersions:
