@@ -2,7 +2,7 @@
     "modules": [
         {
             "name": "module-ballerina-encoding",
-            "version": "1.0.8-SNAPSHOT",
+            "version": "1.0.9-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": [
