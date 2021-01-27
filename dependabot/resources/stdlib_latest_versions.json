@@ -1,7 +1,7 @@
 {
     "modules": [
         {
-            "module-ballerina-encoding": "1.0.8"
+            "module-ballerina-encoding": "1.0.9"
         },
         {
             "module-ballerina-io": "0.5.6"
@@ -13,10 +13,10 @@
             "module-ballerina-jsonutils": "1.0.6"
         },
         {
-            "module-ballerina-random": "0.9.1"
+            "module-ballerina-random": "0.9.2"
         },
         {
-            "module-ballerina-regex": "0.6.1"
+            "module-ballerina-regex": "0.6.2"
         },
         {
             "module-ballerina-runtime": "0.5.6"
@@ -25,13 +25,13 @@
             "module-ballerina-task": "1.1.6"
         },
         {
-            "module-ballerina-time": "1.0.7"
+            "module-ballerina-time": "1.0.8"
         },
         {
             "module-ballerina-xmlutils": "1.0.6"
         },
         {
-            "module-ballerina-crypto": "1.0.6"
+            "module-ballerina-crypto": "1.0.7"
         },
         {
             "module-ballerina-os": "0.7.1"
@@ -103,7 +103,7 @@
             "module-ballerina-websub": "1.1.1"
         },
         {
-            "module-ballerina-websubhub": "0.1.1"
+            "module-ballerina-websubhub": "0.1.2"
         },
         {
             "module-ballerinax-kafka": "2.0.5"
