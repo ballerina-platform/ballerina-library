@@ -91,7 +91,7 @@
         },
         {
             "name": "module-ballerina-crypto",
-            "version": "1.0.6-SNAPSHOT",
+            "version": "1.0.7-SNAPSHOT",
             "level": 2,
             "release": true,
             "dependents": [
