@@ -119,15 +119,16 @@ def get_updated_properties_file(module_name, properties_file, lang_version):
 def commit_changes(repo, updated_file, lang_version):
     author = InputGitAuthor(packageUser, packageEmail)
     try:
-        repo.get_branch(LANG_VERSION_UPDATE_BRANCH)
+        base = repo.get_branch(MASTER_BRANCH)
     except:
-        try:
-            branch = repo.get_branch(MASTER_BRANCH)
-        except:
-            branch = repo.get_branch(MAIN_BRANCH)
+        base = repo.get_branch(MAIN_BRANCH)
 
+    try:
+        repo.get_branch(LANG_VERSION_UPDATE_BRANCH)
+        repo.merge(LANG_VERSION_UPDATE_BRANCH, base.commit.sha, "Sync master branch")
+    except:
         ref = f"refs/heads/" + LANG_VERSION_UPDATE_BRANCH
-        repo.create_git_ref(ref=ref, sha=branch.commit.sha)
+        repo.create_git_ref(ref=ref, sha=base.commit.sha)
 
     current_file = repo.get_contents(PROPERTIES_FILE, ref=LANG_VERSION_UPDATE_BRANCH)
     repo.update_file(
