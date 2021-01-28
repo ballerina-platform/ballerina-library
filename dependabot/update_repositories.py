@@ -14,6 +14,7 @@ packageUser =  os.environ["packageUser"]
 packagePAT = os.environ["packagePAT"]
 packageEmail =  os.environ["packageEmail"]
 organization = 'ballerina-platform'
+dependabotBranchName = 'stdlib-dependabot'
 
 def main():
     modulesWithVersionUpdates = preprocessString()
@@ -136,8 +137,8 @@ def configureGithubRepository(module):
 # Fetch gradle.properties file from a given repository
 def fetchPropertiesFile(repo, module):
     try:
-        branch = repo.get_branch(branch="dependabot/" + module)
-        file = repo.get_contents("gradle.properties", ref="dependabot/" + module)
+        branch = repo.get_branch(branch=dependabotBranchName)
+        file = repo.get_contents("gradle.properties", ref=dependabotBranchName)
     except GithubException:
         file = repo.get_contents("gradle.properties")
 
@@ -193,49 +194,44 @@ def commitChanges(data, currentVersion, repo, module, latestVersion):
 
     # If branch already exists checkout and commit else create new branch from master branch and commit
     try:
-        source = repo.get_branch(branch="dependabot/" + module)
+        source = repo.get_branch(branch=dependabotBranchName)
     except GithubException:
         try:
             source = repo.get_branch("main")
         except GithubException:
             source = repo.get_branch("master")
 
-        repo.create_git_ref(ref=f"refs/heads/dependabot/" + module, sha=source.commit.sha)
+        repo.create_git_ref(ref=f"refs/heads/" + dependabotBranchName, sha=source.commit.sha)
 
-    contents = repo.get_contents("gradle.properties", ref="dependabot/" + module)
+    contents = repo.get_contents("gradle.properties", ref=dependabotBranchName)
     repo.update_file(contents.path, 
                     "[Automated] Bump " + module + " from " + currentVersion + " to " + latestVersion, 
                     data, 
                     contents.sha, 
-                    branch="dependabot/" + module, 
+                    branch=dependabotBranchName, 
                     author=author)
 
 # Create a PR from the branch created
 def createPullRequest(repo, currentVersion, module, latestVersion):
-    pulls = repo.get_pulls(state='open', head='dependabot/' + module)
-
+    pulls = repo.get_pulls(state='open', head=dependabotBranchName)
     prExists = 0
 
     # Check if a PR already exists for the module
     for pull in pulls:
-        if "Bump " + module in pull.title:
+        if "Bump stdlib module versions" in pull.title:
             prExists = pull.number
-            minVersion = pull.title.split()[3]
 
-    # If PR exists update the title else create a new PR
-    if prExists:
-        existingPr = repo.get_pull(prExists)
-        existingPr.edit(title="Bump " + module + " from " + minVersion + " to " + latestVersion)
-    else:
+    # Create a new PR if PR doesn't exist
+    if prExists == 0:
         try:
-            repo.create_pull(title="Bump " + module + " from " + currentVersion + " to " + latestVersion, 
+            repo.create_pull(title="Bump stdlib module versions", 
                             body='$subject', 
-                            head="dependabot/" + module, 
+                            head=dependabotBranchName, 
                             base="main")
         except GithubException:
-            repo.create_pull(title="Bump " + module + " from " + currentVersion + " to " + latestVersion, 
+            repo.create_pull(title="Bump stdlib module versions", 
                             body='$subject', 
-                            head="dependabot/" + module, 
+                            head=dependabotBranchName, 
                             base="master")
 
 main()
