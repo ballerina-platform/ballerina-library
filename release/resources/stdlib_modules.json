@@ -137,7 +137,7 @@
         },
         {
             "name": "module-ballerina-reflect",
-            "version": "0.5.6-SNAPSHOT",
+            "version": "0.5.7-SNAPSHOT",
             "level": 3,
             "release": true,
             "dependents": [
@@ -221,7 +221,7 @@
         },
         {
             "name": "module-ballerina-auth",
-            "version": "1.0.6-SNAPSHOT",
+            "version": "1.0.7-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": [
