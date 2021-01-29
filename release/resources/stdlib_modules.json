@@ -257,7 +257,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "version": "1.0.6-SNAPSHOT",
+            "version": "1.0.7-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": [
