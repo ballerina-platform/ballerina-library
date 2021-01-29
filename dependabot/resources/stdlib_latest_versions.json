@@ -115,10 +115,10 @@
             "module-ballerina-sql": "0.5.6"
         },
         {
-            "module-ballerina-java.jdbc": "0.5.5"
+            "module-ballerina-java.jdbc": "0.5.6"
         },
         {
-            "module-ballerinax-mysql": "0.6.5"
+            "module-ballerinax-mysql": "0.6.6"
         }
     ]
 }
