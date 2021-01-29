@@ -121,7 +121,7 @@
         },
         {
             "name": "module-ballerina-log",
-            "version": "1.0.6-SNAPSHOT",
+            "version": "1.0.7-SNAPSHOT",
             "level": 3,
             "release": true,
             "dependents": [
