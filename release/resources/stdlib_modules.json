@@ -21,7 +21,7 @@
         },
         {
             "name": "module-ballerina-java.arrays",
-            "version": "0.9.6-SNAPSHOT",
+            "version": "0.9.7-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": []
