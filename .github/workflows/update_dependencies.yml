@@ -58,7 +58,6 @@ jobs:
                     fi
 
             -   name: Update Ballerina Distribution
-                if : steps.commit.outputs.changes
                 run: |
                     cd ballerina-standard-library
                     python release/src/version_update/main.py
