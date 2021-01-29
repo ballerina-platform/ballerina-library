@@ -341,14 +341,14 @@
         },
         {
             "name": "module-ballerina-java.jdbc",
-            "version": "0.5.5-SNAPSHOT",
+            "version": "0.5.6-SNAPSHOT",
             "level": 8,
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerinax-mysql",
-            "version": "0.6.5-SNAPSHOT",
+            "version": "0.6.6-SNAPSHOT",
             "level": 8,
             "release": true,
             "dependents": []
