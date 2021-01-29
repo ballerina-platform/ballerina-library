@@ -84,7 +84,7 @@
         },
         {
             "name": "module-ballerina-xmlutils",
-            "version": "1.0.6-SNAPSHOT",
+            "version": "1.0.7-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": []
