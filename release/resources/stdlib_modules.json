@@ -193,14 +193,14 @@
         },
         {
             "name": "module-ballerinax-nats",
-            "version": "1.0.8-SNAPSHOT",
+            "version": "1.0.9-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerinax-stan",
-            "version": "1.0.2-SNAPSHOT",
+            "version": "1.0.3-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": []
@@ -315,7 +315,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "version": "2.0.5-SNAPSHOT",
+            "version": "2.0.6-SNAPSHOT",
             "level": 8,
             "release": true,
             "dependents": []
