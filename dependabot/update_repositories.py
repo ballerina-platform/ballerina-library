@@ -194,13 +194,14 @@ def commitChanges(data, currentVersion, repo, module, latestVersion):
 
     # If branch already exists checkout and commit else create new branch from master branch and commit
     try:
-        source = repo.get_branch(branch=dependabotBranchName)
+        source = repo.get_branch("main")
     except GithubException:
-        try:
-            source = repo.get_branch("main")
-        except GithubException:
-            source = repo.get_branch("master")
+        source = repo.get_branch("master")
 
+    try:
+        repo.get_branch(branch=dependabotBranchName)
+        repo.merge(dependabotBranchName, source.commit.sha, "Sync default branch")
+    except:
         repo.create_git_ref(ref=f"refs/heads/" + dependabotBranchName, sha=source.commit.sha)
 
     contents = repo.get_contents("gradle.properties", ref=dependabotBranchName)
