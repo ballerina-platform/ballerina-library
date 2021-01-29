@@ -14,9 +14,13 @@ packagePAT = os.environ["packagePAT"]
 packageEmail =  os.environ["packageEmail"]
 organization = 'ballerina-platform'
 standardLibrary = 'stdlib'
+versionUpdateBranchName = 'automated-stdlib-version-update'
+pullRequestTitle = '[Automated] Update Stdlib module versions'
+
 javaArraysModuleName = 'stdlibJavaArraysVersion'
 javaJdbcModuleName = 'stdlibJdbcVersion'
 OAuth2ModuleName = 'stdlibOAuth2Version'
+
 
 def main():
     print("Checking Ballerina Distribution for stdlib version updates")
@@ -56,8 +60,14 @@ def fetchBallerinaDistributionRepo():
 # Fetch the gradle.properties file from the ballerina-distribution repo
 def fetchPropertiesFile(repo):
     try:
-        branch = repo.get_branch(branch="automated-stdlib-version-update")
-        file = repo.get_contents("gradle.properties", ref="automated-stdlib-version-update")
+        source = repo.get_branch("main")
+    except GithubException:
+        source = repo.get_branch("master")
+
+    try:
+        branch = repo.get_branch(branch=versionUpdateBranchName)
+        repo.merge(versionUpdateBranchName, source.commit.sha, "Sync default branch")
+        file = repo.get_contents("gradle.properties", ref=versionUpdateBranchName)
     except GithubException:
         file = repo.get_contents("gradle.properties")
 
@@ -159,16 +169,17 @@ def commitChanges(data, repo, updatedModules):
 
     # If branch already exists checkout and commit else create new branch from master branch and commit
     try:
-        source = repo.get_branch(branch="automated-stdlib-version-update")
+        source = repo.get_branch("main")
     except GithubException:
-        try:
-            source = repo.get_branch("main")
-        except GithubException:
-            source = repo.get_branch("master")
+        source = repo.get_branch("master")
 
-        repo.create_git_ref(ref=f"refs/heads/automated-stdlib-version-update", sha=source.commit.sha)
+    try:
+        repo.get_branch(branch=versionUpdateBranchName)
+        repo.merge(versionUpdateBranchName, source.commit.sha, "Sync default branch")
+    except:
+        repo.create_git_ref(ref=f"refs/heads/" + versionUpdateBranchName, sha=source.commit.sha)
 
-    contents = repo.get_contents("gradle.properties", ref="automated-stdlib-version-update")
+    contents = repo.get_contents("gradle.properties", ref=versionUpdateBranchName)
 
     if len(updatedModules) > 0:
         commitMessage = "Bump the version of stdlib module(s) - "
@@ -182,31 +193,31 @@ def commitChanges(data, repo, updatedModules):
                     commitMessage, 
                     data, 
                     contents.sha, 
-                    branch="automated-stdlib-version-update", 
+                    branch=versionUpdateBranchName, 
                     author=author)
 
 # Create a PR from the branch created
 def createPullRequest(repo):
-    pulls = repo.get_pulls(state='open', head="automated-stdlib-version-update")
+    pulls = repo.get_pulls(state='open', head=versionUpdateBranchName)
 
     PRExists = 0
 
     # Check if a PR already exists for the module
     for pull in pulls:
-        if "[Automated] Update Stdlib module versions" in pull.title:
+        if pullRequestTitle in pull.title:
             PRExists = pull.number
 
     # If PR doesn't exists create a new PR
     if PRExists == 0:
         try:
-            repo.create_pull(title="[Automated] Update Stdlib module versions", 
+            repo.create_pull(title=pullRequestTitle, 
                             body='$subject', 
-                            head="automated-stdlib-version-update", 
+                            head=versionUpdateBranchName, 
                             base="main")
         except GithubException:
-            repo.create_pull(title="[Automated] Update Stdlib module versions", 
+            repo.create_pull(title=pullRequestTitle, 
                             body='$subject', 
-                            head="automated-stdlib-version-update", 
+                            head=versionUpdateBranchName, 
                             base="master")
 
 main()
