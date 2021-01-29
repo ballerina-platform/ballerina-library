@@ -10,11 +10,14 @@ from github import Github, InputGitAuthor, GithubException
 HTTP_REQUEST_RETRIES = 3
 HTTP_REQUEST_DELAY_IN_SECONDS = 2
 HTTP_REQUEST_DELAY_MULTIPLIER = 2
+
 packageUser =  os.environ["packageUser"]
 packagePAT = os.environ["packagePAT"]
 packageEmail =  os.environ["packageEmail"]
 organization = 'ballerina-platform'
+
 dependabotBranchName = 'stdlib-dependabot'
+pullRequestTitle = '[Automated] Bump stdlib module versions'
 
 def main():
     modulesWithVersionUpdates = preprocessString()
@@ -219,18 +222,18 @@ def createPullRequest(repo, currentVersion, module, latestVersion):
 
     # Check if a PR already exists for the module
     for pull in pulls:
-        if "Bump stdlib module versions" in pull.title:
+        if pullRequestTitle in pull.title:
             prExists = pull.number
 
     # Create a new PR if PR doesn't exist
     if prExists == 0:
         try:
-            repo.create_pull(title="Bump stdlib module versions", 
+            repo.create_pull(title=pullRequestTitle, 
                             body='$subject', 
                             head=dependabotBranchName, 
                             base="main")
         except GithubException:
-            repo.create_pull(title="Bump stdlib module versions", 
+            repo.create_pull(title=pullRequestTitle, 
                             body='$subject', 
                             head=dependabotBranchName, 
                             base="master")
