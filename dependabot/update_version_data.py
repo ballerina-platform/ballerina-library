@@ -1,6 +1,5 @@
 import urllib.request
 import json
-import re
 import sys
 from retry import retry
 

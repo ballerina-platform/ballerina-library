@@ -14,7 +14,7 @@ packagePAT = os.environ["packagePAT"]
 packageEmail =  os.environ["packageEmail"]
 organization = 'ballerina-platform'
 standardLibrary = 'stdlib'
-versionUpdateBranchName = 'automated-stdlib-version-update'
+versionUpdateBranchName = 'automated/stdlib_version_update'
 pullRequestTitle = '[Automated] Update Stdlib module versions'
 
 javaArraysModuleName = 'stdlibJavaArraysVersion'

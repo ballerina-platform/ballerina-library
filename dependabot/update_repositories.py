@@ -16,7 +16,7 @@ packagePAT = os.environ["packagePAT"]
 packageEmail =  os.environ["packageEmail"]
 organization = 'ballerina-platform'
 
-dependabotBranchName = 'stdlib-dependabot'
+dependabotBranchName = 'automated/stdlib_version_update'
 pullRequestTitle = '[Automated] Bump stdlib module versions'
 
 def main():
