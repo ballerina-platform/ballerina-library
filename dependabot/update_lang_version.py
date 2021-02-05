@@ -14,7 +14,7 @@ ORGANIZATION = "ballerina-platform"
 LANG_VERSION_KEY = "ballerinaLangVersion"
 VERSION_KEY = "version="
 
-LANG_VERSION_UPDATE_BRANCH = "automated/ballerina-lang"
+LANG_VERSION_UPDATE_BRANCH = 'automated/stdlib_version_update'
 MASTER_BRANCH = "master"
 MAIN_BRANCH = "main"
 
@@ -28,9 +28,11 @@ OPEN = "open"
 MODULES = "modules"
 
 COMMIT_MESSAGE_PREFIX = "[Automated] Update lang version to "
-PULL_REQUEST_TITLE = "[Automated] Update Lang Version"
+PULL_REQUEST_BODY_PREFIX = "Update ballerina lang version to `"
+PULL_REQUEST_TITLE = "[Automated] Update Ballerina Lang Version"
 
 MODULE_LIST_FILE = "release/resources/module_list.json"
+BALLERINA_DISTRIBUTION = "ballerina-distribution"
 PROPERTIES_FILE = "gradle.properties"
 
 
@@ -73,6 +75,8 @@ def get_module_list_json():
         print(e)
         sys.exit(1)
 
+    # Append ballerina distribution to the list to update the lang version
+    module_list[MODULES].append(BALLERINA_DISTRIBUTION)
     return module_list
 
 
@@ -125,7 +129,7 @@ def commit_changes(repo, updated_file, lang_version):
 
     try:
         repo.get_branch(LANG_VERSION_UPDATE_BRANCH)
-        repo.merge(LANG_VERSION_UPDATE_BRANCH, base.commit.sha, "Sync master branch")
+        repo.merge(LANG_VERSION_UPDATE_BRANCH, base.commit.sha, "Sync default branch")
     except:
         ref = f"refs/heads/" + LANG_VERSION_UPDATE_BRANCH
         repo.create_git_ref(ref=ref, sha=base.commit.sha)
@@ -153,14 +157,14 @@ def create_pull_request(repo, lang_version):
         try:
             repo.create_pull(
                 title=PULL_REQUEST_TITLE,
-                body="Update ballerina lang version to " + lang_version,
+                body=PULL_REQUEST_BODY_PREFIX + lang_version + "`",
                 head=LANG_VERSION_UPDATE_BRANCH,
                 base=MASTER_BRANCH
             )
         except:
             repo.create_pull(
                 title=PULL_REQUEST_TITLE,
-                body="Update ballerina lang version to " + lang_version,
+                body=PULL_REQUEST_BODY_PREFIX + lang_version + "`",
                 head=LANG_VERSION_UPDATE_BRANCH,
                 base=MAIN_BRANCH
             )
