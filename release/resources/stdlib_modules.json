@@ -177,7 +177,7 @@
         },
         {
             "name": "module-ballerina-file",
-            "version": "0.6.5-SNAPSHOT",
+            "version": "0.7.0-alpha2-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": [
@@ -187,7 +187,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "version": "1.0.6-SNAPSHOT",
+            "version": "1.1.0-alpha2-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": []
@@ -303,14 +303,14 @@
         },
         {
             "name": "module-ballerina-websub",
-            "version": "1.1.2-SNAPSHOT",
+            "version": "1.2.0-alpha2-SNAPSHOT",
             "level": 6,
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerina-websubhub",
-            "version": "0.1.2-SNAPSHOT",
+            "version": "0.2.0-alpha2-SNAPSHOT",
             "level": 6,
             "release": true,
             "dependents": []
