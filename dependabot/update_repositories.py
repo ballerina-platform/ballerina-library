@@ -165,10 +165,11 @@ def updatePropertiesFile(data, module, latestVersion):
         if 'stdlib' + module.split('-')[-1].capitalize() + 'Version' in line:
             currentVersion = line.split('=')[-1]
             # update only if the current version < latest version
-            if compareVersion(latestVersion, currentVersion) == 1:
-                modifiedLine = 'stdlib' + module.split('-')[-1].capitalize() + 'Version=' + latestVersion + "\n"
-                modifiedData += modifiedLine
-                commitFlag = True
+            # TODO: RRemoving comparison temporarily
+            # if compareVersion(latestVersion, currentVersion) == 1:
+            modifiedLine = 'stdlib' + module.split('-')[-1].capitalize() + 'Version=' + latestVersion + "\n"
+            modifiedData += modifiedLine
+            commitFlag = True
         elif module.split('-')[-1] == 'oauth2' and 'stdlibOAuth2Version' in line:
             currentVersion = line.split('=')[-1]
             if compareVersion(latestVersion, currentVersion) == 1:
