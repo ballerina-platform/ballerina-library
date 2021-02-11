@@ -29,22 +29,26 @@ def main():
 # Fetch the updated module versions string from the environment and append it to an array
 def preprocessString():
     try:
-        # String is in the form -> '"module": "version" "module": "version"'
-        updatedModules = os.environ["modules"].split()
-
+        with open('./dependabot/resources/stdlib_latest_versions.json') as f:
+            moduleList = json.load(f)
+            updatedModules = moduleList["modules"]
+    except:
+        print('Failed to read stdlib_latest_versions.json')
+        sys.exit(1)
+    try:
         latestVersion = []
-        for i in range(0, len(updatedModules)-1, 2):
-            latestVersion.append(updatedModules[i][1:-2] + ':' + updatedModules[i+1][1:-1]) 
+        for module in updatedModules:
+            latestVersion.append(module)
 
         # Processed string -> ["module:version", ",module:version"]
         print("Modules with version updates: ", latestVersion)
         return latestVersion
     except:
         print("Failed to update files")
-        print("Input String: " + os.environ["modules"])
+        print("Input String: " + updatedModules)
         sys.exit(1)
 
-# Fetch list of stdlib modules from stdlib_latest_versions.json 
+# Fetch list of stdlib modules from stdlib_latest_versions.json
 def getModuleListFromFile():
     try:
         with open('./dependabot/resources/stdlib_latest_versions.json') as f:
@@ -57,34 +61,35 @@ def getModuleListFromFile():
     for module in moduleList['modules']:
         for key in module:
             stdlibModules.append(key)
-        
+
     return stdlibModules
 
 # Initialize a JSON with updated modules, latest version, and its dependents
 def initializeModuleDetails(moduleList):
     updatedModuleDetails = {'modules':[]}
 
-    for module in moduleList:						
-        updatedModuleDetails['modules'].append({
-            'name': module.split(':')[0], 
-            'version':module.split(':')[-1],
-            'dependents': [] })
+    for module in moduleList:
+        for key, value in module.items():
+            updatedModuleDetails['modules'].append({
+                'name': key,
+                'version': value,
+                'dependents': [] })
 
     return updatedModuleDetails
 
-# Fetch all the immediate dependents of modules with version upgrades and update the JSON  
+# Fetch all the immediate dependents of modules with version upgrades and update the JSON
 def getImmediateDependents(stdlibModules, updatedModuleDetails):
     for moduleName in stdlibModules:
         dependencies = getDependencies(moduleName)
         for module in updatedModuleDetails['modules']:
             if module['name'] in dependencies:
                 updatedModuleDetails['modules'][updatedModuleDetails['modules'].index(module)]['dependents'].append(moduleName)
-                    
+
     return updatedModuleDetails
 
 # Returns the file in the given url
-# Retry decorator will retry the function 3 times, doubling the backoff delay if URLError is raised 
-@retry(urllib.error.URLError, tries=HTTP_REQUEST_RETRIES, delay=HTTP_REQUEST_DELAY_IN_SECONDS, 
+# Retry decorator will retry the function 3 times, doubling the backoff delay if URLError is raised
+@retry(urllib.error.URLError, tries=HTTP_REQUEST_RETRIES, delay=HTTP_REQUEST_DELAY_IN_SECONDS,
                                     backoff=HTTP_REQUEST_DELAY_MULTIPLIER)
 def urlOpenWithRetry(url):
     return urllib.request.urlopen(url)
@@ -93,7 +98,7 @@ def urlOpenWithRetry(url):
 # returns: list of dependencies
 def getDependencies(balModule):
     try:
-        data = urlOpenWithRetry("https://raw.githubusercontent.com/ballerina-platform/" 
+        data = urlOpenWithRetry("https://raw.githubusercontent.com/ballerina-platform/"
                                     + balModule + "/master/build.gradle")
     except:
         print('Failed to read build.gradle file of ' + balModule)
@@ -132,10 +137,11 @@ def configureGithubRepository(module):
     github = Github(packagePAT)
     try:
         repo = github.get_repo(organization + "/" + module)
+        return repo
     except:
         print("Error fetching repository " + module)
+        sys.exit(1)
 
-    return repo
 
 # Fetch gradle.properties file from a given repository
 def fetchPropertiesFile(repo, module):
@@ -178,10 +184,10 @@ def updatePropertiesFile(data, module, latestVersion):
         else:
             modifiedLine = line + '\n'
             modifiedData += modifiedLine
-    
+
     if currentVersion == '':
         print("Inconsistent module name: ", module)
-    
+
     return modifiedData, currentVersion, commitFlag
 
 # Compare latest version with current version
@@ -208,11 +214,11 @@ def commitChanges(data, currentVersion, repo, module, latestVersion):
         repo.create_git_ref(ref=f"refs/heads/" + dependabotBranchName, sha=source.commit.sha)
 
     contents = repo.get_contents("gradle.properties", ref=dependabotBranchName)
-    repo.update_file(contents.path, 
-                    "[Automated] Bump " + module + " from " + currentVersion + " to " + latestVersion, 
-                    data, 
-                    contents.sha, 
-                    branch=dependabotBranchName, 
+    repo.update_file(contents.path,
+                    "[Automated] Bump " + module + " from " + currentVersion + " to " + latestVersion,
+                    data,
+                    contents.sha,
+                    branch=dependabotBranchName,
                     author=author)
 
 # Create a PR from the branch created
@@ -228,14 +234,14 @@ def createPullRequest(repo, currentVersion, module, latestVersion):
     # Create a new PR if PR doesn't exist
     if prExists == 0:
         try:
-            repo.create_pull(title=pullRequestTitle, 
-                            body='$subject', 
-                            head=dependabotBranchName, 
+            repo.create_pull(title=pullRequestTitle,
+                            body='$subject',
+                            head=dependabotBranchName,
                             base="main")
         except GithubException:
-            repo.create_pull(title=pullRequestTitle, 
-                            body='$subject', 
-                            head=dependabotBranchName, 
+            repo.create_pull(title=pullRequestTitle,
+                            body='$subject',
+                            head=dependabotBranchName,
                             base="master")
 
 main()
