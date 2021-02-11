@@ -58,7 +58,6 @@ jobs:
                     fi
                     
             -   name : Update Files
-                if : steps.commit.outputs.updates
                 run : |
                     cd ballerina-standard-library
                     python dependabot/update_repositories.py
