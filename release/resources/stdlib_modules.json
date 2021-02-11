@@ -331,7 +331,7 @@
         },
         {
             "name": "module-ballerina-sql",
-            "version": "0.5.6-SNAPSHOT",
+            "version": "0.6.0-alpha2-SNAPSHOT",
             "level": 7,
             "release": true,
             "dependents": [
@@ -348,7 +348,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "version": "0.6.6-SNAPSHOT",
+            "version": "0.7.0-alpha2-SNAPSHOT",
             "level": 8,
             "release": true,
             "dependents": []
