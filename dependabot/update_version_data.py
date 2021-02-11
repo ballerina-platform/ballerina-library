@@ -53,9 +53,7 @@ def getLatestVersions(moduleList):
     latestModuleVersions = {'modules':[]}
 
     for module in moduleList:
-        version = fetchModuleVersionFromBallerinaCentral(module['name'])	
-        if version == '0.0.0':
-            version = module['version'].split('-')[0]					
+        version = module['version']
         latestModuleVersions['modules'].append({module['name']: version})
 
     return latestModuleVersions
