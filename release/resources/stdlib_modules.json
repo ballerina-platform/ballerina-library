@@ -42,7 +42,7 @@
         },
         {
             "name": "module-ballerina-regex",
-            "version": "0.6.2-SNAPSHOT",
+            "version": "0.7.0-alpha2-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": [
@@ -159,7 +159,7 @@
         },
         {
             "name": "module-ballerina-uuid",
-            "version": "0.9.3-SNAPSHOT",
+            "version": "0.10.0-alpha2-SNAPSHOT",
             "level": 3,
             "release": true,
             "dependents": [
