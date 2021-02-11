@@ -341,7 +341,7 @@
         },
         {
             "name": "module-ballerina-java.jdbc",
-            "version": "0.5.6-SNAPSHOT",
+            "version": "0.6.0-alpha2-SNAPSHOT",
             "level": 8,
             "release": true,
             "dependents": []
