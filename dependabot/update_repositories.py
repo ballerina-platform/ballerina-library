@@ -170,7 +170,7 @@ def updatePropertiesFile(data, module, latestVersion):
             currentVersion = line.split('=')[-1].split('-')[0]
             if compareVersion(latestVersion, currentVersion) == 1:
                 if 'SNAPSHOT' in line:
-                    modifiedLine = 'stdlibOAuth2Version=' + latestVersion + "-SNAPSHOT\n"
+                    modifiedLine = 'stdlibOAuth2Version=' + latestVersion + "\n"
                 else:
                     modifiedLine = 'stdlibOAuth2Version=' + latestVersion + "\n"
                 modifiedData += modifiedLine
