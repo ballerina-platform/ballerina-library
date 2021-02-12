@@ -115,7 +115,7 @@
         },
         {
             "name": "module-ballerina-os",
-            "version": "0.8.0-alpha2-SNAPSHOT",
+            "version": "0.8.0-alpha3-SNAPSHOT",
             "level": 2,
             "release": true,
             "dependents": [
@@ -132,7 +132,7 @@
         },
         {
             "name": "module-ballerina-log",
-            "version": "1.1.0-alpha2-SNAPSHOT",
+            "version": "1.1.0-alpha3-SNAPSHOT",
             "level": 3,
             "release": true,
             "dependents": [
@@ -159,7 +159,7 @@
         },
         {
             "name": "module-ballerina-uuid",
-            "version": "0.10.0-alpha2-SNAPSHOT",
+            "version": "0.10.0-alpha3-SNAPSHOT",
             "level": 3,
             "release": true,
             "dependents": [
@@ -257,7 +257,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "version": "1.1.0-alpha2-SNAPSHOT",
+            "version": "1.1.0-alpha3-SNAPSHOT",
             "level": 5,
             "release": true,
             "dependents": [
