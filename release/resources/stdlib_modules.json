@@ -4,7 +4,7 @@
             "name": "module-ballerina-encoding",
             "version": "1.1.0-alpha2-SNAPSHOT",
             "level": 1,
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-jwt"
             ]
@@ -13,7 +13,7 @@
             "name": "module-ballerina-io",
             "version": "0.6.0-alpha2-SNAPSHOT",
             "level": 1,
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-os",
                 "module-ballerina-xslt"
@@ -30,21 +30,21 @@
             "name": "module-ballerina-jsonutils",
             "version": "1.1.0-alpha2-SNAPSHOT",
             "level": 1,
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
             "name": "module-ballerina-random",
             "version": "0.10.0-alpha2-SNAPSHOT",
             "level": 1,
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
             "name": "module-ballerina-regex",
             "version": "0.7.0-alpha2-SNAPSHOT",
             "level": 1,
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-log",
                 "module-ballerina-reflect",
@@ -55,7 +55,7 @@
             "name": "module-ballerina-runtime",
             "version": "0.6.0-alpha2-SNAPSHOT",
             "level": 1,
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-grpc"
             ]
@@ -86,7 +86,7 @@
             "name": "module-ballerina-xmlutils",
             "version": "1.1.0-alpha2-SNAPSHOT",
             "level": 1,
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
