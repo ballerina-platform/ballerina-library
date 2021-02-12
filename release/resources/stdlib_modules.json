@@ -28,7 +28,7 @@
         },
         {
             "name": "module-ballerina-jsonutils",
-            "version": "1.1.0-alpha2-SNAPSHOT",
+            "version": "1.1.0-alpha3-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": []
@@ -42,7 +42,7 @@
         },
         {
             "name": "module-ballerina-regex",
-            "version": "0.7.0-alpha2-SNAPSHOT",
+            "version": "0.7.0-alpha3-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": [
@@ -102,7 +102,7 @@
         },
         {
             "name": "module-ballerina-crypto",
-            "version": "1.1.0-alpha2-SNAPSHOT",
+            "version": "1.1.0-alpha3-SNAPSHOT",
             "level": 2,
             "release": true,
             "dependents": [
@@ -125,7 +125,7 @@
         },
         {
             "name": "module-ballerina-xslt",
-            "version": "1.1.0-alpha2-SNAPSHOT",
+            "version": "1.1.0-alpha3-SNAPSHOT",
             "level": 2,
             "release": true,
             "dependents": []
@@ -150,7 +150,7 @@
         },
         {
             "name": "module-ballerina-reflect",
-            "version": "0.6.0-alpha2-SNAPSHOT",
+            "version": "0.6.0-alpha3-SNAPSHOT",
             "level": 3,
             "release": true,
             "dependents": [
@@ -168,7 +168,7 @@
         },
         {
             "name": "module-ballerina-auth",
-            "version": "1.1.0-alpha2-SNAPSHOT",
+            "version": "1.1.0-alpha3-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": [
@@ -194,7 +194,7 @@
         },
         {
             "name": "module-ballerina-jwt",
-            "version": "1.1.0-alpha2-SNAPSHOT",
+            "version": "1.1.0-alpha3-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": [
@@ -213,14 +213,14 @@
         },
         {
             "name": "module-ballerinax-nats",
-            "version": "1.1.0-alpha2-SNAPSHOT",
+            "version": "1.1.0-alpha3-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerina-oauth2",
-            "version": "1.1.0-alpha2-SNAPSHOT",
+            "version": "1.1.0-alpha3-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": [
@@ -317,7 +317,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "version": "2.1.0-alpha2-SNAPSHOT",
+            "version": "2.1.0-alpha3-SNAPSHOT",
             "level": 7,
             "release": true,
             "dependents": []
@@ -331,7 +331,7 @@
         },
         {
             "name": "module-ballerina-sql",
-            "version": "0.6.0-alpha2-SNAPSHOT",
+            "version": "0.6.0-alpha3-SNAPSHOT",
             "level": 7,
             "release": true,
             "dependents": [
@@ -341,14 +341,14 @@
         },
         {
             "name": "module-ballerina-java.jdbc",
-            "version": "0.6.0-alpha2-SNAPSHOT",
+            "version": "0.6.0-alpha3-SNAPSHOT",
             "level": 8,
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerinax-mysql",
-            "version": "0.7.0-alpha2-SNAPSHOT",
+            "version": "0.7.0-alpha3-SNAPSHOT",
             "level": 8,
             "release": true,
             "dependents": []
