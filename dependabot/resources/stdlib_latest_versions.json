@@ -1,124 +1,124 @@
 {
     "modules": [
         {
-            "module-ballerina-encoding": "1.1.0-alpha2-SNAPSHOT"
+            "module-ballerina-encoding": "1.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-io": "0.6.0-alpha2-SNAPSHOT"
+            "module-ballerina-io": "0.6.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-java.arrays": "0.10.0-alpha2-SNAPSHOT"
+            "module-ballerina-java.arrays": "0.10.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-jsonutils": "1.1.0-alpha2-SNAPSHOT"
+            "module-ballerina-jsonutils": "1.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-random": "0.10.0-alpha2-SNAPSHOT"
+            "module-ballerina-random": "0.10.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-regex": "0.7.0-alpha2-SNAPSHOT"
+            "module-ballerina-regex": "0.7.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-runtime": "0.6.0-alpha2-SNAPSHOT"
+            "module-ballerina-runtime": "0.6.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-task": "1.2.0-alpha2-SNAPSHOT"
+            "module-ballerina-task": "1.2.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-time": "1.1.0-alpha2-SNAPSHOT"
+            "module-ballerina-time": "1.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-xmlutils": "1.1.0-alpha2-SNAPSHOT"
+            "module-ballerina-xmlutils": "1.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-cache": "2.1.0-alpha2-SNAPSHOT"
+            "module-ballerina-cache": "2.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-crypto": "1.1.0-alpha2-SNAPSHOT"
+            "module-ballerina-crypto": "1.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-os": "0.8.0-alpha2-SNAPSHOT"
+            "module-ballerina-os": "0.8.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-xslt": "1.1.0-alpha2-SNAPSHOT"
+            "module-ballerina-xslt": "1.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-log": "1.1.0-alpha2-SNAPSHOT"
+            "module-ballerina-log": "1.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-reflect": "0.6.0-alpha2-SNAPSHOT"
+            "module-ballerina-reflect": "0.6.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-uuid": "0.10.0-alpha2-SNAPSHOT"
+            "module-ballerina-uuid": "0.10.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-auth": "1.1.0-alpha2-SNAPSHOT"
+            "module-ballerina-auth": "1.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-file": "0.7.0-alpha2-SNAPSHOT"
+            "module-ballerina-file": "0.7.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-ftp": "1.1.0-alpha2-SNAPSHOT"
+            "module-ballerina-ftp": "1.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-jwt": "1.1.0-alpha2-SNAPSHOT"
+            "module-ballerina-jwt": "1.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-mime": "1.1.0-alpha2-SNAPSHOT"
+            "module-ballerina-mime": "1.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerinax-nats": "1.1.0-alpha2-SNAPSHOT"
+            "module-ballerinax-nats": "1.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-oauth2": "1.1.0-alpha2-SNAPSHOT"
+            "module-ballerina-oauth2": "1.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerinax-stan": "1.1.0-alpha2-SNAPSHOT"
+            "module-ballerinax-stan": "1.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-tcp": "0.8.0-alpha2-SNAPSHOT"
+            "module-ballerina-tcp": "0.8.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-udp": "0.9.0-alpha2-SNAPSHOT"
+            "module-ballerina-udp": "0.9.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-email": "1.1.0-alpha2-SNAPSHOT"
+            "module-ballerina-email": "1.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-http": "1.1.0-alpha2-SNAPSHOT"
+            "module-ballerina-http": "1.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-graphql": "0.2.0-alpha2-SNAPSHOT"
+            "module-ballerina-graphql": "0.2.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-grpc": "0.8.0-alpha2-SNAPSHOT"
+            "module-ballerina-grpc": "0.8.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerinai-transaction": "1.0.6-SNAPSHOT"
+            "module-ballerinai-transaction": "1.0.7-SNAPSHOT"
         },
         {
-            "module-ballerina-websocket": "1.2.0-alpha2-SNAPSHOT"
+            "module-ballerina-websocket": "1.2.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-websub": "1.2.0-alpha2-SNAPSHOT"
+            "module-ballerina-websub": "1.2.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-websubhub": "0.2.0-alpha2-SNAPSHOT"
+            "module-ballerina-websubhub": "0.2.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerinax-kafka": "2.1.0-alpha2-SNAPSHOT"
+            "module-ballerinax-kafka": "2.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerinax-rabbitmq": "1.1.0-alpha2-SNAPSHOT"
+            "module-ballerinax-rabbitmq": "1.1.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-sql": "0.6.0-alpha2-SNAPSHOT"
+            "module-ballerina-sql": "0.6.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerina-java.jdbc": "0.6.0-alpha2-SNAPSHOT"
+            "module-ballerina-java.jdbc": "0.6.0-alpha3-SNAPSHOT"
         },
         {
-            "module-ballerinax-mysql": "0.7.0-alpha2-SNAPSHOT"
+            "module-ballerinax-mysql": "0.7.0-alpha3-SNAPSHOT"
         }
     ]
 }
