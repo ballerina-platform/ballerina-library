@@ -23,7 +23,7 @@
             "name": "module-ballerina-java.arrays",
             "version": "0.10.0-alpha2-SNAPSHOT",
             "level": 1,
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -75,7 +75,7 @@
             "name": "module-ballerina-time",
             "version": "1.1.0-alpha2-SNAPSHOT",
             "level": 1,
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-cache",
                 "module-ballerina-crypto",
