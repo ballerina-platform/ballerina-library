@@ -2,7 +2,7 @@
     "modules": [
         {
             "name": "module-ballerina-encoding",
-            "version": "1.1.0-alpha2-SNAPSHOT",
+            "version": "1.1.0-alpha3-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": [
@@ -11,7 +11,7 @@
         },
         {
             "name": "module-ballerina-io",
-            "version": "0.6.0-alpha2-SNAPSHOT",
+            "version": "0.6.0-alpha3-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": [
@@ -21,7 +21,7 @@
         },
         {
             "name": "module-ballerina-java.arrays",
-            "version": "0.10.0-alpha2-SNAPSHOT",
+            "version": "0.10.0-alpha3-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": []
@@ -53,7 +53,7 @@
         },
         {
             "name": "module-ballerina-runtime",
-            "version": "0.6.0-alpha2-SNAPSHOT",
+            "version": "0.6.0-alpha3-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": [
@@ -62,7 +62,7 @@
         },
         {
             "name": "module-ballerina-task",
-            "version": "1.2.0-alpha2-SNAPSHOT",
+            "version": "1.2.0-alpha3-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": [
@@ -84,14 +84,14 @@
         },
         {
             "name": "module-ballerina-xmlutils",
-            "version": "1.1.0-alpha2-SNAPSHOT",
+            "version": "1.1.0-alpha3-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerina-cache",
-            "version": "2.1.0-alpha2-SNAPSHOT",
+            "version": "2.1.0-alpha3-SNAPSHOT",
             "level": 2,
             "release": true,
             "dependents": [
@@ -229,7 +229,7 @@
         },
         {
             "name": "module-ballerinax-stan",
-            "version": "1.1.0-alpha2-SNAPSHOT",
+            "version": "1.1.0-alpha3-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": []
@@ -278,7 +278,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "version": "0.8.0-alpha2-SNAPSHOT",
+            "version": "0.8.0-alpha3-SNAPSHOT",
             "level": 6,
             "release": true,
             "dependents": []
@@ -324,7 +324,7 @@
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "version": "1.1.0-alpha2-SNAPSHOT",
+            "version": "1.1.0-alpha3-SNAPSHOT",
             "level": 7,
             "release": true,
             "dependents": []
