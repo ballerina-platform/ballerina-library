@@ -42,7 +42,7 @@
         },
         {
             "name": "module-ballerina-regex",
-            "version": "0.7.0-alpha2-SNAPSHOT",
+            "version": "0.7.0-alpha3-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": [
