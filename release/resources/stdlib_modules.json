@@ -236,14 +236,14 @@
         },
         {
             "name": "module-ballerina-tcp",
-            "version": "0.8.0-alpha3-SNAPSHOT",
+            "version": "0.8.0-alpha4-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerina-udp",
-            "version": "0.9.0-alpha3-SNAPSHOT",
+            "version": "0.9.0-alpha4-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": []
