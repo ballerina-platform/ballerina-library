@@ -9,17 +9,28 @@ from github import Github, GithubException, InputGitAuthor
 HTTP_REQUEST_RETRIES = 3
 HTTP_REQUEST_DELAY_IN_SECONDS = 2
 HTTP_REQUEST_DELAY_MULTIPLIER = 2
+
 packageUser =  os.environ["packageUser"]
 packagePAT = os.environ["packagePAT"]
 packageEmail =  os.environ["packageEmail"]
-organization = 'ballerina-platform'
-standardLibrary = 'stdlib'
-versionUpdateBranchName = 'automated/stdlib_version_update'
-pullRequestTitle = '[Automated] Update Stdlib module versions'
+
+ORGANIZATION = "ballerina-platform"
+STANDARD_LIBRARY = "stdlib"
+
+MASTER_BRANCH = "master"
+MAIN_BRANCH = "main"
+
+VERSION_UPDATE_BRANCH_NAME = "automated/stdlib_version_update"
+PULL_REQUEST_TITLE = "[Automated] Update Stdlib module versions"
+PULL_REQUEST_BODY = "$subject"
+
+PROPERTIES_FILE = "gradle.properties"
 
 javaArraysModuleName = 'stdlibJavaArraysVersion'
 javaJdbcModuleName = 'stdlibJdbcVersion'
 OAuth2ModuleName = 'stdlibOAuth2Version'
+
+SKIPPING_MODULES = ["kafka", "nats", "stan", "rabbitmq"]
 
 
 def main():
@@ -51,7 +62,7 @@ def getStdlibModules():
 def fetchBallerinaDistributionRepo():
     github = Github(packagePAT)
     try:
-        repo = github.get_repo(organization + "/" + 'ballerina-distribution')
+        repo = github.get_repo(ORGANIZATION + "/" + 'ballerina-distribution')
     except:
         print("Error fetching repository ballerina-distribution")
 
@@ -60,16 +71,16 @@ def fetchBallerinaDistributionRepo():
 # Fetch the gradle.properties file from the ballerina-distribution repo
 def fetchPropertiesFile(repo):
     try:
-        source = repo.get_branch("main")
+        source = repo.get_branch(MAIN_BRANCH)
     except GithubException:
-        source = repo.get_branch("master")
+        source = repo.get_branch(MASTER_BRANCH)
 
     try:
-        branch = repo.get_branch(branch=versionUpdateBranchName)
-        repo.merge(versionUpdateBranchName, source.commit.sha, "Sync default branch")
-        file = repo.get_contents("gradle.properties", ref=versionUpdateBranchName)
+        branch = repo.get_branch(branch=VERSION_UPDATE_BRANCH_NAME)
+        repo.merge(VERSION_UPDATE_BRANCH_NAME, source.commit.sha, "Sync default branch")
+        file = repo.get_contents(PROPERTIES_FILE, ref=VERSION_UPDATE_BRANCH_NAME)
     except GithubException:
-        file = repo.get_contents("gradle.properties")
+        file = repo.get_contents(PROPERTIES_FILE)
 
     data = file.decoded_content.decode("utf-8")
 
@@ -80,7 +91,7 @@ def getCurrentModuleVersions(propertiesFile):
     currentVersions = {}
 
     for line in propertiesFile.splitlines():
-        if standardLibrary in line and 'Version=' in line:
+        if STANDARD_LIBRARY in line and 'Version=' in line:
             moduleName = line.split('=')[0]
             version = line.split('=')[1]
             currentVersions[moduleName] = version
@@ -107,7 +118,7 @@ def updatePropertiesFile(data, modules, currentVersions):
     lineList = data.splitlines()
 
     for line in lineList:
-        if standardLibrary in line.lower():
+        if STANDARD_LIBRARY in line.lower():
             currentLine = line
             break 
         line += '\n'
@@ -133,13 +144,15 @@ def updatePropertiesFile(data, modules, currentVersions):
         elif moduleName == 'oauth2':
             version = compareVersion(latestVersion, currentVersions[OAuth2ModuleName])
             line = OAuth2ModuleName + "=" + version + "\n"
+        elif moduleName in SKIPPING_MODULES:
+            continue
         else:
-            moduleNameInNamingConvention = standardLibrary + moduleName.capitalize() + 'Version'
+            moduleNameInNamingConvention = STANDARD_LIBRARY + moduleName.capitalize() + 'Version'
             if moduleNameInNamingConvention in currentVersions:
                 version = compareVersion(latestVersion, currentVersions[moduleNameInNamingConvention])
             else:
                 version = latestVersion
-            line = standardLibrary + moduleName.capitalize() + "Version=" + version + "\n"
+            line = STANDARD_LIBRARY + moduleName.capitalize() + "Version=" + version + "\n"
 
         if line[0:-1] not in lineList:
             updatedModules.append(moduleName)
@@ -147,13 +160,13 @@ def updatePropertiesFile(data, modules, currentVersions):
 
     for line in lineList[lineList.index(currentLine):len(lineList)]:
         currentLine = line
-        if standardLibrary not in line.lower() and line != '':
+        if STANDARD_LIBRARY not in line.lower() and line != '':
             break
 
     modifiedData += "\n"
 
     for line in lineList[lineList.index(currentLine):len(lineList)]:
-        if standardLibrary not in line.lower():
+        if STANDARD_LIBRARY not in line.lower():
             line += "\n"
             modifiedData += line
 
@@ -169,17 +182,17 @@ def commitChanges(data, repo, updatedModules):
 
     # If branch already exists checkout and commit else create new branch from master branch and commit
     try:
-        source = repo.get_branch("main")
+        source = repo.get_branch(MAIN_BRANCH)
     except GithubException:
-        source = repo.get_branch("master")
+        source = repo.get_branch(MASTER_BRANCH)
 
     try:
-        repo.get_branch(branch=versionUpdateBranchName)
-        repo.merge(versionUpdateBranchName, source.commit.sha, "Sync default branch")
+        repo.get_branch(branch=VERSION_UPDATE_BRANCH_NAME)
+        repo.merge(VERSION_UPDATE_BRANCH_NAME, source.commit.sha, "Sync default branch")
     except:
-        repo.create_git_ref(ref=f"refs/heads/" + versionUpdateBranchName, sha=source.commit.sha)
+        repo.create_git_ref(ref=f"refs/heads/" + VERSION_UPDATE_BRANCH_NAME, sha=source.commit.sha)
 
-    contents = repo.get_contents("gradle.properties", ref=versionUpdateBranchName)
+    contents = repo.get_contents(PROPERTIES_FILE, ref=VERSION_UPDATE_BRANCH_NAME)
 
     if len(updatedModules) > 0:
         commitMessage = "Bump the version of stdlib module(s) - "
@@ -189,35 +202,41 @@ def commitChanges(data, repo, updatedModules):
     else:
         commitMessage = "Update gradle.properties"
 
-    repo.update_file(contents.path, 
-                    commitMessage, 
-                    data, 
-                    contents.sha, 
-                    branch=versionUpdateBranchName, 
-                    author=author)
+    repo.update_file(
+        contents.path, 
+        commitMessage, 
+        data, 
+        contents.sha, 
+        branch=VERSION_UPDATE_BRANCH_NAME, 
+        author=author
+    )
 
 # Create a PR from the branch created
 def createPullRequest(repo):
-    pulls = repo.get_pulls(state='open', head=versionUpdateBranchName)
+    pulls = repo.get_pulls(state='open', head=VERSION_UPDATE_BRANCH_NAME)
 
     PRExists = 0
 
     # Check if a PR already exists for the module
     for pull in pulls:
-        if pullRequestTitle in pull.title:
+        if PULL_REQUEST_TITLE in pull.title:
             PRExists = pull.number
 
     # If PR doesn't exists create a new PR
     if PRExists == 0:
         try:
-            repo.create_pull(title=pullRequestTitle, 
-                            body='$subject', 
-                            head=versionUpdateBranchName, 
-                            base="main")
+            repo.create_pull(
+                title=PULL_REQUEST_TITLE, 
+                body=PULL_REQUEST_BODY, 
+                head=VERSION_UPDATE_BRANCH_NAME, 
+                base=MAIN_BRANCH
+            )
         except GithubException:
-            repo.create_pull(title=pullRequestTitle, 
-                            body='$subject', 
-                            head=versionUpdateBranchName, 
-                            base="master")
+            repo.create_pull(
+                title=PULL_REQUEST_TITLE, 
+                body=PULL_REQUEST_BODY, 
+                head=VERSION_UPDATE_BRANCH_NAME, 
+                base=MASTER_BRANCH
+            )
 
 main()
