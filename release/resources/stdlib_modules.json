@@ -271,7 +271,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "version": "0.2.0-alpha3-SNAPSHOT",
+            "version": "0.2.0-alpha4-SNAPSHOT",
             "level": 6,
             "release": true,
             "dependents": []
