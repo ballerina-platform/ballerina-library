@@ -28,7 +28,7 @@
         },
         {
             "name": "module-ballerina-jsonutils",
-            "version": "1.1.0-alpha3-SNAPSHOT",
+            "version": "1.1.0-alpha4-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": []
@@ -125,7 +125,7 @@
         },
         {
             "name": "module-ballerina-xslt",
-            "version": "1.1.0-alpha3-SNAPSHOT",
+            "version": "1.1.0-alpha4-SNAPSHOT",
             "level": 2,
             "release": true,
             "dependents": []
@@ -150,7 +150,7 @@
         },
         {
             "name": "module-ballerina-reflect",
-            "version": "0.6.0-alpha3-SNAPSHOT",
+            "version": "0.6.0-alpha4-SNAPSHOT",
             "level": 3,
             "release": true,
             "dependents": [
@@ -331,7 +331,7 @@
         },
         {
             "name": "module-ballerina-sql",
-            "version": "0.6.0-alpha3-SNAPSHOT",
+            "version": "0.6.0-alpha4-SNAPSHOT",
             "level": 7,
             "release": true,
             "dependents": [
