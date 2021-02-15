@@ -16,24 +16,26 @@ def main():
 
 # Return the content in the given url
 # Retry decorator will retry the function 3 times, doubling the backoff delay if URLError is raised 
-@retry(urllib.error.URLError, tries=HTTP_REQUEST_RETRIES, delay=HTTP_REQUEST_DELAY_IN_SECONDS, 
-                                    backoff=HTTP_REQUEST_DELAY_MULTIPLIER)
+@retry(
+    urllib.error.URLError, 
+    tries=HTTP_REQUEST_RETRIES, 
+    delay=HTTP_REQUEST_DELAY_IN_SECONDS, 
+    backoff=HTTP_REQUEST_DELAY_MULTIPLIER
+)
 def urlOpenWithRetry(url):
     return urllib.request.urlopen(url)
 
 # Get a list of Ballerina Stdlib modules from the standard library repo
 def fetchModuleList():
     try:
-        data = urlOpenWithRetry("https://raw.githubusercontent.com/ballerina-platform/ballerina-standard-library" 
-                                    + "/main/release/resources/stdlib_modules.json")
+        with open('./release/resources/stdlib_modules.json') as f:
+            stdlibModuleList = json.load(f)
+            modules = stdlibModuleList["modules"]
     except:
         print('Failed to read module_list.json file in ballerina stdlib')
         sys.exit(1)
 
-    dataToString = data.read().decode("utf-8")
-    moduleList = json.loads(dataToString)['modules']
-
-    return moduleList
+    return modules
 
 # Get the latest version of a Ballerina Stdlib module from the Ballerina Central
 def fetchModuleVersionFromBallerinaCentral(module):

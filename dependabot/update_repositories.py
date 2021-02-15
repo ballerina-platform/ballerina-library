@@ -14,55 +14,44 @@ HTTP_REQUEST_DELAY_MULTIPLIER = 2
 packageUser =  os.environ["packageUser"]
 packagePAT = os.environ["packagePAT"]
 packageEmail =  os.environ["packageEmail"]
-organization = 'ballerina-platform'
 
-dependabotBranchName = 'automated/stdlib_version_update'
-pullRequestTitle = '[Automated] Bump stdlib module versions'
+ORGANIZATION = "ballerina-platform"
+
+MASTER_BRANCH = "master"
+MAIN_BRANCH = "main"
+
+DEPENDABOT_BRANCH_NAME = "automated/stdlib_version_update"
+PULL_REQUEST_TITLE = "[Automated] Bump stdlib module versions"
+PULL_REQUEST_BODY = "$subject"
+
+PROPERTIES_FILE = "gradle.properties"
 
 def main():
-    modulesWithVersionUpdates = preprocessString()
-    stdlibModules = getModuleListFromFile()
-    updatedModuleDetails = initializeModuleDetails(modulesWithVersionUpdates)
-    updatedModuleDetails = getImmediateDependents(stdlibModules, updatedModuleDetails)
+    stdlibModuleNameList, latestVersions = getModuleListFromFile()
+    updatedModuleDetails = initializeModuleDetails(latestVersions)
+    updatedModuleDetails = getImmediateDependents(stdlibModuleNameList, updatedModuleDetails)
     updateFiles(updatedModuleDetails)
 
-# Fetch the updated module versions string from the environment and append it to an array
-def preprocessString():
-    try:
-        with open('./dependabot/resources/stdlib_latest_versions.json') as f:
-            moduleList = json.load(f)
-            updatedModules = moduleList["modules"]
-    except:
-        print('Failed to read stdlib_latest_versions.json')
-        sys.exit(1)
-    try:
-        latestVersion = []
-        for module in updatedModules:
-            latestVersion.append(module)
 
-        # Processed string -> ["module:version", ",module:version"]
-        print("Modules with version updates: ", latestVersion)
-        return latestVersion
-    except:
-        print("Failed to update files")
-        print("Input String: " + updatedModules)
-        sys.exit(1)
-
-# Fetch list of stdlib modules from stdlib_latest_versions.json
+# Fetch the updated module versions and module name list from stdlib_latest_versions.json
 def getModuleListFromFile():
     try:
         with open('./dependabot/resources/stdlib_latest_versions.json') as f:
-            moduleList = json.load(f)
+            stdlibModuleList = json.load(f)
+            modules = stdlibModuleList["modules"]
     except:
         print('Failed to read stdlib_latest_versions.json')
         sys.exit(1)
-
-    stdlibModules = []
-    for module in moduleList['modules']:
+    
+    stdlibModuleNameList = []
+    latestVersions = []
+    for module in modules:
+        latestVersions.append(module)
         for key in module:
-            stdlibModules.append(key)
+            stdlibModuleNameList.append(key)
 
-    return stdlibModules
+    return stdlibModuleNameList, latestVersions
+
 
 # Initialize a JSON with updated modules, latest version, and its dependents
 def initializeModuleDetails(moduleList):
@@ -77,6 +66,7 @@ def initializeModuleDetails(moduleList):
 
     return updatedModuleDetails
 
+
 # Fetch all the immediate dependents of modules with version upgrades and update the JSON
 def getImmediateDependents(stdlibModules, updatedModuleDetails):
     for moduleName in stdlibModules:
@@ -87,12 +77,18 @@ def getImmediateDependents(stdlibModules, updatedModuleDetails):
 
     return updatedModuleDetails
 
+
 # Returns the file in the given url
 # Retry decorator will retry the function 3 times, doubling the backoff delay if URLError is raised
-@retry(urllib.error.URLError, tries=HTTP_REQUEST_RETRIES, delay=HTTP_REQUEST_DELAY_IN_SECONDS,
-                                    backoff=HTTP_REQUEST_DELAY_MULTIPLIER)
+@retry(
+    urllib.error.URLError, 
+    tries=HTTP_REQUEST_RETRIES, 
+    delay=HTTP_REQUEST_DELAY_IN_SECONDS,
+    backoff=HTTP_REQUEST_DELAY_MULTIPLIER
+)
 def urlOpenWithRetry(url):
     return urllib.request.urlopen(url)
+
 
 # Get dependencies of a given ballerina standard library module from build.gradle file in module repository
 # returns: list of dependencies
@@ -116,10 +112,12 @@ def getDependencies(balModule):
 
     return dependencies
 
+
 # Update the gradle.properties file of each dependent module stored in the dependents list of modules with version updates
 def updateFiles(modules):
     for module in modules['modules']:
         for dependent in module['dependents']:
+            print("Updating " + module['name'] + " version in " + dependent)
             # Fetch repository of the module
             repo = configureGithubRepository(dependent)
             # Fetch gradle.properties file
@@ -130,13 +128,18 @@ def updateFiles(modules):
             if commitFlag:
                 commitChanges(updatedData, currentVersion, repo, module['name'], module['version'])
                 createPullRequest(repo, currentVersion, module['name'], module['version'])
+                print("Bump " + module['name'] + " version from " + currentVersion + " to " + module['version'])
+            else:
+                print(module['name'] + " version is already the lastest version " + currentVersion)
+                
             time.sleep(30)
+
 
 # Fetch repository of a given stdlib module
 def configureGithubRepository(module):
     github = Github(packagePAT)
     try:
-        repo = github.get_repo(organization + "/" + module)
+        repo = github.get_repo(ORGANIZATION + "/" + module)
         return repo
     except:
         print("Error fetching repository " + module)
@@ -146,14 +149,15 @@ def configureGithubRepository(module):
 # Fetch gradle.properties file from a given repository
 def fetchPropertiesFile(repo, module):
     try:
-        branch = repo.get_branch(branch=dependabotBranchName)
-        file = repo.get_contents("gradle.properties", ref=dependabotBranchName)
+        branch = repo.get_branch(branch=DEPENDABOT_BRANCH_NAME)
+        file = repo.get_contents(PROPERTIES_FILE, ref=DEPENDABOT_BRANCH_NAME)
     except GithubException:
-        file = repo.get_contents("gradle.properties")
+        file = repo.get_contents(PROPERTIES_FILE)
 
     data = file.decoded_content.decode("utf-8")
 
     return data
+
 
 # Update the version of a given module in the gradle.properties file
 def updatePropertiesFile(data, module, latestVersion):
@@ -185,6 +189,7 @@ def updatePropertiesFile(data, module, latestVersion):
 
     return modifiedData, currentVersion, commitFlag
 
+
 # Compare latest version with current version
 # Return 1 if latest version > current version
 # Return 0 if latest version = current version
@@ -192,51 +197,60 @@ def updatePropertiesFile(data, module, latestVersion):
 def compareVersion(latestVersion, currentVersion):
     return semver.compare(latestVersion, currentVersion)
 
+
 # Checkout branch and commit changes
 def commitChanges(data, currentVersion, repo, module, latestVersion):
     author = InputGitAuthor(packageUser, packageEmail)
 
     # If branch already exists checkout and commit else create new branch from master branch and commit
     try:
-        source = repo.get_branch("main")
+        source = repo.get_branch(MAIN_BRANCH)
     except GithubException:
-        source = repo.get_branch("master")
+        source = repo.get_branch(MASTER_BRANCH)
 
     try:
-        repo.get_branch(branch=dependabotBranchName)
-        repo.merge(dependabotBranchName, source.commit.sha, "Sync default branch")
+        repo.get_branch(branch=DEPENDABOT_BRANCH_NAME)
+        repo.merge(DEPENDABOT_BRANCH_NAME, source.commit.sha, "Sync default branch")
     except:
-        repo.create_git_ref(ref=f"refs/heads/" + dependabotBranchName, sha=source.commit.sha)
+        repo.create_git_ref(ref=f"refs/heads/" + DEPENDABOT_BRANCH_NAME, sha=source.commit.sha)
 
-    contents = repo.get_contents("gradle.properties", ref=dependabotBranchName)
-    repo.update_file(contents.path,
-                    "[Automated] Bump " + module + " from " + currentVersion + " to " + latestVersion,
-                    data,
-                    contents.sha,
-                    branch=dependabotBranchName,
-                    author=author)
+    contents = repo.get_contents(PROPERTIES_FILE, ref=DEPENDABOT_BRANCH_NAME)
+    repo.update_file(
+        contents.path,
+        "[Automated] Bump " + module + " from " + currentVersion + " to " + latestVersion,
+        data,
+        contents.sha,
+        branch=DEPENDABOT_BRANCH_NAME,
+        author=author
+    )
+
 
 # Create a PR from the branch created
 def createPullRequest(repo, currentVersion, module, latestVersion):
-    pulls = repo.get_pulls(state='open', head=dependabotBranchName)
+    pulls = repo.get_pulls(state='open', head=DEPENDABOT_BRANCH_NAME)
     prExists = 0
 
     # Check if a PR already exists for the module
     for pull in pulls:
-        if pullRequestTitle in pull.title:
+        if PULL_REQUEST_TITLE in pull.title:
             prExists = pull.number
 
     # Create a new PR if PR doesn't exist
     if prExists == 0:
         try:
-            repo.create_pull(title=pullRequestTitle,
-                            body='$subject',
-                            head=dependabotBranchName,
-                            base="main")
+            repo.create_pull(
+                title=PULL_REQUEST_TITLE,
+                body=PULL_REQUEST_BODY,
+                head=DEPENDABOT_BRANCH_NAME,
+                base=MAIN_BRANCH
+            )
         except GithubException:
-            repo.create_pull(title=pullRequestTitle,
-                            body='$subject',
-                            head=dependabotBranchName,
-                            base="master")
+            repo.create_pull(
+                title=PULL_REQUEST_TITLE,
+                body=PULL_REQUEST_BODY,
+                head=DEPENDABOT_BRANCH_NAME,
+                base=MASTER_BRANCH
+            )
+
 
 main()
