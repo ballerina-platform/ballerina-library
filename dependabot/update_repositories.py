@@ -116,8 +116,8 @@ def get_dependencies(module_name):
 # Update the gradle.properties file of each dependent module stored in the dependents list of modules with version updates
 def update_files(modules):
     for module in modules['modules']:
+        print("Updating dependents of " + module)
         for dependent in module['dependents']:
-            print("Updating " + module['name'] + " version in " + dependent)
             # Fetch repository of the module
             repo = configure_github_repository(dependent)
             # Fetch gradle.properties file
@@ -126,12 +126,15 @@ def update_files(modules):
             updated_data, current_version, commit_flag = update_properties_file(data, module['name'], module['version'])
             # If gradle.properties file is updated, commit changes and create PR
             if commit_flag:
-                commit_changes(updated_data, current_version, repo, module['name'], module['version'])
-                create_pull_request(repo, current_version, module['name'], module['version'])
-                print("Bump " + module['name'] + " version from " + current_version + " to " + module['version'])
+                try:
+                    commit_changes(updated_data, current_version, repo, module['name'], module['version'])
+                    create_pull_request(repo, current_version, module['name'], module['version'])
+                    print("Bump " + module['name'] + " version from " + current_version + " to " + module['version'])
+                except:
+                    continue
             else:
                 print(module['name'] + " version is already the lastest version " + current_version)
-                
+        print("-------------------------------------------------------------------------------------")        
             time.sleep(30)
 
 
@@ -212,7 +215,10 @@ def commit_changes(data, current_version, repo, module, latest_version):
 
     try:
         repo.get_branch(branch=DEPENDABOT_BRANCH_NAME)
-        repo.merge(DEPENDABOT_BRANCH_NAME, source.commit.sha, "Sync default branch")
+        try:
+            repo.merge(DEPENDABOT_BRANCH_NAME, source.commit.sha, "Sync default branch")
+        except Exception as e:
+            print(e)
     except:
         repo.create_git_ref(ref=f"refs/heads/" + DEPENDABOT_BRANCH_NAME, sha=source.commit.sha)
 
