@@ -1,9 +1,7 @@
-import urllib.request
 import json
 import sys
 import os
 import semver
-from retry import retry
 from github import Github, GithubException, InputGitAuthor
 
 HTTP_REQUEST_RETRIES = 3

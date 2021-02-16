@@ -133,9 +133,9 @@ def update_files(modules):
                 except:
                     continue
             else:
-                print(module['name'] + " version is already the lastest version " + current_version)
-        print("-------------------------------------------------------------------------------------")        
+                print(module['name'] + " version is already the lastest version " + current_version)       
             time.sleep(30)
+        print("-------------------------------------------------------------------------------------") 
 
 
 # Fetch repository of a given stdlib module
