@@ -324,7 +324,7 @@
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "version": "1.1.0-alpha4-SNAPSHOT",
+            "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 7,
             "release": true,
             "dependents": []
