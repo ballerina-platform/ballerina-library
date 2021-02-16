@@ -16,22 +16,22 @@
             "module-ballerina-random": "0.10.0-alpha4-SNAPSHOT"
         },
         {
-            "module-ballerina-regex": "0.7.0-alpha3-SNAPSHOT"
+            "module-ballerina-regex": "0.7.0-alpha4-SNAPSHOT"
         },
         {
-            "module-ballerina-runtime": "0.6.0-alpha3-SNAPSHOT"
+            "module-ballerina-runtime": "0.6.0-alpha4-SNAPSHOT"
         },
         {
-            "module-ballerina-task": "1.2.0-alpha3-SNAPSHOT"
+            "module-ballerina-task": "1.2.0-alpha4-SNAPSHOT"
         },
         {
-            "module-ballerina-time": "1.1.0-alpha3-SNAPSHOT"
+            "module-ballerina-time": "1.1.0-alpha4-SNAPSHOT"
         },
         {
-            "module-ballerina-xmlutils": "1.1.0-alpha3-SNAPSHOT"
+            "module-ballerina-xmlutils": "1.1.0-alpha4-SNAPSHOT"
         },
         {
-            "module-ballerina-cache": "2.1.0-alpha3-SNAPSHOT"
+            "module-ballerina-cache": "2.1.0-alpha4-SNAPSHOT"
         },
         {
             "module-ballerina-crypto": "1.1.0-alpha4-SNAPSHOT"
@@ -55,7 +55,7 @@
             "module-ballerina-auth": "1.1.0-alpha4-SNAPSHOT"
         },
         {
-            "module-ballerina-file": "0.7.0-alpha3-SNAPSHOT"
+            "module-ballerina-file": "0.7.0-alpha4-SNAPSHOT"
         },
         {
             "module-ballerina-ftp": "1.1.0-alpha4-SNAPSHOT"
@@ -85,7 +85,7 @@
             "module-ballerina-email": "1.1.0-alpha4-SNAPSHOT"
         },
         {
-            "module-ballerina-http": "1.1.0-alpha3-SNAPSHOT"
+            "module-ballerina-http": "1.1.0-alpha4-SNAPSHOT"
         },
         {
             "module-ballerina-graphql": "0.2.0-alpha4-SNAPSHOT"
@@ -109,7 +109,7 @@
             "module-ballerinax-kafka": "2.1.0-alpha4-SNAPSHOT"
         },
         {
-            "module-ballerinax-rabbitmq": "1.1.0-alpha4-SNAPSHOT"
+            "module-ballerinax-rabbitmq": "1.1.0-alpha5-SNAPSHOT"
         },
         {
             "module-ballerina-sql": "0.6.0-alpha4-SNAPSHOT"
