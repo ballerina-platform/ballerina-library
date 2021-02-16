@@ -116,7 +116,7 @@ def get_dependencies(module_name):
 # Update the gradle.properties file of each dependent module stored in the dependents list of modules with version updates
 def update_files(modules):
     for module in modules['modules']:
-        print("Updating dependents of " + module)
+        print("Updating dependents of " + module['name'])
         for dependent in module['dependents']:
             # Fetch repository of the module
             repo = configure_github_repository(dependent)
