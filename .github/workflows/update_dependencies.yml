@@ -34,7 +34,7 @@ jobs:
             -   name: Get Dependencies and update files
                 run: |
                     cd ballerina-standard-library
-                    python release/src/module_dependencies/main.py
+                    python release/src/module_dependencies/update_version_data.py
                 env:
                     packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
                     packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
@@ -60,7 +60,7 @@ jobs:
             -   name: Update Ballerina Distribution
                 run: |
                     cd ballerina-standard-library
-                    python release/src/version_update/main.py
+                    python release/src/version_update/update_distribution.py
                 env:
                     packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
                     packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
