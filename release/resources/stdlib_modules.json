@@ -38,7 +38,9 @@
             "version": "0.10.0-alpha4-SNAPSHOT",
             "level": 1,
             "release": true,
-            "dependents": []
+            "dependents": [
+                "module-ballerina-websub"
+            ]
         },
         {
             "name": "module-ballerina-regex",
