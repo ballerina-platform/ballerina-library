@@ -312,7 +312,7 @@
         },
         {
             "name": "module-ballerina-websubhub",
-            "version": "0.2.0-alpha4-SNAPSHOT",
+            "version": "0.2.0-alpha5-SNAPSHOT",
             "level": 6,
             "release": true,
             "dependents": []
