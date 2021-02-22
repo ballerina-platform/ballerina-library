@@ -28,14 +28,14 @@
         },
         {
             "name": "module-ballerina-jsonutils",
-            "version": "1.1.0-alpha4-SNAPSHOT",
+            "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerina-random",
-            "version": "0.10.0-alpha4-SNAPSHOT",
+            "version": "0.10.0-alpha5-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": [
@@ -117,7 +117,7 @@
         },
         {
             "name": "module-ballerina-os",
-            "version": "0.8.0-alpha4-SNAPSHOT",
+            "version": "0.8.0-alpha5-SNAPSHOT",
             "level": 2,
             "release": true,
             "dependents": [
@@ -134,7 +134,7 @@
         },
         {
             "name": "module-ballerina-log",
-            "version": "1.1.0-alpha4-SNAPSHOT",
+            "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 3,
             "release": true,
             "dependents": [
@@ -161,7 +161,7 @@
         },
         {
             "name": "module-ballerina-uuid",
-            "version": "0.10.0-alpha4-SNAPSHOT",
+            "version": "0.10.0-alpha5-SNAPSHOT",
             "level": 3,
             "release": true,
             "dependents": [
