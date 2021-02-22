@@ -298,7 +298,7 @@
         },
         {
             "name": "module-ballerina-websocket",
-            "version": "1.2.0-alpha4-SNAPSHOT",
+            "version": "1.2.0-alpha5-SNAPSHOT",
             "level": 6,
             "release": true,
             "dependents": []
