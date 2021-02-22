@@ -128,11 +128,12 @@ def commit_changes(repo, updated_file, lang_version):
         base = repo.get_branch(MAIN_BRANCH)
 
     try:
-        repo.get_branch(LANG_VERSION_UPDATE_BRANCH)
-        repo.merge(LANG_VERSION_UPDATE_BRANCH, base.commit.sha, "Sync default branch")
-    except:
         ref = f"refs/heads/" + LANG_VERSION_UPDATE_BRANCH
         repo.create_git_ref(ref=ref, sha=base.commit.sha)
+    except :
+        repo.get_branch(LANG_VERSION_UPDATE_BRANCH)
+        repo.merge(LANG_VERSION_UPDATE_BRANCH, base.commit.sha, "Sync default branch")
+
 
     current_file = repo.get_contents(PROPERTIES_FILE, ref=LANG_VERSION_UPDATE_BRANCH)
     repo.update_file(
