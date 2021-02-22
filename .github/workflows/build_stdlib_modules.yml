@@ -16,7 +16,7 @@ jobs:
 
             -   name: Trigger the Standard Library Module Builds
                 if: github.event.action != 'stdlib-module-push'
-                uses: ballerina-platform/ballerina-action@master
+                uses: ballerina-platform/ballerina-action@1.2.x
                 with:
                     args:
                         run publish

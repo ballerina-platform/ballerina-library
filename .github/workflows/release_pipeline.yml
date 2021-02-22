@@ -10,7 +10,7 @@ jobs:
             -   uses: actions/checkout@v2
 
             -   name: Release Pipeline
-                uses: ballerina-platform/ballerina-action@master
+                uses: ballerina-platform/ballerina-action@1.2.x
                 with:
                     args:
                         run release
