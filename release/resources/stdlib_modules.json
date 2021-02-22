@@ -170,7 +170,7 @@
         },
         {
             "name": "module-ballerina-auth",
-            "version": "1.1.0-alpha4-SNAPSHOT",
+            "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": [
@@ -196,7 +196,7 @@
         },
         {
             "name": "module-ballerina-jwt",
-            "version": "1.1.0-alpha4-SNAPSHOT",
+            "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": [
@@ -222,7 +222,7 @@
         },
         {
             "name": "module-ballerina-oauth2",
-            "version": "1.1.0-alpha4-SNAPSHOT",
+            "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 4,
             "release": true,
             "dependents": [
@@ -273,7 +273,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "version": "0.2.0-alpha4-SNAPSHOT",
+            "version": "0.2.0-alpha5-SNAPSHOT",
             "level": 6,
             "release": true,
             "dependents": []
