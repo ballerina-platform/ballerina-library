@@ -64,7 +64,7 @@
         },
         {
             "name": "module-ballerina-task",
-            "version": "1.2.0-alpha4-SNAPSHOT",
+            "version": "1.2.0-alpha5-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": [
@@ -86,14 +86,14 @@
         },
         {
             "name": "module-ballerina-xmlutils",
-            "version": "1.1.0-alpha4-SNAPSHOT",
+            "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 1,
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerina-cache",
-            "version": "2.1.0-alpha4-SNAPSHOT",
+            "version": "2.1.0-alpha5-SNAPSHOT",
             "level": 2,
             "release": true,
             "dependents": [
