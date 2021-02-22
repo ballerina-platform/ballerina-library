@@ -1,4 +1,4 @@
-from github import Github, InputGitAuthor
+from github import Github, InputGitAuthor, GithubException
 import json
 import os
 from retry import retry
@@ -131,8 +131,11 @@ def commit_changes(repo, updated_file, lang_version):
         ref = f"refs/heads/" + LANG_VERSION_UPDATE_BRANCH
         repo.create_git_ref(ref=ref, sha=base.commit.sha)
     except :
-        repo.get_branch(LANG_VERSION_UPDATE_BRANCH)
-        repo.merge(LANG_VERSION_UPDATE_BRANCH, base.commit.sha, "Sync default branch")
+        try:
+            repo.get_branch(LANG_VERSION_UPDATE_BRANCH)
+            repo.merge(LANG_VERSION_UPDATE_BRANCH, base.commit.sha, "Sync default branch")
+        except GithubException as e:
+            print("Error occurred: " + e)
 
 
     current_file = repo.get_contents(PROPERTIES_FILE, ref=LANG_VERSION_UPDATE_BRANCH)
