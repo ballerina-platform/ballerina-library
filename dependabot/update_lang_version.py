@@ -29,7 +29,7 @@ MODULES = "modules"
 
 COMMIT_MESSAGE_PREFIX = "[Automated] Update lang version to "
 PULL_REQUEST_BODY_PREFIX = "Update ballerina lang version to `"
-PULL_REQUEST_TITLE = "[Automated] Update Ballerina Lang Version"
+PULL_REQUEST_TITLE = "[Automated] Dependency Update"
 
 MODULE_LIST_FILE = "release/resources/module_list.json"
 BALLERINA_DISTRIBUTION = "ballerina-distribution"
