@@ -58,7 +58,7 @@
             "module-ballerina-file": "0.7.0-alpha5-SNAPSHOT"
         },
         {
-            "module-ballerina-ftp": "1.1.0-alpha4-SNAPSHOT"
+            "module-ballerina-ftp": "1.1.0-alpha5-SNAPSHOT"
         },
         {
             "module-ballerina-jwt": "1.1.0-alpha5-SNAPSHOT"
@@ -82,7 +82,7 @@
             "module-ballerina-udp": "0.9.0-alpha5-SNAPSHOT"
         },
         {
-            "module-ballerina-email": "1.1.0-alpha4-SNAPSHOT"
+            "module-ballerina-email": "1.1.0-alpha5-SNAPSHOT"
         },
         {
             "module-ballerina-http": "1.1.0-alpha5-SNAPSHOT"
@@ -94,7 +94,7 @@
             "module-ballerina-grpc": "0.8.0-alpha5-SNAPSHOT"
         },
         {
-            "module-ballerinai-transaction": "1.0.8-SNAPSHOT"
+            "module-ballerinai-transaction": "1.0.9-SNAPSHOT"
         },
         {
             "module-ballerina-websocket": "1.2.0-alpha5-SNAPSHOT"
