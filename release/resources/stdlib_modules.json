@@ -337,12 +337,12 @@
             "level": 7,
             "release": true,
             "dependents": [
-                "module-ballerina-java.jdbc",
+                "module-ballerinax-java.jdbc",
                 "module-ballerinax-mysql"
             ]
         },
         {
-            "name": "module-ballerina-java.jdbc",
+            "name": "module-ballerinax-java.jdbc",
             "version": "0.6.0-alpha5-SNAPSHOT",
             "level": 8,
             "release": true,
