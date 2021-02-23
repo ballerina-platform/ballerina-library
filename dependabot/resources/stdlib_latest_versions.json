@@ -16,7 +16,7 @@
             "module-ballerina-random": "0.10.0-alpha5-SNAPSHOT"
         },
         {
-            "module-ballerina-regex": "0.7.0-alpha4-SNAPSHOT"
+            "module-ballerina-regex": "0.7.0-alpha5-SNAPSHOT"
         },
         {
             "module-ballerina-runtime": "0.6.0-alpha5-SNAPSHOT"
@@ -55,7 +55,7 @@
             "module-ballerina-auth": "1.1.0-alpha5-SNAPSHOT"
         },
         {
-            "module-ballerina-file": "0.7.0-alpha4-SNAPSHOT"
+            "module-ballerina-file": "0.7.0-alpha5-SNAPSHOT"
         },
         {
             "module-ballerina-ftp": "1.1.0-alpha4-SNAPSHOT"
@@ -115,7 +115,7 @@
             "module-ballerina-sql": "0.6.0-alpha5-SNAPSHOT"
         },
         {
-            "module-ballerina-java.jdbc": "0.6.0-alpha5-SNAPSHOT"
+            "module-ballerinax-java.jdbc": "0.6.0-alpha5-SNAPSHOT"
         },
         {
             "module-ballerinax-mysql": "0.7.0-alpha5-SNAPSHOT"
