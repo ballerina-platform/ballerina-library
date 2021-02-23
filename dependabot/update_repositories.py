@@ -21,7 +21,7 @@ MASTER_BRANCH = "master"
 MAIN_BRANCH = "main"
 
 DEPENDABOT_BRANCH_NAME = "automated/stdlib_version_update"
-PULL_REQUEST_TITLE = "[Automated] Bump stdlib module versions"
+PULL_REQUEST_TITLE = "[Automated] Dependency Update"
 PULL_REQUEST_BODY = "$subject"
 
 PROPERTIES_FILE = "gradle.properties"
