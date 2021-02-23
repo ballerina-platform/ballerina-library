@@ -130,11 +130,11 @@ def update_files(modules):
                     commit_changes(updated_data, current_version, repo, module['name'], module['version'])
                     create_pull_request(repo, current_version, module['name'], module['version'])
                     print("Bump " + module['name'] + " version from " + current_version + " to " + module['version'])
+                    time.sleep(30)
                 except:
                     continue
             else:
-                print(module['name'] + " version is already the lastest version " + current_version)       
-            time.sleep(30)
+                print(module['name'] + " version is already the lastest version " + current_version)
         print("-------------------------------------------------------------------------------------") 
 
 
