@@ -12,7 +12,7 @@
         "module-ballerina-http",
         "module-ballerina-io",
         "module-ballerina-java.arrays",
-        "module-ballerina-java.jdbc",
+        "module-ballerinax-java.jdbc",
         "module-ballerina-jsonutils",
         "module-ballerina-jwt",
         "module-ballerinax-kafka",
