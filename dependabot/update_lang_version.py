@@ -83,7 +83,6 @@ def get_module_list_json():
 def check_and_update_lang_version(module_list_json, lang_version):
     for module_name in module_list_json[MODULES]:
         update_module(module_name, lang_version)
-        time.sleep(30)
 
 
 def update_module(module_name, lang_version):
@@ -99,6 +98,7 @@ def update_module(module_name, lang_version):
     if update:
         commit_changes(repo, updated_properties_file, lang_version)
         create_pull_request(repo, lang_version)
+        time.sleep(30)
 
 
 def get_updated_properties_file(module_name, properties_file, lang_version):
