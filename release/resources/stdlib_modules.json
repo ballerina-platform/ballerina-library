@@ -27,13 +27,6 @@
             "dependents": []
         },
         {
-            "name": "module-ballerina-jsonutils",
-            "version": "1.1.0-alpha5-SNAPSHOT",
-            "level": 1,
-            "release": true,
-            "dependents": []
-        },
-        {
             "name": "module-ballerina-random",
             "version": "0.10.0-alpha5-SNAPSHOT",
             "level": 1,
@@ -85,7 +78,7 @@
             ]
         },
         {
-            "name": "module-ballerina-xmlutils",
+            "name": "module-ballerina-xmldata",
             "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 1,
             "release": true,
