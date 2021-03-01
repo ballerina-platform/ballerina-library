@@ -13,7 +13,6 @@
         "module-ballerina-io",
         "module-ballerina-java.arrays",
         "module-ballerinax-java.jdbc",
-        "module-ballerina-jsonutils",
         "module-ballerina-jwt",
         "module-ballerinax-kafka",
         "module-ballerina-log",
@@ -38,7 +37,7 @@
         "module-ballerina-websocket",
         "module-ballerina-websub",
         "module-ballerina-websubhub",
-        "module-ballerina-xmlutils",
+        "module-ballerina-xmldata",
         "module-ballerina-xslt"
     ]
 }
