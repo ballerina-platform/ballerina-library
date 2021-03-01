@@ -6,7 +6,7 @@
             "level": 1,
             "release": true,
             "dependents": [
-                "module-ballerina-jwt"
+                "module-ballerina-http"
             ]
         },
         {
