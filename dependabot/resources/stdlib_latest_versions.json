@@ -10,9 +10,6 @@
             "module-ballerina-java.arrays": "0.10.0-alpha5-SNAPSHOT"
         },
         {
-            "module-ballerina-jsonutils": "1.1.0-alpha5-SNAPSHOT"
-        },
-        {
             "module-ballerina-random": "0.10.0-alpha5-SNAPSHOT"
         },
         {
@@ -28,7 +25,7 @@
             "module-ballerina-time": "1.1.0-alpha5-SNAPSHOT"
         },
         {
-            "module-ballerina-xmlutils": "1.1.0-alpha5-SNAPSHOT"
+            "module-ballerina-xmldata": "1.1.0-alpha5-SNAPSHOT"
         },
         {
             "module-ballerina-cache": "2.1.0-alpha5-SNAPSHOT"
