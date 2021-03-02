@@ -1,15 +1,6 @@
 {
     "modules": [
         {
-            "name": "module-ballerina-encoding",
-            "version": "1.1.0-alpha5-SNAPSHOT",
-            "level": 1,
-            "release": true,
-            "dependents": [
-                "module-ballerina-http"
-            ]
-        },
-        {
             "name": "module-ballerina-io",
             "version": "0.6.0-alpha5-SNAPSHOT",
             "level": 1,
@@ -76,6 +67,13 @@
                 "module-ballerina-crypto",
                 "module-ballerina-file"
             ]
+        },
+        {
+            "name": "module-ballerina-url",
+            "version": "1.1.0-alpha5-SNAPSHOT",
+            "level": 1,
+            "release": true,
+            "dependents": []
         },
         {
             "name": "module-ballerina-xmldata",
