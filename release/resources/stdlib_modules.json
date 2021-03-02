@@ -147,7 +147,6 @@
             "level": 3,
             "release": true,
             "dependents": [
-                "module-ballerina-grpc",
                 "module-ballerina-websub",
                 "module-ballerina-websubhub"
             ]
