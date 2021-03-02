@@ -150,7 +150,6 @@
             "release": true,
             "dependents": [
                 "module-ballerina-grpc",
-                "module-ballerinax-java.jdbc",
                 "module-ballerinax-mysql",
                 "module-ballerina-websub",
                 "module-ballerina-websubhub"
