@@ -149,9 +149,8 @@
             "level": 3,
             "release": true,
             "dependents": [
-                "module-ballerina-graphql",
                 "module-ballerina-grpc",
-                "module-ballerinai-transaction",
+                "module-ballerina-sql",
                 "module-ballerina-websocket",
                 "module-ballerina-websub",
                 "module-ballerina-websubhub"
