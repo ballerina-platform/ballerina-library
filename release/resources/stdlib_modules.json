@@ -151,7 +151,6 @@
             "dependents": [
                 "module-ballerina-grpc",
                 "module-ballerina-sql",
-                "module-ballerina-websocket",
                 "module-ballerina-websub",
                 "module-ballerina-websubhub"
             ]
