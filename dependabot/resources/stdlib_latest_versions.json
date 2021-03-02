@@ -1,9 +1,6 @@
 {
     "modules": [
         {
-            "module-ballerina-encoding": "1.1.0-alpha5-SNAPSHOT"
-        },
-        {
             "module-ballerina-io": "0.6.0-alpha5-SNAPSHOT"
         },
         {
@@ -23,6 +20,9 @@
         },
         {
             "module-ballerina-time": "1.1.0-alpha5-SNAPSHOT"
+        },
+        {
+            "module-ballerina-url": "1.1.0-alpha5-SNAPSHOT"
         },
         {
             "module-ballerina-xmldata": "1.1.0-alpha5-SNAPSHOT"
