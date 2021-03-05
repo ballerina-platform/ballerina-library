@@ -149,7 +149,6 @@
             "level": 3,
             "release": true,
             "dependents": [
-                "module-ballerina-websub",
                 "module-ballerina-websubhub"
             ]
         },
