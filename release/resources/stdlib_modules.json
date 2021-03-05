@@ -148,9 +148,7 @@
             "version": "0.6.0-alpha5-SNAPSHOT",
             "level": 3,
             "release": true,
-            "dependents": [
-                "module-ballerina-websubhub"
-            ]
+            "dependents": []
         },
         {
             "name": "module-ballerina-uuid",
