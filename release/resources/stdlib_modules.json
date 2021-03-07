@@ -33,17 +33,7 @@
             "release": true,
             "dependents": [
                 "module-ballerina-log",
-                "module-ballerina-reflect",
                 "module-ballerina-uuid"
-            ]
-        },
-        {
-            "name": "module-ballerina-runtime",
-            "version": "0.6.0-alpha5-SNAPSHOT",
-            "level": 1,
-            "release": true,
-            "dependents": [
-                "module-ballerina-grpc"
             ]
         },
         {
@@ -114,8 +104,7 @@
             "level": 2,
             "release": true,
             "dependents": [
-                "module-ballerina-log",
-                "module-ballerina-reflect"
+                "module-ballerina-log"
             ]
         },
         {
@@ -142,13 +131,6 @@
                 "module-ballerina-tcp",
                 "module-ballerina-udp"
             ]
-        },
-        {
-            "name": "module-ballerina-reflect",
-            "version": "0.6.0-alpha5-SNAPSHOT",
-            "level": 3,
-            "release": true,
-            "dependents": []
         },
         {
             "name": "module-ballerina-uuid",
