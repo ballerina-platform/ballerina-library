@@ -13,9 +13,6 @@
             "module-ballerina-regex": "0.7.0-alpha5-SNAPSHOT"
         },
         {
-            "module-ballerina-runtime": "0.6.0-alpha5-SNAPSHOT"
-        },
-        {
             "module-ballerina-task": "1.2.0-alpha5-SNAPSHOT"
         },
         {
@@ -41,9 +38,6 @@
         },
         {
             "module-ballerina-log": "1.1.0-alpha5-SNAPSHOT"
-        },
-        {
-            "module-ballerina-reflect": "0.6.0-alpha5-SNAPSHOT"
         },
         {
             "module-ballerina-uuid": "0.10.0-alpha5-SNAPSHOT"
