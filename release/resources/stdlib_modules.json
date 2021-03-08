@@ -64,7 +64,8 @@
             "level": 1,
             "release": true,
             "dependents": [
-                "module-ballerina-graphql"
+                "module-ballerina-graphql",
+                "module-ballerina-websub"
             ]
         },
         {
