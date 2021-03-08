@@ -12,6 +12,7 @@ HTTP_REQUEST_DELAY_MULTIPLIER = 2
 BALLERINA_ORG_NAME = "ballerina-platform"
 BALLERINA_ORG_URL = "https://github.com/ballerina-platform/"
 GITHUB_BADGE_URL = "https://img.shields.io/github/"
+CODECOV_BADGE_URL = "https://codecov.io/gh/"
 
 def main():
     print('Running main.py')
@@ -218,7 +219,10 @@ def update_stdlib_dashboard(module_details_json):
     for line in readme_file:
         processed_line = line.decode("utf-8")
         updated_readme_file += processed_line
-        if "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|" in processed_line:
+        if "## Status Dashboard" in processed_line:
+            updated_readme_file += "\n"
+            updated_readme_file += "|Level| Modules | Latest Version | Build | Code Coverage | Open Issues | Open Pull Requests |\n"
+            updated_readme_file += "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n"
             break
 
     # Modules in levels 0 and 1 are categorized under level 1
@@ -239,8 +243,8 @@ def update_stdlib_dashboard(module_details_json):
         "[![Build](" + BALLERINA_ORG_URL + module['name'] + "/workflows/Build/badge.svg)]" + 
         "(" + BALLERINA_ORG_URL + module['name'] + "/actions?query=workflow%3ABuild)| " + 
 
-        "[![GitHub Last Commit](" + GITHUB_BADGE_URL + "last-commit/" + BALLERINA_ORG_NAME + "/" + module['name'] + ".svg?label=)]" +
-        "(" + BALLERINA_ORG_URL + module['name'] + "/commits/master)| " + 
+        "[![codecov](" + CODECOV_BADGE_URL + BALLERINA_ORG_NAME + "/" + module['name'] + "/branch/master/graph/badge.svg)]" +
+        "(" + CODECOV_BADGE_URL + BALLERINA_ORG_NAME + "/" + module['name'] + ")| " + 
         
         "[![Github issues](" + GITHUB_BADGE_URL + "issues" + "/" + BALLERINA_ORG_NAME + "/ballerina-standard-library/module/" 
         + module['name'].split('-')[-1] + ".svg?label=)]" + 
