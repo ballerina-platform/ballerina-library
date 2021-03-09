@@ -107,6 +107,7 @@
                 "module-ballerinax-nats",
                 "module-ballerina-oauth2",
                 "module-ballerinax-stan",
+                "module-ballerina-tcp",
                 "module-ballerina-uuid"
             ]
         },
