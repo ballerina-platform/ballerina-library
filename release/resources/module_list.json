@@ -10,7 +10,7 @@
         "module-ballerina-grpc",
         "module-ballerina-http",
         "module-ballerina-io",
-        "module-ballerina-java.arrays",
+        "module-ballerinax-java.arrays",
         "module-ballerinax-java.jdbc",
         "module-ballerina-jwt",
         "module-ballerinax-kafka",
