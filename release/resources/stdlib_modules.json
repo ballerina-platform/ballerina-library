@@ -72,7 +72,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-graphql",
-                "module-ballerina-websub"
+                "module-ballerina-websub",
+                "module-ballerina-websubhub"
             ]
         },
         {
