@@ -4,7 +4,7 @@
             "module-ballerina-io": "0.6.0-alpha5-SNAPSHOT"
         },
         {
-            "module-ballerina-java.arrays": "0.10.0-alpha5-SNAPSHOT"
+            "module-ballerinax-java.arrays": "0.10.0-alpha5-SNAPSHOT"
         },
         {
             "module-ballerina-random": "0.10.0-alpha5-SNAPSHOT"
@@ -16,7 +16,7 @@
             "module-ballerina-task": "1.2.0-alpha5-SNAPSHOT"
         },
         {
-            "module-ballerina-time": "1.1.0-alpha5-SNAPSHOT"
+            "module-ballerina-time": "2.0.0-alpha5-SNAPSHOT"
         },
         {
             "module-ballerina-url": "1.1.0-alpha5-SNAPSHOT"
