@@ -3,6 +3,7 @@ import json
 import re
 import networkx as nx
 import sys
+import time
 from retry import retry
 
 HTTP_REQUEST_RETRIES = 3
@@ -87,7 +88,7 @@ def get_dependencies(module_name):
 
 # Gets the version of the ballerina standard library module from gradle.properties file in module repository
 # returns: current version of the module
-def getVersion(module_name):
+def get_version(module_name):
     try:
         data = url_open_with_retry("https://raw.githubusercontent.com/ballerina-platform/" 
                                     + module_name + "/master/gradle.properties")
@@ -110,13 +111,12 @@ def getVersion(module_name):
 # returns: default branch name
 def get_default_branch(module_name):
     try:
-        data = urlOpenWithRetry("https://api.github.com/repos/ballerina-platform/" + module_name)
-    except:
-        print('Failed to get repo details: ' + module_name)
-
-    data = json.load(data)
-    
-    return data['default_branch']
+        data = url_open_with_retry("https://api.github.com/repos/ballerina-platform/" + module_name)
+        json_data = json.load(data)
+        return json_data['default_branch']
+    except Exception as e:
+        print('Failed to get repo details for ' + module_name + ": " + str(e))
+        return ""
 
 # Calculates the longest path between source and destination modules and replaces dependents that have intermediates
 def remove_modules_in_intermediate_paths(G, source, destination, successors, module_details_json):
@@ -197,7 +197,7 @@ def initialize_module_details(module_name_list):
     module_details_json = {'modules':[]}
 
     for module_name in module_name_list:
-        version = getVersion(module_name)		
+        version = get_version(module_name)		
         default_branch = get_default_branch(module_name)			
         module_details_json['modules'].append({
             'name': module_name, 
@@ -206,6 +206,8 @@ def initialize_module_details(module_name_list):
             'default_branch': default_branch,
             'release': True, 
             'dependents': [] })
+        
+        time.sleep(10)
 
     return module_details_json
 
