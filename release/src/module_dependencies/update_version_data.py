@@ -12,6 +12,7 @@ HTTP_REQUEST_DELAY_MULTIPLIER = 2
 BALLERINA_ORG_NAME = "ballerina-platform"
 BALLERINA_ORG_URL = "https://github.com/ballerina-platform/"
 GITHUB_BADGE_URL = "https://img.shields.io/github/"
+CODECOV_BADGE_URL = "https://codecov.io/gh/"
 
 def main():
     print('Running main.py')
@@ -105,6 +106,18 @@ def getVersion(module_name):
 
     return version 
 
+# Gets the default branch of the standard library repository
+# returns: default branch name
+def get_default_branch(module_name):
+    try:
+        data = urlOpenWithRetry("https://api.github.com/repos/ballerina-platform/" + module_name)
+    except:
+        print('Failed to get repo details: ' + module_name)
+
+    data = json.load(data)
+    
+    return data['default_branch']
+
 # Calculates the longest path between source and destination modules and replaces dependents that have intermediates
 def remove_modules_in_intermediate_paths(G, source, destination, successors, module_details_json):
     longest_path = max(nx.all_simple_paths(G, source, destination), key=lambda x: len(x))
@@ -184,11 +197,13 @@ def initialize_module_details(module_name_list):
     module_details_json = {'modules':[]}
 
     for module_name in module_name_list:
-        version = getVersion(module_name)						
+        version = getVersion(module_name)		
+        default_branch = get_default_branch(module_name)			
         module_details_json['modules'].append({
             'name': module_name, 
             'version':version,
             'level': 0,
+            'default_branch': default_branch,
             'release': True, 
             'dependents': [] })
 
@@ -218,7 +233,10 @@ def update_stdlib_dashboard(module_details_json):
     for line in readme_file:
         processed_line = line.decode("utf-8")
         updated_readme_file += processed_line
-        if "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|" in processed_line:
+        if "## Status Dashboard" in processed_line:
+            updated_readme_file += "\n"
+            updated_readme_file += "|Level| Modules | Latest Version | Build | Code Coverage | Open Issues | Open Pull Requests |\n"
+            updated_readme_file += "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n"
             break
 
     # Modules in levels 0 and 1 are categorized under level 1
@@ -239,8 +257,8 @@ def update_stdlib_dashboard(module_details_json):
         "[![Build](" + BALLERINA_ORG_URL + module['name'] + "/workflows/Build/badge.svg)]" + 
         "(" + BALLERINA_ORG_URL + module['name'] + "/actions?query=workflow%3ABuild)| " + 
 
-        "[![GitHub Last Commit](" + GITHUB_BADGE_URL + "last-commit/" + BALLERINA_ORG_NAME + "/" + module['name'] + ".svg?label=)]" +
-        "(" + BALLERINA_ORG_URL + module['name'] + "/commits/master)| " + 
+        "[![CodeCov](" + CODECOV_BADGE_URL + BALLERINA_ORG_NAME + "/" + module['name'] + "/branch/" + module['default_branch'] + "/graph/badge.svg)]" +
+        "(" + CODECOV_BADGE_URL + BALLERINA_ORG_NAME + "/" + module['name'] + ")| " + 
         
         "[![Github issues](" + GITHUB_BADGE_URL + "issues" + "/" + BALLERINA_ORG_NAME + "/ballerina-standard-library/module/" 
         + module['name'].split('-')[-1] + ".svg?label=)]" + 
