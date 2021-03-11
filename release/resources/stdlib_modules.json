@@ -105,6 +105,7 @@
             "release": true,
             "dependents": [
                 "module-ballerina-auth",
+                "module-ballerina-jwt",
                 "module-ballerinax-nats",
                 "module-ballerina-oauth2",
                 "module-ballerinax-stan",
@@ -179,6 +180,16 @@
             "dependents": []
         },
         {
+            "name": "module-ballerina-jwt",
+            "version": "1.1.0-alpha5-SNAPSHOT",
+            "level": 3,
+            "default_branch": "master",
+            "release": true,
+            "dependents": [
+                "module-ballerina-http"
+            ]
+        },
+        {
             "name": "module-ballerina-mime",
             "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 3,
@@ -238,7 +249,7 @@
             "default_branch": "main",
             "release": true,
             "dependents": [
-                "module-ballerina-jwt"
+                "module-ballerina-http"
             ]
         },
         {
@@ -250,19 +261,9 @@
             "dependents": []
         },
         {
-            "name": "module-ballerina-jwt",
-            "version": "1.1.0-alpha5-SNAPSHOT",
-            "level": 4,
-            "default_branch": "master",
-            "release": true,
-            "dependents": [
-                "module-ballerina-http"
-            ]
-        },
-        {
             "name": "module-ballerina-http",
             "version": "1.1.0-alpha5-SNAPSHOT",
-            "level": 5,
+            "level": 4,
             "default_branch": "master",
             "release": true,
             "dependents": [
@@ -277,7 +278,7 @@
         {
             "name": "module-ballerina-graphql",
             "version": "0.2.0-alpha5-SNAPSHOT",
-            "level": 6,
+            "level": 5,
             "default_branch": "master",
             "release": true,
             "dependents": []
@@ -285,7 +286,7 @@
         {
             "name": "module-ballerina-grpc",
             "version": "0.8.0-alpha5-SNAPSHOT",
-            "level": 6,
+            "level": 5,
             "default_branch": "master",
             "release": true,
             "dependents": []
@@ -293,7 +294,7 @@
         {
             "name": "module-ballerinai-transaction",
             "version": "1.0.9-SNAPSHOT",
-            "level": 6,
+            "level": 5,
             "default_branch": "master",
             "release": true,
             "dependents": [
@@ -305,7 +306,7 @@
         {
             "name": "module-ballerina-websocket",
             "version": "1.2.0-alpha5-SNAPSHOT",
-            "level": 6,
+            "level": 5,
             "default_branch": "main",
             "release": true,
             "dependents": []
@@ -313,7 +314,7 @@
         {
             "name": "module-ballerina-websub",
             "version": "1.2.0-alpha5-SNAPSHOT",
-            "level": 6,
+            "level": 5,
             "default_branch": "master",
             "release": true,
             "dependents": []
@@ -321,7 +322,7 @@
         {
             "name": "module-ballerina-websubhub",
             "version": "0.2.0-alpha5-SNAPSHOT",
-            "level": 6,
+            "level": 5,
             "default_branch": "main",
             "release": true,
             "dependents": []
@@ -329,7 +330,7 @@
         {
             "name": "module-ballerinax-kafka",
             "version": "2.1.0-alpha5-SNAPSHOT",
-            "level": 7,
+            "level": 6,
             "default_branch": "master",
             "release": true,
             "dependents": []
@@ -337,7 +338,7 @@
         {
             "name": "module-ballerinax-rabbitmq",
             "version": "1.1.0-alpha6-SNAPSHOT",
-            "level": 7,
+            "level": 6,
             "default_branch": "master",
             "release": true,
             "dependents": []
@@ -345,7 +346,7 @@
         {
             "name": "module-ballerina-sql",
             "version": "0.6.0-alpha5-SNAPSHOT",
-            "level": 7,
+            "level": 6,
             "default_branch": "master",
             "release": true,
             "dependents": [
@@ -356,7 +357,7 @@
         {
             "name": "module-ballerinax-java.jdbc",
             "version": "0.6.0-alpha5-SNAPSHOT",
-            "level": 8,
+            "level": 7,
             "default_branch": "master",
             "release": true,
             "dependents": []
@@ -364,7 +365,7 @@
         {
             "name": "module-ballerinax-mysql",
             "version": "0.7.0-alpha5-SNAPSHOT",
-            "level": 8,
+            "level": 7,
             "default_branch": "master",
             "release": true,
             "dependents": []
