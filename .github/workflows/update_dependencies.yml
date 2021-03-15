@@ -1,4 +1,4 @@
-name: Update Stdlib Dependencies
+name: Update Stdlib Dependency Graph
 
 on: 
     workflow_dispatch:
