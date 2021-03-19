@@ -5,7 +5,7 @@
             "version": "0.6.0-alpha5-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-log",
                 "module-ballerina-os",
@@ -17,7 +17,7 @@
             "version": "0.10.0-alpha5-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
@@ -25,7 +25,7 @@
             "version": "0.10.0-alpha5-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-websub"
             ]
@@ -35,7 +35,7 @@
             "version": "0.7.0-alpha5-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-log",
                 "module-ballerina-uuid"
@@ -46,7 +46,7 @@
             "version": "2.0.0-alpha5-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-crypto",
                 "module-ballerina-file",
@@ -58,7 +58,7 @@
             "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-graphql",
                 "module-ballerina-websub",
@@ -70,7 +70,7 @@
             "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
@@ -78,7 +78,7 @@
             "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-auth",
                 "module-ballerina-jwt",
@@ -94,7 +94,7 @@
             "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-auth",
                 "module-ballerina-file",
@@ -113,7 +113,7 @@
             "version": "0.8.0-alpha5-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-file"
             ]
@@ -123,7 +123,7 @@
             "version": "2.0.0-alpha5-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-cache",
                 "module-ballerina-email",
@@ -135,7 +135,7 @@
             "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
@@ -143,7 +143,7 @@
             "version": "2.1.0-alpha5-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-auth",
                 "module-ballerina-jwt",
@@ -155,7 +155,7 @@
             "version": "0.7.0-alpha5-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-email",
                 "module-ballerina-http"
@@ -166,7 +166,7 @@
             "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
@@ -174,7 +174,7 @@
             "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-email",
                 "module-ballerina-http"
@@ -185,7 +185,7 @@
             "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
@@ -193,7 +193,7 @@
             "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
@@ -201,7 +201,7 @@
             "version": "0.8.0-alpha5-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
@@ -209,7 +209,7 @@
             "version": "0.9.0-alpha5-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
@@ -217,7 +217,7 @@
             "version": "0.10.0-alpha5-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-http"
             ]
@@ -227,7 +227,7 @@
             "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-http"
             ]
@@ -237,7 +237,7 @@
             "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
@@ -245,7 +245,7 @@
             "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-http"
             ]
@@ -255,7 +255,7 @@
             "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-http"
             ]
@@ -265,7 +265,7 @@
             "version": "1.1.0-alpha5-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-graphql",
                 "module-ballerina-grpc",
@@ -280,7 +280,7 @@
             "version": "0.2.0-alpha5-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
@@ -308,7 +308,7 @@
             "version": "1.2.0-alpha5-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
@@ -316,7 +316,7 @@
             "version": "1.2.0-alpha5-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
@@ -324,7 +324,7 @@
             "version": "0.2.0-alpha5-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
