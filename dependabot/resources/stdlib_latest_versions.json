@@ -82,7 +82,7 @@
             "module-ballerina-graphql": "0.2.0-alpha6-SNAPSHOT"
         },
         {
-            "module-ballerina-grpc": "0.8.0-alpha5-SNAPSHOT"
+            "module-ballerina-grpc": "0.8.0-alpha6-SNAPSHOT"
         },
         {
             "module-ballerinai-transaction": "1.0.9-SNAPSHOT"
@@ -103,13 +103,13 @@
             "module-ballerinax-rabbitmq": "1.1.0-alpha6-SNAPSHOT"
         },
         {
-            "module-ballerina-sql": "0.6.0-alpha5-SNAPSHOT"
+            "module-ballerina-sql": "0.6.0-alpha6-SNAPSHOT"
         },
         {
-            "module-ballerinax-java.jdbc": "0.6.0-alpha5-SNAPSHOT"
+            "module-ballerinax-java.jdbc": "0.6.0-alpha6-SNAPSHOT"
         },
         {
-            "module-ballerinax-mysql": "0.7.0-alpha5-SNAPSHOT"
+            "module-ballerinax-mysql": "0.7.0-alpha6-SNAPSHOT"
         }
     ]
 }
