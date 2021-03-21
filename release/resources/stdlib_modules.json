@@ -285,7 +285,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "version": "0.8.0-alpha5-SNAPSHOT",
+            "version": "0.8.0-alpha6-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "release": true,
