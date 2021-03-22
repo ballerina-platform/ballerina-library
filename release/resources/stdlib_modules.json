@@ -43,7 +43,7 @@
         },
         {
             "name": "module-ballerina-time",
-            "version": "2.0.0-alpha5-SNAPSHOT",
+            "version": "2.0.0-alpha6-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "release": true,
@@ -313,7 +313,7 @@
         },
         {
             "name": "module-ballerina-websub",
-            "version": "1.2.0-alpha5-SNAPSHOT",
+            "version": "1.2.0-alpha6-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "release": true,
@@ -321,7 +321,7 @@
         },
         {
             "name": "module-ballerina-websubhub",
-            "version": "0.2.0-alpha5-SNAPSHOT",
+            "version": "0.2.0-alpha6-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "release": true,
