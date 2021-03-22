@@ -2,7 +2,7 @@
     "modules": [
         {
             "name": "module-ballerina-io",
-            "version": "0.6.0-alpha5-SNAPSHOT",
+            "version": "0.6.0-alpha6-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "release": true,
@@ -14,7 +14,7 @@
         },
         {
             "name": "module-ballerinax-java.arrays",
-            "version": "0.10.0-alpha5-SNAPSHOT",
+            "version": "0.10.0-alpha6-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "release": true,
@@ -22,7 +22,7 @@
         },
         {
             "name": "module-ballerina-random",
-            "version": "0.10.0-alpha5-SNAPSHOT",
+            "version": "0.10.0-alpha6-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "release": true,
@@ -120,7 +120,7 @@
         },
         {
             "name": "module-ballerina-task",
-            "version": "2.0.0-alpha5-SNAPSHOT",
+            "version": "2.0.0-alpha6-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "release": true,
@@ -140,7 +140,7 @@
         },
         {
             "name": "module-ballerina-cache",
-            "version": "2.1.0-alpha5-SNAPSHOT",
+            "version": "2.1.0-alpha6-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "release": true,
@@ -152,7 +152,7 @@
         },
         {
             "name": "module-ballerina-file",
-            "version": "0.7.0-alpha5-SNAPSHOT",
+            "version": "0.7.0-alpha6-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "release": true,
@@ -182,7 +182,7 @@
         },
         {
             "name": "module-ballerinax-nats",
-            "version": "1.1.0-alpha5-SNAPSHOT",
+            "version": "1.1.0-alpha6-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "release": true,
@@ -190,7 +190,7 @@
         },
         {
             "name": "module-ballerinax-stan",
-            "version": "1.1.0-alpha5-SNAPSHOT",
+            "version": "1.1.0-alpha6-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "release": true,
@@ -329,7 +329,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "version": "2.1.0-alpha5-SNAPSHOT",
+            "version": "2.1.0-alpha6-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "release": true,
@@ -337,7 +337,7 @@
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "version": "1.1.0-alpha6-SNAPSHOT",
+            "version": "1.1.0-alpha7-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "release": true,
