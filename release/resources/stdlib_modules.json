@@ -32,7 +32,7 @@
         },
         {
             "name": "module-ballerina-regex",
-            "version": "0.7.0-alpha5-SNAPSHOT",
+            "version": "0.7.0-alpha6-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "release": true,
@@ -67,7 +67,7 @@
         },
         {
             "name": "module-ballerina-xmldata",
-            "version": "1.1.0-alpha5-SNAPSHOT",
+            "version": "1.1.0-alpha6-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "release": true,
@@ -132,7 +132,7 @@
         },
         {
             "name": "module-ballerina-xslt",
-            "version": "1.1.0-alpha5-SNAPSHOT",
+            "version": "1.1.0-alpha6-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "release": true,
@@ -305,7 +305,7 @@
         },
         {
             "name": "module-ballerina-websocket",
-            "version": "1.2.0-alpha5-SNAPSHOT",
+            "version": "1.2.0-alpha6-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "release": true,
