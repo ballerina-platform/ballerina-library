@@ -163,7 +163,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "version": "1.1.0-alpha5-SNAPSHOT",
+            "version": "1.1.0-alpha6-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "release": true,
@@ -171,7 +171,7 @@
         },
         {
             "name": "module-ballerina-mime",
-            "version": "1.1.0-alpha5-SNAPSHOT",
+            "version": "1.1.0-alpha6-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "release": true,
@@ -206,7 +206,7 @@
         },
         {
             "name": "module-ballerina-udp",
-            "version": "0.9.0-alpha5-SNAPSHOT",
+            "version": "0.9.0-alpha6-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "release": true,
@@ -262,7 +262,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "version": "1.1.0-alpha5-SNAPSHOT",
+            "version": "1.1.0-alpha6-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "release": true,
