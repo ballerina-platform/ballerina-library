@@ -13,7 +13,7 @@
             ]
         },
         {
-            "name": "module-ballerinax-java.arrays",
+            "name": "module-ballerina-jballerina.java.arrays",
             "version": "0.10.0-alpha6-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
