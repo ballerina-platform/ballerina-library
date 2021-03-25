@@ -2,6 +2,7 @@ public type Module record {|
     string name;
     string 'version;
     int level;
+    string default_branch;
     boolean release;
     string[] dependents;
     Module[] dependentModules = [];

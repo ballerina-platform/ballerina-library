@@ -1,4 +1,4 @@
-name: Update Stdlibs on Version Update
+name: Update Lang Version in Stdlibs
 
 on:
     workflow_dispatch:

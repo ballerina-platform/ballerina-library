@@ -133,7 +133,7 @@ def update_properties_file(data, modules, current_versions):
         module_name = module['name'].split('-')[-1]
         latest_version = module['version']
 
-        if module_name == 'java.arrays':
+        if module_name == 'jballerina.java.arrays':
             version = compare_version(latest_version, current_versions[javaArraysModuleName])
             line = javaArraysModuleName + "=" + version + "\n"
         elif module_name == 'java.jdbc':

@@ -1,42 +1,30 @@
 {
     "modules": [
         {
-            "name": "module-ballerina-encoding",
-            "version": "1.1.0-alpha5-SNAPSHOT",
-            "level": 1,
-            "release": true,
-            "dependents": [
-                "module-ballerina-jwt"
-            ]
-        },
-        {
             "name": "module-ballerina-io",
-            "version": "0.6.0-alpha5-SNAPSHOT",
+            "version": "0.6.0-alpha6-SNAPSHOT",
             "level": 1,
+            "default_branch": "master",
             "release": true,
             "dependents": [
+                "module-ballerina-log",
                 "module-ballerina-os",
                 "module-ballerina-xslt"
             ]
         },
         {
-            "name": "module-ballerina-java.arrays",
-            "version": "0.10.0-alpha5-SNAPSHOT",
+            "name": "module-ballerinax-java.arrays",
+            "version": "0.10.0-alpha6-SNAPSHOT",
             "level": 1,
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerina-jsonutils",
-            "version": "1.1.0-alpha5-SNAPSHOT",
-            "level": 1,
+            "default_branch": "master",
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerina-random",
-            "version": "0.10.0-alpha5-SNAPSHOT",
+            "version": "0.10.0-alpha6-SNAPSHOT",
             "level": 1,
+            "default_branch": "main",
             "release": true,
             "dependents": [
                 "module-ballerina-websub"
@@ -44,98 +32,68 @@
         },
         {
             "name": "module-ballerina-regex",
-            "version": "0.7.0-alpha5-SNAPSHOT",
+            "version": "0.7.0-alpha6-SNAPSHOT",
             "level": 1,
+            "default_branch": "main",
             "release": true,
             "dependents": [
                 "module-ballerina-log",
-                "module-ballerina-reflect",
                 "module-ballerina-uuid"
-            ]
-        },
-        {
-            "name": "module-ballerina-runtime",
-            "version": "0.6.0-alpha5-SNAPSHOT",
-            "level": 1,
-            "release": true,
-            "dependents": [
-                "module-ballerina-grpc"
-            ]
-        },
-        {
-            "name": "module-ballerina-task",
-            "version": "1.2.0-alpha5-SNAPSHOT",
-            "level": 1,
-            "release": true,
-            "dependents": [
-                "module-ballerina-cache",
-                "module-ballerina-email",
-                "module-ballerina-ftp"
             ]
         },
         {
             "name": "module-ballerina-time",
-            "version": "1.1.0-alpha5-SNAPSHOT",
+            "version": "2.0.0-alpha6-SNAPSHOT",
             "level": 1,
+            "default_branch": "master",
             "release": true,
             "dependents": [
-                "module-ballerina-cache",
                 "module-ballerina-crypto",
-                "module-ballerina-file"
+                "module-ballerina-file",
+                "module-ballerina-task"
             ]
         },
         {
-            "name": "module-ballerina-xmlutils",
-            "version": "1.1.0-alpha5-SNAPSHOT",
+            "name": "module-ballerina-url",
+            "version": "1.1.0-alpha6-SNAPSHOT",
             "level": 1,
+            "default_branch": "master",
+            "release": true,
+            "dependents": [
+                "module-ballerina-graphql",
+                "module-ballerina-websub",
+                "module-ballerina-websubhub"
+            ]
+        },
+        {
+            "name": "module-ballerina-xmldata",
+            "version": "1.1.0-alpha6-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
             "release": true,
             "dependents": []
         },
         {
-            "name": "module-ballerina-cache",
-            "version": "2.1.0-alpha5-SNAPSHOT",
+            "name": "module-ballerina-crypto",
+            "version": "1.1.0-alpha6-SNAPSHOT",
             "level": 2,
+            "default_branch": "master",
             "release": true,
             "dependents": [
                 "module-ballerina-auth",
                 "module-ballerina-jwt",
-                "module-ballerina-oauth2"
-            ]
-        },
-        {
-            "name": "module-ballerina-crypto",
-            "version": "1.1.0-alpha5-SNAPSHOT",
-            "level": 2,
-            "release": true,
-            "dependents": [
-                "module-ballerina-auth",
                 "module-ballerinax-nats",
                 "module-ballerina-oauth2",
                 "module-ballerinax-stan",
+                "module-ballerina-tcp",
                 "module-ballerina-uuid"
             ]
         },
         {
-            "name": "module-ballerina-os",
-            "version": "0.8.0-alpha5-SNAPSHOT",
-            "level": 2,
-            "release": true,
-            "dependents": [
-                "module-ballerina-log",
-                "module-ballerina-reflect"
-            ]
-        },
-        {
-            "name": "module-ballerina-xslt",
-            "version": "1.1.0-alpha5-SNAPSHOT",
-            "level": 2,
-            "release": true,
-            "dependents": []
-        },
-        {
             "name": "module-ballerina-log",
-            "version": "1.1.0-alpha5-SNAPSHOT",
-            "level": 3,
+            "version": "1.1.0-alpha6-SNAPSHOT",
+            "level": 2,
+            "default_branch": "master",
             "release": true,
             "dependents": [
                 "module-ballerina-auth",
@@ -151,36 +109,52 @@
             ]
         },
         {
-            "name": "module-ballerina-reflect",
-            "version": "0.6.0-alpha5-SNAPSHOT",
-            "level": 3,
+            "name": "module-ballerina-os",
+            "version": "0.8.0-alpha6-SNAPSHOT",
+            "level": 2,
+            "default_branch": "master",
             "release": true,
             "dependents": [
-                "module-ballerina-http"
+                "module-ballerina-file"
             ]
         },
         {
-            "name": "module-ballerina-uuid",
-            "version": "0.10.0-alpha5-SNAPSHOT",
-            "level": 3,
+            "name": "module-ballerina-task",
+            "version": "2.0.0-alpha6-SNAPSHOT",
+            "level": 2,
+            "default_branch": "master",
             "release": true,
             "dependents": [
-                "module-ballerina-jwt"
+                "module-ballerina-cache",
+                "module-ballerina-email",
+                "module-ballerina-ftp"
             ]
         },
         {
-            "name": "module-ballerina-auth",
-            "version": "1.1.0-alpha5-SNAPSHOT",
-            "level": 4,
+            "name": "module-ballerina-xslt",
+            "version": "1.1.0-alpha6-SNAPSHOT",
+            "level": 2,
+            "default_branch": "master",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerina-cache",
+            "version": "2.1.0-alpha6-SNAPSHOT",
+            "level": 3,
+            "default_branch": "master",
             "release": true,
             "dependents": [
-                "module-ballerina-http"
+                "module-ballerina-auth",
+                "module-ballerina-jwt",
+                "module-ballerina-oauth2"
             ]
         },
         {
             "name": "module-ballerina-file",
-            "version": "0.7.0-alpha5-SNAPSHOT",
-            "level": 4,
+            "version": "0.7.0-alpha6-SNAPSHOT",
+            "level": 3,
+            "default_branch": "master",
             "release": true,
             "dependents": [
                 "module-ballerina-email",
@@ -189,24 +163,17 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "version": "1.1.0-alpha5-SNAPSHOT",
-            "level": 4,
+            "version": "1.1.0-alpha6-SNAPSHOT",
+            "level": 3,
+            "default_branch": "master",
             "release": true,
             "dependents": []
         },
         {
-            "name": "module-ballerina-jwt",
-            "version": "1.1.0-alpha5-SNAPSHOT",
-            "level": 4,
-            "release": true,
-            "dependents": [
-                "module-ballerina-http"
-            ]
-        },
-        {
             "name": "module-ballerina-mime",
-            "version": "1.1.0-alpha5-SNAPSHOT",
-            "level": 4,
+            "version": "1.1.0-alpha6-SNAPSHOT",
+            "level": 3,
+            "default_branch": "master",
             "release": true,
             "dependents": [
                 "module-ballerina-email",
@@ -215,52 +182,89 @@
         },
         {
             "name": "module-ballerinax-nats",
-            "version": "1.1.0-alpha5-SNAPSHOT",
-            "level": 4,
+            "version": "1.1.0-alpha6-SNAPSHOT",
+            "level": 3,
+            "default_branch": "master",
             "release": true,
             "dependents": []
         },
         {
-            "name": "module-ballerina-oauth2",
-            "version": "1.1.0-alpha5-SNAPSHOT",
-            "level": 4,
+            "name": "module-ballerinax-stan",
+            "version": "1.1.0-alpha6-SNAPSHOT",
+            "level": 3,
+            "default_branch": "main",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerina-tcp",
+            "version": "0.8.0-alpha6-SNAPSHOT",
+            "level": 3,
+            "default_branch": "master",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerina-udp",
+            "version": "0.9.0-alpha6-SNAPSHOT",
+            "level": 3,
+            "default_branch": "main",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerina-uuid",
+            "version": "0.10.0-alpha6-SNAPSHOT",
+            "level": 3,
+            "default_branch": "main",
             "release": true,
             "dependents": [
                 "module-ballerina-http"
             ]
         },
         {
-            "name": "module-ballerinax-stan",
-            "version": "1.1.0-alpha5-SNAPSHOT",
+            "name": "module-ballerina-auth",
+            "version": "1.1.0-alpha6-SNAPSHOT",
             "level": 4,
+            "default_branch": "master",
             "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerina-tcp",
-            "version": "0.8.0-alpha5-SNAPSHOT",
-            "level": 4,
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerina-udp",
-            "version": "0.9.0-alpha5-SNAPSHOT",
-            "level": 4,
-            "release": true,
-            "dependents": []
+            "dependents": [
+                "module-ballerina-http"
+            ]
         },
         {
             "name": "module-ballerina-email",
-            "version": "1.1.0-alpha5-SNAPSHOT",
-            "level": 5,
+            "version": "1.1.0-alpha6-SNAPSHOT",
+            "level": 4,
+            "default_branch": "master",
             "release": true,
             "dependents": []
         },
         {
+            "name": "module-ballerina-jwt",
+            "version": "1.1.0-alpha6-SNAPSHOT",
+            "level": 4,
+            "default_branch": "master",
+            "release": true,
+            "dependents": [
+                "module-ballerina-http"
+            ]
+        },
+        {
+            "name": "module-ballerina-oauth2",
+            "version": "1.1.0-alpha6-SNAPSHOT",
+            "level": 4,
+            "default_branch": "master",
+            "release": true,
+            "dependents": [
+                "module-ballerina-http"
+            ]
+        },
+        {
             "name": "module-ballerina-http",
-            "version": "1.1.0-alpha5-SNAPSHOT",
+            "version": "1.1.0-alpha6-SNAPSHOT",
             "level": 5,
+            "default_branch": "master",
             "release": true,
             "dependents": [
                 "module-ballerina-graphql",
@@ -273,15 +277,17 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "version": "0.2.0-alpha5-SNAPSHOT",
+            "version": "0.2.0-alpha6-SNAPSHOT",
             "level": 6,
+            "default_branch": "master",
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerina-grpc",
-            "version": "0.8.0-alpha5-SNAPSHOT",
+            "version": "0.8.0-alpha6-SNAPSHOT",
             "level": 6,
+            "default_branch": "master",
             "release": true,
             "dependents": []
         },
@@ -289,6 +295,7 @@
             "name": "module-ballerinai-transaction",
             "version": "1.0.9-SNAPSHOT",
             "level": 6,
+            "default_branch": "master",
             "release": true,
             "dependents": [
                 "module-ballerinax-kafka",
@@ -298,43 +305,49 @@
         },
         {
             "name": "module-ballerina-websocket",
-            "version": "1.2.0-alpha5-SNAPSHOT",
+            "version": "1.2.0-alpha6-SNAPSHOT",
             "level": 6,
+            "default_branch": "main",
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerina-websub",
-            "version": "1.2.0-alpha5-SNAPSHOT",
+            "version": "1.2.0-alpha6-SNAPSHOT",
             "level": 6,
+            "default_branch": "master",
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerina-websubhub",
-            "version": "0.2.0-alpha5-SNAPSHOT",
+            "version": "0.2.0-alpha6-SNAPSHOT",
             "level": 6,
+            "default_branch": "main",
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerinax-kafka",
-            "version": "2.1.0-alpha5-SNAPSHOT",
+            "version": "2.1.0-alpha6-SNAPSHOT",
             "level": 7,
+            "default_branch": "master",
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "version": "1.1.0-alpha6-SNAPSHOT",
+            "version": "1.1.0-alpha7-SNAPSHOT",
             "level": 7,
+            "default_branch": "master",
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerina-sql",
-            "version": "0.6.0-alpha5-SNAPSHOT",
+            "version": "0.6.0-alpha6-SNAPSHOT",
             "level": 7,
+            "default_branch": "master",
             "release": true,
             "dependents": [
                 "module-ballerinax-java.jdbc",
@@ -343,15 +356,17 @@
         },
         {
             "name": "module-ballerinax-java.jdbc",
-            "version": "0.6.0-alpha5-SNAPSHOT",
+            "version": "0.6.0-alpha6-SNAPSHOT",
             "level": 8,
+            "default_branch": "master",
             "release": true,
             "dependents": []
         },
         {
             "name": "module-ballerinax-mysql",
-            "version": "0.7.0-alpha5-SNAPSHOT",
+            "version": "0.7.0-alpha6-SNAPSHOT",
             "level": 8,
+            "default_branch": "master",
             "release": true,
             "dependents": []
         }

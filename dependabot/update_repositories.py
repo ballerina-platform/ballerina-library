@@ -21,7 +21,7 @@ MASTER_BRANCH = "master"
 MAIN_BRANCH = "main"
 
 DEPENDABOT_BRANCH_NAME = "automated/stdlib_version_update"
-PULL_REQUEST_TITLE = "[Automated] Dependency Update"
+PULL_REQUEST_TITLE = "[Automated] Update Dependencies"
 PULL_REQUEST_BODY = "$subject"
 
 PROPERTIES_FILE = "gradle.properties"
@@ -116,25 +116,26 @@ def get_dependencies(module_name):
 # Update the gradle.properties file of each dependent module stored in the dependents list of modules with version updates
 def update_files(modules):
     for module in modules['modules']:
-        print("Updating dependents of " + module['name'])
+        print("Updating dependents of " + module['name'] + " to " + module['version'])
         for dependent in module['dependents']:
             # Fetch repository of the module
             repo = configure_github_repository(dependent)
             # Fetch gradle.properties file
             data = fetch_properties_file(repo, module['name'])
             # Update the gradle.properties file with version updates
-            updated_data, current_version, commit_flag = update_properties_file(data, module['name'], module['version'])
+            updated_data, current_version, commit_flag = update_properties_file(data, module['name'], module['version'], dependent)
             # If gradle.properties file is updated, commit changes and create PR
             if commit_flag:
                 try:
                     commit_changes(updated_data, current_version, repo, module['name'], module['version'])
                     create_pull_request(repo, current_version, module['name'], module['version'])
-                    print("Bump " + module['name'] + " version from " + current_version + " to " + module['version'])
+                    print("Bump version in " + dependent + " from " + current_version)
                     time.sleep(30)
                 except:
                     continue
             else:
-                print(module['name'] + " version is already the lastest version " + current_version)
+                if current_version:
+                    print(dependent + " version is already in the lastest version " + current_version)
         print("-------------------------------------------------------------------------------------") 
 
 
@@ -163,7 +164,7 @@ def fetch_properties_file(repo, module):
 
 
 # Update the version of a given module in the gradle.properties file
-def update_properties_file(data, module, latest_version):
+def update_properties_file(data, module, latest_version, dependent):
     modified_data = ''
     commit_flag = False
     current_version = ''
@@ -190,7 +191,7 @@ def update_properties_file(data, module, latest_version):
             modified_data += modified_line
 
     if current_version == '':
-        print("Inconsistent module name: ", module)
+        print("Version not defined in the dependent: ", dependent)
 
     return modified_data, current_version, commit_flag
 

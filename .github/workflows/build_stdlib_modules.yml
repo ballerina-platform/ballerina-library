@@ -1,4 +1,4 @@
-name: Publish Snapshots
+name: Publish Package Snapshots
 
 on:
     repository_dispatch:
