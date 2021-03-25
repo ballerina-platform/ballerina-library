@@ -4,7 +4,7 @@
             "module-ballerina-io": "0.6.0-alpha6-SNAPSHOT"
         },
         {
-            "module-ballerinax-java.arrays": "0.10.0-alpha6-SNAPSHOT"
+            "module-ballerina-jballerina.java.arrays": "0.10.0-alpha6-SNAPSHOT"
         },
         {
             "module-ballerina-random": "0.10.0-alpha6-SNAPSHOT"
