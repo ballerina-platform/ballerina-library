@@ -85,7 +85,7 @@
             "module-ballerina-grpc": "0.8.0-alpha6-SNAPSHOT"
         },
         {
-            "module-ballerinai-transaction": "1.0.9-SNAPSHOT"
+            "module-ballerinai-transaction": "1.0.10-SNAPSHOT"
         },
         {
             "module-ballerina-websocket": "1.2.0-alpha6-SNAPSHOT"
