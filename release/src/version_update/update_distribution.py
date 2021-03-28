@@ -25,7 +25,6 @@ PULL_REQUEST_BODY = "$subject"
 PROPERTIES_FILE = "gradle.properties"
 
 javaArraysModuleName = 'stdlibJavaArraysVersion'
-javaJdbcModuleName = 'stdlibJdbcVersion'
 OAuth2ModuleName = 'stdlibOAuth2Version'
 
 SKIPPING_MODULES = ["kafka", "nats", "stan", "rabbitmq"]
@@ -136,9 +135,6 @@ def update_properties_file(data, modules, current_versions):
         if module_name == 'jballerina.java.arrays':
             version = compare_version(latest_version, current_versions[javaArraysModuleName])
             line = javaArraysModuleName + "=" + version + "\n"
-        elif module_name == 'java.jdbc':
-            version = compare_version(latest_version, current_versions[javaJdbcModuleName])
-            line = javaJdbcModuleName + "=" + version + "\n"
         elif module_name == 'oauth2':
             version = compare_version(latest_version, current_versions[OAuth2ModuleName])
             line = OAuth2ModuleName + "=" + version + "\n"
