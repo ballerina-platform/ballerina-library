@@ -120,7 +120,7 @@
         },
         {
             "name": "module-ballerina-task",
-            "version": "2.0.0-alpha6-SNAPSHOT",
+            "version": "2.0.0-alpha7-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "release": true,
@@ -132,7 +132,7 @@
         },
         {
             "name": "module-ballerina-xslt",
-            "version": "1.1.0-alpha6-SNAPSHOT",
+            "version": "1.1.0-alpha7-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "release": true,
