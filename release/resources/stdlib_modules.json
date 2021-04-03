@@ -252,7 +252,7 @@
         },
         {
             "name": "module-ballerina-oauth2",
-            "version": "1.1.0-alpha7-SNAPSHOT",
+            "version": "1.1.0-alpha6-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "release": true,
