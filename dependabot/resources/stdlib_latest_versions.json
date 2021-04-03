@@ -97,7 +97,7 @@
             "module-ballerina-websubhub": "0.2.0-alpha7-SNAPSHOT"
         },
         {
-            "module-ballerinax-kafka": "2.1.0-alpha7-SNAPSHOT"
+            "module-ballerinax-kafka": "2.1.0-alpha6-SNAPSHOT"
         },
         {
             "module-ballerinax-rabbitmq": "1.1.0-alpha8-SNAPSHOT"
