@@ -329,7 +329,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "version": "2.1.0-alpha6-SNAPSHOT",
+            "version": "2.1.0-alpha7-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "release": true,
