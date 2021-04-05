@@ -284,7 +284,7 @@ def update_stdlib_dashboard(module_details_json):
 
 def get_bug_query(module):
     module_name = module['name']
-    return "query=is%3Aopen+label%3AType%2FBug+label%3Amodule%2F" + get_module_short_name(module_name) + "&label=Bugs&color=yellow"
+    return "query=is%3Aopen+label%3AType%2FBug+label%3Amodule%2F" + get_module_short_name(module_name) + "&label=Bugs&color=yellow&logo=github"
 
 
 def get_bugs_link(module):
