@@ -5,7 +5,7 @@
             "version": "0.6.0-alpha7-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-log",
                 "module-ballerina-os",
@@ -17,7 +17,7 @@
             "version": "0.10.0-alpha7-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -25,7 +25,7 @@
             "version": "0.10.0-alpha7-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-websub"
             ]
@@ -35,7 +35,7 @@
             "version": "0.7.0-alpha7-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-log",
                 "module-ballerina-uuid"
@@ -58,7 +58,7 @@
             "version": "1.1.0-alpha7-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-graphql",
                 "module-ballerina-websub",
@@ -70,7 +70,7 @@
             "version": "1.1.0-alpha7-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
