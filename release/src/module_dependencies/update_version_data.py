@@ -237,7 +237,7 @@ def update_stdlib_dashboard(module_details_json):
         updated_readme_file += processed_line
         if "## Status Dashboard" in processed_line:
             updated_readme_file += "\n"
-            updated_readme_file += "|Level| Modules | Latest Version | Build | Code Coverage | Open Issues | Open Pull Requests |\n"
+            updated_readme_file += "|Level| Modules | Latest Version | Build | Code Coverage | Bugs | Open Pull Requests |\n"
             updated_readme_file += "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n"
             break
 
@@ -262,9 +262,8 @@ def update_stdlib_dashboard(module_details_json):
         "[![CodeCov](" + CODECOV_BADGE_URL + BALLERINA_ORG_NAME + "/" + module['name'] + "/branch/" + module['default_branch'] + "/graph/badge.svg)]" +
         "(" + CODECOV_BADGE_URL + BALLERINA_ORG_NAME + "/" + module['name'] + ")| " + 
         
-        "[![Github issues](" + GITHUB_BADGE_URL + "issues" + "/" + BALLERINA_ORG_NAME + "/ballerina-standard-library/module/" 
-        + module['name'].split('-')[-1] + ".svg?label=)]" + 
-        "(" + BALLERINA_ORG_URL + "ballerina-standard-library/labels/module%2F" + module['name'].split('-')[-1] + ")| " + 
+        "[![Bugs](" + GITHUB_BADGE_URL + "issues-search/" + BALLERINA_ORG_NAME + "/ballerina-standard-library?query="
+               + get_bug_query(module) + ")](" + get_bugs_link(module) + ")| " +
 
         "[![GitHub pull-requests](" + GITHUB_BADGE_URL + "issues-pr" + "/" + BALLERINA_ORG_NAME + "/" + module['name'] + ".svg?label=)]" + 
         "(" + BALLERINA_ORG_URL + module['name'] + "/pulls)|\n")
@@ -281,5 +280,19 @@ def update_stdlib_dashboard(module_details_json):
     except:
         print('Failed to write to README.md')
         sys.exit()
+
+
+def get_bug_query(module):
+    module_name = module['name']
+    return "query=is%3Aopen+label%3AType%2FBug+label%3Amodule%2F" + get_module_short_name(module_name) + "&label=Bugs&color=yellow"
+
+
+def get_bugs_link(module):
+    return BALLERINA_ORG_URL + "/ballerina-standard-library/issues?q=is%3Aopen+label%3AType%2FBug+label%3Amodule%2F" + get_module_short_name(module['name'])
+
+
+def get_module_short_name(module_name):
+    return module_name.split("-")[-1]
+
 
 main()
