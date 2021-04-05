@@ -163,7 +163,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "version": "1.1.0-alpha7-SNAPSHOT",
+            "version": "1.1.0-alpha8-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "release": true,
