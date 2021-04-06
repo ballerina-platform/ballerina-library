@@ -106,16 +106,7 @@ def get_updated_properties_file(module_name, properties_file, lang_version):
     update = False
 
     for line in properties_file.splitlines():
-        if line.startswith(LANG_VERSION_KEY):
-            current_version = line.split("=")[-1]
-            if current_version != lang_version:
-                print("[Info] Updating the lang version in module: \"" + module_name + "\"")
-                updated_properties_file += LANG_VERSION_KEY + "=" + lang_version + "\n"
-                update = True
-            else:
-                updated_properties_file += line + "\n"
-        else:
-            updated_properties_file += line + "\n"
+        updated_properties_file += line + "\n"
 
     return update, updated_properties_file
 
