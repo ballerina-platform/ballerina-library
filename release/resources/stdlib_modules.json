@@ -24,7 +24,7 @@
             "name": "module-ballerina-random",
             "version": "0.10.0-alpha7-SNAPSHOT",
             "level": 1,
-            "default_branch": "main",
+            "default_branch": "",
             "release": true,
             "dependents": [
                 "module-ballerina-websub"
@@ -34,7 +34,7 @@
             "name": "module-ballerina-regex",
             "version": "0.7.0-alpha7-SNAPSHOT",
             "level": 1,
-            "default_branch": "main",
+            "default_branch": "",
             "release": true,
             "dependents": [
                 "module-ballerina-log",
@@ -45,7 +45,7 @@
             "name": "module-ballerina-time",
             "version": "2.0.0-alpha8-SNAPSHOT",
             "level": 1,
-            "default_branch": "master",
+            "default_branch": "",
             "release": true,
             "dependents": [
                 "module-ballerina-crypto",
@@ -112,7 +112,7 @@
             "name": "module-ballerina-os",
             "version": "0.8.0-alpha7-SNAPSHOT",
             "level": 2,
-            "default_branch": "master",
+            "default_branch": "",
             "release": true,
             "dependents": [
                 "module-ballerina-file"
@@ -122,7 +122,7 @@
             "name": "module-ballerina-task",
             "version": "2.0.0-alpha8-SNAPSHOT",
             "level": 2,
-            "default_branch": "master",
+            "default_branch": "",
             "release": true,
             "dependents": [
                 "module-ballerina-cache",
@@ -184,7 +184,7 @@
             "name": "module-ballerinax-nats",
             "version": "1.1.0-alpha7-SNAPSHOT",
             "level": 3,
-            "default_branch": "master",
+            "default_branch": "",
             "release": true,
             "dependents": []
         },
@@ -192,7 +192,7 @@
             "name": "module-ballerinax-stan",
             "version": "1.1.0-alpha7-SNAPSHOT",
             "level": 3,
-            "default_branch": "main",
+            "default_branch": "",
             "release": true,
             "dependents": []
         },
@@ -200,7 +200,7 @@
             "name": "module-ballerina-tcp",
             "version": "0.8.0-alpha7-SNAPSHOT",
             "level": 3,
-            "default_branch": "master",
+            "default_branch": "",
             "release": true,
             "dependents": []
         },
@@ -208,7 +208,7 @@
             "name": "module-ballerina-udp",
             "version": "0.9.0-alpha7-SNAPSHOT",
             "level": 3,
-            "default_branch": "main",
+            "default_branch": "",
             "release": true,
             "dependents": []
         },
@@ -254,7 +254,7 @@
             "name": "module-ballerina-oauth2",
             "version": "1.1.0-alpha7-SNAPSHOT",
             "level": 4,
-            "default_branch": "master",
+            "default_branch": "",
             "release": true,
             "dependents": [
                 "module-ballerina-http"
@@ -295,7 +295,7 @@
             "name": "module-ballerinai-transaction",
             "version": "1.0.11-SNAPSHOT",
             "level": 6,
-            "default_branch": "master",
+            "default_branch": "",
             "release": true,
             "dependents": [
                 "module-ballerinax-kafka",
@@ -339,7 +339,7 @@
             "name": "module-ballerinax-rabbitmq",
             "version": "1.1.0-alpha8-SNAPSHOT",
             "level": 7,
-            "default_branch": "master",
+            "default_branch": "",
             "release": true,
             "dependents": []
         },
@@ -347,7 +347,7 @@
             "name": "module-ballerina-sql",
             "version": "0.6.0-alpha7-SNAPSHOT",
             "level": 7,
-            "default_branch": "master",
+            "default_branch": "",
             "release": true,
             "dependents": [
                 "module-ballerinax-java.jdbc",
