@@ -2,7 +2,7 @@
     "modules": [
         {
             "name": "module-ballerina-io",
-            "version": "0.6.0-alpha7-SNAPSHOT",
+            "version": "0.6.0-alpha8-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "release": true,
@@ -14,7 +14,7 @@
         },
         {
             "name": "module-ballerina-jballerina.java.arrays",
-            "version": "0.10.0-alpha7-SNAPSHOT",
+            "version": "0.10.0-alpha8-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "release": true,
@@ -43,7 +43,7 @@
         },
         {
             "name": "module-ballerina-time",
-            "version": "2.0.0-alpha8-SNAPSHOT",
+            "version": "2.0.0-alpha9-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "release": true,
@@ -55,7 +55,7 @@
         },
         {
             "name": "module-ballerina-url",
-            "version": "1.1.0-alpha7-SNAPSHOT",
+            "version": "1.1.0-alpha8-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "release": true,
@@ -75,7 +75,7 @@
         },
         {
             "name": "module-ballerina-crypto",
-            "version": "1.1.0-alpha7-SNAPSHOT",
+            "version": "1.1.0-alpha8-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "release": true,
@@ -190,7 +190,7 @@
         },
         {
             "name": "module-ballerinax-stan",
-            "version": "1.1.0-alpha7-SNAPSHOT",
+            "version": "1.1.0-alpha8-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "release": true,
@@ -224,7 +224,7 @@
         },
         {
             "name": "module-ballerina-auth",
-            "version": "1.1.0-alpha7-SNAPSHOT",
+            "version": "1.1.0-alpha8-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "release": true,
@@ -242,7 +242,7 @@
         },
         {
             "name": "module-ballerina-jwt",
-            "version": "1.1.0-alpha7-SNAPSHOT",
+            "version": "1.1.0-alpha8-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "release": true,
@@ -277,7 +277,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "version": "0.2.0-alpha7-SNAPSHOT",
+            "version": "0.2.0-alpha8-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "release": true,
@@ -285,7 +285,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "version": "0.8.0-alpha7-SNAPSHOT",
+            "version": "0.8.0-alpha8-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "release": true,
@@ -305,7 +305,7 @@
         },
         {
             "name": "module-ballerina-websocket",
-            "version": "1.2.0-alpha7-SNAPSHOT",
+            "version": "1.2.0-alpha8-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "release": true,
@@ -313,7 +313,7 @@
         },
         {
             "name": "module-ballerina-websub",
-            "version": "1.2.0-alpha7-SNAPSHOT",
+            "version": "1.2.0-alpha8-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "release": true,
@@ -321,7 +321,7 @@
         },
         {
             "name": "module-ballerina-websubhub",
-            "version": "0.2.0-alpha7-SNAPSHOT",
+            "version": "0.2.0-alpha8-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "release": true,
@@ -337,7 +337,7 @@
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "version": "1.1.0-alpha8-SNAPSHOT",
+            "version": "1.1.0-alpha9-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "release": true,
@@ -345,7 +345,7 @@
         },
         {
             "name": "module-ballerina-sql",
-            "version": "0.6.0-alpha7-SNAPSHOT",
+            "version": "0.6.0-alpha8-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "release": true,
@@ -356,7 +356,7 @@
         },
         {
             "name": "module-ballerinax-java.jdbc",
-            "version": "0.6.0-alpha7-SNAPSHOT",
+            "version": "0.6.0-alpha8-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "release": true,
@@ -364,7 +364,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "version": "0.7.0-alpha7-SNAPSHOT",
+            "version": "0.7.0-alpha8-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "release": true,
