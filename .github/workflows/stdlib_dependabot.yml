@@ -2,8 +2,7 @@ name: Ballerina Stdlib Dependabot
 
 on: 
     workflow_dispatch:
-    schedule:
-        - cron: '30 18 * * *'
+
 jobs:
     dependabot:
         name: Stdlib Dependabot
