@@ -1,8 +1,9 @@
 name: Build Dependents of a Package
 
 on:
-    repository_dispatch:
-        types: [ stdlib-module-push ]
+    workflow_dispatch:
+#    repository_dispatch:
+#        types: [ stdlib-module-push ]
 
 jobs:
     publish-dependent-modules:
