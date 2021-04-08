@@ -45,7 +45,7 @@
             "name": "module-ballerina-time",
             "version": "2.0.0-alpha9-SNAPSHOT",
             "level": 1,
-            "default_branch": "",
+            "default_branch": "master",
             "release": true,
             "dependents": [
                 "module-ballerina-crypto",
@@ -57,7 +57,7 @@
             "name": "module-ballerina-url",
             "version": "1.1.0-alpha8-SNAPSHOT",
             "level": 1,
-            "default_branch": "",
+            "default_branch": "master",
             "release": true,
             "dependents": [
                 "module-ballerina-graphql",
@@ -69,7 +69,7 @@
             "name": "module-ballerina-xmldata",
             "version": "1.1.0-alpha8-SNAPSHOT",
             "level": 1,
-            "default_branch": "",
+            "default_branch": "master",
             "release": true,
             "dependents": []
         },
@@ -122,7 +122,7 @@
             "name": "module-ballerina-task",
             "version": "2.0.0-alpha9-SNAPSHOT",
             "level": 2,
-            "default_branch": "",
+            "default_branch": "master",
             "release": true,
             "dependents": [
                 "module-ballerina-cache",
@@ -134,7 +134,7 @@
             "name": "module-ballerina-xslt",
             "version": "1.1.0-alpha8-SNAPSHOT",
             "level": 2,
-            "default_branch": "",
+            "default_branch": "master",
             "release": true,
             "dependents": []
         },
@@ -192,7 +192,7 @@
             "name": "module-ballerinax-stan",
             "version": "1.1.0-alpha8-SNAPSHOT",
             "level": 3,
-            "default_branch": "",
+            "default_branch": "main",
             "release": true,
             "dependents": []
         },
@@ -200,7 +200,7 @@
             "name": "module-ballerina-tcp",
             "version": "0.8.0-alpha8-SNAPSHOT",
             "level": 3,
-            "default_branch": "",
+            "default_branch": "master",
             "release": true,
             "dependents": []
         },
@@ -208,7 +208,7 @@
             "name": "module-ballerina-udp",
             "version": "0.9.0-alpha8-SNAPSHOT",
             "level": 3,
-            "default_branch": "",
+            "default_branch": "main",
             "release": true,
             "dependents": []
         },
@@ -216,7 +216,7 @@
             "name": "module-ballerina-uuid",
             "version": "0.10.0-alpha8-SNAPSHOT",
             "level": 3,
-            "default_branch": "",
+            "default_branch": "main",
             "release": true,
             "dependents": [
                 "module-ballerina-http"
@@ -295,7 +295,7 @@
             "name": "module-ballerinai-transaction",
             "version": "1.0.12-SNAPSHOT",
             "level": 6,
-            "default_branch": "",
+            "default_branch": "master",
             "release": true,
             "dependents": [
                 "module-ballerinax-kafka",
@@ -307,7 +307,7 @@
             "name": "module-ballerina-websocket",
             "version": "1.2.0-alpha8-SNAPSHOT",
             "level": 6,
-            "default_branch": "",
+            "default_branch": "main",
             "release": true,
             "dependents": []
         },
@@ -315,7 +315,7 @@
             "name": "module-ballerina-websub",
             "version": "1.2.0-alpha8-SNAPSHOT",
             "level": 6,
-            "default_branch": "",
+            "default_branch": "master",
             "release": true,
             "dependents": []
         },
@@ -323,7 +323,7 @@
             "name": "module-ballerina-websubhub",
             "version": "0.2.0-alpha8-SNAPSHOT",
             "level": 6,
-            "default_branch": "",
+            "default_branch": "main",
             "release": true,
             "dependents": []
         },
@@ -347,7 +347,7 @@
             "name": "module-ballerina-sql",
             "version": "0.6.0-alpha8-SNAPSHOT",
             "level": 7,
-            "default_branch": "",
+            "default_branch": "master",
             "release": true,
             "dependents": [
                 "module-ballerinax-java.jdbc",
