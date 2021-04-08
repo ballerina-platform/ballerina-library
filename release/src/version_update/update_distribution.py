@@ -27,7 +27,7 @@ PROPERTIES_FILE = "gradle.properties"
 javaArraysModuleName = 'stdlibJavaArraysVersion'
 OAuth2ModuleName = 'stdlibOAuth2Version'
 
-SKIPPING_MODULES = ["kafka", "nats", "stan", "rabbitmq", "java.jdbc", "mysql"]
+SKIPPING_MODULES = ["kafka", "nats", "stan", "rabbitmq", "java.jdbc", "mysql", "serdes"]
 
 
 def main():

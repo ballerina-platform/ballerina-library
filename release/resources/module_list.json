@@ -23,6 +23,7 @@
         "module-ballerinax-rabbitmq",
         "module-ballerina-random",
         "module-ballerina-regex",
+        "module-ballerina-serdes",
         "module-ballerina-sql",
         "module-ballerinax-stan",
         "module-ballerina-task",
