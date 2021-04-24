@@ -256,7 +256,7 @@ def update_stdlib_dashboard(module_details_json):
         "[![GitHub Release](" + GITHUB_BADGE_URL + "release/" + BALLERINA_ORG_NAME + "/" + module['name'] + ".svg?label=)]" + 
         "(" + BALLERINA_ORG_URL + module['name'] + "/releases)| " + 
 
-        "[![Timestamped Build](" + BALLERINA_ORG_URL + module['name'] + "/actions/workflows/build-timestamped-master.yml/badge.svg)]" + 
+        "[![Build](" + BALLERINA_ORG_URL + module['name'] + "/actions/workflows/build-timestamped-master.yml/badge.svg)]" + 
         "(" + BALLERINA_ORG_URL + module['name'] + "/actions/workflows/build-timestamped-master.yml)| " + 
 
         "[![CodeCov](" + CODECOV_BADGE_URL + BALLERINA_ORG_NAME + "/" + module['name'] + "/branch/" + module['default_branch'] + "/graph/badge.svg)]" +
