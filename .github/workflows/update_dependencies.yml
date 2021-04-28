@@ -2,8 +2,8 @@ name: Update Stdlib Dependency Graph
 
 on: 
     workflow_dispatch:
-    repository_dispatch:
-        types: [dependency-update]
+    schedule:
+        -   cron: '30 3 * * 0'
 jobs:
     dependency:
         name: Derive module dependencies
