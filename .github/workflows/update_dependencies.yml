@@ -56,12 +56,3 @@ jobs:
                     else
                         echo "No changes to commit"
                     fi
-
-            -   name: Update Ballerina Distribution
-                run: |
-                    cd ballerina-standard-library
-                    python release/src/version_update/update_distribution.py
-                env:
-                    packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
-                    packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
-                    packageEmail: ${{ secrets.BALLERINA_BOT_EMAIL }}
