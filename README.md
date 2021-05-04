@@ -1,5 +1,4 @@
 # The Ballerina Standard Library
-[![Publish Package Snapshots](https://github.com/ballerina-platform/ballerina-standard-library/actions/workflows/build_stdlib_modules.yml/badge.svg)](https://github.com/ballerina-platform/ballerina-standard-library/actions/workflows/build_stdlib_modules.yml)
 
 The [Ballerina](https://ballerina.io/) standard library includes a vast array of standard libraries and it is often described as coming with "Batteries included". It includes a clean set of building blocks and APIs to rapidly build applications. Some of the included standard libraries are HTTP1.1/2, WebSocket, gRPC, File, Filepath, etc and the full list of standard libraries are listed under the `Status Dashboard` section.
  
