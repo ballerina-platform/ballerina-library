@@ -2,7 +2,6 @@ import json
 import os
 import re
 import sys
-import time
 import urllib.request
 
 import networkx as nx
@@ -224,8 +223,6 @@ def initialize_module_details(module_name_list):
             'default_branch': default_branch,
             'release': True,
             'dependents': []})
-
-        time.sleep(10)
 
     return module_details_json
 
