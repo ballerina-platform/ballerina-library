@@ -284,7 +284,22 @@ def update_stdlib_dashboard(module_details_json):
 
 def get_bug_query(module):
     module_name = module['name']
-    return "query=is%3Aopen+label%3AType%2FBug+label%3Amodule%2F" + get_module_short_name(module_name) + "&label=&color=yellow&logo=github"
+
+    try:
+        data = url_open_with_retry("https://api.github.com/repos/ballerina-platform/ballerina-standard-library/" +
+                                   "issues?state=open&labels=Type/Bug,module/" + get_module_short_name(module_name))
+        json_data = json.load(data)
+        issue_count = len(json_data)
+    except Exception as e:
+        print('Failed to get issue details for ' + module_name + ": " + str(e))
+        issue_count = 1
+
+    if issue_count == 0:
+        label_colour = "green"
+    else:
+        label_colour = "yellow"
+
+    return "query=is%3Aopen+label%3AType%2FBug+label%3Amodule%2F" + get_module_short_name(module_name) + "&label=&color=" + label_colour + "&logo=github"
 
 
 def get_bugs_link(module):
