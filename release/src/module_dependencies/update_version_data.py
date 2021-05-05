@@ -302,7 +302,7 @@ def get_bug_query(module):
         issue_count = 1
 
     if issue_count == 0:
-        label_colour = "green"
+        label_colour = "brightgreen"
     else:
         label_colour = "yellow"
 
