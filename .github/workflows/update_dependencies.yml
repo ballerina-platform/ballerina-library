@@ -3,7 +3,7 @@ name: Update Stdlib Dependency Graph
 on: 
     workflow_dispatch:
     schedule:
-        -   cron: '30 3 * * 0'
+        -   cron: '30 8,20 * * *' # Run everyday at 8.30 AM and 8.30 PM
 jobs:
     dependency:
         name: Derive module dependencies
