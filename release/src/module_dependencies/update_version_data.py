@@ -1,10 +1,11 @@
-import urllib.request
 import json
+import os
 import re
-import networkx as nx
 import sys
 import time
-import os
+import urllib.request
+
+import networkx as nx
 from retry import retry
 
 HTTP_REQUEST_RETRIES = 3
@@ -17,6 +18,7 @@ GITHUB_BADGE_URL = "https://img.shields.io/github/"
 CODECOV_BADGE_URL = "https://codecov.io/gh/"
 
 ballerina_bot_token = os.environ["packagePAT"]
+
 
 def main():
     print('Running main.py')
@@ -33,6 +35,7 @@ def main():
     print('Updated module details successfully')
     update_stdlib_dashboard(module_details_json)
     print('Updated README file successfully')
+
 
 # Sorts the ballerina standard library module list in ascending order
 def sort_module_name_list():
@@ -56,6 +59,7 @@ def sort_module_name_list():
 
     return name_list['modules']
 
+
 # Returns the file in the given url
 # Retry decorator will retry the function 3 times, doubling the backoff delay if URLError is raised 
 @retry(
@@ -71,12 +75,13 @@ def url_open_with_retry(url):
 
     return urllib.request.urlopen(request)
 
+
 # Gets dependencies of ballerina standard library module from build.gradle file in module repository
 # returns: list of dependencies
 def get_dependencies(module_name):
     try:
         data = url_open_with_retry("https://raw.githubusercontent.com/ballerina-platform/"
-                                    + module_name + "/master/build.gradle")
+                                   + module_name + "/master/build.gradle")
     except:
         print('Failed to read build.gradle file of ' + module_name)
         sys.exit()
@@ -93,12 +98,13 @@ def get_dependencies(module_name):
 
     return dependencies
 
+
 # Gets the version of the ballerina standard library module from gradle.properties file in module repository
 # returns: current version of the module
 def get_version(module_name):
     try:
         data = url_open_with_retry("https://raw.githubusercontent.com/ballerina-platform/"
-                                    + module_name + "/master/gradle.properties")
+                                   + module_name + "/master/gradle.properties")
     except:
         print('Failed to read gradle.properties file of ' + module_name)
         sys.exit()
@@ -114,6 +120,7 @@ def get_version(module_name):
 
     return version
 
+
 # Gets the default branch of the standard library repository
 # returns: default branch name
 def get_default_branch(module_name):
@@ -124,6 +131,7 @@ def get_default_branch(module_name):
     except Exception as e:
         print('Failed to get repo details for ' + module_name + ": " + str(e))
         return ""
+
 
 # Calculates the longest path between source and destination modules and replaces dependents that have intermediates
 def remove_modules_in_intermediate_paths(G, source, destination, successors, module_details_json):
@@ -136,6 +144,7 @@ def remove_modules_in_intermediate_paths(G, source, destination, successors, mod
                     if destination in module['dependents']:
                         module['dependents'].remove(destination)
                     break
+
 
 # Generates a directed graph using the dependencies of the modules
 # Level of each module is calculated by traversing the graph 
@@ -187,6 +196,7 @@ def calculate_levels(module_name_list, module_details_json):
 
     return module_details_json
 
+
 # Updates the stdlib_modules.JSON file with dependents of each standard library module
 def update_json_file(updated_json):
     try:
@@ -198,25 +208,27 @@ def update_json_file(updated_json):
         print('Failed to write to stdlib_modules.json')
         sys.exit()
 
+
 # Creates a JSON string to store module information
 # returns: JSON with module details
 def initialize_module_details(module_name_list):
-    module_details_json = {'modules':[]}
+    module_details_json = {'modules': []}
 
     for module_name in module_name_list:
         version = get_version(module_name)
         default_branch = get_default_branch(module_name)
         module_details_json['modules'].append({
             'name': module_name,
-            'version':version,
+            'version': version,
             'level': 0,
             'default_branch': default_branch,
             'release': True,
-            'dependents': [] })
+            'dependents': []})
 
         time.sleep(10)
 
     return module_details_json
+
 
 # Gets all the dependents of each module to generate the dependency graph
 # returns: module details JSON with updated dependent details
@@ -229,10 +241,12 @@ def get_immediate_dependents(module_name_list, module_details_json):
 
     return module_details_json
 
+
 # Updates the stdlib dashboard in README.md
 def update_stdlib_dashboard(module_details_json):
     try:
-        readme_file = url_open_with_retry("https://raw.githubusercontent.com/ballerina-platform/ballerina-standard-library/main/README.md")
+        readme_file = url_open_with_retry(
+            "https://raw.githubusercontent.com/ballerina-platform/ballerina-standard-library/main/README.md")
     except:
         print('Failed to read README.md file')
         sys.exit()
@@ -258,22 +272,22 @@ def update_stdlib_dashboard(module_details_json):
             current_level = module['level']
 
         row = ("|" + str(level_column) + "|" +
-        "[" + module['name'].split('-')[-1] + "](" + BALLERINA_ORG_URL + module['name'] + ")| " +
+               "[" + module['name'].split('-')[-1] + "](" + BALLERINA_ORG_URL + module['name'] + ")| " +
 
-        "[![GitHub Release](" + GITHUB_BADGE_URL + "release/" + BALLERINA_ORG_NAME + "/" + module['name'] + ".svg?label=)]" +
-        "(" + BALLERINA_ORG_URL + module['name'] + "/releases)| " +
+               "[![GitHub Release](" + GITHUB_BADGE_URL + "release/" + BALLERINA_ORG_NAME + "/" + module['name'] + ".svg?label=)]" +
+               "(" + BALLERINA_ORG_URL + module['name'] + "/releases)| " +
 
-        "[![Build](" + BALLERINA_ORG_URL + module['name'] + "/actions/workflows/build-timestamped-master.yml/badge.svg)]" +
-        "(" + BALLERINA_ORG_URL + module['name'] + "/actions/workflows/build-timestamped-master.yml)| " +
+               "[![Build](" + BALLERINA_ORG_URL + module['name'] + "/actions/workflows/build-timestamped-master.yml/badge.svg)]" +
+               "(" + BALLERINA_ORG_URL + module['name'] + "/actions/workflows/build-timestamped-master.yml)| " +
 
-        "[![CodeCov](" + CODECOV_BADGE_URL + BALLERINA_ORG_NAME + "/" + module['name'] + "/branch/" + module['default_branch'] + "/graph/badge.svg)]" +
-        "(" + CODECOV_BADGE_URL + BALLERINA_ORG_NAME + "/" + module['name'] + ")| " +
+               "[![CodeCov](" + CODECOV_BADGE_URL + BALLERINA_ORG_NAME + "/" + module['name'] + "/branch/" + module['default_branch'] + "/graph/badge.svg)]" +
+               "(" + CODECOV_BADGE_URL + BALLERINA_ORG_NAME + "/" + module['name'] + ")| " +
 
-        "[![Bugs](" + GITHUB_BADGE_URL + "issues-search/" + BALLERINA_ORG_NAME + "/ballerina-standard-library?"
+               "[![Bugs](" + GITHUB_BADGE_URL + "issues-search/" + BALLERINA_ORG_NAME + "/ballerina-standard-library?"
                + get_bug_query(module) + ")](" + get_bugs_link(module) + ")| " +
 
-        "[![GitHub pull-requests](" + GITHUB_BADGE_URL + "issues-pr" + "/" + BALLERINA_ORG_NAME + "/" + module['name'] + ".svg?label=)]" +
-        "(" + BALLERINA_ORG_URL + module['name'] + "/pulls)|\n")
+                "[![GitHub pull-requests](" + GITHUB_BADGE_URL + "issues-pr" + "/" + BALLERINA_ORG_NAME + "/" + module['name'] + ".svg?label=)]" +
+                "(" + BALLERINA_ORG_URL + module['name'] + "/pulls)|\n")
 
         updated_readme_file += row
 
