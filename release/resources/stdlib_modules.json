@@ -293,7 +293,7 @@
         },
         {
             "name": "module-ballerinai-transaction",
-            "version": "1.0.13-SNAPSHOT",
+            "version": "1.0.14-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "release": true,
