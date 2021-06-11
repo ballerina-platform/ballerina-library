@@ -61,6 +61,7 @@
             "release": true,
             "dependents": [
                 "module-ballerina-graphql",
+                "module-ballerinai-transaction",
                 "module-ballerina-websub",
                 "module-ballerina-websubhub"
             ]
