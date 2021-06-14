@@ -45,7 +45,7 @@ def sort_module_name_list():
         print('Failed to read module_list.json')
         sys.exit()
 
-    name_list['modules'].sort(key=lambda x: x.split('-')[-1])
+    name_list['modules'].sort(key=lambda x: x['name'].split('-')[-1])
 
     try:
         with open('./release/resources/module_list.json', 'w') as json_file:
@@ -77,10 +77,10 @@ def url_open_with_retry(url):
 
 # Gets dependencies of ballerina standard library module from build.gradle file in module repository
 # returns: list of dependencies
-def get_dependencies(module_name):
+def get_dependencies(module_name, module_details_json):
     try:
         data = url_open_with_retry("https://raw.githubusercontent.com/ballerina-platform/"
-                                   + module_name + "/master/build.gradle")
+                                   + module_name + "/master/gradle.properties")
     except:
         print('Failed to read build.gradle file of ' + module_name)
         sys.exit()
@@ -89,11 +89,12 @@ def get_dependencies(module_name):
 
     for line in data:
         processed_line = line.decode("utf-8")
-        if 'ballerina-platform/module' in processed_line:
-            module = processed_line.split('/')[-1]
-            if module[:-2] == module_name:
-                continue
-            dependencies.append(module[:-2])
+        for module in module_details_json['modules']:
+            if module['version_key'] in processed_line:
+                if module['name'] == module_name:
+                    continue
+                dependencies.append(module['name'])
+                break
 
     return dependencies
 
@@ -157,7 +158,7 @@ def calculate_levels(module_name_list, module_details_json):
 
     # Module names are used to create the nodes and the level attribute of the node is initialized to 0
     for module in module_name_list:
-        G.add_node(module, level=1)
+        G.add_node(module['name'], level=1)
 
     # Edges are created considering the dependents of each module
     for module in module_details_json['modules']:
@@ -213,14 +214,19 @@ def update_json_file(updated_json):
 def initialize_module_details(module_name_list):
     module_details_json = {'modules': []}
 
-    for module_name in module_name_list:
-        version = get_version(module_name)
-        default_branch = get_default_branch(module_name)
+    for module in module_name_list:
+        version = get_version(module['name'])
+        default_branch = get_default_branch(module['name'])
+
+        artifact_name = module['name'].split('-')[-1]
+        default_version_key = 'stdlib' + artifact_name.capitalize() + 'Version'
+
         module_details_json['modules'].append({
-            'name': module_name,
+            'name': module['name'],
             'version': version,
             'level': 0,
             'default_branch': default_branch,
+            'version_key': module.get('version_key', default_version_key),
             'release': True,
             'dependents': []})
 
@@ -231,10 +237,10 @@ def initialize_module_details(module_name_list):
 # returns: module details JSON with updated dependent details
 def get_immediate_dependents(module_name_list, module_details_json):
     for module_name in module_name_list:
-        dependencies = get_dependencies(module_name)
+        dependencies = get_dependencies(module_name['name'], module_details_json)
         for module in module_details_json['modules']:
             if module['name'] in dependencies:
-                module_details_json['modules'][module_details_json['modules'].index(module)]['dependents'].append(module_name)
+                module_details_json['modules'][module_details_json['modules'].index(module)]['dependents'].append(module_name['name'])
 
     return module_details_json
 
