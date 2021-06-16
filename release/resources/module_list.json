@@ -113,6 +113,9 @@
         },
         {
             "name": "module-ballerina-xslt"
+        },
+        {
+            "name": "module-ballerinax-postgresql"
         }
     ]
 }

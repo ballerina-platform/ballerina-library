@@ -4,6 +4,12 @@ on:
     workflow_dispatch:
     schedule:
         -   cron: '30 8,20 * * *' # Run everyday at 8.30 AM and 8.30 PM
+    push:
+        branches:
+          - main
+        paths:
+          - 'release/resources/module_list.json'
+
 jobs:
     dependency:
         name: Derive module dependencies
