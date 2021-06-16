@@ -64,6 +64,9 @@
             "name": "module-ballerina-os"
         },
         {
+            "name": "module-ballerinax-postgresql"
+        },
+        {
             "name": "module-ballerinax-rabbitmq"
         },
         {
@@ -113,9 +116,6 @@
         },
         {
             "name": "module-ballerina-xslt"
-        },
-        {
-            "name": "module-ballerinax-postgresql"
         }
     ]
 }

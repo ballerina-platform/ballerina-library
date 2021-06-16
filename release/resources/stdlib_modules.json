@@ -384,7 +384,8 @@
             "release": true,
             "dependents": [
                 "module-ballerinax-java.jdbc",
-                "module-ballerinax-mysql"
+                "module-ballerinax-mysql",
+                "module-ballerinax-postgresql"
             ]
         },
         {
@@ -402,6 +403,15 @@
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerinax-postgresql",
+            "version": "0.7.0-beta.1-SNAPSHOT",
+            "level": 8,
+            "default_branch": "main",
+            "version_key": "stdlibPostgresqlVersion",
             "release": true,
             "dependents": []
         }
