@@ -7,6 +7,7 @@ public type Module record {|
     string[] dependents;
     Module[] dependentModules = [];
     boolean inProgress = false;
+    string version_key;
 |};
 
 public type WorkflowStatus record {|
