@@ -6,7 +6,7 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibIoVersion",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-log",
                 "module-ballerina-os",
@@ -19,7 +19,7 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibJavaArraysVersion",
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
@@ -28,7 +28,7 @@
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibRandomVersion",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-websub"
             ]
@@ -39,7 +39,7 @@
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibRegexVersion",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-log",
                 "module-ballerina-uuid"
@@ -51,7 +51,7 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibTimeVersion",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-crypto",
                 "module-ballerina-file",
@@ -64,7 +64,7 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibUrlVersion",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-http"
             ]
@@ -75,7 +75,7 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
-            "release": false,
+            "release": true,
             "dependents": []
         },
         {
@@ -84,7 +84,7 @@
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibCryptoVersion",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-auth",
                 "module-ballerina-jwt",
@@ -101,7 +101,7 @@
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibLogVersion",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-auth",
                 "module-ballerina-file",
@@ -121,7 +121,7 @@
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibOsVersion",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-file"
             ]
@@ -132,7 +132,7 @@
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibTaskVersion",
-            "release": false,
+            "release": true,
             "dependents": [
                 "module-ballerina-cache",
                 "module-ballerina-email",
