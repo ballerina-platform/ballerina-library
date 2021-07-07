@@ -301,7 +301,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "version": "0.2.0-beta.2-SNAPSHOT",
+            "version": "0.2.0-beta.3-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
@@ -377,7 +377,7 @@
         },
         {
             "name": "module-ballerina-sql",
-            "version": "0.6.0-beta.2-SNAPSHOT",
+            "version": "0.6.0-beta.3-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
@@ -390,7 +390,7 @@
         },
         {
             "name": "module-ballerinax-java.jdbc",
-            "version": "0.6.0-beta.2-SNAPSHOT",
+            "version": "0.6.0-beta.3-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibJdbcVersion",
@@ -399,7 +399,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "version": "0.7.0-beta.2-SNAPSHOT",
+            "version": "0.7.0-beta.3-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
