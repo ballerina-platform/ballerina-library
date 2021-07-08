@@ -141,7 +141,7 @@
         },
         {
             "name": "module-ballerina-xslt",
-            "version": "1.1.0-beta.2-SNAPSHOT",
+            "version": "1.1.0-beta.3-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibXsltVersion",
