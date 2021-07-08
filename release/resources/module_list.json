@@ -51,6 +51,9 @@
             "name": "module-ballerina-mime"
         },
         {
+            "name": "module-ballerinax-mssql"
+        },
+        {
             "name": "module-ballerinax-mysql"
         },
         {
