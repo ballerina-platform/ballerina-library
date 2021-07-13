@@ -30,7 +30,8 @@
             "version_key": "stdlibRandomVersion",
             "release": true,
             "dependents": [
-                "module-ballerina-websub"
+                "module-ballerina-websub",
+                "module-ballerina-websubhub"
             ]
         },
         {
