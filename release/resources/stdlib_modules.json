@@ -320,7 +320,7 @@
         },
         {
             "name": "module-ballerinai-transaction",
-            "version": "1.0.14-SNAPSHOT",
+            "version": "1.0.15-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibTransactionVersion",
