@@ -185,7 +185,7 @@
         },
         {
             "name": "module-ballerina-mime",
-            "version": "1.1.0-beta.3-SNAPSHOT",
+            "version": "2.0.0-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibMimeVersion",
@@ -286,7 +286,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "version": "1.1.0-beta.3-SNAPSHOT",
+            "version": "2.0.0-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibHttpVersion",
@@ -401,7 +401,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "version": "0.1.0-beta.3-SNAPSHOT",
+            "version": "1.0.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
