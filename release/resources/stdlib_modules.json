@@ -2,7 +2,7 @@
     "modules": [
         {
             "name": "module-ballerina-io",
-            "version": "0.6.0-beta.3-SNAPSHOT",
+            "version": "1.0.0-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibIoVersion",
@@ -15,7 +15,7 @@
         },
         {
             "name": "module-ballerina-jballerina.java.arrays",
-            "version": "0.10.0-beta.3-SNAPSHOT",
+            "version": "1.0.0-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibJavaArraysVersion",
@@ -48,7 +48,7 @@
         },
         {
             "name": "module-ballerina-time",
-            "version": "2.0.0-beta.3-SNAPSHOT",
+            "version": "2.0.0-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibTimeVersion",
@@ -72,7 +72,7 @@
         },
         {
             "name": "module-ballerina-xmldata",
-            "version": "2.0.0-beta.3-SNAPSHOT",
+            "version": "2.0.0-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
@@ -98,7 +98,7 @@
         },
         {
             "name": "module-ballerina-log",
-            "version": "1.1.0-beta.3-SNAPSHOT",
+            "version": "2.0.0-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibLogVersion",
@@ -118,7 +118,7 @@
         },
         {
             "name": "module-ballerina-os",
-            "version": "0.8.0-beta.3-SNAPSHOT",
+            "version": "1.0.0-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibOsVersion",
@@ -142,7 +142,7 @@
         },
         {
             "name": "module-ballerina-xslt",
-            "version": "1.1.0-beta.3-SNAPSHOT",
+            "version": "2.0.0-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibXsltVersion",
@@ -311,7 +311,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "version": "0.8.0-beta.3-SNAPSHOT",
+            "version": "1.0.0-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
