@@ -56,6 +56,7 @@
             "dependents": [
                 "module-ballerina-crypto",
                 "module-ballerina-file",
+                "module-ballerina-protobuf",
                 "module-ballerina-task"
             ]
         },
@@ -126,6 +127,15 @@
             "dependents": [
                 "module-ballerina-file"
             ]
+        },
+        {
+            "name": "module-ballerina-protobuf",
+            "version": "0.1.0-beta.3-SNAPSHOT",
+            "level": 2,
+            "default_branch": "main",
+            "version_key": "stdlibProtobufVersion",
+            "release": true,
+            "dependents": []
         },
         {
             "name": "module-ballerina-task",

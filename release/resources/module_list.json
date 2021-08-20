@@ -67,10 +67,10 @@
             "name": "module-ballerina-os"
         },
         {
-            "name": "module-ballerina-protobuf"
+            "name": "module-ballerinax-postgresql"
         },
         {
-            "name": "module-ballerinax-postgresql"
+            "name": "module-ballerina-protobuf"
         },
         {
             "name": "module-ballerinax-rabbitmq"
