@@ -46,7 +46,7 @@ For more on BBEs guide lines see [here](https://docs.google.com/document/d/1OMLp
 
 ## Zero Bugs
 
-Each library should not have any reported bugs. All the bugs should be addressed then and there. Goal is to emphasize on quality. Bugs are un-expected behaviours of each functionality. These behaviours slip in when the spec, implementation or test-suite is incomplete. Incomplete features shouldn’t have merged to master in the first place. Therefore, these bugs need to be addressed before we do any new features. More on that is explained [here](library-development-process.md). 
+Each library should not have any reported bugs. All the bugs should be addressed then and there. Goal is to emphasize on quality. Bugs are un-expected behaviours of each functionality. These behaviours slip in when the spec, implementation or test-suite is incomplete. Incomplete features shouldn’t have merged to master in the first place. Therefore, these bugs need to be addressed before we do any new features. More on that is explained [here](zero-bug-policy.md). 
 
 ## Five Real World Use-cases
 
