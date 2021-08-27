@@ -30,6 +30,7 @@
             "version_key": "stdlibRandomVersion",
             "release": true,
             "dependents": [
+                "module-ballerina-grpc",
                 "module-ballerina-websub",
                 "module-ballerina-websubhub"
             ]
