@@ -94,3 +94,9 @@ The results should be recorded in an issue in the form of a report. I think we c
 ## Negative Test Report
 
 This is to ensure the robustness of the library. An example for this can be found here. The issue must be tagged with the relevant milestone. 
+
+## Security Report
+
+Each library must pass the security check. Libraries should not have any security vulnerabilities directly or indirectly (via third party libraries). 
+
+The results should be recorded in an issue in the form of a report. The issue must be tagged with the relevant milestone.
