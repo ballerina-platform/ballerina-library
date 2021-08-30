@@ -9,7 +9,7 @@ The below section discusses each step of this process.
 
 ## Spec
 
-Specification is basically a structured document which discusses the problem domain and how we are planning to solve those. Many libraries have a design doc which basically does the same thing. We just need to re-organize it in the proper way. For more information read [this](https://spec.graphql.org/June2018/). Once written this needs to be committed into the relevant repo under `docs` folder.
+Specification is basically a structured document which discusses the problem domain and how we are planning to solve those. Many libraries have a design doc which basically does the same thing. We just need to re-organize it in the proper way. For more information read [this](https://openjdk.java.net/jeps/409). Once written this needs to be committed into the relevant repo under `docs` folder.
 
 ## Implementation
 
@@ -24,6 +24,8 @@ Each library must have at least 80% test coverage. 90% would be even better. Her
 This basically means that both Java and Ballerina code standards are met. We use `Clean Code` (The Book) as our guideline. The standard library code will always be used as a reference for ideal code that could be written using Ballerina so it must be top notch. 
 
 Apart from `Clean Code` guidelines, check these [anti-patterns](https://docs.google.com/document/d/1y6QVqaZzZt9jMpYV4jP5WRS_W_KoC4y40Uuoh1ALu8E/edit?usp=sharing) as well.
+
+Of Course most of the code quality checks are done while reviewing the PR. This is just a second line of defence and formal acknowledgement of the library developer that the code is upto to the expected level. If the code is not up to the expected standards the library developer must take necessary action to refactor the code. Refactoring could only be done after meeting the 80% code coverage requirement.
 
 ## API Docs
 
