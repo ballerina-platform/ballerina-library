@@ -3,13 +3,16 @@ _Author: Shafreen Anfar, Reviewer: Danesh Kuruppu, Created on: 2021/08/26, Last 
 
 This section basically discusses the library development process from the inception to materializing it. The goal is to make sure we deliver the best possible library experience we could. The order of each step could be changed a bit but the overall process stays the same. Once a library goes to each step and reaches the end, we can sign it off as a general availability ready library. Each library owner is responsible for making sure their libraries go through these steps before signing off. 
 
-<img src="_resources/DevWorkflow.jpg" alt="drawing" style="width:300px;"/>
+<img src="_resources/DevWorkflow.jpg" alt="drawing" width='250'/>
 
 The below section discusses each step of this process.
 
-## Spec
+## Specification
 
-Specification is basically a structured document which discusses the problem domain and how we are planning to solve those. Many libraries have a design doc which basically does the same thing. We just need to re-organize it in the proper way. For more information read [this](https://openjdk.java.net/jeps/409). Once written this needs to be committed into the relevant repo under `docs` folder.
+Library specification is basically a structured document which clearly states what needs to be implemented. Many libraries have a design doc which basically does the same thing. We just need to re-organize it in the proper way. For an example specification read [this](https://spec.graphql.org/June2018/). Once written this needs to be committed into the relevant repo under `docs/sepc` folder.
+
+In order to update the spec first there should be a proposal. This proposal could be either rejected or accepted after discussing with area leads. If accepted, the content of the proposal must be added to the library spec. A proposal should clearly state the motivation, description of the solution, goals and none-goals and future work, etc. For an example proposal read [this](https://openjdk.java.net/jeps/409). Once written this needs to be committed into the relevant repo under `docs/proposals` folder.
+
 
 ## Implementation
 
