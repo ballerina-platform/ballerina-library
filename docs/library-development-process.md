@@ -69,7 +69,7 @@ Any identified usability issues must be reported in the form of an issue and the
 
 - WebSubHub remote method arguments cannot be serialized to store in a kafka topic. Main reason for this was that arguments were not anydata. This was because records that were passed in by the WebSubHub listener had object references. 
 - The Websocket `caller` object was not isolated. Therefore it was difficult to store it in a map and then use it somewhere else. 
-- Having meaningful errors to identify the root cause 
+- Having meaningful errors to identify the root cause. 
 
 Also usability issues could be feature limitations as well. For example, not having the `mutation` operation in GraphQL is a usability issue. Those types usability issues need to be addressed before releasing it as GA.
 
@@ -92,7 +92,7 @@ Also the issue must be tagged with the relevant milestone.
 
 Load test is not a performance test. The goal of load testing is to identify any memory leaks, thread blocking issues, etc. These tests must be done in containers with limited resources such as number of cores and memory. As a starting point these could be set to 0.25 cores and 300M. 
 
-Type of the load test could be different from library to library. Therefore, it is the library owner’s judgment call as to what type of test to be done.
+Type of the load test could be different from library to library. Therefore, it is the library owner’s judgment call as to what type of test to be done. A Docker compose file should be written to repeat the test at any time and committed to the folder `loadtest` along with the readme which explains how to re-run the load test.
 
 The results should be recorded in an issue in the form of a report. I think we can start with something similar to this [issue](https://github.com/ballerina-platform/ballerina-standard-library/issues/989). The issue must be tagged with the relevant milestone.
 
