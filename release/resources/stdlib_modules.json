@@ -136,7 +136,9 @@
             "default_branch": "main",
             "version_key": "stdlibProtobufVersion",
             "release": true,
-            "dependents": []
+            "dependents": [
+                "module-ballerina-grpc"
+            ]
         },
         {
             "name": "module-ballerina-task",
