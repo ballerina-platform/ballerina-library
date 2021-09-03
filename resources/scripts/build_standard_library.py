@@ -162,7 +162,7 @@ def replace_stdlibs_version():
 def clone_module(module_link):
     print_info("Cloning Module: " + module_link)
     repo_path = "https://www.github.com/ballerina-platform/" + module_link + ".git"
-    subprocess.run(["git", "clone", repo_path, "--depth=1"])
+    subprocess.run(["git", "clone", repo_path])
 
 
 def get_required_module(module_name, module_list):
