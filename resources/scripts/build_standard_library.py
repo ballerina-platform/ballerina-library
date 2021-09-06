@@ -4,9 +4,11 @@ import os
 import re
 import subprocess
 import sys
-import urllib.request
 
+from colorama import Fore
+from colorama import Style
 from pathlib import Path
+from urllib import request
 
 MODULE_LIST = "https://raw.githubusercontent.com/ballerina-platform/ballerina-standard-library/main/release/resources/stdlib_modules.json"
 
@@ -35,7 +37,8 @@ parser.add_argument('--skip-tests', action="store_true", help="Skip tests in the
 parser.add_argument('--keep-local-changes', action="store_true", help="Stop updating the repos from the origin. Keep the local changes")
 parser.add_argument('--module', help="Build up to the specified module")
 parser.add_argument('--module-list', help="Path to the module list JSON file. If not provided, the existing 'stdlib_modules.json' from the GitHub will be used")
-
+parser.add_argument('--build-distribution', action="store_true", help="If the distribution should be built on top of the changes been done. This has to be used with '--snapshots-build' to be affective")
+parser.add_argument('--commands', help="To provide a custom command to execute inside each repo. Provide this as a string. If not provided './gradlew clean build' will be used")
 
 def main():
     global MODULE_LIST
@@ -48,6 +51,7 @@ def main():
     use_snapshots = False
     keep_local_changes = False
     required_module = None
+    build_distribution = args.build_distribution
 
     print_block()
     print_info("Building Standard Library Modules")
@@ -72,17 +76,27 @@ def main():
         print_info("Using local SNAPSHOT builds for upper level dependencies")
         commands.append("publishToMavenLocal")
         use_snapshots = True
+        if build_distribution:
+            print_info("Building the distribution with the SNAPSHOT versions.")
+        if args.commands:
+            print_warn("'--snapshots-build' flag will be overridden by the '--commands' flag")
     else:
         print_info("Using existing timestamp versions for the builds")
+        if build_distribution:
+            print_warn("Building the distribution, but not using the SNAPSHOT builds")
 
     if args.publish_to_local_central:
         print_info("Pushing all the modules to local ballerina central repository")
         commands.append("-PpublishToLocalCentral=true")
+        if args.commands:
+            print_warn("'--publish-to-local-central' flag will be overridden by the '--commands' flag")
 
     if args.skip_tests:
         print_info("Skipping tests")
         commands.append("-x")
         commands.append("test")
+        if args.commands:
+            print_warn("'--skip-tests' flag will be overridden by the '--commands' flag")
 
     if args.keep_local_changes:
         print_info("Not updating the local repos.")
@@ -99,9 +113,17 @@ def main():
     else:
         print_info("Using default module list JSON file from: " + MODULE_LIST)
 
-    module_list = get_stdlib_module_list()
+    if args.commands:
+        print_info(f'Using custom command: "{args.commands}"')
+        commands = list(filter(None, map(lambda command: command.strip(), args.commands.split(" "))))
+    else:
+        print_info(f'Using the command: "{" ".join(commands)}"')
+
+    module_list = get_stdlib_module_list(build_distribution)
 
     if args.module:
+        if build_distribution:
+            print_error("'--build-distribution' and '--module' flags are mutually exclusive")
         required_module = get_required_module(args.module, module_list)
 
     for module in module_list:
@@ -114,7 +136,7 @@ def main():
 
 def process_module(module, commands, lang_version, use_snapshots):
     print_block()
-    print_info("Building: " + module[FIELD_NAME])
+    print_info("Processing: " + module[FIELD_NAME])
     print_info("Branch: " + module[FIELD_BRANCH])
     print_block()
 
@@ -189,11 +211,16 @@ def create_directory(directory_name):
     Path(directory_name).mkdir(parents=True, exist_ok=True)
 
 
-def get_stdlib_module_list():
+def get_stdlib_module_list(build_distribution):
     try:
         data = open_file_from_url(MODULE_LIST)
         module_list = json.load(data)
 
+        if build_distribution:
+            module_list["modules"].append({
+                'name': 'ballerina-distribution',
+                'default_branch': 'master'
+            })
         return module_list["modules"]
     except Exception as e:
         print("Failed to read the module list JSON file: " + str(e))
@@ -201,16 +228,19 @@ def get_stdlib_module_list():
 
 
 def open_file_from_url(url):
-    return urllib.request.urlopen(url)
+    return request.urlopen(url)
 
 
 def print_info(message):
-    print("[INFO] " + message)
+    print(f'{Fore.GREEN}[INFO] {message}{Style.RESET_ALL}')
 
 
 def print_error(message):
-    print("[ERROR] " + message)
+    print(f'{Fore.RED}[ERROR] {message}{Style.RESET_ALL}')
     sys.exit(1)
+
+def print_warn(message):
+    print(f'{Fore.RED}[WARN] {message}{Style.RESET_ALL}')
 
 
 def print_block():
