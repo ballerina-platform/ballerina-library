@@ -1,5 +1,5 @@
 # Library Development Process 
-_Author: Shafreen Anfar, Reviewer: Danesh Kuruppu, Created on: 2021/08/26, Last updated: 2021/08/26_ 
+_Author: Shafreen Anfar, Reviewer: Danesh Kuruppu, Created on: 2021/08/26, Last updated: 2021/09/06_ 
 
 This section basically discusses the library development process from the inception to materializing it. The goal is to make sure we deliver the best possible library experience we could. The order of each step could be changed a bit but the overall process stays the same. Once a library goes to each step and reaches the end, we can sign it off as a general availability ready library. Each library owner is responsible for making sure their libraries go through these steps before signing off. 
 
@@ -53,11 +53,11 @@ For more on BBEs guide lines see [here](https://docs.google.com/document/d/1OMLp
 
 Each library should not have any reported bugs. All the bugs should be addressed then and there. Goal is to emphasize on quality. Bugs are un-expected behaviours of each functionality. These behaviours slip in when the spec, implementation or test-suite is incomplete. Incomplete features shouldn’t have merged to master in the first place. Therefore, these bugs need to be addressed before we do any new features. More on that is explained [here](zero-bug-policy.md). 
 
-## Five Real World Use-cases
+## Real World Use-cases
 
 Each library should have an `example` folder which includes examples written using real world use-cases. Adding examples helps library owners identify any usability issues, bugs and at the same time build github-centric learning materials. 
 
-Five real world use-case examples is just a number to set some goal. The more you write, the better it gets. Examples could include one more other standard library which is fine. Depending on the library examples could be small or large but that is not the point. The point is to write real world use-cases, the size doesn’t matter. 
+At least five real world use-cases, is just a number to set some goal. The more you write, the better it gets. Examples could include one more other standard library, which is fine. Depending on the library examples could be small or large but that is not the point. The point is to write real world use-cases, the size doesn’t matter. 
 
 Better to organize a code review for each use-case before merging to the repo.
 
