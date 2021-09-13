@@ -1,5 +1,5 @@
 # Library Development Process 
-_Author: Shafreen Anfar, Reviewer: Danesh Kuruppu, Created on: 2021/08/26, Last updated: 2021/09/06_ 
+_Author: Shafreen Anfar, Chanaka Lakmal Reviewer: Danesh Kuruppu, Created on: 2021/08/26, Last updated: 2021/09/10_ 
 
 This section basically discusses the library development process from the inception to materializing it. The goal is to make sure we deliver the best possible library experience we could. The order of each step could be changed a bit but the overall process stays the same. Once a library goes to each step and reaches the end, we can sign it off as a general availability ready library. Each library owner is responsible for making sure their libraries go through these steps before signing off. 
 
@@ -102,6 +102,29 @@ This is to ensure the robustness of the library. An example for this can be foun
 
 ## Security Report
 
-Each library must pass the security check. Libraries should not have any security vulnerabilities directly or indirectly (via third party libraries). 
+Each library must pass the security check. Libraries should not have any security vulnerabilities directly or indirectly (via third-party libraries). The security check is a mandatory step of the library development process. It should be checked and passed before a release.
 
-The results should be recorded in an issue in the form of a report. The issue must be tagged with the relevant milestone.
+Following steps can be taken to identify the security vulnerabilities of the third-party dependencies.
+- Refer to [installation](https://aquasecurity.github.io/trivy/latest/getting-started/installation/) guide for installing Trivy based on your operating system.
+- Navigate to the module directory and execute the `./gradlew build` command to build the module.
+- Now, execute the `trivy fs ballerina/lib` command to start the Trivy scan. If there is any vulnerability there will be a similar report as below.
+    ```shell
+    2021-09-05T20:01:46.858+0530	INFO	Number of language-specific files: 189
+    2021-09-05T20:01:46.858+0530	INFO	Detecting jar vulnerabilities...
+
+    bcprov-jdk15on-1.61.jar (jar)
+    ===========================================
+    Total: 1 (UNKNOWN: 0, LOW: 0, MEDIUM: 1, HIGH: 0, CRITICAL: 0)
+
+    +---------------------------------+------------------+----------+-------------------+---------------+---------------------------------------+
+    |             LIBRARY             | VULNERABILITY ID | SEVERITY | INSTALLED VERSION | FIXED VERSION |                 TITLE                 |
+    +---------------------------------+------------------+----------+-------------------+---------------+---------------------------------------+
+    | org.bouncycastle:bcprov-jdk15on | CVE-2020-15522   | MEDIUM   |              1.61 |          1.66 | bouncycastle: Timing issue            |
+    |                                 |                  |          |                   |               | within the EC math library            |
+    |                                 |                  |          |                   |               | -->avd.aquasec.com/nvd/cve-2020-15522 |
+    +---------------------------------+------------------+----------+-------------------+---------------+---------------------------------------+
+    ```
+- Find and update the installed vulnerable dependency for the vulnerability fixed version as in the report or the latest stable version (recommended).
+- The results should be recorded in a GitHub issue in the form of a report. The issue must be tagged with the relevant milestone.
+
+Additionally, a security vulnerability can be notified either from internal security tests and scans or the <security@ballerina.io> mailing list. More on that is explained [here](https://ballerina.io/security/).
