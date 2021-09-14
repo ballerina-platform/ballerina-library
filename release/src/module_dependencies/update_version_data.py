@@ -261,8 +261,8 @@ def update_stdlib_dashboard(module_details_json):
         updated_readme_file += processed_line
         if "## Status Dashboard" in processed_line:
             updated_readme_file += "\n"
-            updated_readme_file += "|Level| Modules | Latest Version | Build | Code Coverage | Bugs | Open Pull Requests |\n"
-            updated_readme_file += "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n"
+            updated_readme_file += "|Level| Modules | Latest Version | Build | Security Check | Code Coverage | Bugs | Open Pull Requests |\n"
+            updated_readme_file += "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n"
             break
 
     # Modules in levels 0 and 1 are categorized under level 1
@@ -282,6 +282,9 @@ def update_stdlib_dashboard(module_details_json):
 
                "[![Build](" + BALLERINA_ORG_URL + module['name'] + "/actions/workflows/build-timestamped-master.yml/badge.svg)]" +
                "(" + BALLERINA_ORG_URL + module['name'] + "/actions/workflows/build-timestamped-master.yml)| " +
+
+               "[![Trivy](" + BALLERINA_ORG_URL + module['name'] + "/actions/workflows/trivy-scan.yml/badge.svg)]" +
+               "(" + BALLERINA_ORG_URL + module['name'] + "/actions/workflows/trivy-scan.yml)| " +
 
                "[![CodeCov](" + CODECOV_BADGE_URL + BALLERINA_ORG_NAME + "/" + module['name'] + "/branch/" + module['default_branch'] + "/graph/badge.svg)]" +
                "(" + CODECOV_BADGE_URL + BALLERINA_ORG_NAME + "/" + module['name'] + ")| " +
