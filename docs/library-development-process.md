@@ -11,7 +11,7 @@ The below section discusses each step of this process.
 
 Library specification is basically a structured document which clearly states what needs to be implemented. Many libraries have a design doc which basically does the same thing. We just need to re-organize it in the proper way. For an example specification read [this](https://spec.graphql.org/June2018/). Once written this needs to be committed into the relevant repo under `docs/sepc` folder.
 
-In order to update the spec first there should be a proposal. This proposal could be either rejected or accepted after discussing with area leads. If accepted, the content of the proposal must be added to the library spec. A proposal should clearly state the motivation, description of the solution, goals and none-goals and future work, etc. For an example proposal read [this](https://openjdk.java.net/jeps/409). Once written this needs to be committed into the relevant repo under `docs/proposals` folder.
+In order to update the spec first there should be a proposal. This proposal could be either rejected or accepted after discussing with area leads. If accepted, the content of the proposal must be added to the library spec. A proposal should clearly state the motivation, description of the solution, goals and none-goals and future work, etc. For an example proposal read [this](https://openjdk.java.net/jeps/409) and the template can be found [here](https://openjdk.java.net/jeps/2). Basically, we are following the JEP format. Once written this needs to be committed into the relevant repo under `docs/proposals` folder.
 
 
 ## Implementation
