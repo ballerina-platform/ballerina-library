@@ -401,6 +401,7 @@
                 "module-ballerinax-java.jdbc",
                 "module-ballerinax-mssql",
                 "module-ballerinax-mysql",
+                "module-ballerinax-oracledb",
                 "module-ballerinax-postgresql"
             ]
         },
@@ -428,6 +429,15 @@
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerinax-oracledb",
+            "version": "0.1.0-beta.3-SNAPSHOT",
+            "level": 8,
+            "default_branch": "main",
+            "version_key": "stdlibOracledbVersion",
             "release": true,
             "dependents": []
         },

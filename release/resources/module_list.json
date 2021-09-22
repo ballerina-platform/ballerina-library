@@ -57,14 +57,14 @@
             "name": "module-ballerinax-mysql"
         },
         {
-            "name": "module-ballerinax-oracledb"
-        },
-        {
             "name": "module-ballerinax-nats"
         },
         {
             "name": "module-ballerina-oauth2",
             "version_key": "stdlibOAuth2Version"
+        },
+        {
+            "name": "module-ballerinax-oracledb"
         },
         {
             "name": "module-ballerina-os"
