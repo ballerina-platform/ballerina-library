@@ -17,6 +17,7 @@ FIELD_BRANCH = "branch"
 FIELD_DEFAULT_BRANCH = "default_branch"
 FIELD_NAME = "name"
 FIELD_KEEP_LOCAL_CHANGES = "keep_local_changes"
+FIELD_SKIP = "skip"
 
 # File Names
 TEMP_PROPERTIES = "temp.properties"
@@ -39,6 +40,7 @@ parser.add_argument('--module', help="Build up to the specified module")
 parser.add_argument('--module-list', help="Path to the module list JSON file. If not provided, the existing 'stdlib_modules.json' from the GitHub will be used")
 parser.add_argument('--build-distribution', action="store_true", help="If the distribution should be built on top of the changes been done. This has to be used with '--snapshots-build' to be affective")
 parser.add_argument('--commands', help="To provide a custom command to execute inside each repo. Provide this as a string. If not provided './gradlew clean build' will be used")
+parser.add_argument('--skip-modules', help="To provide a list of modules to be skipped. Provide this as a comma separated list. Even a part of the module name will be sufficient")
 
 def main():
     global MODULE_LIST
@@ -51,6 +53,7 @@ def main():
     use_snapshots = False
     keep_local_changes = False
     required_module = None
+    skip_modules = []
     build_distribution = args.build_distribution
 
     print_block()
@@ -119,6 +122,11 @@ def main():
     else:
         print_info(f'Using the command: "{" ".join(commands)}"')
 
+    if args.skip_modules:
+        skip_modules = list(filter(None, map(lambda module: module.strip(), args.skip_modules.split(","))))
+        skipping_word_list = "\",\"".join(skip_modules)
+        print_info(f'Skipping all the modules containing any of the following words: "{skipping_word_list}"')
+
     module_list = get_stdlib_module_list(build_distribution)
 
     if args.module:
@@ -127,6 +135,10 @@ def main():
         required_module = get_required_module(args.module, module_list)
 
     for module in module_list:
+        if any(map(module[FIELD_NAME].__contains__, skip_modules)):
+            module[FIELD_SKIP] = True
+        else:
+            module[FIELD_SKIP] = False
         module[FIELD_BRANCH] = branch if branch else module[FIELD_DEFAULT_BRANCH]
         module[FIELD_KEEP_LOCAL_CHANGES] = keep_local_changes
         process_module(module, commands, lang_version, use_snapshots)
@@ -136,9 +148,15 @@ def main():
 
 def process_module(module, commands, lang_version, use_snapshots):
     print_block()
-    print_info("Processing: " + module[FIELD_NAME])
+    if module[FIELD_SKIP]:
+        print_info("Skipping: " + module[FIELD_NAME])
+    else:
+        print_info("Processing: " + module[FIELD_NAME])
     print_info("Branch: " + module[FIELD_BRANCH])
     print_block()
+
+    if module[FIELD_SKIP]:
+        return
 
     if not os.path.exists(module[FIELD_NAME]):
         clone_module(module[FIELD_NAME])
@@ -200,8 +218,8 @@ def checkout_branch(branch, keep_local_changes):
     try:
         subprocess.run(["git", "checkout", branch])
         if not keep_local_changes:
-            subprocess.run(["git", "reset", "--hard", "origin/" + branch])
-        subprocess.run(["git", "pull", "origin", branch])
+            subprocess.run(["git", "reset", "--hard", "origin"])
+            subprocess.run(["git", "pull", "origin", branch])
 
     except Exception as e:
         print("Failed to Sync the Default Branch: " + str(e))
