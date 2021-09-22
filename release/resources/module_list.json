@@ -57,6 +57,9 @@
             "name": "module-ballerinax-mysql"
         },
         {
+            "name": "module-ballerinax-oracledb"
+        },
+        {
             "name": "module-ballerinax-nats"
         },
         {
