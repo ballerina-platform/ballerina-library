@@ -15,14 +15,8 @@ jobs:
         name: Derive module dependencies
         runs-on: ubuntu-latest
         steps:
-            -   name : Configure GitHub
-                env:
-                    GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
-                run: |
-                    git config --global user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
-                    git config --global user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
-                    git clone https://${{ secrets.BALLERINA_BOT_USERNAME }}:${{ secrets.BALLERINA_BOT_TOKEN }}@github.com/ballerina-platform/ballerina-standard-library.git
-                    cd ballerina-standard-library
+            -   name: Checkout Repository
+                uses: actions/checkout@v2
         
             -   name: Setup Python
                 uses: actions/setup-python@v2
@@ -39,26 +33,23 @@ jobs:
             
             -   name: Get Dependencies and update files
                 run: |
-                    cd ballerina-standard-library
                     python release/src/module_dependencies/update_version_data.py
                 env:
                     packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
                     packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
             
             -   name : Commit files
-                id: commit
                 env:
                     GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
                 run: |
-                    cd ballerina-standard-library
                     git update-index -q --refresh
                     if ! git diff-index --quiet HEAD --;then
                         echo ::set-output name=changes::true
-                        git remote set-url origin https://${{ secrets.BALLERINA_BOT_USERNAME }}:${{ secrets.BALLERINA_BOT_TOKEN }}@github.com/ballerina-platform/ballerina-standard-library.git
+                        git config --global user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
+                        git config --global user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
                         git add .
                         git commit -m "[Automated] Update the dependency order"
-                        curl -fsSL https://github.com/github/hub/raw/master/script/get | bash -s 2.14.1
-                        bin/hub push origin main
+                        git push origin main
                     else
                         echo "No changes to commit"
                     fi
