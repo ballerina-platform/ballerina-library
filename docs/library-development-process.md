@@ -1,5 +1,8 @@
 # Library Development Process 
-_Author: Shafreen Anfar, Chanaka Lakmal Reviewer: Danesh Kuruppu, Created on: 2021/08/26, Last updated: 2021/09/10_ 
+_Author_: Shafreen Anfar, Chanaka Lakmal  
+_Reviewer_: Danesh Kuruppu  
+_Created_: 2021/08/26   
+_Updated_: 2021/09/27   
 
 This section basically discusses the library development process from the inception to materializing it. The goal is to make sure we deliver the best possible library experience we could. The order of each step could be changed a bit but the overall process stays the same. Once a library goes to each step and reaches the end, we can sign it off as a general availability ready library. Each library owner is responsible for making sure their libraries go through these steps before signing off. 
 
@@ -11,7 +14,7 @@ The below section discusses each step of this process.
 
 Library specification is basically a structured document which clearly states what needs to be implemented. Many libraries have a design doc which basically does the same thing. We just need to re-organize it in the proper way. For an example specification read [this](https://spec.graphql.org/June2018/). Once written this needs to be committed into the relevant repo under `docs/sepc` folder.
 
-In order to update the spec first there should be a proposal. This proposal could be either rejected or accepted after discussing with area leads. If accepted, the content of the proposal must be added to the library spec. A proposal should clearly state the motivation, description of the solution, goals and none-goals and future work, etc. For an example proposal read [this](https://openjdk.java.net/jeps/409) and the template can be found [here](https://openjdk.java.net/jeps/2). Basically, we are following the JEP format. Once written this needs to be committed into the relevant repo under `docs/proposals` folder.
+In order to update the specification first there should be a proposal. This proposal could be either rejected or accepted after discussing with area leads. If accepted, the content of the proposal must be added to the library specification. A proposal should clearly state the motivation, description of the solution, goals and none-goals and future work, etc. For an example proposal read [this](https://github.com/ballerina-platform/module-ballerina-http/blob/master/docs/proposals/interceptors.md) and the template can be found [here](https://openjdk.java.net/jeps/2). Basically, we are following the JEP format. Once written this needs to be committed into the relevant repo under `docs/proposals` folder.
 
 
 ## Implementation
@@ -21,6 +24,8 @@ I think this step is pretty obvious. It is basically the implementation of the d
 ## Test Coverage
 
 Each library must have at least 80% test coverage. 90% would be even better. Here the goal is not to reach some number but to make sure most code we’ve written is validated against the intended usage. There is no difference between the test code and production code; both are the same. Therefore the same effort needs to be made for both. Remember any code that is not covered with a test usually ends up as a bug. 
+
+At the moment package level Ballerina integration test is not possible but once the support is added there should be integration test as well. However, we must stick to the standard test pyramid; meaning a lot of unit tests and a few integration tests.
 
 ## Code Quality Check
 
@@ -79,7 +84,7 @@ Library developers must verify if adequate tooling support is available for a gi
 
 Failing to do so would lead to bad developer experience. Therefore, librarie developers must make sure they use the tool in the best possible way.
 
-- The relevant issue must tick all of the below,
+The relevant issue must tick all of the below,
 - Diagnostics
 - Code completions
 - Code actions
@@ -98,7 +103,7 @@ The results should be recorded in an issue in the form of a report. I think we c
 
 ## Negative Test Report
 
-This is to ensure the robustness of the library. An example for this can be found here. The issue must be tagged with the relevant milestone. 
+This is to ensure the robustness of the library. An example for this can be found [here](https://github.com/ballerina-platform/ballerina-standard-library/issues/365). The issue must be tagged with the relevant milestone. 
 
 ## Security Report
 
