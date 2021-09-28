@@ -95,11 +95,11 @@ Also the issue must be tagged with the relevant milestone.
 
 ## Load Test Report
 
-Load test is not a performance test. The goal of load testing is to identify any memory leaks, thread blocking issues, etc. These tests must be done in containers with limited resources such as number of cores and memory. As a starting point these could be set to 0.25 cores and 300M. 
+Load test is not a performance test. The goal of load test is to identify any memory leaks, thread blocking issues, etc. These tests must be done in containers with limited resources such as number of cores and memory. As a starting point these could be set to 0.25 cores and 300M. 
 
-Type of the load test could be different from library to library. Therefore, it is the library owner’s judgment call as to what type of test to be done. A Docker compose file should be written to repeat the test at any time and committed to the folder `loadtest` along with the readme which explains how to re-run the load test.
+Type of the load test could be different from library to library. Therefore, it is the library owner’s judgment call as to what type of test to be done. However, a good approach is to always maintain a subset of what is there in the `example` folder as the load test suite. Load test suite must be captured in the form of `yaml` files which are compatible with the [Ballerina performance cloud](https://github.com/ballerina-platform/ballerina-performance-cloud) along with the `readme.md` which explains how to run the load test. In other words, the load test must be repeatable. 
 
-The results should be recorded in an issue in the form of a report. I think we can start with something similar to this [issue](https://github.com/ballerina-platform/ballerina-standard-library/issues/989). The issue must be tagged with the relevant milestone.
+The results should be recorded in an issue. The issue must be tagged with the relevant milestone. 
 
 ## Negative Test Report
 
