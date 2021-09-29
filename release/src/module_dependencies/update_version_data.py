@@ -60,7 +60,7 @@ def sort_module_name_list():
 
 
 # Returns the file in the given url
-# Retry decorator will retry the function 3 times, doubling the backoff delay if URLError is raised 
+# Retry decorator will retry the function 3 times, doubling the backoff delay if URLError is raised
 @retry(
     urllib.error.URLError,
     tries=HTTP_REQUEST_RETRIES,
@@ -147,7 +147,7 @@ def remove_modules_in_intermediate_paths(G, source, destination, successors, mod
 
 
 # Generates a directed graph using the dependencies of the modules
-# Level of each module is calculated by traversing the graph 
+# Level of each module is calculated by traversing the graph
 # Returns a json string with updated level of each module
 def calculate_levels(module_name_list, module_details_json):
     try:
@@ -172,7 +172,7 @@ def calculate_levels(module_name_list, module_details_json):
         processing_list.append(root)
 
     # While the processing list is not empty, successors of each node in the current level are determined
-    # For each successor of the node, 
+    # For each successor of the node,
     #    - Longest path from node to successor is considered and intermediate nodes are removed from dependent list
     #    - The level is updated and the successor is appended to a temporary array
     # After all nodes are processed in the current level the processing list is updated with the temporary array
@@ -266,7 +266,7 @@ def update_stdlib_dashboard(module_details_json):
             break
 
     # Modules in levels 0 and 1 are categorized under level 1
-    # A single row in the table is created for each module in the module list    
+    # A single row in the table is created for each module in the module list
     level_column = 1
     current_level = 1
     for module in module_details_json['modules']:
@@ -277,7 +277,7 @@ def update_stdlib_dashboard(module_details_json):
         row = ("|" + str(level_column) + "|" +
                "[" + module['name'].split('-')[-1] + "](" + BALLERINA_ORG_URL + module['name'] + ")| " +
 
-               "[![GitHub Release](" + GITHUB_BADGE_URL + "release/" + BALLERINA_ORG_NAME + "/" + module['name'] + ".svg?label=)]" +
+               "[![GitHub Release](" + GITHUB_BADGE_URL + "/v/release/" + BALLERINA_ORG_NAME + "/" + module['name'] + "?color=light-green&label=)]" +
                "(" + BALLERINA_ORG_URL + module['name'] + "/releases)| " +
 
                "[![Build](" + BALLERINA_ORG_URL + module['name'] + "/actions/workflows/build-timestamped-master.yml/badge.svg)]" +
