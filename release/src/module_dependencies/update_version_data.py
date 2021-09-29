@@ -276,26 +276,28 @@ def update_stdlib_dashboard(module_details_json):
             level_column = module['level']
             current_level = module['level']
 
+        module_name = module['name']
+
         row = ("|" + str(level_column) + "|" +
-               "[" + module['name'].split('-')[-1] + "](" + BALLERINA_ORG_URL + module['name'] + ")| " +
+               "[" + module_name.split('-')[-1] + "](" + BALLERINA_ORG_URL + module_name + ")| " +
 
-               f'[![GitHub Release]({GITHUB_BADGE_URL}v/release/{BALLERINA_ORG_NAME}/{module[{"name"}]}?color={badge_green_color}&label=)]' +
-               "(" + BALLERINA_ORG_URL + module['name'] + "/releases)| " +
+               f'[![GitHub Release]({GITHUB_BADGE_URL}v/release/{BALLERINA_ORG_NAME}/{module_name}?color={badge_green_color}&label=)]' +
+               "(" + BALLERINA_ORG_URL + module_name + "/releases)| " +
 
-               "[![Build](" + BALLERINA_ORG_URL + module['name'] + "/actions/workflows/build-timestamped-master.yml/badge.svg)]" +
-               "(" + BALLERINA_ORG_URL + module['name'] + "/actions/workflows/build-timestamped-master.yml)| " +
+               "[![Build](" + BALLERINA_ORG_URL + module_name + "/actions/workflows/build-timestamped-master.yml/badge.svg)]" +
+               "(" + BALLERINA_ORG_URL + module_name + "/actions/workflows/build-timestamped-master.yml)| " +
 
-               "[![Trivy](" + BALLERINA_ORG_URL + module['name'] + "/actions/workflows/trivy-scan.yml/badge.svg)]" +
-               "(" + BALLERINA_ORG_URL + module['name'] + "/actions/workflows/trivy-scan.yml)| " +
+               "[![Trivy](" + BALLERINA_ORG_URL + module_name + "/actions/workflows/trivy-scan.yml/badge.svg)]" +
+               "(" + BALLERINA_ORG_URL + module_name + "/actions/workflows/trivy-scan.yml)| " +
 
-               "[![CodeCov](" + CODECOV_BADGE_URL + BALLERINA_ORG_NAME + "/" + module['name'] + "/branch/" + module['default_branch'] + "/graph/badge.svg)]" +
-               "(" + CODECOV_BADGE_URL + BALLERINA_ORG_NAME + "/" + module['name'] + ")| " +
+               "[![CodeCov](" + CODECOV_BADGE_URL + BALLERINA_ORG_NAME + "/" + module_name + "/branch/" + module['default_branch'] + "/graph/badge.svg)]" +
+               "(" + CODECOV_BADGE_URL + BALLERINA_ORG_NAME + "/" + module_name + ")| " +
 
                "[![Bugs](" + GITHUB_BADGE_URL + "issues-search/" + BALLERINA_ORG_NAME + "/ballerina-standard-library?"
                + get_bug_query(module) + ")](" + get_bugs_link(module) + ")| " +
 
-                "[![GitHub pull-requests](" + GITHUB_BADGE_URL + "issues-pr" + "/" + BALLERINA_ORG_NAME + "/" + module['name'] + ".svg?label=)]" +
-                "(" + BALLERINA_ORG_URL + module['name'] + "/pulls)|\n")
+                "[![GitHub pull-requests](" + GITHUB_BADGE_URL + "issues-pr" + "/" + BALLERINA_ORG_NAME + "/" + module_name + ".svg?label=)]" +
+                "(" + BALLERINA_ORG_URL + module_name + "/pulls)|\n")
 
         updated_readme_file += row
 
