@@ -281,7 +281,7 @@ def update_stdlib_dashboard(module_details_json):
         row = ("|" + str(level_column) + "|" +
                "[" + module_name.split('-')[-1] + "](" + BALLERINA_ORG_URL + module_name + ")| " +
 
-               f'[![GitHub Release]({GITHUB_BADGE_URL}v/release/{BALLERINA_ORG_NAME}/{module_name}?color={badge_green_color}&label=)]' +
+               "[![GitHub Release](" + GITHUB_BADGE_URL + "v/release/" + BALLERINA_ORG_NAME + "/" + module_name + "?color=" + badge_green_color + "&label=)]" +
                "(" + BALLERINA_ORG_URL + module_name + "/releases)| " +
 
                "[![Build](" + BALLERINA_ORG_URL + module_name + "/actions/workflows/build-timestamped-master.yml/badge.svg)]" +
