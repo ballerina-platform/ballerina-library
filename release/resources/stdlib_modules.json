@@ -434,7 +434,7 @@
         },
         {
             "name": "module-ballerinax-oracledb",
-            "version": "0.1.0-beta.3-SNAPSHOT",
+            "version": "1.0.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibOracledbVersion",
