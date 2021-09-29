@@ -18,6 +18,8 @@ CODECOV_BADGE_URL = "https://codecov.io/gh/"
 
 ballerina_bot_token = os.environ["packagePAT"]
 
+badge_green_color = "brightgreen"
+badge_yellow_color = "yellow"
 
 def main():
     print('Running main.py')
@@ -277,7 +279,7 @@ def update_stdlib_dashboard(module_details_json):
         row = ("|" + str(level_column) + "|" +
                "[" + module['name'].split('-')[-1] + "](" + BALLERINA_ORG_URL + module['name'] + ")| " +
 
-               "[![GitHub Release](" + GITHUB_BADGE_URL + "v/release/" + BALLERINA_ORG_NAME + "/" + module['name'] + "?color=light-green&label=)]" +
+               f'[![GitHub Release]({GITHUB_BADGE_URL}v/release/{BALLERINA_ORG_NAME}/{module[{"name"}]}?color={badge_green_color}&label=)]' +
                "(" + BALLERINA_ORG_URL + module['name'] + "/releases)| " +
 
                "[![Build](" + BALLERINA_ORG_URL + module['name'] + "/actions/workflows/build-timestamped-master.yml/badge.svg)]" +
@@ -322,9 +324,9 @@ def get_bug_query(module):
         issue_count = 1
 
     if issue_count == 0:
-        label_colour = "brightgreen"
+        label_colour = badge_green_color
     else:
-        label_colour = "yellow"
+        label_colour = badge_yellow_color
 
     return "query=is%3Aopen+label%3AType%2FBug+label%3Amodule%2F" + get_module_short_name(module_name) + "&label=&color=" + label_colour + "&logo=github"
 
