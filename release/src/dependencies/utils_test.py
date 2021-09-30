@@ -1,7 +1,7 @@
 from sys import modules
 import unittest
 
-from release.src.dependencies import utils
+import utils
 
 IO_MODULE = "module-ballerina-io"
 JAVA_ARRAYS_MODULE = "module-ballerina-jballerina.java.arrays"
@@ -45,11 +45,6 @@ class TestDashboardCreation(unittest.TestCase):
         expected = "[![CodeCov](https://codecov.io/gh/ballerina-platform/module-ballerina-io/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-io)"
         actual = utils.get_codecov_badge(IO_MODULE, "master")
         self.assertEqual(expected, actual)
-
-
-    def test_get_bug_query(self):
-        expected = ""
-        actual = utils.get_bug_query(JAVA_ARRAYS_MODULE)
 
 
     def test_get_bugs_badge(self):
