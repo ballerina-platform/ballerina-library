@@ -33,7 +33,7 @@ jobs:
             -   name: Install Python packages
                 run: |
                     pip install requests
-                    pip install network
+                    pip install networkx
                     pip install retry
                     pip install PyGithub
                     pip install semver
