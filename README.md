@@ -1,15 +1,15 @@
 # The Ballerina Standard Library
 
 The [Ballerina](https://ballerina.io/) standard library includes a vast array of standard libraries and it is often described as coming with "Batteries included". It includes a clean set of building blocks and APIs to rapidly build applications. Some of the included standard libraries are HTTP1.1/2, WebSocket, gRPC, File, Filepath, etc and the full list of standard libraries are listed under the `Status Dashboard` section.
- 
+
 All the Ballerina standard libraries are made available on [Ballerina Central](https://central.ballerina.io/). Therefore, Ballerina standard library fixes and improvements will be made available instantly to Ballerina users without waiting for every six month release cycle of the Ballerina language.
- 
+
 ## Repository Organization
- 
+
 This is the Parent repository of the Ballerina standard library and used to report bugs, request new features, start new discussions, view project boards, etc.
- 
+
 However, to enable instant releases of each standard library, each standard library code is separated into a child repository. Therefore, in order to go through the code, please refer to the relevant child repository.
- 
+
 Both Parent and Child repositories are owned and maintained by the Ballerina standard library team who is responsible for governing, ensuring security and quality, doing timely releases, maintaining backward compatibility, etc.
 
 ## Contributing to Ballerina
