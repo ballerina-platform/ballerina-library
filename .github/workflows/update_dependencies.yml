@@ -42,7 +42,6 @@ jobs:
                 run: |
                     python release/src/dependencies/graph.py
                 env:
-                    BALLERINA_BOT_USERNAME: ${{ secrets.BALLERINA_BOT_USERNAME }}
                     BALLERINA_BOT_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
             -   name: Commit files
