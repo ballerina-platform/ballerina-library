@@ -1,0 +1,31 @@
+name: Pull Request Build
+
+on: pull_request
+
+jobs:
+    ubuntu-build:
+        name: Build on Ubuntu
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout Repository
+                uses: actions/checkout@v2
+
+            -   name: Setup Python
+                uses: actions/setup-python@v2
+                with:
+                    python-version: '3.x'
+
+            -   name: Install Python packages
+                run: |
+                    pip install requests
+                    pip install networkx
+                    pip install retry
+                    pip install PyGithub
+                    pip install semver
+
+            -   name: Run Tests
+                env:
+                    BALLERINA_BOT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                    cd release/src/dependencies
+                    python -m unittest utils_test.py

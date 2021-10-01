@@ -29,6 +29,10 @@ hs_err_pid*
 *.iml
 .idea
 .code
+.vscode
 
 # Ballerina
 Ballerina.lock
+
+# Python
+*.pyc
