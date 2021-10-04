@@ -1,5 +1,8 @@
 # The Zero Bug Policy 
-_Author: Shafreen Anfar, Reviewer: Danesh Kuruppu, Created on: 2021/08/27, Last updated: 2021/08/27_ 
+_Author_: Shafreen Anfar  
+_Reviewer_: Danesh Kuruppu  
+_Created_: 2021/08/27  
+_Updated_: 2021/08/27 
 
 As mentioned earlier, the zero bugs policy is meant to emphasise our commitment to quality. The Zero Bug Policy is simple. All bugs take priority over all new feature development or improvements. That’s it. There is nothing more.
 
