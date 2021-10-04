@@ -11,8 +11,8 @@ on:
           - 'release/resources/module_list.json'
 
 jobs:
-    dependency:
-        name: Derive module dependencies
+    dependency_graph:
+        name: Update the Standard Library Dependency Graph
         runs-on: ubuntu-latest
         steps:
             -   name : Checkout Repo
@@ -46,5 +46,6 @@ jobs:
 
             -   name: Commit files
                 run: |
-                    git commit -am "[AUTOMATED] Update the Dependency Graph and Dashboard"
+                    git add -A
+                    git diff-index --quiet HEAD || git commit -m "[AUTOMATED] Update the dependency graph and the dashboard"
                     git push
