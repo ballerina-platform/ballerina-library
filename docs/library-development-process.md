@@ -1,6 +1,6 @@
 # Library Development Process 
-_Author_: Shafreen Anfar, Chanaka Lakmal  
-_Reviewer_: Danesh Kuruppu  
+_Author_: @shafreenAnfar @ldclakmal  
+_Reviewer_: @daneshk   
 _Created_: 2021/08/26   
 _Updated_: 2021/09/27   
 

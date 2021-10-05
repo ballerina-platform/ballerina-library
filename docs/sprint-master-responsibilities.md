@@ -1,7 +1,7 @@
 # Sprint Master Responsibilities
 
-_Author_: Shafreen Anfar  
-_Reviewer_: Danesh Kuruppu  
+_Author_: @shafreenAnfar    
+_Reviewer_: @daneshk   
 _Created_: 2021/10/01  
 _Updated_: 2021/10/01
 
