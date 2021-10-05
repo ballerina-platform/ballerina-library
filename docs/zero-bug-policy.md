@@ -1,6 +1,6 @@
 # The Zero Bug Policy 
-_Author_: Shafreen Anfar  
-_Reviewer_: Danesh Kuruppu  
+_Author_: @shafreenAnfar  
+_Reviewer_: @daneshk  
 _Created_: 2021/08/27  
 _Updated_: 2021/08/27 
 
