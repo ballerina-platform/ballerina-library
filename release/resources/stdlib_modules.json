@@ -6,7 +6,7 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibIoVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-log",
                 "module-ballerina-os",
@@ -19,7 +19,7 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibJavaArraysVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -28,7 +28,7 @@
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibRandomVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-grpc",
                 "module-ballerinax-kafka",
@@ -42,7 +42,7 @@
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibRegexVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-log",
                 "module-ballerina-uuid"
@@ -54,7 +54,7 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibTimeVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-crypto",
                 "module-ballerina-file",
@@ -68,7 +68,7 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibUrlVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-http"
             ]
@@ -79,7 +79,7 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -304,7 +304,7 @@
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibHttpVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-graphql",
                 "module-ballerina-grpc",
@@ -320,7 +320,7 @@
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -329,7 +329,7 @@
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -338,7 +338,7 @@
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibTransactionVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerinax-kafka",
                 "module-ballerinax-rabbitmq",
@@ -351,7 +351,7 @@
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsocketVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -360,7 +360,7 @@
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibWebsubVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -369,7 +369,7 @@
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsubhubVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -378,7 +378,7 @@
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -387,7 +387,7 @@
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibRabbitmqVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -396,7 +396,7 @@
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerinax-java.jdbc",
                 "module-ballerinax-mssql",
@@ -411,7 +411,7 @@
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibJdbcVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -420,7 +420,7 @@
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -429,7 +429,7 @@
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -438,7 +438,7 @@
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibOracledbVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -447,7 +447,7 @@
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         }
     ]
