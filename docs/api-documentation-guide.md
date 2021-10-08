@@ -27,15 +27,17 @@ In order to materialize the above we need make use of three things,
    -  This is all about the distribution of the modules. Rendered in Ballerina central but not in API docs of ballerina.io 
    -  This can include stuff like a banner saying this is owned by the standard library module, version compatibility, release dates, governing principles, security validations, etc.
 - Module.md documentation 
-  -  Default Module.md 
+   -  Default Module.md 
        - Module.md in the default acts as the root description. Basically this corresponds to what is discussed in point 2 above (Overview section). This includes the synopsis of this module. 
    -  Other Module.md 
       -  All the module files fall under point 3 above (Sub Topics) which includes a synopsis specific to that particular module.
-   -  Can use code snippets if it helps solidify the message
+   - Can use code snippets if it helps solidify the message
        - Remember to evolve those along with the code
-       - Pointing to BBEs  (More on that later)
+   -  Pointing to BBEs  (More on that later)
 - Code documentation 
    -  Falls under point 3 above (Sub Topics). However, this is the leaf level information which basically completes the message. There is no other information that goes beyond this.
+
+
 
 ## Ballerina by Examples (BBEs)
 
@@ -60,12 +62,10 @@ If we are to add BBEs, I think we should do it as GoLang has done. Added it as a
 
 In fact, IMO, linking should be done the other way around. BBEs should be linked to API docs. Because BBEs are short and incomplete. Therefore if one wants to know more information about the particular module that person can refer to API docs.  
 
-
 ## Guidelines and Best Practices
-
 - Do not add full stops for any of the parameter descriptions
-   - Incorrect: # + url - Target service URL.
-   -  Correct:   # + url - Target service URL
+  - Incorrect: # + url - Target service URL.
+  - Correct:   # + url - Target service URL
 - Add full stops in the function/record/object/const descriptions (in comments).
   -  Incorrect: # Attaches a service to the listener
   -  Correct:   # Attaches a service to the listener.
@@ -73,34 +73,40 @@ In fact, IMO, linking should be done the other way around. BBEs should be linked
   -  Incorrect: + url - target service URL
   -  Correct:   + url - Target service URL
 -  Avoid repeating the 'returns' word when documenting the function returns. Just mention what is being returned.
-   -  Incorrect:   # + return - Returns the response of the request or an error if failed to establish the communication with the upstream server 
-   -  Correct:   # + return - The response of the request or else an `http:Error` if failed to establish the communication with the upstream server
+    -  Incorrect:   \# + return - Returns the response of the request or an error if failed to establish the communication with the upstream server 
+    -  Correct:   # + return - The response of the request or else an `http:Error` if failed to establish the communication with the upstream server
    -  When you have more than one returned items:
       -  \# + return - Generated string token,  an `auth:Error` occurred while generating the token, or else () if nothing is to be returned
       -  \# + return - `true` if authentication is successful, `false` otherwise, or else an `auth:Error` occurred while authenticating the credentials.
 -  Do NOT use "we" or "please" anywhere in technical docs. Always use the passive form or direct form to say "you need to...".
    -  Incorrect: # For details, please see the WebSocket module.
    -  Correct:   # For details, see the WebSocket module.
-For comments, it should always be the singular form. "# Attaches.."
-Incorrect: # Attach a service to the listener.
-Correct:   # Attaches a service to the listener.
-Capitalize standard words like URL, HTTP, or JSON.
-Incorrect: # Creates http server endpoints.
-Correct:   # Creates HTTP server endpoints.
-Add the Oxford comma before “and” or “or” in lists.
-Incorrect: # + message - An HTTP outbound request message or any payload of type `string`, `xml`, `json`, `byte[]`, `io:ReadableByteChannel` or `mime:Entity[]`
-Correct: # + message - An HTTP outbound request message or any payload of type `string`, `xml`, `json`, `byte[]`, `io:ReadableByteChannel`, or `mime:Entity[]`
-Note: We do not need the Oxford comma when there are only 2 items in the list as follows. E.g.,
+-  For comments, it should always be the singular form. "# Attaches.."
+   -  Incorrect: # Attach a service to the listener.
+   -  Correct:   # Attaches a service to the listener.
+-  Can use code snippets if it helps solidify the message
+    - Remember to evolve those along with the code
+    - Pointing to BBEs  (More on that later)
+- Code documentation 
+   -  Falls under point 3 above (Sub Topics). However, this is the leaf level information which basically completes the message. There is no other information that goes beyond this.
+-  Capitalize standard words like URL, HTTP, or JSON.
+   -  Incorrect: # Creates http server endpoints.
+   -  Correct:   # Creates HTTP server endpoints.
+-  Add the Oxford comma before “and” or “or” in lists.
+   -  Incorrect: # + message - An HTTP outbound request message or any payload of type `string`, `xml`, `json`, `byte[]`, `io:ReadableByteChannel` or `mime:Entity[]`
+   -  Correct: # + message - An HTTP outbound request message or any payload of type `string`, `xml`, `json`, `byte[]`, `io:ReadableByteChannel`, or `mime:Entity[]`
+   -  Note: We do not need the Oxford comma when there are only 2 items in the list as follows. E.g.,
 
-        foo or bar  
-        foo, bar, or baz  
-        foo and bar  
-        foo, bar, and baz  
-
--  For names of third party technologies, use the exact way they write it (Google and check). 
-   -  Examples: MySQL not Mysql 
+```
+foo or bar
+foo, bar, or baz
+foo and bar
+foo, bar, and baz
+```
 -  Capitalize all file extensions.
    -  Examples: BAL, ZIP
+-  For names of third party technologies, use the exact way they write it (Google and check). 
+   -  Examples: MySQL not Mysql 
 -  Add one line code snippet if possible. E.g., https://ballerina.io/v1-2/learn/api-docs/ballerina/java/index.html#annotations.
 -  All the referrings of records/objects/functions inside the API docs and Module.md should have the representation as `<module-name>:<type-name>` instead of `<type-name>`.
 -  Any description related to the parameter goes beyond a single line, and should start with the starting position of the 1st line.
@@ -112,13 +118,9 @@ Note: We do not need the Oxford comma when there are only 2 items in the list as
    -  Right: You can also pass a key/value pair where the value is an error stack trace.
 
 ## Anti-Patterns
-This doc basically explains how to write better Ballerina code.
-
-https://docs.google.com/document/d/1y6QVqaZzZt9jMpYV4jP5WRS_W_KoC4y40Uuoh1ALu8E/edit?usp=sharing
+[This doc](https://docs.google.com/document/d/1y6QVqaZzZt9jMpYV4jP5WRS_W_KoC4y40Uuoh1ALu8E/edit?usp=sharing) basically explains how to write better Ballerina code.
 
 ## Additional Guidelines 
 
-This link has additional information with regard to writing BBEs and API documentation.
-
-https://github.com/ballerina-platform/ballerina-distribution/blob/master/doc-guidelines.md#ballerina-by-examples-guidelines
+[This link](https://github.com/ballerina-platform/ballerina-distribution/blob/master/doc-guidelines.md#ballerina-by-examples-guidelines) has additional information with regard to writing BBEs and API documentation.
 
