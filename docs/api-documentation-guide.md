@@ -25,7 +25,7 @@ In order to materialize the above we need make use of three things,
 
 -  Package.md documentation 
    -  This is all about the distribution of the modules. Rendered in Ballerina central but not in API docs of ballerina.io 
-   -  This can include stuff like a banner saying this is owned by the standard library module, version compatibility, release dates, governing principles, security validations, etc.
+   -  This can include stuff like a banner saying this is owned by the standard library team, version compatibility, release dates, governing principles, security validations, etc.
 - Module.md documentation 
    -  Default Module.md 
        - Module.md in the default acts as the root description. Basically this corresponds to what is discussed in point 2 above (Overview section). This includes the synopsis of this module. 
