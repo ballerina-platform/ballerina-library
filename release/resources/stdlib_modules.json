@@ -2,7 +2,7 @@
     "modules": [
         {
             "name": "module-ballerina-io",
-            "version": "1.0.0-SNAPSHOT",
+            "version": "1.0.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibIoVersion",
@@ -15,7 +15,7 @@
         },
         {
             "name": "module-ballerina-jballerina.java.arrays",
-            "version": "1.0.0-SNAPSHOT",
+            "version": "1.0.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibJavaArraysVersion",
@@ -24,7 +24,7 @@
         },
         {
             "name": "module-ballerina-random",
-            "version": "1.0.0-SNAPSHOT",
+            "version": "1.0.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibRandomVersion",
@@ -50,7 +50,7 @@
         },
         {
             "name": "module-ballerina-time",
-            "version": "2.0.0-SNAPSHOT",
+            "version": "2.0.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibTimeVersion",
@@ -101,7 +101,7 @@
         },
         {
             "name": "module-ballerina-log",
-            "version": "2.0.0-SNAPSHOT",
+            "version": "2.0.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibLogVersion",
@@ -121,7 +121,7 @@
         },
         {
             "name": "module-ballerina-os",
-            "version": "1.0.0-SNAPSHOT",
+            "version": "1.0.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibOsVersion",
@@ -132,7 +132,7 @@
         },
         {
             "name": "module-ballerina-protobuf",
-            "version": "1.0.0-SNAPSHOT",
+            "version": "1.0.1-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibProtobufVersion",
@@ -156,7 +156,7 @@
         },
         {
             "name": "module-ballerina-xslt",
-            "version": "2.0.0-SNAPSHOT",
+            "version": "2.0.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibXsltVersion",
@@ -211,7 +211,7 @@
         },
         {
             "name": "module-ballerinax-nats",
-            "version": "2.0.0-SNAPSHOT",
+            "version": "2.0.1-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibNatsVersion",
@@ -220,7 +220,7 @@
         },
         {
             "name": "module-ballerinax-stan",
-            "version": "2.0.0-SNAPSHOT",
+            "version": "2.0.1-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibStanVersion",
@@ -247,7 +247,7 @@
         },
         {
             "name": "module-ballerina-uuid",
-            "version": "1.0.0-SNAPSHOT",
+            "version": "1.0.1-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibUuidVersion",
@@ -325,7 +325,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "version": "1.0.0-SNAPSHOT",
+            "version": "1.0.1-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
@@ -334,7 +334,7 @@
         },
         {
             "name": "module-ballerinai-transaction",
-            "version": "1.0.15-SNAPSHOT",
+            "version": "1.0.16-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibTransactionVersion",
@@ -374,7 +374,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "version": "3.0.0-SNAPSHOT",
+            "version": "3.0.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
@@ -383,7 +383,7 @@
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "version": "2.0.0-SNAPSHOT",
+            "version": "2.0.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibRabbitmqVersion",
