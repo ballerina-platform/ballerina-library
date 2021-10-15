@@ -20,7 +20,35 @@ scope for this proposal. -->
 <!-- Why should this work be done?  What are its benefits?  Who's asking
 for it?  How does it compare to the competition, if any? -->
 
+## Success Metrics
+
+<!--  If the success of this work can be gauged by specific numerical
+ metrics and associated goals then describe them here. -->
+
 ## Description
 
 <!-- REQUIRED -- Describe the enhancement in detail: Both what it is and,
  to the extent understood, how you intend to implement it. -->
+
+## Alternatives
+
+<!--  Did you consider any alternative approaches or technologies?  If so
+ then please describe them here and explain why they were not chosen. -->
+
+## Testing
+
+<!--  What kinds of test development and execution will be required in order
+ to validate this enhancement, beyond the usual mandatory unit tests?
+ Be sure to list any special platform or hardware requirements. -->
+
+## Risks and Assumptions
+
+<!--  Describe any risks or assumptions that must be considered along with
+ this proposal.  Could any plausible events derail this work, or even
+ render it unnecessary?  If you have mitigation plans for the known
+ risks then please describe them. -->
+
+## Dependencies
+
+<!--  Describe all dependencies that this JEP has on other JEPs, JBS issues,
+ components, products, or anything else. -->
