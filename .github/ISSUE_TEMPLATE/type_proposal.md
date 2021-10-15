@@ -8,8 +8,7 @@ labels: 'Type/Proposal'
 <!-- REQUIRED -- Provide a short summary of the proposal, at most one or two sentences -->
 
 ## Goals
-<!-- REQUIRED -- What are the goals of this proposal?  Omit this section if you have
-nothing to say beyond what's already in the summary. -->
+<!-- REQUIRED -- Goals help us understand what we are trying to archive. -->
 
 ## Non-Goals
 <!-- Describe any goals you wish to identify specifically as being out of
@@ -17,7 +16,7 @@ scope for this proposal. -->
 
 ## Motivation
 
-<!-- REQUIRED -- Why should this work be done?  What are its benefits?  Who's asking
+<!-- REQUIRED -- Motivation help us understand why we are doing this. What are its benefits?  Who's asking
 for it?  How does it compare to the competition, if any? -->
 
 ## Success Metrics
