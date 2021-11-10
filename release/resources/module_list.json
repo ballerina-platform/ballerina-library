@@ -125,6 +125,12 @@
         },
         {
             "name": "module-ballerina-xslt"
+        },
+        {
+            "name": "module-ballerina-observe"
+        },
+        {
+            "name": "module-ballerinai-observe"
         }
     ]
 }
