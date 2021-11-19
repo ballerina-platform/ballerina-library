@@ -105,7 +105,7 @@
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibLogVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-auth",
                 "module-ballerina-file",
@@ -169,7 +169,7 @@
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibCacheVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-auth",
                 "module-ballerina-jwt",
@@ -182,7 +182,7 @@
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibFileVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-email",
                 "module-ballerina-http"
@@ -194,7 +194,7 @@
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -203,7 +203,7 @@
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibMimeVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-email",
                 "module-ballerina-http"
@@ -215,7 +215,7 @@
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibNatsVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -224,7 +224,7 @@
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibStanVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -233,7 +233,7 @@
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibTcpVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -242,7 +242,7 @@
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibUdpVersion",
-            "release": true,
+            "release": false,
             "dependents": []
         },
         {
@@ -251,7 +251,7 @@
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibUuidVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-http"
             ]
