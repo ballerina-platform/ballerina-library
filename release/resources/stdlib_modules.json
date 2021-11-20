@@ -334,7 +334,7 @@
         },
         {
             "name": "module-ballerinai-transaction",
-            "version": "1.0.16-SNAPSHOT",
+            "version": "1.0.17-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibTransactionVersion",
@@ -392,7 +392,7 @@
         },
         {
             "name": "module-ballerina-sql",
-            "version": "1.1.0-SNAPSHOT",
+            "version": "1.1.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
@@ -407,7 +407,7 @@
         },
         {
             "name": "module-ballerinax-java.jdbc",
-            "version": "1.1.0-SNAPSHOT",
+            "version": "1.1.1-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibJdbcVersion",
@@ -416,7 +416,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "version": "1.1.0-SNAPSHOT",
+            "version": "1.1.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
@@ -425,7 +425,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "version": "1.1.0-SNAPSHOT",
+            "version": "1.1.1-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
@@ -434,7 +434,7 @@
         },
         {
             "name": "module-ballerinax-oracledb",
-            "version": "1.1.0-SNAPSHOT",
+            "version": "1.1.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibOracledbVersion",
@@ -443,7 +443,7 @@
         },
         {
             "name": "module-ballerinax-postgresql",
-            "version": "1.1.0-SNAPSHOT",
+            "version": "1.1.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
