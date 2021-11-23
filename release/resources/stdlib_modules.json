@@ -75,7 +75,7 @@
         },
         {
             "name": "module-ballerina-xmldata",
-            "version": "2.0.1-SNAPSHOT",
+            "version": "2.0.2-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
@@ -101,7 +101,7 @@
         },
         {
             "name": "module-ballerina-log",
-            "version": "2.0.1-SNAPSHOT",
+            "version": "2.0.2-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibLogVersion",
@@ -132,7 +132,7 @@
         },
         {
             "name": "module-ballerina-protobuf",
-            "version": "1.0.1-SNAPSHOT",
+            "version": "1.0.2-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibProtobufVersion",
@@ -199,7 +199,7 @@
         },
         {
             "name": "module-ballerina-mime",
-            "version": "2.0.1-SNAPSHOT",
+            "version": "2.0.2-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibMimeVersion",
@@ -300,7 +300,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "version": "2.0.1-SNAPSHOT",
+            "version": "2.0.2-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibHttpVersion",
@@ -316,7 +316,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "version": "1.0.1-SNAPSHOT",
+            "version": "1.0.2-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
@@ -356,7 +356,7 @@
         },
         {
             "name": "module-ballerina-websub",
-            "version": "2.0.1-SNAPSHOT",
+            "version": "2.0.2-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibWebsubVersion",
@@ -365,7 +365,7 @@
         },
         {
             "name": "module-ballerina-websubhub",
-            "version": "1.0.1-SNAPSHOT",
+            "version": "1.0.2-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsubhubVersion",
