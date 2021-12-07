@@ -1,4 +1,4 @@
-# The Standard Library API Documentation Guide
+# Standard Library API Documentation Guide
 
 _Authors_: @shafreenAnfar @daneshk @praneesha  
 _Reviewers_: @chamil321  
