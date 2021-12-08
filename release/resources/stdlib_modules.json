@@ -75,7 +75,7 @@
         },
         {
             "name": "module-ballerina-xmldata",
-            "version": "2.0.2-SNAPSHOT",
+            "version": "2.1.0-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
