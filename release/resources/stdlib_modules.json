@@ -2,7 +2,7 @@
     "modules": [
         {
             "name": "module-ballerina-io",
-            "version": "1.0.2-SNAPSHOT",
+            "version": "1.1.0-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibIoVersion",
@@ -15,7 +15,7 @@
         },
         {
             "name": "module-ballerina-jballerina.java.arrays",
-            "version": "1.0.2-SNAPSHOT",
+            "version": "1.1.0-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibJavaArraysVersion",
@@ -38,7 +38,7 @@
         },
         {
             "name": "module-ballerina-regex",
-            "version": "1.0.2-SNAPSHOT",
+            "version": "1.1.0-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibRegexVersion",
@@ -50,7 +50,7 @@
         },
         {
             "name": "module-ballerina-time",
-            "version": "2.0.2-SNAPSHOT",
+            "version": "2.1.0-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibTimeVersion",
@@ -101,7 +101,7 @@
         },
         {
             "name": "module-ballerina-log",
-            "version": "2.0.2-SNAPSHOT",
+            "version": "2.1.0-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibLogVersion",
@@ -143,7 +143,7 @@
         },
         {
             "name": "module-ballerina-task",
-            "version": "2.0.2-SNAPSHOT",
+            "version": "2.1.0-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibTaskVersion",
@@ -156,7 +156,7 @@
         },
         {
             "name": "module-ballerina-xslt",
-            "version": "2.0.2-SNAPSHOT",
+            "version": "2.1.0-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibXsltVersion",
@@ -165,7 +165,7 @@
         },
         {
             "name": "module-ballerina-cache",
-            "version": "3.0.2-SNAPSHOT",
+            "version": "3.1.0-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibCacheVersion",
@@ -178,7 +178,7 @@
         },
         {
             "name": "module-ballerina-file",
-            "version": "1.0.2-SNAPSHOT",
+            "version": "1.1.0-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibFileVersion",
@@ -229,7 +229,7 @@
         },
         {
             "name": "module-ballerina-tcp",
-            "version": "1.0.2-SNAPSHOT",
+            "version": "1.2.0-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibTcpVersion",
@@ -325,7 +325,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "version": "1.0.2-SNAPSHOT",
+            "version": "1.1.0-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
@@ -347,7 +347,7 @@
         },
         {
             "name": "module-ballerina-websocket",
-            "version": "2.0.2-SNAPSHOT",
+            "version": "2.1.0-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsocketVersion",
@@ -392,7 +392,7 @@
         },
         {
             "name": "module-ballerina-sql",
-            "version": "1.1.1-SNAPSHOT",
+            "version": "1.2.0-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
@@ -416,7 +416,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "version": "1.1.1-SNAPSHOT",
+            "version": "1.2.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
@@ -425,7 +425,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "version": "1.1.1-SNAPSHOT",
+            "version": "1.2.0-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
@@ -434,7 +434,7 @@
         },
         {
             "name": "module-ballerinax-oracledb",
-            "version": "1.1.1-SNAPSHOT",
+            "version": "1.2.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibOracledbVersion",
@@ -443,7 +443,7 @@
         },
         {
             "name": "module-ballerinax-postgresql",
-            "version": "1.1.1-SNAPSHOT",
+            "version": "1.2.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
