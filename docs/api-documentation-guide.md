@@ -133,9 +133,7 @@ For information on how to write better Ballerina code, see [Ballerina Anti-Patte
 
 5. You should NOT try to refer to the BBEs with links from within API Docs, but rather have separate examples. This is because the required examples will probably not match the examples in the BBEs. The API Docs should have more examples to explain each API operation etc. Also, you will not want to click another link and navigate away from the API docs to a separate BBE page. Rather, you will need to see the example in the same place where the module is described. 
 
-6. The examples in API Docs should be self-contained. They should contain a fully working program when an example is given, for example, including all the imports and a main function. The Ballerina documentation generator can later remove any redundant code segments in a post-processing operation. This is required since this code should be executable from the Ballerina website. 
-
-7. In scenarios such as error value returns, all possible error types and their scenarios should be mentioned clearly. There should NOT be statements such as “returns error when something goes wrong”. 
+6. In scenarios such as error value returns, all possible error types and their scenarios should be mentioned clearly. There should NOT be statements such as “returns error when something goes wrong”. 
 
 ## More Ballerina Doc Guidelines
 
