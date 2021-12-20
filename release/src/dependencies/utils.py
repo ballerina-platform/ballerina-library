@@ -19,9 +19,8 @@ def get_dashboard_row(module, level):
     trivy_badge = get_trivy_badge(module_name)
     codecov_badge = get_codecov_badge(module_name, default_branch)
     bugs_badge = get_bugs_badge(module_name)
-    pull_requests_badge = get_pull_requests_badge(module_name)
 
-    return f'|{level}|{repo_link}|{release_badge}|{build_status_badge}|{trivy_badge}|{codecov_badge}|{bugs_badge}|{pull_requests_badge}|\n'
+    return f'|{level}|{repo_link}|{release_badge}|{build_status_badge}|{trivy_badge}|{codecov_badge}|{bugs_badge}|\n'
 
 
 def get_repo_link(module_name):
@@ -63,13 +62,6 @@ def get_bugs_badge(module_name):
     repo_url = f'{constants.BALLERINA_ORG_URL}/{constants.BALLERINA_STANDARD_LIBRARY}/issues?q={encoded_query_parameter}'
 
     return f'[![Bugs]({badge_url})]({repo_url})'
-
-
-def get_pull_requests_badge(module_name):
-    badge_url = f'{constants.GITHUB_BADGE_URL}/issues-pr/{constants.BALLERINA_ORG_NAME}/{module_name}.svg?label='
-    repo_url = f'{constants.BALLERINA_ORG_URL}/{module_name}/pulls'
-
-    return f'[![GitHub pull-requests]({badge_url})]({repo_url})'
 
 
 def get_bug_query(module_name):
