@@ -35,13 +35,13 @@ def get_release_badge(module_name):
 
 
 def get_build_status_badge(module_name):
-    badge_url = f'{constants.BALLERINA_ORG_URL}/{module_name}/actions/workflows/build-timestamped-master.yml/badge.svg'
+    badge_url = f'{constants.GITHUB_BADGE_URL}/workflow/status/{constants.BALLERINA_ORG_NAME}/{module_name}/Build?label='
     repo_url = f'{constants.BALLERINA_ORG_URL}/{module_name}/actions/workflows/build-timestamped-master.yml'
     return f'[![Build]({badge_url})]({repo_url})'
 
 
 def get_trivy_badge(module_name):
-    badge_url = f'{constants.BALLERINA_ORG_URL}/{module_name}/actions/workflows/trivy-scan.yml/badge.svg'
+    badge_url = f'{constants.GITHUB_BADGE_URL}/workflow/status/{constants.BALLERINA_ORG_NAME}/{module_name}/Trivy?label='
     repo_url = f'{constants.BALLERINA_ORG_URL}/{module_name}/actions/workflows/trivy-scan.yml'
     return f'[![Trivy]({badge_url})]({repo_url})'
 
@@ -83,7 +83,7 @@ def get_bug_query(module_name):
 
     issue_filter = f'is:open label:module/{short_name} label:Type/Bug'
     encoded_filter = urllib.parse.quote_plus(issue_filter)
-    return f'{encoded_filter}&label=&color={label_colour}&logo=github'
+    return f'{encoded_filter}&label=&color={label_colour}'
 
 
 def get_module_short_name(module_name):
