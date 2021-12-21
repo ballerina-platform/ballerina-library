@@ -316,7 +316,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "version": "1.1.1-SNAPSHOT",
+            "version": "1.2.0-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
@@ -347,7 +347,7 @@
         },
         {
             "name": "module-ballerina-websocket",
-            "version": "2.1.1-SNAPSHOT",
+            "version": "2.2.0-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsocketVersion",
@@ -356,7 +356,7 @@
         },
         {
             "name": "module-ballerina-websub",
-            "version": "2.1.1-SNAPSHOT",
+            "version": "2.2.0-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibWebsubVersion",
@@ -365,7 +365,7 @@
         },
         {
             "name": "module-ballerina-websubhub",
-            "version": "1.1.1-SNAPSHOT",
+            "version": "1.2.0-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsubhubVersion",
@@ -374,7 +374,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "version": "3.1.1-SNAPSHOT",
+            "version": "3.2.0-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
