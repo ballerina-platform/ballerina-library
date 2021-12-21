@@ -19,9 +19,8 @@ def get_dashboard_row(module, level):
     trivy_badge = get_trivy_badge(module_name)
     codecov_badge = get_codecov_badge(module_name, default_branch)
     bugs_badge = get_bugs_badge(module_name)
-    pull_requests_badge = get_pull_requests_badge(module_name)
 
-    return f'|{level}|{repo_link}|{release_badge}|{build_status_badge}|{trivy_badge}|{codecov_badge}|{bugs_badge}|{pull_requests_badge}|\n'
+    return f'|{level}|{repo_link}|{release_badge}|{build_status_badge}|{trivy_badge}|{codecov_badge}|{bugs_badge}|\n'
 
 
 def get_repo_link(module_name):
@@ -36,13 +35,13 @@ def get_release_badge(module_name):
 
 
 def get_build_status_badge(module_name):
-    badge_url = f'{constants.BALLERINA_ORG_URL}/{module_name}/actions/workflows/build-timestamped-master.yml/badge.svg'
+    badge_url = f'{constants.GITHUB_BADGE_URL}/workflow/status/{constants.BALLERINA_ORG_NAME}/{module_name}/Build?label='
     repo_url = f'{constants.BALLERINA_ORG_URL}/{module_name}/actions/workflows/build-timestamped-master.yml'
     return f'[![Build]({badge_url})]({repo_url})'
 
 
 def get_trivy_badge(module_name):
-    badge_url = f'{constants.BALLERINA_ORG_URL}/{module_name}/actions/workflows/trivy-scan.yml/badge.svg'
+    badge_url = f'{constants.GITHUB_BADGE_URL}/workflow/status/{constants.BALLERINA_ORG_NAME}/{module_name}/Trivy?label='
     repo_url = f'{constants.BALLERINA_ORG_URL}/{module_name}/actions/workflows/trivy-scan.yml'
     return f'[![Trivy]({badge_url})]({repo_url})'
 
@@ -65,13 +64,6 @@ def get_bugs_badge(module_name):
     return f'[![Bugs]({badge_url})]({repo_url})'
 
 
-def get_pull_requests_badge(module_name):
-    badge_url = f'{constants.GITHUB_BADGE_URL}/issues-pr/{constants.BALLERINA_ORG_NAME}/{module_name}.svg?label='
-    repo_url = f'{constants.BALLERINA_ORG_URL}/{module_name}/pulls'
-
-    return f'[![GitHub pull-requests]({badge_url})]({repo_url})'
-
-
 def get_bug_query(module_name):
     short_name = get_module_short_name(module_name)
     query = f'state=open&labels=Type/Bug,module/{short_name}'
@@ -91,7 +83,7 @@ def get_bug_query(module_name):
 
     issue_filter = f'is:open label:module/{short_name} label:Type/Bug'
     encoded_filter = urllib.parse.quote_plus(issue_filter)
-    return f'{encoded_filter}&label=&color={label_colour}&logo=github'
+    return f'{encoded_filter}&label=&color={label_colour}'
 
 
 def get_module_short_name(module_name):
