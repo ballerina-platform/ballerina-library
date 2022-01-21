@@ -39,5 +39,5 @@ ENCODING = "UTF-8"
 
 # README Contents
 DASHBOARD_TITLE = "## Status Dashboard"
-README_HEADER = "| Level | Modules | Latest Version | Build | Security Check | Code Coverage | Bugs |\n"
-README_HEADER_SEPARATOR = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n"
+README_HEADER = "| Level | Modules | Latest Version | Build | Security Check | Code Coverage | Bugs | Open Pull Requests |\n"
+README_HEADER_SEPARATOR = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n"
