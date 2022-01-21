@@ -66,7 +66,7 @@ def get_bugs_badge(module_name):
 
 
 def get_pull_requests_badge(module_name):
-    badge_url = f'{constants.GITHUB_BADGE_URL}/issues-pr/{constants.BALLERINA_ORG_NAME}/{module_name}.svg?label='
+    badge_url = f'{constants.GITHUB_BADGE_URL}/issues-pr-raw/{constants.BALLERINA_ORG_NAME}/{module_name}.svg?label='
     repo_url = f'{constants.BALLERINA_ORG_URL}/{module_name}/pulls'
 
     return f'[![GitHub Pull Requests]({badge_url})]({repo_url})'
