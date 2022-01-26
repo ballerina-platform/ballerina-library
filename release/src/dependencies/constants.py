@@ -36,8 +36,9 @@ DEPENDENTS = "dependents"
 
 # Misc
 ENCODING = "UTF-8"
+NABADGE = "https://img.shields.io/badge/-N%2FA-yellow"
 
 # README Contents
 DASHBOARD_TITLE = "## Status Dashboard"
-README_HEADER = "| Level | Modules | Latest Version | Build | Security Check | Code Coverage | Bugs | Open PRs |\n"
-README_HEADER_SEPARATOR = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n"
+README_HEADER = "| Level | Modules | Latest Version | Build | Security Check | Code Coverage | Bugs | Open PRs | Load Test Results |\n"
+README_HEADER_SEPARATOR = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n"
