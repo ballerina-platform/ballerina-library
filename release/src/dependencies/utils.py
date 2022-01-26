@@ -97,6 +97,11 @@ def get_bug_query(module_name):
 def get_load_tests_badge(module_name):
     badge_url = f'{constants.GITHUB_BADGE_URL}/workflow/status/{constants.BALLERINA_ORG_NAME}/{module_name}/Process%20load%20test%20results?label='
     repo_url = f'{constants.BALLERINA_ORG_URL}/{module_name}/actions/workflows/process-load-test-result.yml'
+    workflow_file_url = f'{constants.GITHUB_RAW_LINK}/{constants.BALLERINA_ORG_NAME}/{module_name}/master/.github/workflows/process-load-test-result.yml'
+    try:
+        urllib.request.urlopen(workflow_file_url)
+    except:
+        badge_url = constants.NABADGE
     return f'[![Load Tests]({badge_url})]({repo_url})'
 
 def get_module_short_name(module_name):

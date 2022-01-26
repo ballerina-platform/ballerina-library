@@ -36,6 +36,7 @@ DEPENDENTS = "dependents"
 
 # Misc
 ENCODING = "UTF-8"
+NABADGE = "https://img.shields.io/badge/-N%2FA-yellow"
 
 # README Contents
 DASHBOARD_TITLE = "## Status Dashboard"
