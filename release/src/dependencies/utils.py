@@ -20,8 +20,9 @@ def get_dashboard_row(module, level):
     codecov_badge = get_codecov_badge(module_name, default_branch)
     bugs_badge = get_bugs_badge(module_name)
     pull_requests_badge = get_pull_requests_badge(module_name)
+    load_tests_badge = get_load_tests_badge(module_name)
 
-    return f'|{level}|{repo_link}|{release_badge}|{build_status_badge}|{trivy_badge}|{codecov_badge}|{bugs_badge}|{pull_requests_badge}|\n'
+    return f'|{level}|{repo_link}|{release_badge}|{build_status_badge}|{trivy_badge}|{codecov_badge}|{bugs_badge}|{pull_requests_badge}|{load_tests_badge}|\n'
 
 
 def get_repo_link(module_name):
@@ -93,6 +94,10 @@ def get_bug_query(module_name):
     encoded_filter = urllib.parse.quote_plus(issue_filter)
     return f'{encoded_filter}&label=&color={label_colour}'
 
+def get_load_tests_badge(module_name):
+    badge_url = f'{constants.GITHUB_BADGE_URL}/workflow/status/{constants.BALLERINA_ORG_NAME}/{module_name}/Process%20load%20test%20results?label='
+    repo_url = f'{constants.BALLERINA_ORG_URL}/{module_name}/actions/workflows/process-load-test-result.yml'
+    return f'[![Load Tests]({badge_url})]({repo_url})'
 
 def get_module_short_name(module_name):
     short_name = module_name.split("-")[-1]
