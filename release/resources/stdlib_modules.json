@@ -15,7 +15,7 @@
         },
         {
             "name": "module-ballerina-jballerina.java.arrays",
-            "version": "1.2.0-SNAPSHOT",
+            "version": "1.2.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibJavaArraysVersion",
@@ -24,7 +24,7 @@
         },
         {
             "name": "module-ballerina-random",
-            "version": "1.2.0-SNAPSHOT",
+            "version": "1.2.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibRandomVersion",
@@ -38,7 +38,7 @@
         },
         {
             "name": "module-ballerina-regex",
-            "version": "1.2.0-SNAPSHOT",
+            "version": "1.2.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibRegexVersion",
@@ -50,7 +50,7 @@
         },
         {
             "name": "module-ballerina-time",
-            "version": "2.2.0-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibTimeVersion",
@@ -75,7 +75,7 @@
         },
         {
             "name": "module-ballerina-xmldata",
-            "version": "2.2.0-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
