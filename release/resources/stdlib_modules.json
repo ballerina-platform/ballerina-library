@@ -64,7 +64,7 @@
         },
         {
             "name": "module-ballerina-url",
-            "version": "2.2.0-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibUrlVersion",
@@ -84,7 +84,7 @@
         },
         {
             "name": "module-ballerina-crypto",
-            "version": "2.2.0-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibCryptoVersion",
@@ -121,7 +121,7 @@
         },
         {
             "name": "module-ballerina-os",
-            "version": "1.2.0-SNAPSHOT",
+            "version": "1.2.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibOsVersion",
@@ -132,7 +132,7 @@
         },
         {
             "name": "module-ballerina-protobuf",
-            "version": "1.2.0-SNAPSHOT",
+            "version": "1.2.1-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibProtobufVersion",
@@ -156,7 +156,7 @@
         },
         {
             "name": "module-ballerina-xslt",
-            "version": "2.2.0-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibXsltVersion",
@@ -190,7 +190,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "version": "2.2.0-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
@@ -211,7 +211,7 @@
         },
         {
             "name": "module-ballerinax-nats",
-            "version": "2.2.0-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibNatsVersion",
@@ -220,7 +220,7 @@
         },
         {
             "name": "module-ballerinax-stan",
-            "version": "2.2.0-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibStanVersion",
@@ -229,7 +229,7 @@
         },
         {
             "name": "module-ballerina-tcp",
-            "version": "1.2.0-SNAPSHOT",
+            "version": "1.2.1-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibTcpVersion",
@@ -238,7 +238,7 @@
         },
         {
             "name": "module-ballerina-udp",
-            "version": "1.2.0-SNAPSHOT",
+            "version": "1.2.1-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibUdpVersion",
@@ -247,7 +247,7 @@
         },
         {
             "name": "module-ballerina-uuid",
-            "version": "1.2.0-SNAPSHOT",
+            "version": "1.2.1-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibUuidVersion",
@@ -258,7 +258,7 @@
         },
         {
             "name": "module-ballerina-auth",
-            "version": "2.2.0-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibAuthVersion",
@@ -269,7 +269,7 @@
         },
         {
             "name": "module-ballerina-email",
-            "version": "2.2.0-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibEmailVersion",
@@ -278,7 +278,7 @@
         },
         {
             "name": "module-ballerina-jwt",
-            "version": "2.2.0-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibJwtVersion",
@@ -289,7 +289,7 @@
         },
         {
             "name": "module-ballerina-oauth2",
-            "version": "2.2.0-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibOAuth2Version",
@@ -316,7 +316,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "version": "1.2.0-SNAPSHOT",
+            "version": "1.2.1-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
@@ -325,7 +325,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "version": "1.2.0-SNAPSHOT",
+            "version": "1.2.1-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
@@ -334,7 +334,7 @@
         },
         {
             "name": "module-ballerinai-transaction",
-            "version": "1.0.18-SNAPSHOT",
+            "version": "1.0.19-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibTransactionVersion",
@@ -347,7 +347,7 @@
         },
         {
             "name": "module-ballerina-websocket",
-            "version": "2.2.0-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsocketVersion",
@@ -374,7 +374,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "version": "3.2.0-SNAPSHOT",
+            "version": "3.2.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
@@ -383,7 +383,7 @@
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "version": "2.2.0-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibRabbitmqVersion",
