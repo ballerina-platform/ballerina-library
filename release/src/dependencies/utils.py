@@ -31,7 +31,7 @@ def get_repo_link(module_name):
 
 
 def get_release_badge(module_name):
-    badge_url = f'{constants.GITHUB_BADGE_URL}/v/release/{constants.BALLERINA_ORG_NAME}/{module_name}?color={constants.BADGE_COLOR_GREEN}&label='
+    badge_url = f'{constants.GITHUB_BADGE_URL}/v/release/{constants.BALLERINA_ORG_NAME}/{module_name}?sort=semver&color={constants.BADGE_COLOR_GREEN}&label='
     repo_url = f'{constants.BALLERINA_ORG_URL}/{module_name}/releases'
     return f'[![GitHub Release]({badge_url})]({repo_url})'
 

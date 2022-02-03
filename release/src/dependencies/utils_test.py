@@ -24,7 +24,7 @@ class TestDashboardCreation(unittest.TestCase):
 
 
     def test_get_release_badge(self):
-        expected = "[![GitHub Release](https://img.shields.io/github/v/release/ballerina-platform/module-ballerina-io?color=30c955&label=)](https://github.com/ballerina-platform/module-ballerina-io/releases)"
+        expected = "[![GitHub Release](https://img.shields.io/github/v/release/ballerina-platform/module-ballerina-io?sort=semver&color=30c955&label=)](https://github.com/ballerina-platform/module-ballerina-io/releases)"
         actual = utils.get_release_badge(IO_MODULE)
         self.assertEqual(expected, actual)
 
