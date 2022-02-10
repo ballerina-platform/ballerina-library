@@ -20,7 +20,7 @@ def get_dashboard_row(module, level):
     codecov_badge = get_codecov_badge(module_name, default_branch)
     bugs_badge = get_bugs_badge(module_name)
     pull_requests_badge = get_pull_requests_badge(module_name)
-    load_tests_badge = get_load_tests_badge(module_name, default_branch)
+    load_tests_badge = get_load_tests_badge(module_name)
 
     return f'|{level}|{repo_link}|{release_badge}|{build_status_badge}|{trivy_badge}|{codecov_badge}|{bugs_badge}|{pull_requests_badge}|{load_tests_badge}|\n'
 
@@ -98,7 +98,6 @@ def get_load_tests_badge(module_name, default_branch):
     # websub/websubhub load tests are in websubhub module, hence `websub` load-test badge should be same as `websubhub` load-test badge
     if module_name == "module-ballerina-websub":
         module_name = "module-ballerina-websubhub"
-        default_branch = "main"
     badge_url = f'{constants.GITHUB_BADGE_URL}/workflow/status/{constants.BALLERINA_ORG_NAME}/{module_name}/Process%20load%20test%20results?label='
     repo_url = f'{constants.BALLERINA_ORG_URL}/{module_name}/actions/workflows/process-load-test-result.yml'
     workflow_file_url = f'{constants.GITHUB_RAW_LINK}/{constants.BALLERINA_ORG_NAME}/{module_name}/{default_branch}/.github/workflows/process-load-test-result.yml'
