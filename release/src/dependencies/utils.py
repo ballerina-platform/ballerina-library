@@ -94,7 +94,7 @@ def get_bug_query(module_name):
     encoded_filter = urllib.parse.quote_plus(issue_filter)
     return f'{encoded_filter}&label=&color={label_colour}'
 
-def get_load_tests_badge(module_name, default_branch):
+def get_load_tests_badge(module_name):
     # websub/websubhub load tests are in websubhub module, hence `websub` load-test badge should be same as `websubhub` load-test badge
     if module_name == "module-ballerina-websub":
         module_name = "module-ballerina-websubhub"
