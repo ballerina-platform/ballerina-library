@@ -60,10 +60,10 @@ class TestDashboardCreation(unittest.TestCase):
 
     def test_get_load_tests_badge(self):
         expected = "[![Load Tests](https://img.shields.io/github/workflow/status/ballerina-platform/module-ballerina-io/Process%20load%20test%20results?label=)](https://github.com/ballerina-platform/module-ballerina-io/actions/workflows/process-load-test-result.yml)"
-        actual = utils.get_load_tests_badge(IO_MODULE)
+        actual = utils.get_load_tests_badge(IO_MODULE, "master")
         self.assertEqual(expected, actual)
         expected = "[![Load Tests](https://img.shields.io/badge/-N%2FA-yellow)](https://github.com/ballerina-platform/module-ballerina-jballerina.java.arrays/actions/workflows/process-load-test-result.yml)"
-        actual = utils.get_load_tests_badge(JAVA_ARRAYS_MODULE)
+        actual = utils.get_load_tests_badge(JAVA_ARRAYS_MODULE, "master")
         self.assertEqual(expected, actual)
 
     def test_get_row_without_level(self):
