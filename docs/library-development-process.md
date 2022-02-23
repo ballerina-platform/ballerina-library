@@ -12,9 +12,11 @@ The below section discusses each step of this process.
 
 ## Specification
 
-Library specification is basically a structured document which clearly states what needs to be implemented. Many libraries have a design doc which basically does the same thing. We just need to re-organize it in the proper way. For an example specification refer to [this](https://github.com/ballerina-platform/module-ballerina-auth/blob/master/docs/spec/spec.md). Once written this needs to be committed into the relevant repo under `docs/spec` folder.
+Library specification is a structured document which states what needs to be implemented. For an example specification refer to [this](https://github.com/ballerina-platform/module-ballerina-auth/blob/master/docs/spec/spec.md). Once written the specification needs to be committed into the relevant repo under `docs/sepc` folder.
 
-In order to update the specification first there should be a proposal. This proposal could be either rejected or accepted after discussing with area leads. If accepted, the content of the proposal must be added to the library specification. A proposal should clearly state the motivation, description of the solution, goals and none-goals and future work, etc. For an example proposal refer to [this](https://github.com/ballerina-platform/module-ballerina-http/blob/master/docs/proposals/interceptors.md) and the template can be found [here](https://openjdk.java.net/jeps/2). Basically, we are following the JEP format. Once written this needs to be committed into the relevant repo under `docs/proposals` folder.
+In order to update the specification first there should be a proposal. A proposal could be in `active`, `rejected`, `accepted` or `implemented` state. Only area leads could reject or accept a given proposal. If accepted, the proposal must be implemented in a branch. Once implemented, the PR must be sent to the main-branch which includes the code changes, the proposal and the specification update. The main idea is since the main-branch is always production ready, the code and the specification must always be in sync with each other.
+
+Proposal should clearly state the motivation, description of the solution, goals and none-goals and future work, etc. For an example proposal refer to [this](https://github.com/ballerina-platform/module-ballerina-http/blob/master/docs/proposals/interceptors.md) and the template can be found [here](https://openjdk.java.net/jeps/2). Basically, the JEP format is followed. Once accepted, as mentioned earlier the proposal needs to be committed to the relevant repo under `docs/proposals` folder.
 
 
 ## Implementation
