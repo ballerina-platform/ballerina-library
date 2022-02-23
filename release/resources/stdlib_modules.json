@@ -2,7 +2,7 @@
     "modules": [
         {
             "name": "module-ballerina-io",
-            "version": "1.2.2-SNAPSHOT",
+            "version": "1.2.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibIoVersion",
@@ -15,7 +15,7 @@
         },
         {
             "name": "module-ballerina-jballerina.java.arrays",
-            "version": "1.2.2-SNAPSHOT",
+            "version": "1.2.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibJavaArraysVersion",
@@ -50,7 +50,7 @@
         },
         {
             "name": "module-ballerina-time",
-            "version": "2.2.2-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibTimeVersion",
@@ -64,7 +64,7 @@
         },
         {
             "name": "module-ballerina-url",
-            "version": "2.2.2-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibUrlVersion",
@@ -84,7 +84,7 @@
         },
         {
             "name": "module-ballerina-crypto",
-            "version": "2.2.2-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibCryptoVersion",
@@ -156,7 +156,7 @@
         },
         {
             "name": "module-ballerina-xslt",
-            "version": "2.2.2-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibXsltVersion",
@@ -258,7 +258,7 @@
         },
         {
             "name": "module-ballerina-auth",
-            "version": "2.2.2-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibAuthVersion",
@@ -278,7 +278,7 @@
         },
         {
             "name": "module-ballerina-jwt",
-            "version": "2.2.2-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibJwtVersion",
@@ -289,7 +289,7 @@
         },
         {
             "name": "module-ballerina-oauth2",
-            "version": "2.2.2-SNAPSHOT",
+            "version": "2.2.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibOAuth2Version",
