@@ -31,12 +31,7 @@ jobs:
                     python-version: '3.x'
 
             -   name: Install Python packages
-                run: |
-                    pip install requests
-                    pip install networkx
-                    pip install retry
-                    pip install PyGithub
-                    pip install semver
+                run: pip install -r release/src/dependencies/requirements.txt
 
             -   name: Get Dependencies and update files
                 run: |
