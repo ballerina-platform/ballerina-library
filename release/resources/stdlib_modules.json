@@ -270,7 +270,7 @@
         },
         {
             "name": "module-ballerina-email",
-            "version": "2.2.1-SNAPSHOT",
+            "version": "2.2.2-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibEmailVersion",
@@ -357,7 +357,7 @@
         },
         {
             "name": "module-ballerina-websub",
-            "version": "2.2.1-SNAPSHOT",
+            "version": "2.2.2-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibWebsubVersion",
@@ -366,7 +366,7 @@
         },
         {
             "name": "module-ballerina-websubhub",
-            "version": "1.2.1-SNAPSHOT",
+            "version": "1.2.2-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsubhubVersion",
