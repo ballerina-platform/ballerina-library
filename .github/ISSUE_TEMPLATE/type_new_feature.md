@@ -1,7 +1,7 @@
 ---
 name: "New Feature Request"
 about: "Create a new feature request"
-labels: 'Type/NewFeature'
+labels: 'type/newFeature'
 
 ---
 

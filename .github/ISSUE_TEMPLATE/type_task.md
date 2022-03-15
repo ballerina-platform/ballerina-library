@@ -1,7 +1,7 @@
 ---
 name: "Task"
 about: "Create a task which you want to keep track"
-labels: 'Type/Task'
+labels: 'type/task'
 
 ---
 
