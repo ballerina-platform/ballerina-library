@@ -366,7 +366,7 @@
         },
         {
             "name": "module-ballerina-websubhub",
-            "version": "1.2.2-SNAPSHOT",
+            "version": "1.2.3-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsubhubVersion",
