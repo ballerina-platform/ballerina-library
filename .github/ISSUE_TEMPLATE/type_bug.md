@@ -1,7 +1,7 @@
 ---
 name: "Bug Report"
 about: "Report a bug if something is not working as expected"
-labels: 'type/bug'
+labels: 'Type/Bug'
 
 ---
 

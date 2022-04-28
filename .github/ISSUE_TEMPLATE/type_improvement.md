@@ -1,7 +1,7 @@
 ---
 name: "Improvement Request"
 about: "Create an improvement request for an existing feature"
-labels: 'type/improvement'
+labels: 'Type/Improvement'
 
 ---
 
