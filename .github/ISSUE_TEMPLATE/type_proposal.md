@@ -1,7 +1,7 @@
 ---
 name: "Proposal"
 about: "Start a proposal for a new feature or an improvement"
-labels: 'type/proposal'
+labels: 'Type/Proposal'
 ---
 
 ## Summary
