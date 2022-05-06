@@ -200,7 +200,7 @@
         },
         {
             "name": "module-ballerina-mime",
-            "version": "2.2.2-SNAPSHOT",
+            "version": "2.2.3-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibMimeVersion",
@@ -270,7 +270,7 @@
         },
         {
             "name": "module-ballerina-email",
-            "version": "2.2.2-SNAPSHOT",
+            "version": "2.2.5-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibEmailVersion",
@@ -307,22 +307,12 @@
             "version_key": "stdlibHttpVersion",
             "release": true,
             "dependents": [
-                "module-ballerina-graphql",
                 "module-ballerina-grpc",
                 "module-ballerinai-transaction",
                 "module-ballerina-websocket",
                 "module-ballerina-websub",
                 "module-ballerina-websubhub"
             ]
-        },
-        {
-            "name": "module-ballerina-graphql",
-            "version": "1.2.2-SNAPSHOT",
-            "level": 6,
-            "default_branch": "master",
-            "version_key": "stdlibGraphqlVersion",
-            "release": true,
-            "dependents": []
         },
         {
             "name": "module-ballerina-grpc",
@@ -353,7 +343,9 @@
             "default_branch": "main",
             "version_key": "stdlibWebsocketVersion",
             "release": true,
-            "dependents": []
+            "dependents": [
+                "module-ballerina-graphql"
+            ]
         },
         {
             "name": "module-ballerina-websub",
@@ -370,6 +362,15 @@
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsubhubVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerina-graphql",
+            "version": "1.3.0-SNAPSHOT",
+            "level": 7,
+            "default_branch": "master",
+            "version_key": "stdlibGraphqlVersion",
             "release": true,
             "dependents": []
         },
