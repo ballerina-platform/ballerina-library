@@ -376,7 +376,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "version": "3.2.2-SNAPSHOT",
+            "version": "3.3.0-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
@@ -385,7 +385,7 @@
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "version": "2.2.2-SNAPSHOT",
+            "version": "2.3.0-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibRabbitmqVersion",
