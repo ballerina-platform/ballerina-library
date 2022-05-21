@@ -1,6 +1,8 @@
 import ballerina/io;
 import ballerina/regex;
 
+string[] gradleFilesBal = [];
+
 type list record {|
     m[] modules;
 |};
@@ -17,10 +19,11 @@ type m record {|
 
 public function main() returns error? {
     list[] moduleNameList = check getSortedModuleNameList();
-    list moduleDetailsJsonBalx = check initializeModuleDteails(moduleNameList[0]);
+    // list moduleDetailsJsonBalx = check initializeModuleDteails(moduleNameList[0]);
     list moduleDetailsJsonBal = check initializeModuleDteails(moduleNameList[1]);
     // io:println(moduleDetailsJsonBal);
     error? immediateDependencies = getImmediateDependencies(moduleDetailsJsonBal);
+    // io:println(moduleDetailsJsonBal.toJson());
 }
 
 //  Sorts the ballerina standard library module list in ascending order
@@ -61,6 +64,7 @@ function initializeModuleInfo(m module) returns m|error {
     string defaultBranch = check getDefaultBranch(moduleName);
     string gradle_properties_file = check readRemoteFile(
         moduleName, GRADLE_PROPERTIES, defaultBranch);
+    gradleFilesBal.push(gradle_properties_file);
     string nameInVesrsionKey = getModuleShortName(moduleName);
     string defaultVersionKey = "stdlib"+nameInVesrsionKey+"Version";
     if module.version_key is string {
@@ -95,32 +99,38 @@ function getVersion(string moduleName, string propertiesFile) returns string|err
 }
 
 function getImmediateDependencies(list moduleDetailsJson) returns error? {
-    foreach m module in moduleDetailsJson.modules {
+    foreach int i in 0...moduleDetailsJson.modules.length()-1 {
+        m module = moduleDetailsJson.modules[i];
         printInfo("Finding dependents of module "+ module.name);
-        string[] dependees = check getDependencies(module, moduleDetailsJson);
+        string[] dependees = check getDependencies(module, moduleDetailsJson, i);
+        
+        foreach m dependee in moduleDetailsJson.modules {
+            string dependeeName = dependee.name;
+            if dependees.indexOf(dependeeName) is int{
+                string[] d = <string[]>dependee.dependents;
+                d.push(module.name);
+                dependee.dependents = d;
+            }
+        }
     }
 }
 
-function getDependencies(m module, list moduleDetailsJson) returns string[]|error {
+function getDependencies(m module, list moduleDetailsJson, int i) returns string[]|error {
     string moduleName = module.name;
-    string defaultBranch = <string> module.default_branch;
-    string propertiesFile = check readRemoteFile(
-            moduleName, GRADLE_PROPERTIES, defaultBranch);
+    string propertiesFile = gradleFilesBal[i];
     string[] propertiesFileList = regex:split(propertiesFile, "\n");
 
     string[] dependencies = [];
-    io:println(propertiesFile);
+
     foreach string line in propertiesFileList {
         foreach m item in moduleDetailsJson.modules {
             string dependentName = item.name;
             if dependentName == moduleName {continue;}
-            if regex:matches(line, "^.*"+<string>module.version_key+".*$") {
-                io:println(<string>module.version_key+" :",line);
+            if regex:matches(line, "^.*"+<string>item.version_key+".*$") { // Find a solution to this
                 dependencies.push(dependentName);
                 break;
             }
         }
     }
-    // io:println(dependencies);
     return dependencies;
 }
