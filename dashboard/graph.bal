@@ -19,8 +19,8 @@ type m record {|
 
 public function main() returns error? {
     list[] moduleNameList = check getSortedModuleNameList();
-    // list moduleDetailsJsonBalx = check initializeModuleDteails(moduleNameList[0]);
-    list moduleDetailsJsonBal = check initializeModuleDteails(moduleNameList[1]);
+    list moduleDetailsJsonBalx = check initializeModuleDteails(moduleNameList[0], false);
+    list moduleDetailsJsonBal = check initializeModuleDteails(moduleNameList[1], true);
     // io:println(moduleDetailsJsonBal);
     error? immediateDependencies = getImmediateDependencies(moduleDetailsJsonBal);
     // io:println(moduleDetailsJsonBal.toJson());
@@ -48,23 +48,25 @@ function getSortedModuleNameList() returns list[]|error {
     return [sortedNameListX, sortedNameList];
 }
 
-function initializeModuleDteails(list moduleNameList) returns list|error  {
+function initializeModuleDteails(list moduleNameList, boolean isBal) returns list|error  {
     printInfo("Initializing the module information");
     list moduleDetailsJson = {modules: []};
 
     foreach var module in moduleNameList.modules {
-        m initialModule = check initializeModuleInfo(module);
+        m initialModule = check initializeModuleInfo(module, isBal);
         moduleDetailsJson.modules.push(initialModule);
     }
     return moduleDetailsJson;
 }
 
-function initializeModuleInfo(m module) returns m|error {
+function initializeModuleInfo(m module, boolean isBal) returns m|error {
     string moduleName = module.name;
     string defaultBranch = check getDefaultBranch(moduleName);
     string gradle_properties_file = check readRemoteFile(
         moduleName, GRADLE_PROPERTIES, defaultBranch);
-    gradleFilesBal.push(gradle_properties_file);
+    
+    if isBal{gradleFilesBal.push(gradle_properties_file);}
+    
     string nameInVesrsionKey = getModuleShortName(moduleName);
     string defaultVersionKey = "stdlib"+nameInVesrsionKey+"Version";
     if module.version_key is string {
