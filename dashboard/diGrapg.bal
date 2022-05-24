@@ -3,6 +3,7 @@ import ballerina/io;
 public type node record {|
     readonly string V;
     string[] E = [];
+    int level = 1;
 |};
 
 class DiGraph {
@@ -46,6 +47,15 @@ class DiGraph {
 
     public function getGraph() returns table<node> key(V) {
         return self.graph;
+    }
+
+    public function setCurrentLevel(string v, int level) {
+        node n = self.graph.get(v);
+        n.level = level;
+    }
+
+    public function getCurrentLevel(string v) returns int{
+        return self.graph.get(v).level;
     }
 
     public function getAllThePaths(string sourceNode, string targetNode) returns string[][]{
