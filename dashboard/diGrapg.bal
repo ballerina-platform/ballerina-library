@@ -83,6 +83,16 @@ class DiGraph {
         isVisited[sourceNode] = false;
     }
 
-    
+    public function getLongestPath(string sourceNode, string targetNode) returns string[]{
+        string[][] allThePaths = self.getAllThePaths(sourceNode, targetNode);
+
+        string[] longestPath = [];
+        foreach string[] path in allThePaths {
+            if path.length() > longestPath.length() {
+                longestPath = path;
+            }
+        }
+        return longestPath;
+    }
 
 }
