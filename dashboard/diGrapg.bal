@@ -47,4 +47,42 @@ class DiGraph {
     public function getGraph() returns table<node> key(V) {
         return self.graph;
     }
+
+    public function getAllThePaths(string sourceNode, string targetNode) returns string[][]{
+        map<boolean> isVisited = {};
+        string[][] allPathList = [];
+        string[] pathList = [];
+
+        pathList.push(sourceNode);
+        self.getAllThePathUntil(sourceNode, targetNode, isVisited, pathList, allPathList);
+        return allPathList;
+    }
+
+    public function getAllThePathUntil(string sourceNode, string targetNode, 
+                        map<boolean> isVisited, string[] localPathList, string[][] allPathList) {
+        if sourceNode == targetNode {
+            allPathList.push(localPathList.clone());
+            return;
+        }
+        
+        // Mark the current node
+        isVisited[sourceNode] = true;
+
+        foreach string item in self.successor(sourceNode) {
+            if !(isVisited[item] is true){
+                localPathList.push(item);
+                self.getAllThePathUntil(item, targetNode, isVisited, localPathList, allPathList);
+
+                // remove the current node
+                int indexOfItem = <int> localPathList.indexOf(item);
+                _ = localPathList.remove(indexOfItem);
+            }
+        }
+
+        // Mark the current node
+        isVisited[sourceNode] = false;
+    }
+
+    
+
 }
