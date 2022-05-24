@@ -23,6 +23,7 @@ public function main() returns error? {
     list moduleDetailsJsonBal = check initializeModuleDteails(moduleNameList[1], true);
     // io:println(moduleDetailsJsonBal);
     error? immediateDependencies = getImmediateDependencies(moduleDetailsJsonBal);
+    error? calculateLevelsResult = calculateLevels(moduleDetailsJsonBal);
     // io:println(moduleDetailsJsonBal.toJson());
 }
 
@@ -128,11 +129,86 @@ function getDependencies(m module, list moduleDetailsJson, int i) returns string
         foreach m item in moduleDetailsJson.modules {
             string dependentName = item.name;
             if dependentName == moduleName {continue;}
-            if regex:matches(line, "^.*"+<string>item.version_key+".*$") { // Find a solution to this
+            if regex:matches(line, "^.*"+<string>item.version_key+".*$") {
                 dependencies.push(dependentName);
                 break;
             }
         }
     }
     return dependencies;
+}
+
+function calculateLevels(list moduleDetailsJson) returns error?{
+    DiGraph dependencyGraph = check new DiGraph();
+    
+    // Module names are used to create the nodes and the level attribute of the node is initialized to 1
+    foreach m module in moduleDetailsJson.modules {
+        dependencyGraph.addNode(module.name);
+    }
+
+    // Edges are created considering the dependents of each module
+    foreach m module in moduleDetailsJson.modules {
+        foreach var dependent in <string[]>module.dependents {
+            dependencyGraph.addEdge(module.name, dependent);
+        }
+    }
+
+    string[] processedList = [];
+    foreach node n in dependencyGraph.getGraph() {
+        if dependencyGraph.inDegree(n.V) == 0 {
+            processedList.push(n.V);
+        }
+    }
+
+    // While the processing list is not empty, successors of each node in the current level are determined
+    // For each successor of the node,
+    //    - Longest path from node to successor is considered and intermediate nodes are removed from dependent list
+    //   - The level is updated and the successor is appended to a temporary array
+    // After all nodes are processed in the current level the processing list is updated with the temporary array
+    int currentLevel = 2;
+    while processedList.length() > 0 {
+        string[] processing = [];
+
+        foreach string n in processedList {
+            processCurrentLevel(dependencyGraph, processing, moduleDetailsJson, currentLevel, n);
+        }
+        processedList = processing;
+        currentLevel += 1;
+    }
+
+    foreach m module in moduleDetailsJson.modules {
+        module.level = dependencyGraph.getCurrentLevel(module.name);
+    }
+}
+
+function processCurrentLevel(DiGraph dependencyGraph, string[] processing, list moduleDetailsJson, 
+                                int currentLevel, string node) {
+    string[] successors = dependencyGraph.successor(node);
+    foreach string successor in successors {
+        removeModulesInIntermediatePaths(
+            dependencyGraph, node, successor, successors, moduleDetailsJson);
+        dependencyGraph.setCurrentLevel(successor, currentLevel);
+        if !(processing.indexOf(successor) is int){
+            processing.push(successor);
+        }
+    }
+}
+
+function removeModulesInIntermediatePaths(DiGraph dependencyGraph, string sourceNode, 
+                    string destinationNode, string[] successors, list moduleDetailsJson) {
+    string[] longestPath = dependencyGraph.getLongestPath(sourceNode, destinationNode);
+    foreach string n in longestPath.slice(1,longestPath.length()-1) {
+        if (successors.indexOf(n) is int){
+            foreach m module in moduleDetailsJson.modules {
+                if module.name == sourceNode {
+                    if ((<string[]>module.dependents).indexOf(destinationNode) is int){
+                        string[] dependents = <string[]> module.dependents;
+                        _ = dependents.remove(<int> dependents.indexOf(destinationNode));
+                        module.dependents = dependents;
+                    }
+                    break;
+                }
+            }
+        }
+    }
 }
