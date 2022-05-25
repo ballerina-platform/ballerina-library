@@ -16,6 +16,7 @@
 
 import ballerina/io;
 import ballerina/regex;
+import ballerina/lang.array;
 
 string[] gradleFilesBal = [];
 
@@ -34,56 +35,50 @@ type m record {|
 |};
 
 public function main() returns error? {
-    list[] moduleNameList = check getSortedModuleNameList();
-    list moduleDetailsJsonBalx = check initializeModuleDteails(moduleNameList[0], false);
-    list moduleDetailsJsonBal = check initializeModuleDteails(moduleNameList[1], true);
-    // io:println(moduleDetailsJsonBal);
-    error? immediateDependencies = getImmediateDependencies(moduleDetailsJsonBal);
-    error? calculateLevelsResult = calculateLevels(moduleDetailsJsonBal);
-    // _ = moduleDetailsJsonBal.modules.sort(array:ASCENDING, compare);
-    // io:println(moduleDetailsJsonBal.toJson());
+    list moduleNameList = check getSortedModuleNameList();
+    list moduleDetailsJson = check initializeModuleDteails(moduleNameList);
+    _ = check getImmediateDependencies(moduleDetailsJson);
+    _ = check calculateLevels(moduleDetailsJson);
+    m[] sortedModules = moduleDetailsJson.modules.sort(array:ASCENDING, a => a.level);
+    moduleDetailsJson = {"modules":sortedModules};
+
+    io:println(moduleDetailsJson);
 }
 
 //  Sorts the ballerina standard library module list in ascending order
-function getSortedModuleNameList() returns list[]|error {
+function getSortedModuleNameList() returns list|error {
 
     json nameList = check io:fileReadJson(MODULE_LIST_JSON);
     list nameListClone = check nameList.cloneWithType();
 
-    m[] ballerinaxSorted = from var e in nameListClone.modules 
-                                where regex:split(e.name, "-")[1] == "ballerinax" 
-                                order by regex:split(e.name, "-")[2]
-                                ascending select e;
     m[] ballerinaSorted = from var e in nameListClone.modules 
-                                where regex:split(e.name, "-")[1] == "ballerina"
                                 order by regex:split(e.name, "-")[2]
                                 ascending select e;
-    list sortedNameListX = {"modules":ballerinaxSorted};
     list sortedNameList = {"modules":ballerinaSorted};
 
-    // _ = check io:fileWriteJson("./resources/myfile.json", sorted_name_list);
+    _ = check io:fileWriteJson("./resources/module_list.json", sortedNameList.toJson());
 
-    return [sortedNameListX, sortedNameList];
+    return sortedNameList;
 }
 
-function initializeModuleDteails(list moduleNameList, boolean isBal) returns list|error  {
+function initializeModuleDteails(list moduleNameList) returns list|error  {
     printInfo("Initializing the module information");
     list moduleDetailsJson = {modules: []};
 
     foreach var module in moduleNameList.modules {
-        m initialModule = check initializeModuleInfo(module, isBal);
+        m initialModule = check initializeModuleInfo(module);
         moduleDetailsJson.modules.push(initialModule);
     }
     return moduleDetailsJson;
 }
 
-function initializeModuleInfo(m module, boolean isBal) returns m|error {
+function initializeModuleInfo(m module) returns m|error {
     string moduleName = module.name;
     string defaultBranch = check getDefaultBranch(moduleName);
-    string gradle_properties_file = check readRemoteFile(
+    string gradlePropertiesFile = check readRemoteFile(
         moduleName, GRADLE_PROPERTIES, defaultBranch);
     
-    if isBal{gradleFilesBal.push(gradle_properties_file);}
+    gradleFilesBal.push(gradlePropertiesFile);
     
     string nameInVesrsionKey = getModuleShortName(moduleName);
     string defaultVersionKey = "stdlib"+nameInVesrsionKey+"Version";
@@ -91,7 +86,7 @@ function initializeModuleInfo(m module, boolean isBal) returns m|error {
         defaultVersionKey = <string> module.version_key;
     }
 
-    string moduleVersion = check getVersion(moduleName, gradle_properties_file);
+    string moduleVersion = check getVersion(moduleName, gradlePropertiesFile);
 
     return {
         "name" : moduleName,
@@ -228,4 +223,8 @@ function removeModulesInIntermediatePaths(DiGraph dependencyGraph, string source
             }
         }
     }
+}
+
+function updateModulesJsonFile(list updatedJson) returns error|(){
+    _ = check io:fileWriteJson(STDLIB_MODULES_JSON, updatedJson.toJson());    
 }
