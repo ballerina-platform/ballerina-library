@@ -82,7 +82,7 @@ function initializeModuleInfo(m module) returns m|error {
     gradleFilesBal.push(gradlePropertiesFile);
     
     string nameInVesrsionKey = capitalize(getModuleShortName(moduleName));
-    string defaultVersionKey = "stdlib"+nameInVesrsionKey+"Version";
+    string defaultVersionKey = string `stdlib${nameInVesrsionKey}Version`;
     if module.version_key is string {
         defaultVersionKey = <string> module.version_key;
     }
@@ -276,25 +276,19 @@ function updateStdlibDashboard(list moduleDetailsJsonBalX, list moduleDetailsJso
     }
 
     levelColumn = "";
-    currentLevel = 1;
     updatedReadmeFile += "\n" + BALX_TITLE + "\n";
     updatedReadmeFile += README_HEADER;
     updatedReadmeFile += README_HEADER_SEPARATOR;
 
-    foreach m module in moduleDetailsJsonBalX.modules {
-        if <int>module.level > currentLevel {
-            currentLevel = <int>module.level;
-            levelColumn = currentLevel.toString();
-        }
-        
+    foreach m module in moduleDetailsJsonBalX.modules {      
         string row = check getDashboardRow(module, levelColumn);
         updatedReadmeFile += row;
         updatedReadmeFile += "\n";
-        levelColumn = "";
     }
 
     io:Error? fileWriteString = io:fileWriteString("./resources/README.md",updatedReadmeFile);
     if fileWriteString is io:Error {
         io:println(string `Failed to write to the ${README_FILE}`);
     }
+    printInfo("Dashboard Updated");
 }
