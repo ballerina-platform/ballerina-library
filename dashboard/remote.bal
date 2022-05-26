@@ -75,7 +75,7 @@ function readRemoteFile(string moduleName, string fileName, string branch) retur
     return response.getTextPayload();
 }
 
-function openUrl(string page, string url) returns string|error? {
+function openUrl(string page, string url) returns http:Response|error? {
     http:Client httpClient = check new(page, config = {
                             auth: {
                                 token: os:getEnv(GITHUB_TOKEN)
@@ -88,5 +88,5 @@ function openUrl(string page, string url) returns string|error? {
                             });
     
     http:Response response = check httpClient->get(url);
-    return response.getTextPayload();
+    return response;
 }

@@ -17,6 +17,7 @@
 import ballerina/io;
 import ballerina/regex;
 import ballerina/url;
+import ballerina/http;
 
 function getDashboardRow(m module, string level) returns string|error{
     string moduleName = module.name;
@@ -29,7 +30,7 @@ function getDashboardRow(m module, string level) returns string|error{
     string codecovBadge = getCodecovBadge(moduleName, defaultBranch);
     string bugsBadge = check getBugsBadge(moduleName);
     string pullRequestsBadge = getPullRequestsBadge(moduleName);
-    string loadTestsBadge = getLoadTestsBadge(moduleName);
+    string loadTestsBadge = check getLoadTestsBadge(moduleName);
     return string `|${level}|${repoLink}|${releaseBadge}|${buildStatusBadge}|${trivyBadge}|${codecovBadge}|${bugsBadge}|${pullRequestsBadge}|${loadTestsBadge}|`;
 }
 
@@ -77,9 +78,14 @@ function getBugsBadge(string moduleName) returns string|error {
 function getBugQuery(string moduleName) returns string|error {
     string shortName = getModuleShortName(moduleName);
     string labelColour = "";
-    // string query = string `state=open&labels=Type/Bug,module/${shortName}`;
-    // string url = string `/${BALLERINA_ORG_NAME}/${BALLERINA_STANDARD_LIBRARY}/issues?${query}`;
-    int|() issuesCount = check getIssuesCount(BALLERINA_STANDARD_LIBRARY, shortName);
+    int issuesCount = -1;
+    string query = string `state=open&labels=Type/Bug,module/${shortName}`;
+    string url = string `/${BALLERINA_ORG_NAME}/${BALLERINA_STANDARD_LIBRARY}/issues?${query}`;  
+    http:Response openUrlResponse= check openUrl(GITHUB_API_LINK, url).ensureType();
+    json urlResult = check openUrlResponse.getJsonPayload();
+    if urlResult is json[]{
+        issuesCount = (<json[]>urlResult).length();
+    }
     
     if issuesCount == 0 {
         labelColour = BADGE_COLOR_GREEN;
@@ -100,7 +106,7 @@ function getPullRequestsBadge(string moduleName) returns string{
     return string `[![GitHub Pull Requests](${badgeUrl})](${repoUrl})`;
 }
 
-function getLoadTestsBadge(string modName) returns string{
+function getLoadTestsBadge(string modName) returns string|error{
     // websub/websubhub load tests are in websubhub module, hence `websub` load-test badge should be same as `websubhub` load-test badge
     string moduleName = modName;
     if modName == "module-ballerina-websub"{
@@ -109,8 +115,9 @@ function getLoadTestsBadge(string modName) returns string{
     string badgeUrl = string `${GITHUB_BADGE_URL}/workflow/status/${BALLERINA_ORG_NAME}/${moduleName}/Process%20load%20test%20results?label=`;
     string repoUrl = string `${BALLERINA_ORG_URL}/${moduleName}/actions/workflows/process-load-test-result.yml`;
     string workflowFileUrl = string `/${BALLERINA_ORG_NAME}/${moduleName}/master/.github/workflows/process-load-test-result.yml`;
-    string|error? openUrlResult = openUrl(GITHUB_RAW_LINK,workflowFileUrl);
-    if openUrlResult == "404: Not Found" {
+    http:Response openUrlResult = check openUrl(GITHUB_RAW_LINK,workflowFileUrl).ensureType();
+    string urlResult = check openUrlResult.getTextPayload();
+    if urlResult == "404: Not Found" {
         badgeUrl = NABADGE;
     }
     return string `[![Load Tests](${badgeUrl})](${repoUrl})`;
