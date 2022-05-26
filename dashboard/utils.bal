@@ -16,8 +16,9 @@
 
 import ballerina/io;
 import ballerina/regex;
+import ballerina/url;
 
-function getDashboardRow(m module, int level) {
+function getDashboardRow(m module, int level) returns string|error{
     string moduleName = module.name;
     string defaultBranch = <string>module.default_branch;
 
@@ -26,8 +27,10 @@ function getDashboardRow(m module, int level) {
     string buildStatusBadge = getBuildStatusBadge(moduleName);
     string trivyBadge = getTrivyBadge(moduleName);
     string codecovBadge = getCodecovBadge(moduleName, defaultBranch);
+    string bugsBadge = check getBugsBadge(moduleName);
     string pullRequestsBadge = getPullRequestsBadge(moduleName);
     string loadTestsBadge = getLoadTestsBadge(moduleName);
+    return string `|${level}|${repoLink}|${releaseBadge}|${buildStatusBadge}|${trivyBadge}|${codecovBadge}|${bugsBadge}|${pullRequestsBadge}|${loadTestsBadge}|\n`;
 }
 
 function getRepoLink(string moduleName) returns string{
@@ -59,23 +62,36 @@ function getCodecovBadge(string moduleName, string defaultBranch) returns string
     return string `[![CodeCov](${badgeUrl})](${repoUrl})`;
 }
 
-// function getBugsBadge(string moduleName) {
-    
-// }
+function getBugsBadge(string moduleName) returns string|error {
+    string query = check getBugQuery(moduleName);
+    string shortName = getModuleShortName(moduleName);
+    string issueFilter = string `is:open label:module/${shortName} label:Type/Bug`;
+    string encodedQueryParameter = check url:encode(issueFilter, ENCODING);
 
-// function getBugQuery(string moduleName) {
-//     string shortName = getModuleShortName(moduleName);
-//     string query = string `state=open&labels=Type/Bug,module/${shortName}`;
-//     string url = string `/${BALLERINA_ORG_NAME}/${BALLERINA_STANDARD_LIBRARY}/issues?${query}`;
-//     json|error jsonData = openUrl(GITHUB_API_LINK, url);
-//     if jsonData is error {
-//         io:println("Failed to get issue details for "+ moduleName);
-//         int issueCount = 1;
-//     }
-//     else {
-        
-//     }
-// }
+    string badgeUrl = string `${GITHUB_BADGE_URL}/issues-search/${BALLERINA_ORG_NAME}/${BALLERINA_STANDARD_LIBRARY}?query=${query}`;
+    string repoUrl = string `${BALLERINA_ORG_URL}/${BALLERINA_STANDARD_LIBRARY}/issues?q=${encodedQueryParameter}`;
+
+    return string `[![Bugs](${badgeUrl})](${repoUrl})`;
+}
+
+function getBugQuery(string moduleName) returns string|error {
+    string shortName = getModuleShortName(moduleName);
+    string labelColour = "";
+    // string query = string `state=open&labels=Type/Bug,module/${shortName}`;
+    // string url = string `/${BALLERINA_ORG_NAME}/${BALLERINA_STANDARD_LIBRARY}/issues?${query}`;
+    int|() issuesCount = check getIssuesCount(BALLERINA_STANDARD_LIBRARY, shortName);
+    
+    if issuesCount == 0 {
+        labelColour = BADGE_COLOR_GREEN;
+    }
+    else {
+        labelColour = BADGE_COLOR_YELLOW;
+    }
+    string issueFilter = string `is:open label:module/${shortName} label:Type/Bug`;
+    string encodedFilter = check url:encode(issueFilter, ENCODING);
+
+    return string `${encodedFilter}&label=&color=${labelColour}`;
+}
 
 function getPullRequestsBadge(string moduleName) returns string{
     string badgeUrl = string `${GITHUB_BADGE_URL}/issues-pr-raw/${BALLERINA_ORG_NAME}/${moduleName}.svg?label=`;

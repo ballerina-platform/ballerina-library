@@ -28,6 +28,7 @@ const HTTP_REQUEST_DELAY_MULTIPLIER = 2;
 const GITHUB_TOKEN = "BALLERINA_BOT_TOKEN";
 
 // Misc
+const ENCODING = "UTF-8";
 const NABADGE = "https://img.shields.io/badge/-N%2FA-yellow";
 
 // README Contents
