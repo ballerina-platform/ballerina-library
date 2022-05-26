@@ -41,8 +41,9 @@ public function main() returns error? {
     _ = check calculateLevels(moduleDetailsJson);
     m[] sortedModules = moduleDetailsJson.modules.sort(array:ASCENDING, a => a.level);
     moduleDetailsJson = {"modules":sortedModules};
-
-    io:println(moduleDetailsJson);
+    list[] seperateModulesResult = seperateModules(moduleDetailsJson);
+    // io:println(seperateModulesResult[0]);
+    error? stdlibDashboard = updateStdlibDashboard(seperateModulesResult[0],seperateModulesResult[1]);
 }
 
 //  Sorts the ballerina standard library module list in ascending order
@@ -56,7 +57,7 @@ function getSortedModuleNameList() returns list|error {
                                 ascending select e;
     list sortedNameList = {"modules":ballerinaSorted};
 
-    _ = check io:fileWriteJson("./resources/module_list.json", sortedNameList.toJson());
+    _ = check io:fileWriteJson(MODULE_LIST_JSON, sortedNameList.toJson());
 
     return sortedNameList;
 }
@@ -80,7 +81,7 @@ function initializeModuleInfo(m module) returns m|error {
     
     gradleFilesBal.push(gradlePropertiesFile);
     
-    string nameInVesrsionKey = getModuleShortName(moduleName);
+    string nameInVesrsionKey = capitalize(getModuleShortName(moduleName));
     string defaultVersionKey = "stdlib"+nameInVesrsionKey+"Version";
     if module.version_key is string {
         defaultVersionKey = <string> module.version_key;
@@ -92,7 +93,7 @@ function initializeModuleInfo(m module) returns m|error {
         "name" : moduleName,
         "module_version": moduleVersion,
         "level": 1,
-        "default_branch": defaultVersionKey,
+        "default_branch": defaultBranch,
         "version_key": defaultVersionKey,
         "release": true,
         "dependents": []
@@ -112,7 +113,7 @@ function getVersion(string moduleName, string propertiesFile) returns string|err
     }
     return moduleVersion;
 }
-
+// use enumerate
 function getImmediateDependencies(list moduleDetailsJson) returns error? {
     foreach int i in 0...moduleDetailsJson.modules.length()-1 {
         m module = moduleDetailsJson.modules[i];
@@ -227,4 +228,73 @@ function removeModulesInIntermediatePaths(DiGraph dependencyGraph, string source
 
 function updateModulesJsonFile(list updatedJson) returns error|(){
     _ = check io:fileWriteJson(STDLIB_MODULES_JSON, updatedJson.toJson());    
+}
+
+function seperateModules(list moduleDetailsJson) returns list[]{
+    m[] ballerinaxSorted = from var e in moduleDetailsJson.modules 
+                                where regex:split(e.name, "-")[1] == "ballerinax" 
+                                order by e.level
+                                ascending select e;
+    m[] ballerinaSorted = from var e in moduleDetailsJson.modules 
+                                where regex:split(e.name, "-")[1] == "ballerina"
+                                order by e.level
+                                ascending select e;
+    list sortedNameListX = {"modules":ballerinaxSorted};
+    list sortedNameList = {"modules":ballerinaSorted};
+    
+    return [sortedNameListX, sortedNameList];
+}
+
+// Updates the stdlib dashboard in README.md
+function updateStdlibDashboard(list moduleDetailsJsonBalX, list moduleDetailsJsonBal) returns error? {
+    string[] readmeFile = regex:split(check io:fileReadString(README_FILE),"\n");
+    string updatedReadmeFile = "";
+    foreach string line in readmeFile {
+        updatedReadmeFile += line + "\n";
+        if regex:matches(line, "^.*"+DASHBOARD_TITLE+".*$") {
+            updatedReadmeFile += "\n" + BAL_TITLE + "\n";
+            updatedReadmeFile += README_HEADER;
+            updatedReadmeFile += README_HEADER_SEPARATOR;
+            break;
+        }
+    }
+    // Modules in levels 0 and 1 are categorized under level 1
+    // A single row in the table is created for each module in the module list
+    string levelColumn = "1";
+    int currentLevel = 1;
+
+    foreach m module in moduleDetailsJsonBal.modules {
+        if <int>module.level > currentLevel {
+            currentLevel = <int>module.level;
+            levelColumn = currentLevel.toString();
+        }
+        
+        string row = check getDashboardRow(module, levelColumn);
+        updatedReadmeFile += row;
+        updatedReadmeFile += "\n";
+        levelColumn = "";
+    }
+
+    levelColumn = "";
+    currentLevel = 1;
+    updatedReadmeFile += "\n" + BALX_TITLE + "\n";
+    updatedReadmeFile += README_HEADER;
+    updatedReadmeFile += README_HEADER_SEPARATOR;
+
+    foreach m module in moduleDetailsJsonBalX.modules {
+        if <int>module.level > currentLevel {
+            currentLevel = <int>module.level;
+            levelColumn = currentLevel.toString();
+        }
+        
+        string row = check getDashboardRow(module, levelColumn);
+        updatedReadmeFile += row;
+        updatedReadmeFile += "\n";
+        levelColumn = "";
+    }
+
+    io:Error? fileWriteString = io:fileWriteString("./resources/README.md",updatedReadmeFile);
+    if fileWriteString is io:Error {
+        io:println(string `Failed to write to the ${README_FILE}`);
+    }
 }
