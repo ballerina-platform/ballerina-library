@@ -19,6 +19,7 @@ import ballerinax/github;
 import ballerina/http;
 
 public string defaultBranch = "";
+int issueCount = 0;
 
 http:Client git = check new(GITHUB_RAW_LINK, config = {
                             auth: {
@@ -56,9 +57,36 @@ function filterBranch(github:Branch branch){
     else if branch.name == "master" {defaultBranch = "master";}
 }
 
+function getIssuesCount(string repoName, string shortName) returns int|error? {
+    stream<github:Issue, github:Error?> issues = check githubClient->getIssues(BALLERINA_ORG_NAME, repoName, issueFilters = {labels: ["Type/Bug", string `module/${shortName}`], states: [github:ISSUE_OPEN]});
+    issueCount = 0;
+    _ = check issues.forEach(count);
+    return issueCount;
+}
+
+function count(github:Issue issue) {
+    issueCount += 1;
+}
+
 function readRemoteFile(string moduleName, string fileName, string branch) returns string|error {
 
     string url = "/"+BALLERINA_ORG_NAME+"/"+moduleName+"/"+branch+"/"+fileName;
     http:Response response = check git->get(url);
+    return response.getTextPayload();
+}
+
+function openUrl(string page, string url) returns string|error? {
+    http:Client httpClient = check new(page, config = {
+                            auth: {
+                                token: os:getEnv(GITHUB_TOKEN)
+                            },
+                            retryConfig: {
+                                count: HTTP_REQUEST_RETRIES,
+                                interval: <decimal> HTTP_REQUEST_DELAY_IN_SECONDS,
+                                backOffFactor: <float> HTTP_REQUEST_DELAY_MULTIPLIER
+                                }
+                            });
+    
+    http:Response response = check httpClient->get(url);
     return response.getTextPayload();
 }
