@@ -18,7 +18,7 @@ import ballerina/io;
 import ballerina/regex;
 import ballerina/url;
 
-function getDashboardRow(m module, int level) returns string|error{
+function getDashboardRow(m module, string level) returns string|error{
     string moduleName = module.name;
     string defaultBranch = <string>module.default_branch;
 
@@ -30,7 +30,7 @@ function getDashboardRow(m module, int level) returns string|error{
     string bugsBadge = check getBugsBadge(moduleName);
     string pullRequestsBadge = getPullRequestsBadge(moduleName);
     string loadTestsBadge = getLoadTestsBadge(moduleName);
-    return string `|${level}|${repoLink}|${releaseBadge}|${buildStatusBadge}|${trivyBadge}|${codecovBadge}|${bugsBadge}|${pullRequestsBadge}|${loadTestsBadge}|\n`;
+    return string `|${level}|${repoLink}|${releaseBadge}|${buildStatusBadge}|${trivyBadge}|${codecovBadge}|${bugsBadge}|${pullRequestsBadge}|${loadTestsBadge}|`;
 }
 
 function getRepoLink(string moduleName) returns string{
