@@ -17,6 +17,7 @@
 import ballerina/io;
 import ballerina/regex;
 import ballerina/lang.array;
+import ballerina/log;
 
 type List record {|
     Module[] modules;
@@ -62,7 +63,7 @@ function getSortedModuleNameList() returns List|error {
 }
 
 function initializeModuleDteails(List moduleNameList) returns List|error {
-    printInfo("Initializing the module information");
+    log:printInfo("Initializing the module information");
     List moduleDetails = {modules: []};
 
     foreach var module in moduleNameList.modules {
@@ -106,7 +107,7 @@ function getVersion(string moduleName, string gradleProperties) returns string|e
         }
     }
     if moduleVersion == "" {
-        printWarn("Version not found for the module: " + moduleName);
+        log:printWarn(string `Version not found for the module: ${moduleName}`);
     }
     return moduleVersion;
 }
@@ -114,7 +115,7 @@ function getVersion(string moduleName, string gradleProperties) returns string|e
 // Get the modules list which use the specific module
 function getImmediateDependencies(List moduleDetails) returns error? {
     foreach Module module in moduleDetails.modules {
-        printInfo("Finding dependents of module " + module.name);
+        log:printInfo(string `Finding dependents of module ${module.name}`);
         string[] dependees = check getDependencies(module, moduleDetails);
 
         // Get the dependecies modules which use module in there package 
@@ -238,7 +239,7 @@ function removeModulesInIntermediatePaths(DiGraph dependencyGraph, string source
 function updateModulesJsonFile(List updatedJson) {
     io:Error? fileWriteJson = io:fileWriteJson(STDLIB_MODULES_JSON, updatedJson.toJson());
     if fileWriteJson is io:Error {
-        io:println(`Failed to write to the ${STDLIB_MODULES_JSON}`);
+        log:printError(string `Failed to write to the ${STDLIB_MODULES_JSON}`);
     }
 }
 
@@ -300,7 +301,7 @@ function updateStdlibDashboard(List moduleDetailsBalX, List moduleDetailsBal) re
 
     io:Error? fileWriteString = io:fileWriteString(README_FILE, updatedReadmeFile);
     if fileWriteString is io:Error {
-        io:println(string `Failed to write to the ${README_FILE}`);
+        log:printError(string `Failed to write to the ${README_FILE}`);
     }
-    printInfo("Dashboard Updated");
+    log:printInfo("Dashboard Updated");
 }

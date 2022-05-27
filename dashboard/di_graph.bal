@@ -62,10 +62,6 @@ class DiGraph {
         return self.graph.get(v).E;
     }
 
-    public function printGraph() {
-        io:println(self.graph);
-    }
-
     public function getGraph() returns table<Node> key(V) {
         return self.graph;
     }
@@ -125,5 +121,4 @@ class DiGraph {
         }
         return longestPath;
     }
-
 }
