@@ -14,7 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/io;
 import ballerina/regex;
 import ballerina/url;
 import ballerina/http;
@@ -138,13 +137,4 @@ function getModuleShortName(string moduleName) returns string {
 // string formating
 function capitalize(string str) returns string {
     return str[0].toUpperAscii() + str.substring(1, str.length());
-}
-
-// change this to log
-function printInfo(string message) {
-    io:println("[Info] " + message);
-}
-
-function printWarn(string message) {
-    io:println("[Warning] " + message);
 }
