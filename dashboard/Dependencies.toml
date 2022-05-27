@@ -189,6 +189,9 @@ dependencies = [
 	{org = "ballerina", name = "lang.value"},
 	{org = "ballerina", name = "observe"}
 ]
+modules = [
+	{org = "ballerina", packageName = "log", moduleName = "log"}
+]
 
 [[package]]
 org = "ballerina"
@@ -278,23 +281,8 @@ version = "2.2.1"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
 ]
-
-[[package]]
-org = "ballerina"
-name = "websub"
-version = "2.2.1"
-dependencies = [
-	{org = "ballerina", name = "crypto"},
-	{org = "ballerina", name = "http"},
-	{org = "ballerina", name = "jballerina.java"},
-	{org = "ballerina", name = "lang.runtime"},
-	{org = "ballerina", name = "lang.string"},
-	{org = "ballerina", name = "lang.value"},
-	{org = "ballerina", name = "log"},
-	{org = "ballerina", name = "mime"},
-	{org = "ballerina", name = "regex"},
-	{org = "ballerina", name = "time"},
-	{org = "ballerina", name = "url"}
+modules = [
+	{org = "ballerina", packageName = "url", moduleName = "url"}
 ]
 
 [[package]]
@@ -312,20 +300,16 @@ modules = [
 [[package]]
 org = "ballerinax"
 name = "github"
-version = "3.2.1"
+version = "4.0.0"
 dependencies = [
 	{org = "ballerina", name = "http"},
-	{org = "ballerina", name = "jballerina.java"},
-	{org = "ballerina", name = "lang.runtime"},
 	{org = "ballerina", name = "log"},
 	{org = "ballerina", name = "os"},
 	{org = "ballerina", name = "regex"},
-	{org = "ballerina", name = "websub"},
 	{org = "ballerinai", name = "observe"}
 ]
 modules = [
-	{org = "ballerinax", packageName = "github", moduleName = "github"},
-	{org = "ballerinax", packageName = "github", moduleName = "github.webhook"}
+	{org = "ballerinax", packageName = "github", moduleName = "github"}
 ]
 
 [[package]]
@@ -336,9 +320,11 @@ dependencies = [
 	{org = "ballerina", name = "http"},
 	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "lang.array"},
+	{org = "ballerina", name = "log"},
 	{org = "ballerina", name = "os"},
 	{org = "ballerina", name = "regex"},
 	{org = "ballerina", name = "test"},
+	{org = "ballerina", name = "url"},
 	{org = "ballerinai", name = "observe"},
 	{org = "ballerinax", name = "github"}
 ]
