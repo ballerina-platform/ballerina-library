@@ -35,8 +35,8 @@ class DiGraph {
     }
 
     public function addEdge(string v1, string v2) {
-        if !self.graph.hasKey(v1){io:println("vertex "+v1+" doesn't exists");}
-        else if !self.graph.hasKey(v2){io:println("vertex "+v2+" doesn't exists");}
+        if !self.graph.hasKey(v1){io:println(string `vertex ${v1} doesn't exists`);}
+        else if !self.graph.hasKey(v2){io:println(string `vertex ${v2} doesn't exists`);}
         else {
             node n = self.graph.get(v1);
             n.E.push(v2);
