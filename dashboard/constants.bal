@@ -15,7 +15,7 @@ const BADGE_COLOR_YELLOW = "yellow";
 
 // File Paths
 const MODULE_LIST_JSON = "./resources/module_list.json";
-const STDLIB_MODULES_JSON = "./release/resources/stdlib_modules.json";
+const STDLIB_MODULES_JSON = "./resources/stdlib_modules.json";
 const README_FILE = "../README.md";
 const GRADLE_PROPERTIES = "gradle.properties";
 
@@ -36,4 +36,4 @@ const DASHBOARD_TITLE = "## Status Dashboard";
 const README_HEADER = "| Level | Modules | Latest Version | Build | Security Check | Code Coverage | Bugs | Open PRs | Load Test Results |\n";
 const README_HEADER_SEPARATOR = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n";
 const BAL_TITLE = "## Ballerina Modules";
-const BALX_TITLE = "## Ballerinax Modules";
+const BALX_TITLE = "## Ballerina extended Modules";

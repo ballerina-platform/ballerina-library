@@ -41,8 +41,8 @@ public function main() returns error? {
     _ = check calculateLevels(moduleDetailsJson);
     m[] sortedModules = moduleDetailsJson.modules.sort(array:ASCENDING, a => a.level);
     moduleDetailsJson = {"modules":sortedModules};
+    updateModulesJsonFile(moduleDetailsJson);
     list[] seperateModulesResult = seperateModules(moduleDetailsJson);
-    // io:println(seperateModulesResult[0]);
     error? stdlibDashboard = updateStdlibDashboard(seperateModulesResult[0],seperateModulesResult[1]);
 }
 
@@ -62,7 +62,7 @@ function getSortedModuleNameList() returns list|error {
     return sortedNameList;
 }
 
-function initializeModuleDteails(list moduleNameList) returns list|error  {
+function initializeModuleDteails(list moduleNameList) returns list|error {
     printInfo("Initializing the module information");
     list moduleDetailsJson = {modules: []};
 
@@ -113,13 +113,15 @@ function getVersion(string moduleName, string propertiesFile) returns string|err
     }
     return moduleVersion;
 }
-// use enumerate
+
+// Get the modules list which use the specific module
 function getImmediateDependencies(list moduleDetailsJson) returns error? {
     foreach int i in 0...moduleDetailsJson.modules.length()-1 {
         m module = moduleDetailsJson.modules[i];
         printInfo("Finding dependents of module "+ module.name);
         string[] dependees = check getDependencies(module, moduleDetailsJson, i);
         
+        // Get the dependecies modules which use module in there package 
         foreach m dependee in moduleDetailsJson.modules {
             string dependeeName = dependee.name;
             if dependees.indexOf(dependeeName) is int{
@@ -131,6 +133,7 @@ function getImmediateDependencies(list moduleDetailsJson) returns error? {
     }
 }
 
+// Get dependecies of specific module
 function getDependencies(m module, list moduleDetailsJson, int i) returns string[]|error {
     string moduleName = module.name;
     string propertiesFile = gradleFilesBal[i];
@@ -226,8 +229,11 @@ function removeModulesInIntermediatePaths(DiGraph dependencyGraph, string source
     }
 }
 
-function updateModulesJsonFile(list updatedJson) returns error|(){
-    _ = check io:fileWriteJson(STDLIB_MODULES_JSON, updatedJson.toJson());    
+function updateModulesJsonFile(list updatedJson) {
+    io:Error? fileWriteJson = io:fileWriteJson(STDLIB_MODULES_JSON, updatedJson.toJson());
+    if fileWriteJson is io:Error {
+        io:println(string `Failed to write to the ${STDLIB_MODULES_JSON}`);
+    }
 }
 
 function seperateModules(list moduleDetailsJson) returns list[]{
@@ -286,7 +292,7 @@ function updateStdlibDashboard(list moduleDetailsJsonBalX, list moduleDetailsJso
         updatedReadmeFile += "\n";
     }
 
-    io:Error? fileWriteString = io:fileWriteString("./resources/README.md",updatedReadmeFile);
+    io:Error? fileWriteString = io:fileWriteString(README_FILE,updatedReadmeFile);
     if fileWriteString is io:Error {
         io:println(string `Failed to write to the ${README_FILE}`);
     }
