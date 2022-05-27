@@ -18,47 +18,58 @@ import ballerina/os;
 import ballerinax/github;
 import ballerina/http;
 
-public string defaultBranch = "";
 int issueCount = 0;
 
-http:Client git = check new(GITHUB_RAW_LINK, config = {
-                            auth: {
-                                token: os:getEnv(GITHUB_TOKEN)
-                            },
-                            retryConfig: {
-                                count: HTTP_REQUEST_RETRIES,
-                                interval: <decimal> HTTP_REQUEST_DELAY_IN_SECONDS,
-                                backOffFactor: <float> HTTP_REQUEST_DELAY_MULTIPLIER
-                                }
-                            });
-
-github:ConnectionConfig config = {
+http:Client git = check new (GITHUB_RAW_LINK, config = {
     auth: {
-            token: os:getEnv(GITHUB_TOKEN)
+        token: os:getEnv(GITHUB_TOKEN)
     },
     retryConfig: {
         count: HTTP_REQUEST_RETRIES,
-        interval: <decimal> HTTP_REQUEST_DELAY_IN_SECONDS,
-        backOffFactor: <float> HTTP_REQUEST_DELAY_MULTIPLIER
-        }
-    };
+        interval: <decimal>HTTP_REQUEST_DELAY_IN_SECONDS,
+        backOffFactor: <float>HTTP_REQUEST_DELAY_MULTIPLIER
+    }
+});
 
-github:Client githubClient = check new(config);
+github:ConnectionConfig config = {
+    auth: {
+        token: os:getEnv(GITHUB_TOKEN)
+    },
+    retryConfig: {
+        count: HTTP_REQUEST_RETRIES,
+        interval: <decimal>HTTP_REQUEST_DELAY_IN_SECONDS,
+        backOffFactor: <float>HTTP_REQUEST_DELAY_MULTIPLIER
+    }
+};
 
-function getDefaultBranch(string moduleName) returns string|error{
-    stream<github:Branch, github:Error?> branches = check githubClient->getBranches(BALLERINA_ORG_NAME, 
+github:Client githubClient = check new (config);
+
+function getDefaultBranch(string moduleName) returns string|error {
+    string defaultBranchName = "";
+    stream<github:Branch, github:Error?> branches = check githubClient->getBranches(BALLERINA_ORG_NAME,
                                                             moduleName);
-    _ = check branches.forEach(filterBranch);
-    return defaultBranch;
+    stream<github:Branch, github:Error?> filter = branches.filter(filterBranch);
+
+    var defaultBranch = filter.next();
+    if defaultBranch is record {|github:Branch value;|} {
+        defaultBranchName = defaultBranch.value.name;
+    }
+    return defaultBranchName;
 }
 
-function filterBranch(github:Branch branch){
-    if branch.name == "main"{defaultBranch = "main";}
-    else if branch.name == "master" {defaultBranch = "master";}
+function filterBranch(github:Branch branch) returns boolean {
+    if branch.name == "master" || branch.name == "main" {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 function getIssuesCount(string repoName, string shortName) returns int|error? {
-    stream<github:Issue, github:Error?> issues = check githubClient->getIssues(BALLERINA_ORG_NAME, repoName, issueFilters = {labels: ["Type/Bug", string `module/${shortName}`], states: [github:ISSUE_OPEN]});
+    stream<github:Issue, github:Error?> issues =
+        check githubClient->getIssues(BALLERINA_ORG_NAME, repoName,
+        issueFilters = {labels: ["Type/Bug", string `module/${shortName}`], states: [github:ISSUE_OPEN]});
     issueCount = 0;
     _ = check issues.forEach(count);
     return issueCount;
@@ -68,25 +79,18 @@ function count(github:Issue issue) {
     issueCount += 1;
 }
 
-function readRemoteFile(string moduleName, string fileName, string branch) returns string|error {
-
-    string url = "/"+BALLERINA_ORG_NAME+"/"+moduleName+"/"+branch+"/"+fileName;
-    http:Response response = check git->get(url);
-    return response.getTextPayload();
-}
-
 function openUrl(string page, string url) returns http:Response|error? {
-    http:Client httpClient = check new(page, config = {
-                            auth: {
-                                token: os:getEnv(GITHUB_TOKEN)
-                            },
-                            retryConfig: {
-                                count: HTTP_REQUEST_RETRIES,
-                                interval: <decimal> HTTP_REQUEST_DELAY_IN_SECONDS,
-                                backOffFactor: <float> HTTP_REQUEST_DELAY_MULTIPLIER
-                                }
-                            });
-    
+    http:Client httpClient = check new (page, config = {
+        auth: {
+            token: os:getEnv(GITHUB_TOKEN)
+        },
+        retryConfig: {
+            count: HTTP_REQUEST_RETRIES,
+            interval: <decimal>HTTP_REQUEST_DELAY_IN_SECONDS,
+            backOffFactor: <float>HTTP_REQUEST_DELAY_MULTIPLIER
+        }
+    });
+
     http:Response response = check httpClient->get(url);
     return response;
 }
