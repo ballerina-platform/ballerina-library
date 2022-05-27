@@ -153,7 +153,7 @@ function getDependencies(Module module, List moduleDetails) returns string[]|err
             }
         }
     }
-    module.gradle_properties = "";
+    _ = module.remove("gradle_properties");
     return dependencies;
 }
 
