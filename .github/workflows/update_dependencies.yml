@@ -15,27 +15,22 @@ jobs:
         name: Update the Standard Library Dependency Graph
         runs-on: ubuntu-latest
         steps:
-            -   name: Install Ballerina
-                run: |
-                    wget https://dist.ballerina.io/downloads/2201.0.3/ballerina-2201.0.3-swan-lake-linux-x64.deb
-                    sudo dpkg -i ./ballerina-2201.0.3-swan-lake-linux-x64.deb
 
             -   name: Checkout Repo
                 uses: actions/checkout@v2
-                with:
-                    token: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
             -   name: Configure Git User
                 run: |
                     git config --global user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
                     git config --global user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
 
-            -   name: Get Dependencies and update files
-                run: |
-                    cd dashboard
-                    bal run
-                    cd ..
+            -   name: Update the Dependencies and Generate the Dashboard
+                uses: ballerina-platform/ballerina-action@master
+                with:
+                    args:
+                        run
                 env:
+                    WORKING_DIR: ./dashboard
                     BALLERINA_BOT_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
             -   name: Commit files
