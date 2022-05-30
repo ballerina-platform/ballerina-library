@@ -14,8 +14,8 @@ const BADGE_COLOR_GREEN = "30c955";
 const BADGE_COLOR_YELLOW = "yellow";
 
 // File Paths
-const MODULE_LIST_JSON = "./resources/module_list.json";
-const STDLIB_MODULES_JSON = "./resources/stdlib_modules.json";
+const MODULE_LIST_JSON = "../release/resources/module_list.json";
+const STDLIB_MODULES_JSON = "../release/resources/stdlib_modules.json";
 const README_FILE = "../README.md";
 const GRADLE_PROPERTIES = "gradle.properties";
 
