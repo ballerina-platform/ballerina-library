@@ -14,65 +14,72 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/io;
+import ballerina/log;
 
 public type Node record {|
-    readonly string V;
-    string[] E = [];
+    readonly string vertex;
+    string[] edges = [];
     int level = 1;
 |};
 
 class DiGraph {
 
-    private table<Node> key(V) graph = table [];
-
-    public function init() {
-    }
+    private table<Node> key(vertex) graph = table [];
 
     public function addNode(string node) {
         if !self.graph.hasKey(node) {
-            self.graph.add({V: node});
+            self.graph.add({vertex: node});
         }
     }
 
-    public function addEdge(string v1, string v2) {
-        if !self.graph.hasKey(v1) {
-            io:println(`vertex ${v1} doesn't exists`);
+    public function addEdge(string vertex1, string vertex2) {
+        if !self.graph.hasKey(vertex1) {
+            log:printError(string `vertex ${vertex1} doesn't exists`);
         }
-        else if !self.graph.hasKey(v2) {
-            io:println(`vertex ${v2} doesn't exists`);
+        else if !self.graph.hasKey(vertex2) {
+            log:printError(string `vertex ${vertex2} doesn't exists`);
         }
         else {
-            Node n = self.graph.get(v1);
-            n.E.push(v2);
+            Node n = self.graph.get(vertex1);
+            n.edges.push(vertex2);
         }
     }
 
-    public function inDegree(string v) returns int {
+    public function inDegree(string vertex) returns int {
         int count = 0;
-        foreach Node n in self.graph {
-            if n.E.indexOf(v) is int {
+        foreach Node node in self.graph {
+            if node.edges.indexOf(vertex) is int {
                 count += 1;
             }
         }
         return count;
     }
 
-    public function successor(string v) returns string[] {
-        return self.graph.get(v).E;
+    public function successor(string vertex) returns string[] {
+        if !self.graph.hasKey(vertex) {
+            log:printError(string `vertex ${vertex} doesn't exists`);
+        }
+        return self.graph.get(vertex).edges;
     }
 
-    public function getGraph() returns table<Node> key(V) {
+    public function getGraph() returns table<Node> key(vertex) {
         return self.graph;
     }
 
-    public function setCurrentLevel(string v, int level) {
-        Node n = self.graph.get(v);
-        n.level = level;
+    public function setCurrentLevel(string vertex, int level) {
+        if !self.graph.hasKey(vertex) {
+            log:printError(string `vertex ${vertex} doesn't exists`);
+            return;
+        }
+        Node node = self.graph.get(vertex);
+        node.level = level;
     }
 
-    public function getCurrentLevel(string v) returns int {
-        return self.graph.get(v).level;
+    public function getCurrentLevel(string vertex) returns int {
+        if !self.graph.hasKey(vertex) {
+            log:printError(string `vertex ${vertex} doesn't exists`);
+        }
+        return self.graph.get(vertex).level;
     }
 
     public function getAllThePaths(string sourceNode, string targetNode) returns string[][] {

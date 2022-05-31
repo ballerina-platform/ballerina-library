@@ -49,10 +49,10 @@ public function main() returns error? {
 //  Sorts the ballerina standard library module list in ascending order
 function getSortedModuleNameList() returns List|error {
 
-    json nameList = check io:fileReadJson(MODULE_LIST_JSON);
-    List nameListClone = check nameList.cloneWithType();
+    json nameListJson = check io:fileReadJson(MODULE_LIST_JSON);
+    List nameList = check nameListJson.cloneWithType();
 
-    Module[] sortedModules = from var e in nameListClone.modules
+    Module[] sortedModules = from var e in nameList.modules
         order by regex:split(e.name, "-")[2] ascending
         select e;
     List sortedNameList = {modules: sortedModules};
@@ -99,9 +99,9 @@ function initializeModuleInfo(Module module) returns Module|error {
 }
 
 function getVersion(string moduleName, string gradleProperties) returns string|error {
-    string[] graglePropertiesArr = regex:split(gradleProperties, "\n");
+    string[] gradlePropertiesLines = regex:split(gradleProperties, "\n");
     string moduleVersion = "";
-    foreach var item in graglePropertiesArr {
+    foreach var item in gradlePropertiesLines {
         if regex:matches(item, "^version.*$") {
             moduleVersion = regex:split(item, "=")[1];
         }
@@ -122,7 +122,7 @@ function getImmediateDependencies(List moduleDetails) returns error? {
         foreach Module dependee in moduleDetails.modules {
             string dependeeName = dependee.name;
             string[]? dependeeDependents = dependee.dependents;
-            if dependees.indexOf(dependeeName) is int && dependeeDependents is string[]{
+            if dependees.indexOf(dependeeName) is int && dependeeDependents is string[] {
                 dependeeDependents.push(module.name);
                 dependee.dependents = dependeeDependents;
             }
@@ -135,7 +135,7 @@ function getDependencies(Module module, List moduleDetails) returns string[]|err
     string[] propertiesFileArr = [];
     string moduleName = module.name;
     string? propertiesFile = module.gradle_properties;
-    if propertiesFile is string{
+    if propertiesFile is string {
         propertiesFileArr = regex:split(propertiesFile, "\n");
     }
     string[] dependencies = [];
@@ -170,15 +170,15 @@ function calculateLevels(List moduleDetails) returns error? {
         string[]? moduleDependents = module.dependents;
         if moduleDependents is string[] {
             foreach var dependent in moduleDependents {
-            dependencyGraph.addEdge(module.name, dependent);
-        }
+                dependencyGraph.addEdge(module.name, dependent);
+            }
         }
     }
 
     string[] processedList = [];
     foreach Node n in dependencyGraph.getGraph() {
-        if dependencyGraph.inDegree(n.V) == 0 {
-            processedList.push(n.V);
+        if dependencyGraph.inDegree(n.vertex) == 0 {
+            processedList.push(n.vertex);
         }
     }
 
@@ -217,13 +217,13 @@ function processCurrentLevel(DiGraph dependencyGraph, string[] processing, List 
 }
 
 function removeModulesInIntermediatePaths(DiGraph dependencyGraph, string sourceNode,
-                    string destinationNode, string[] successors, List moduleDetails) {
+                                            string destinationNode, string[] successors, List moduleDetails) {
     string[] longestPath = dependencyGraph.getLongestPath(sourceNode, destinationNode);
     foreach string n in longestPath.slice(1, longestPath.length() - 1) {
         if (successors.indexOf(n) is int) {
             foreach Module module in moduleDetails.modules {
                 string[]? moduleDependents = module.dependents;
-                if module.name == sourceNode && moduleDependents is string[]{
+                if module.name == sourceNode && moduleDependents is string[] {
                     int? indexOfDestinationNode = moduleDependents.indexOf(destinationNode);
                     if indexOfDestinationNode is int {
                         _ = moduleDependents.remove(indexOfDestinationNode);

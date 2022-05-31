@@ -22,7 +22,7 @@ int issueCount = 0;
 
 http:Client git = check new (GITHUB_RAW_LINK, config = {
     auth: {
-        token: os:getEnv(GITHUB_TOKEN)
+        token: os:getEnv(BALLERINA_BOT_TOKEN)
     },
     retryConfig: {
         count: HTTP_REQUEST_RETRIES,
@@ -33,7 +33,7 @@ http:Client git = check new (GITHUB_RAW_LINK, config = {
 
 github:ConnectionConfig config = {
     auth: {
-        token: os:getEnv(GITHUB_TOKEN)
+        token: os:getEnv(BALLERINA_BOT_TOKEN)
     },
     retryConfig: {
         count: HTTP_REQUEST_RETRIES,
@@ -82,7 +82,7 @@ function count(github:Issue issue) {
 function openUrl(string page, string url) returns http:Response|error? {
     http:Client httpClient = check new (page, config = {
         auth: {
-            token: os:getEnv(GITHUB_TOKEN)
+            token: os:getEnv(BALLERINA_BOT_TOKEN)
         },
         retryConfig: {
             count: HTTP_REQUEST_RETRIES,
