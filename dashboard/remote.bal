@@ -48,22 +48,14 @@ function getDefaultBranch(string moduleName) returns string|error {
     string defaultBranchName = "";
     stream<github:Branch, github:Error?> branches = check githubClient->getBranches(BALLERINA_ORG_NAME,
                                                             moduleName);
-    stream<github:Branch, github:Error?> filter = branches.filter(filterBranch);
+    stream<github:Branch, github:Error?> filter = 
+        branches.filter(branch => branch.name == "master" || branch.name == "main");
 
     var defaultBranch = filter.next();
     if defaultBranch is record {|github:Branch value;|} {
         defaultBranchName = defaultBranch.value.name;
     }
     return defaultBranchName;
-}
-
-function filterBranch(github:Branch branch) returns boolean {
-    if branch.name == "master" || branch.name == "main" {
-        return true;
-    }
-    else {
-        return false;
-    }
 }
 
 function getIssuesCount(string repoName, string shortName) returns int|error? {
