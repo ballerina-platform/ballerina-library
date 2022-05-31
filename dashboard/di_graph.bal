@@ -55,9 +55,10 @@ class DiGraph {
         return count;
     }
 
-    public function successor(string vertex) returns string[] {
+    public function successor(string vertex) returns string[]? {
         if !self.graph.hasKey(vertex) {
             log:printError(string `vertex ${vertex} doesn't exists`);
+            return;
         }
         return self.graph.get(vertex).edges;
     }
@@ -75,9 +76,10 @@ class DiGraph {
         node.level = level;
     }
 
-    public function getCurrentLevel(string vertex) returns int {
+    public function getCurrentLevel(string vertex) returns int? {
         if !self.graph.hasKey(vertex) {
             log:printError(string `vertex ${vertex} doesn't exists`);
+            return;
         }
         return self.graph.get(vertex).level;
     }
@@ -102,7 +104,13 @@ class DiGraph {
         // Mark the current node
         isVisited[sourceNode] = true;
 
-        foreach string item in self.successor(sourceNode) {
+        string[] successors = [];
+        string[]? successorsOfNode = self.successor(sourceNode);
+        if successorsOfNode is string[] {
+            successors = successorsOfNode;
+        }
+
+        foreach string item in successors {
             if !(isVisited[item] is true) {
                 localPathList.push(item);
                 self.getAllThePathUntil(item, targetNode, isVisited, localPathList, allPathList);

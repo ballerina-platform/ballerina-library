@@ -102,7 +102,7 @@ function getVersion(string moduleName, string gradleProperties) returns string|e
     string[] gradlePropertiesLines = regex:split(gradleProperties, "\n");
     string moduleVersion = "";
     foreach var line in gradlePropertiesLines {
-        if line.startsWith("version"){
+        if line.startsWith("version") {
             moduleVersion = regex:split(line, "=")[1];
         }
     }
@@ -199,13 +199,22 @@ function calculateLevels(List moduleDetails) returns error? {
     }
 
     foreach Module module in moduleDetails.modules {
-        module.level = dependencyGraph.getCurrentLevel(module.name);
+        int? moduleLevel = dependencyGraph.getCurrentLevel(module.name);
+        if moduleLevel is int {
+            module.level = moduleLevel;
+        }
     }
 }
 
 function processCurrentLevel(DiGraph dependencyGraph, string[] processing, List moduleDetails,
                                 int currentLevel, string node) {
-    string[] successors = dependencyGraph.successor(node);
+    string[]? successorsOfNode = dependencyGraph.successor(node);
+    string[] successors = [];
+
+    if successorsOfNode is string[] {
+        successors = successorsOfNode;
+    }
+
     foreach string successor in successors {
         removeModulesInIntermediatePaths(
             dependencyGraph, node, successor, successors, moduleDetails);
