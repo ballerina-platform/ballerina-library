@@ -95,7 +95,7 @@ class DiGraph {
     }
 
     public function getAllThePathUntil(string sourceNode, string targetNode,
-                        map<boolean> isVisited, string[] localPathList, string[][] allPathList) {
+        map<boolean> isVisited, string[] localPathList, string[][] allPathList) {
         if sourceNode == targetNode {
             allPathList.push(localPathList.clone());
             return;

@@ -207,7 +207,7 @@ function calculateLevels(List moduleDetails) returns error? {
 }
 
 function processCurrentLevel(DiGraph dependencyGraph, string[] processing, List moduleDetails,
-                                int currentLevel, string node) {
+    int currentLevel, string node) {
     string[]? successorsOfNode = dependencyGraph.successor(node);
     string[] successors = [];
 
@@ -216,8 +216,7 @@ function processCurrentLevel(DiGraph dependencyGraph, string[] processing, List 
     }
 
     foreach string successor in successors {
-        removeModulesInIntermediatePaths(
-            dependencyGraph, node, successor, successors, moduleDetails);
+        removeModulesInIntermediatePaths(dependencyGraph, node, successor, successors, moduleDetails);
         dependencyGraph.setCurrentLevel(successor, currentLevel);
         if !(processing.indexOf(successor) is int) {
             processing.push(successor);
@@ -226,7 +225,7 @@ function processCurrentLevel(DiGraph dependencyGraph, string[] processing, List 
 }
 
 function removeModulesInIntermediatePaths(DiGraph dependencyGraph, string sourceNode,
-                                            string destinationNode, string[] successors, List moduleDetails) {
+    string destinationNode, string[] successors, List moduleDetails) {
     string[] longestPath = dependencyGraph.getLongestPath(sourceNode, destinationNode);
     foreach string n in longestPath.slice(1, longestPath.length() - 1) {
         if (successors.indexOf(n) is int) {
@@ -261,8 +260,8 @@ function seperateModules(List moduleDetails) returns List[] {
         where regex:split(e.name, "-")[1] == "ballerina"
         order by e.level ascending
         select e;
-    List sortedNameListX = {"modules": ballerinaxSorted};
-    List sortedNameList = {"modules": ballerinaSorted};
+    List sortedNameListX = {modules: ballerinaxSorted};
+    List sortedNameList = {modules: ballerinaSorted};
 
     return [sortedNameListX, sortedNameList];
 }
