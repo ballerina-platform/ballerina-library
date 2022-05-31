@@ -101,9 +101,9 @@ function initializeModuleInfo(Module module) returns Module|error {
 function getVersion(string moduleName, string gradleProperties) returns string|error {
     string[] gradlePropertiesLines = regex:split(gradleProperties, "\n");
     string moduleVersion = "";
-    foreach var item in gradlePropertiesLines {
-        if regex:matches(item, "^version.*$") {
-            moduleVersion = regex:split(item, "=")[1];
+    foreach var line in gradlePropertiesLines {
+        if line.startsWith("version"){
+            moduleVersion = regex:split(line, "=")[1];
         }
     }
     if moduleVersion == "" {
