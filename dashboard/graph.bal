@@ -81,9 +81,7 @@ function initializeModuleInfo(Module module) returns Module|error {
     string nameInVesrsionKey = capitalize(getModuleShortName(moduleName));
     string defaultVersionKey = string `stdlib${nameInVesrsionKey}Version`;
     string? versionKey = module.version_key;
-    if versionKey is string {
-        defaultVersionKey = versionKey;
-    }
+    defaultVersionKey = versionKey == () ? defaultVersionKey : versionKey;
     string moduleVersion = check getVersion(moduleName, gradleProperties);
 
     return {
@@ -104,6 +102,7 @@ function getVersion(string moduleName, string gradleProperties) returns string|e
     foreach var line in gradlePropertiesLines {
         if line.startsWith("version") {
             moduleVersion = regex:split(line, "=")[1];
+            break;
         }
     }
     if moduleVersion == "" {
