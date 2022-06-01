@@ -37,8 +37,8 @@ const GRADLE_PROPERTIES = "gradle.properties";
 
 // Retry Configs
 const HTTP_REQUEST_RETRIES = 3;
-const HTTP_REQUEST_DELAY_IN_SECONDS = 2;
-const HTTP_REQUEST_DELAY_MULTIPLIER = 2;
+const decimal HTTP_REQUEST_DELAY_IN_SECONDS = 2;
+const float HTTP_REQUEST_DELAY_MULTIPLIER = 2;
 
 // Env variable Names
 const BALLERINA_BOT_TOKEN = "BALLERINA_BOT_TOKEN";

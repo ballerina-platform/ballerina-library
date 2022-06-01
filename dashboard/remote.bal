@@ -26,8 +26,8 @@ http:Client git = check new (GITHUB_RAW_LINK, config = {
     },
     retryConfig: {
         count: HTTP_REQUEST_RETRIES,
-        interval: <decimal>HTTP_REQUEST_DELAY_IN_SECONDS,
-        backOffFactor: <float>HTTP_REQUEST_DELAY_MULTIPLIER
+        interval: HTTP_REQUEST_DELAY_IN_SECONDS,
+        backOffFactor: HTTP_REQUEST_DELAY_MULTIPLIER
     }
 });
 
@@ -37,25 +37,23 @@ github:ConnectionConfig config = {
     },
     retryConfig: {
         count: HTTP_REQUEST_RETRIES,
-        interval: <decimal>HTTP_REQUEST_DELAY_IN_SECONDS,
-        backOffFactor: <float>HTTP_REQUEST_DELAY_MULTIPLIER
+        interval: HTTP_REQUEST_DELAY_IN_SECONDS,
+        backOffFactor: HTTP_REQUEST_DELAY_MULTIPLIER
     }
 };
 
 github:Client githubClient = check new (config);
 
 function getDefaultBranch(string moduleName) returns string|error {
-    string defaultBranchName = "";
-    stream<github:Branch, github:Error?> branches = check githubClient->getBranches(BALLERINA_ORG_NAME,
-                                                            moduleName);
-    stream<github:Branch, github:Error?> filter = 
-        branches.filter(branch => branch.name == "master" || branch.name == "main");
+    stream<github:Branch, github:Error?> branches = check githubClient->getBranches(BALLERINA_ORG_NAME, moduleName);
+    stream<github:Branch, github:Error?> filter = branches.filter(filterBranch);
 
-    var defaultBranch = filter.next();
-    if defaultBranch is record {|github:Branch value;|} {
-        defaultBranchName = defaultBranch.value.name;
-    }
-    return defaultBranchName;
+    record {|github:Branch value;|}? defaultBranch = check filter.next();
+    return defaultBranch == () ? "" : defaultBranch.value.name;
+}
+
+function filterBranch(github:Branch branch) returns boolean {
+    return branch.name == "master" || branch.name == "main";
 }
 
 function getIssuesCount(string repoName, string shortName) returns int|error? {
@@ -78,8 +76,8 @@ function openUrl(string page, string url) returns http:Response|error? {
         },
         retryConfig: {
             count: HTTP_REQUEST_RETRIES,
-            interval: <decimal>HTTP_REQUEST_DELAY_IN_SECONDS,
-            backOffFactor: <float>HTTP_REQUEST_DELAY_MULTIPLIER
+            interval: HTTP_REQUEST_DELAY_IN_SECONDS,
+            backOffFactor: HTTP_REQUEST_DELAY_MULTIPLIER
         }
     });
 
