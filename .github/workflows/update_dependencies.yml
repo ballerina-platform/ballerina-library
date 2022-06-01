@@ -25,7 +25,7 @@ jobs:
                     git config --global user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
 
             -   name: Update the Dependencies and Generate the Dashboard
-                uses: ballerina-platform/ballerina-action@swan-lake-release@2201.0.3
+                uses: ballerina-platform/ballerina-action@2201.0.3
                 with:
                     args:
                         run

@@ -10,22 +10,11 @@ jobs:
             -   name: Checkout Repository
                 uses: actions/checkout@v2
 
-            -   name: Setup Python
-                uses: actions/setup-python@v2
+            -   name: Testing the Dashboard Generation
+                uses: ballerina-platform/ballerina-action@2201.0.3
                 with:
-                    python-version: '3.x'
-
-            -   name: Install Python packages
-                run: |
-                    pip install requests
-                    pip install networkx
-                    pip install retry
-                    pip install PyGithub
-                    pip install semver
-
-            -   name: Run Tests
+                    args:
+                        test
                 env:
-                    BALLERINA_BOT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                run: |
-                    cd release/src/dependencies
-                    python -m unittest utils_test.py
+                    WORKING_DIR: ./dashboard
+                    BALLERINA_BOT_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
