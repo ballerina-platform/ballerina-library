@@ -15,28 +15,22 @@ jobs:
         name: Update the Standard Library Dependency Graph
         runs-on: ubuntu-latest
         steps:
-            -   name : Checkout Repo
+
+            -   name: Checkout Repo
                 uses: actions/checkout@v2
-                with:
-                    token: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
             -   name: Configure Git User
                 run: |
                     git config --global user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
                     git config --global user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
 
-            -   name: Setup Python
-                uses: actions/setup-python@v2
+            -   name: Update the Dependencies and Generate the Dashboard
+                uses: ballerina-platform/ballerina-action@2201.0.3
                 with:
-                    python-version: '3.x'
-
-            -   name: Install Python packages
-                run: pip install -r release/src/dependencies/requirements.txt
-
-            -   name: Get Dependencies and update files
-                run: |
-                    python release/src/dependencies/graph.py
+                    args:
+                        run
                 env:
+                    WORKING_DIR: ./dashboard
                     BALLERINA_BOT_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
             -   name: Commit files
