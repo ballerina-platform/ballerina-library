@@ -14,9 +14,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+import ballerina/http;
 import ballerina/regex;
 import ballerina/url;
-import ballerina/http;
 
 function getDashboardRow(Module module, string level) returns string|error {
     string moduleName = module.name;
