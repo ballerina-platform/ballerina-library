@@ -15,9 +15,9 @@
 // under the License.
 
 import ballerina/io;
-import ballerina/regex;
 import ballerina/lang.array;
 import ballerina/log;
+import ballerina/regex;
 
 type List record {|
     Module[] modules;
@@ -117,7 +117,7 @@ function getImmediateDependencies(List moduleDetails) returns error? {
         log:printInfo(string `Finding dependents of module ${module.name}`);
         string[] dependees = check getDependencies(module, moduleDetails);
 
-        // Get the dependecies modules which use module in there package 
+        // Get the dependecies modules which use module in there package
         foreach Module dependee in moduleDetails.modules {
             string dependeeName = dependee.name;
             string[]? dependeeDependents = dependee.dependents;

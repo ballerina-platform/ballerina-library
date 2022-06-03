@@ -14,9 +14,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+import ballerina/http;
 import ballerina/os;
 import ballerinax/github;
-import ballerina/http;
 
 int issueCount = 0;
 
