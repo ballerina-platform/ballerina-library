@@ -39,12 +39,12 @@ jobs:
                 id: commitFiles
                 run: |
                     git add -A
-                    if [[ git diff-index --quiet HEAD ]]
+                    if git diff-index --quiet HEAD --;
                     then
+                        printf "::set-output name=hasChanged::false"
+                    else
                         git commit -m "[AUTOMATED] Update the dependency graph and the dashboard"
                         printf "::set-output name=hasChanged::true"
-                    else
-                        printf "::set-output name=hasChanged::false"
                     fi
 
             -   name: Push Results
