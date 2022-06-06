@@ -76,8 +76,7 @@ jobs:
                     do
                       sleep 20
                       checkCount=$(gh pr status --jq '[.currentBranch .statusCheckRollup[] | select((.conclusion=="SUCCESS") and ((.name=="Build on Ubuntu")))] | length' --json statusCheckRollup)
-                      failedCount=$(gh pr status --jq '[.currentBranch .statusCheckRollup[] | select((.conclusion=="FAILURE") and ((.name=="Build on Ubuntu")))] | length' --json
-                      statusCheckRollup)
+                      failedCount=$(gh pr status --jq '[.currentBranch .statusCheckRollup[] | select((.conclusion=="FAILURE") and ((.name=="Build on Ubuntu")))] | length' --json statusCheckRollup)
                       if [[ "$failedCount" != "0" ]]
                       then
                         echo "PR Build has Failed"
