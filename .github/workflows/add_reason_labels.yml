@@ -1,3 +1,5 @@
+name: Check Reason Labels on Closed Issues
+
 on:
   issues:
     types: [closed]
