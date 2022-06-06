@@ -313,7 +313,7 @@ modules = [
 ]
 
 [[package]]
-org = "prakanth"
+org = "root"
 name = "dashboard"
 version = "0.1.0"
 dependencies = [
@@ -329,7 +329,7 @@ dependencies = [
 	{org = "ballerinax", name = "github"}
 ]
 modules = [
-	{org = "prakanth", packageName = "dashboard", moduleName = "dashboard"}
+	{org = "root", packageName = "dashboard", moduleName = "dashboard"}
 ]
 
 
