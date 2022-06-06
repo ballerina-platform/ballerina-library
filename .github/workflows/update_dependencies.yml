@@ -55,7 +55,7 @@ jobs:
 
             -   name: Create Pull Request to Update the Dashboard
                 id: createPR
-                if: ${{ steps.processResults.outputs.hasPassed }}
+                if: ${{ steps.processResults.outputs.hasChanged }}
                 run: printf "::set-output name=prUrl::$(gh pr create --title "[Automated] Update the Standard Library Dashboard" --body "Updating the standard library dashboard with latest changes")"
                 env:
                     GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
