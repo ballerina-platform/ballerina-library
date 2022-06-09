@@ -38,3 +38,6 @@ Ballerina.lock
 *.pyc
 
 *.DS_Store
+
+#Ballerina
+dashboard/Dependencies.toml
