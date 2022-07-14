@@ -65,7 +65,7 @@ Checklist for the release,
 1. All unit test, integration tests are passing
 2. The module does NOT include any components with an identified Security Vulnerability.
 3. Publish artifact to the Central Staging Environment
-4. Run workflow to verify newly published module is working properly in an integrartion scenario. (This is to ensure any stadard library release will not break the existing users build)
+4. Run workflow to verify newly published module is working properly in an integration scenario. (This is to ensure any standard library release will not break the existing users build)
 5. Run the release workflow 
 6. Update module version in Ballerina Distribution
 
