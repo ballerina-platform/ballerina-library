@@ -28,13 +28,13 @@ Task 1, 2 and 3 are executed through a [Gradle Plugin](https://github.com/baller
 
 ### Branching Strategy
 
-Branches will depend on the update version of the ballerina language, stdlib will depend on.
+Branches will depend on the update version of the ballerina language, standard library will depend on.
 
 1. 2201.1.x
 2. 2201.2.x
 3. master
 
-Branches needs to be created seperatly for Language versions, only if the language includes Essential Breaking Changes.
+Branches needs to be created separately for Language versions, only if the language includes Essential Breaking Changes.
 
 ### Handling Essential Breaking Changes
 
@@ -73,10 +73,10 @@ Checklist for the release,
 
 With the Essential Changes from the Language Team. Many of the libraries may need to be released along with Ballerina Swan Lake Update releases. 
 
-The release of multiple modules can be done through [Stdlib Release Workflow](https://github.com/ballerina-platform/ballerina-standard-library/actions/workflows/release_pipeline.yml). This will release modules from the [list](https://github.com/ballerina-platform/ballerina-standard-library/blob/main/dashboard/resources/stdlib_modules.json#L1). This can be ovveridden by using release property.
+The release of multiple modules can be done through [Stdlib Release Workflow](https://github.com/ballerina-platform/ballerina-standard-library/actions/workflows/release_pipeline.yml). This will release modules from the [list](https://github.com/ballerina-platform/ballerina-standard-library/blob/main/dashboard/resources/stdlib_modules.json#L1). This can be overridden by using release property.
 
 Checklist,
 1. Verify if all modules with essential changes have updated language dependency and distribution version.(All dependant version)
-2. Coordinate among team to update to latest timestamped version of the dependants
+2. Coordinate among team to update to latest timestamped version of the dependents
 3. Ensure the standard libraries are released to Central Staging after each RC vote. Release Manager of the Ballerina Release will publish this. Module owners is responsible for the ballerinax components.
-4. Run workflow to verify newly published module is working properly in an integrartion scenario. (This is to ensure any stadard library release will not break the existing users build)
+4. Run workflow to verify newly published module is working properly in an integration scenario. (This is to ensure any standard library release will not break the existing users build)
