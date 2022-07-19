@@ -17,3 +17,4 @@ Sprint master is responsible for managing and tracking the sprint. Alphabetical 
   - This swings between two teams, say this release is done by PCM team then the next release will be done by DUI team
 - Make sure automated and other PRs are merged in timely manner 
   - This includes PRs sent to distribution as well
+- Coordinate version change of libraries in timely manner
