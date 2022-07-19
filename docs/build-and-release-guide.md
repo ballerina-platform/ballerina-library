@@ -65,7 +65,7 @@ Checklist for the release,
 1. All unit test, integration tests are passing
 2. The module does NOT include any components with an identified Security Vulnerability.
 3. Publish artifact to the Central Staging Environment
-4. Run workflow to verify newly published module is working properly in an integration scenario. (This is to ensure any standard library release will not break the existing users build)
+4. Run [workflow](https://github.com/ballerina-platform/ballerina-standard-library/actions/workflows/test_stdlib_releases_with_staging.yml) to verify newly published module is working properly in an integration scenario. (This is to ensure any standard library release will not break the existing users build)
 5. Run the release workflow 
 6. Update module version in Ballerina Distribution
 
@@ -79,4 +79,4 @@ Checklist,
 1. Verify if all modules with essential changes have updated language dependency and distribution version.(All dependant version)
 2. Coordinate among team to update to latest timestamped version of the dependents
 3. Ensure the standard libraries are released to Central Staging after each RC vote. Release Manager of the Ballerina Release will publish this. Module owners is responsible for the ballerinax components.
-4. Run workflow to verify newly published module is working properly in an integration scenario. (This is to ensure any standard library release will not break the existing users build)
+4. Run [workflow](https://github.com/ballerina-platform/ballerina-standard-library/actions/workflows/test_stdlib_releases_with_staging.yml) to verify newly published module is working properly in an integration scenario. (This is to ensure any standard library release will not break the existing users build)
