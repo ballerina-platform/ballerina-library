@@ -49,20 +49,20 @@ jobs:
                     fi
 
             -   name: Push Results
-                if: ${{ steps.commitFiles.outputs.hasChanged == true }}
+                if: ${{ steps.commitFiles.outputs.hasChanged == 'true' }}
                 run: git push origin "update-dependency-graph"
                 env:
                     GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
             -   name: Create Pull Request to Update the Dashboard
                 id: createPR
-                if: ${{ steps.commitFiles.outputs.hasChanged == true }}
+                if: ${{ steps.commitFiles.outputs.hasChanged == 'true' }}
                 run: printf "::set-output name=prUrl::$(gh pr create --title "[Automated] Update the Standard Library Dashboard" --body "Updating the standard library dashboard with latest changes")"
                 env:
                     GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
             -   name: Approve PR
-                if: ${{ steps.commitFiles.outputs.hasChanged == true }}
+                if: ${{ steps.commitFiles.outputs.hasChanged == 'true' }}
                 run: |
                     sleep 5
                     gh pr review --approve ${{ steps.createPR.outputs.prUrl }}
@@ -70,7 +70,7 @@ jobs:
                     GITHUB_TOKEN: ${{ secrets.BALLERINA_REVIEWER_BOT_TOKEN }}
 
             -   name: Merge PR
-                if: ${{ steps.commitFiles.outputs.hasChanged == true }}
+                if: ${{ steps.commitFiles.outputs.hasChanged == 'true' }}
                 run: |
                     checkCount="0"
                     while [ "$checkCount" != "1" ]
