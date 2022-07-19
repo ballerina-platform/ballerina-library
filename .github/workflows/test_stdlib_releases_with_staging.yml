@@ -5,7 +5,7 @@ on:
 
 jobs:
   test-patch-versions:
-    name: Test Pacth Standard Library Releases
+    name: Test Patch Standard Library Releases
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -34,7 +34,7 @@ jobs:
         run: ./gradlew testStdlibsWithStaging --stacktrace --scan --console=plain --no-daemon --continue
 
   test-minor-versions:
-    name: Test Pacth Standard Library Releases
+    name: Test Minor Standard Library Releases
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
