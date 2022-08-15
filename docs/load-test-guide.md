@@ -7,7 +7,7 @@ _Updated_: 2021/08/15
 
 This section describes the steps to add a load test to a standard library repository. The tests are running in an AKS cluster.
 
-<img src="_resources/load-test-setup.png" alt="drawing" width='250'/>
+<img src="_resources/load-test-setup.png" alt="drawing"/>
 
 Most of the following steps are adapted from [here](https://github.com/ballerina-platform/ballerina-performance-cloud/blob/main/README.md).
 
