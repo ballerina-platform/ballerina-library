@@ -1,6 +1,6 @@
 public type Module record {|
     string name;
-    string 'version;
+    string module_version;
     int level;
     string default_branch;
     boolean release;
