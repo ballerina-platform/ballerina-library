@@ -50,10 +50,10 @@ function handleRelease(commons:Module[] modules) {
 
 function releaseModule(commons:Module module) returns boolean {
     commons:logNewLine();
-    log:printInfo("Releasing " + module.name + " Version " + module.'version);
+    log:printInfo("Releasing " + module.name + " Version " + module.module_version);
     http:Request request = commons:createRequest();
     string moduleName = module.name.toString();
-    string 'version = module.'version.toString();
+    string 'version = module.module_version.toString();
     string apiPath = "/" + moduleName + commons:DISPATCHES;
 
     json payload = {
@@ -117,7 +117,7 @@ function checkInProgressModules(commons:Module module, commons:Module[] unreleas
         if (moduleIndex is int) {
             commons:Module releasedModule = unreleased.remove(moduleIndex);
             released.push(releasedModule);
-            log:printInfo(releasedModule.name + " " + releasedModule.'version + " is released");
+            log:printInfo(releasedModule.name + " " + releasedModule.module_version + " is released");
         }
     }
 }
@@ -129,7 +129,7 @@ function checkModuleRelease(commons:Module module) returns boolean {
     }
     http:Request request = commons:createRequest();
     string moduleName = module.name.toString();
-    string 'version = module.'version.toString();
+    string 'version = module.module_version.toString();
     string expectedReleaseTag = "v" + 'version;
 
     string modulePath = "/" + moduleName + RELEASES + TAGS + "/v" + 'version;
@@ -155,9 +155,9 @@ function checkModuleRelease(commons:Module module) returns boolean {
 
 function removeSnapshotVersions(commons:Module[] modules) {
     foreach commons:Module module in modules {
-        string moduleVersion = module.'version;
+        string moduleVersion = module.module_version;
         if (stringutils:contains(moduleVersion, SNAPSHOT)) {
-            module.'version = stringutils:replace(moduleVersion, SNAPSHOT, "");
+            module.module_version = stringutils:replace(moduleVersion, SNAPSHOT, "");
         }
     }
 }

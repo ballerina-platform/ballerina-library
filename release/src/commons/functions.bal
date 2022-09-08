@@ -168,7 +168,7 @@ public function populteToBePublishedModules(Module module, Module[] toBePublishe
 public function publishModule(Module module, string accessToken, http:Client httpClient) returns boolean {
     http:Request request = createRequest();
     string moduleName = module.name.toString();
-    string 'version = module.'version.toString();
+    string 'version = module.module_version.toString();
     string apiPath = "/" + moduleName + DISPATCHES;
 
     json payload = {
@@ -330,7 +330,7 @@ public function printModules(Module[] modules) {
 }
 
 public function printModule (Module module) {
-    log:printInfo(getModuleName(module) + " " + module.'version);
+    log:printInfo(getModuleName(module) + " " + module.module_version);
 }
 
 public function logNewLine() {
