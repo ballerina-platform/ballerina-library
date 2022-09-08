@@ -6,7 +6,7 @@
       "level": 1,
       "default_branch": "main",
       "version_key": "stdlibConstraintVersion",
-      "release": true,
+      "release": false,
       "dependents": [
         "module-ballerina-http",
         "module-ballerinax-nats"
@@ -18,7 +18,7 @@
       "level": 1,
       "default_branch": "master",
       "version_key": "stdlibIoVersion",
-      "release": true,
+      "release": false,
       "dependents": [
         "module-ballerina-log",
         "module-ballerina-os",
@@ -79,7 +79,7 @@
       "level": 1,
       "default_branch": "master",
       "version_key": "stdlibXmldataVersion",
-      "release": true,
+      "release": false,
       "dependents": []
     },
     {
@@ -105,7 +105,7 @@
       "level": 2,
       "default_branch": "master",
       "version_key": "stdlibLogVersion",
-      "release": true,
+      "release": false,
       "dependents": [
         "module-ballerina-auth",
         "module-ballerina-file",
@@ -136,7 +136,7 @@
       "level": 2,
       "default_branch": "main",
       "version_key": "stdlibProtobufVersion",
-      "release": true,
+      "release": false,
       "dependents": [
         "module-ballerina-grpc"
       ]
@@ -161,7 +161,7 @@
       "level": 2,
       "default_branch": "main",
       "version_key": "stdlibSerdesVersion",
-      "release": true,
+      "release": false,
       "dependents": []
     },
     {
