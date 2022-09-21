@@ -49,5 +49,5 @@ for it?  How does it compare to the competition, if any? -->
 
 ## Dependencies
 
-<!--  Describe all dependencies that this JEP has on other JEPs, JBS issues,
+<!--  Describe all dependencies that this Proposal has on other Proposals, issues,
  components, products, or anything else. -->
