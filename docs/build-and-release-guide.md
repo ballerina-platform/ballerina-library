@@ -76,10 +76,10 @@ The Standard Library Release Manager will use [Stdlib Release Workflow](https://
 Checklist,
 1. Verify if all modules with essential changes have updated language dependency and distribution versions. (All dependent versions)
 2. Coordinate among the team to update modules. Module owners should verify the following,
-   The module can be built with the latest Language release.
-   Modules have the latest published/timestamped dependency versions.
-   Ballerina.toml has the correct distribution version.
+   - The module can be built with the latest Language release.
+   - Modules have the latest published/timestamped dependency versions.
+   - Ballerina.toml has the correct distribution version.
 3. Use the [Extensions - Update Ballerina Version Workflow](https://github.com/ballerina-platform/ballerina-release/actions/workflows/update_dependency_version.yml) to update dependency versions to the latest for consecutive version updates if any (lang RC releases).
-   (Note: If the RM is releasing only a subset of modules, which have the latest Language version, they should update the [extensions.json](https://github.com/ballerina-platform/ballerina-release/blob/master/dependabot/resources/extensions.json) by removing unnecessary modules in a separate branch. They can run the workflow run on said branch)
+   >> If the RM is releasing only a subset of modules, which have the latest Language version, they should update the [extensions.json](https://github.com/ballerina-platform/ballerina-release/blob/master/dependabot/resources/extensions.json) by removing unnecessary modules in a separate branch. They can run the workflow run on said branch
 4. Ensure Ballerina Release Manager has released all modules to the Central Staging after each RC vote. The release Manager of the Ballerina Release will publish this. Module owners are responsible for the ballerinax components.
 5. Run the [stdlib test workflow](https://github.com/ballerina-platform/ballerina-standard-library/actions/workflows/test_stdlib_releases_with_staging.yml) to verify newly published modules are working in an integration scenario. (This is to ensure no standard library release will break the existing users' build)
