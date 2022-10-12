@@ -64,7 +64,7 @@ The release of each modules are done through [Publish Github Workflow](https://g
 Checklist for the release,
 1. All unit test, integration tests are passing
 2. The module does NOT include any components with an identified Security Vulnerability.
-3. Publish artifact to the Central Staging Environment
+3. Publish artifact to the [Central Staging Environment](https://github.com/ballerina-platform/module-ballerina-http/actions/workflows/central-publish.yml)
 4. Run [workflow](https://github.com/ballerina-platform/ballerina-standard-library/actions/workflows/test_stdlib_releases_with_staging.yml) to verify newly published module is working properly in an integration scenario. (This is to ensure any standard library release will not break the existing users build)
 5. Run the release workflow 
 6. Update module version in Ballerina Distribution
@@ -77,6 +77,8 @@ The release of multiple modules can be done through [Stdlib Release Workflow](ht
 
 Checklist,
 1. Verify if all modules with essential changes have updated language dependency and distribution version.(All dependant version)
-2. Coordinate among team to update to latest timestamped version of the dependents
-3. Ensure the standard libraries are released to Central Staging after each RC vote. Release Manager of the Ballerina Release will publish this. Module owners is responsible for the ballerinax components.
-4. Run [workflow](https://github.com/ballerina-platform/ballerina-standard-library/actions/workflows/test_stdlib_releases_with_staging.yml) to verify newly published module is working properly in an integration scenario. (This is to ensure any standard library release will not break the existing users build)
+2. Coordinate among team to update to latest timestamped version of the dependents.
+    - Module owners should verify the modules can be built with with latest lang release, make sure all dependencies are updated to latest release (or to the latest timestamp version of the dependencies) and update modules with the correct distribution version in toml files.
+    - For concecutive version updates if any (lang rc releases), [Extensions - Update Ballerina Version Workflow](https://github.com/ballerina-platform/ballerina-release/actions/workflows/update_dependency_version.yml) can be used to move modules to latest dependencies. (Note: If only subset of modules are moved to the latest lang version, [extensions.json](https://github.com/ballerina-platform/ballerina-release/blob/master/dependabot/resources/extensions.json) should be updated by removing unnecessary modules in a separate branch and workflow run on said branch)
+4. Ensure the standard libraries are released to Central Staging after each RC vote. Release Manager of the Ballerina Release will publish this. Module owners is responsible for the ballerinax components.
+5. Run [workflow](https://github.com/ballerina-platform/ballerina-standard-library/actions/workflows/test_stdlib_releases_with_staging.yml) to verify newly published module is working properly in an integration scenario. (This is to ensure any standard library release will not break the existing users build)
