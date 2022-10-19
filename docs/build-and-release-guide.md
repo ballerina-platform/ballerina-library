@@ -38,20 +38,25 @@ Module owners should create needed branches for Language versions only if the la
 
 ### Handling Essential Breaking Changes
 
-The module, with a dependency on an older Language Distribution, will function on newer versions as long as there are no Essential Breaking Changes from the Language team.
+The module, with a dependency on an older Language Distribution, will function on newer versions as long as there are no Essential Breaking Changes from the Language team for the upcoming Ballerina Update release.
+>> Essential Changes cannot be added in Patch Releases.
 
-[Build Pipelines Workflow](https://github.com/ballerina-platform/ballerina-release/actions/workflows/daily-full-build-2201.2.x.yml) will build all Standard Libraries using the latest language (for the specific update). It will send a notification if there are any build breaks. Module owners should address any failure notification promptly.
+Compiler Team will handle all Essential Changes proactively. We have added a Pull Request check to all `ballerina-lang` Pull Requests. It is to validate that no downstream Standard Library modules are impacted.
 
-#### Steps to be taken
+[Build Pipelines Workflow](https://github.com/ballerina-platform/ballerina-release/actions/workflows/daily-full-build-master.yml) will build all Standard Libraries using the latest Language  version(for the specific update). It will send a notification if there are any build breaks. Module owners should address any failure notification promptly. Since Compiler Team handles the Essential Changes proactively, the builds should not fail for more than a day.
 
-1. Language Team can include Breaking changes only on Update releases. If module owners identify any breaking changes in a patch versions, they should inform the Language team to revert the changes.
-2. Language team needs to defend their decision for any breaking change as essential for the said update. Verify this from the Language team.
-3. Migrate to the latest language version using the timestamp version.
-4. Cut the branch for lower lang dependency(2201.2.x).
-5. Migrate the code to the latest language dependency.
-6. Change the distribution in Ballerina.toml.
-7. Bump to the next minor version.
-8. Let SMs know of the change.They can coordinate with the team. All dependent modules need to follow steps 3-8 recursively.
+#### Steps to merge Essential Changes
+
+1. Language Team developer will work on the feature in an upstream branch.
+2. Run Full Build Pipeline Workflow to identify impacted modules.
+3. Open an issue in `ballerina-standard-library` containing the details of the changes and the impacted modules list.
+3. Module owners will migrate to the provided version in an upstream feature branch,
+    - Cut the branch for lower lang dependency(2201.2.x).
+    - Migrate the code to the latest language dependency.
+    - Change the distribution in Ballerina.toml.
+    - Bump to the next minor version (Skip this step if the development version is the next minor version to the last release)
+4. Developer opens a `ballerina-lang` PR and merges the change.
+      >> The developer should provide the Language timestamped version to module owners to merge the changes to default branch 
 
 ### Release Process
 
