@@ -38,7 +38,8 @@ Module owners should create needed branches for Language versions only if the la
 
 ### Handling Essential Breaking Changes
 
-The module, with a dependency on an older Language Distribution, will function on newer versions as long as there are no Essential Breaking Changes from the Language team.
+The module, with a dependency on an older Language Distribution, will function on newer versions as long as there are no Essential Breaking Changes from the Language team for the upcoming Ballerina Update release.
+>> Essential Changes cannot be added in Patch Releases.
 
 Compiler Team will handle all Essential Changes proactively. We have added a Pull Request check to all `ballerina-lang` Pull Requests. It is to validate that no downstream Standard Library modules are impacted.
 
