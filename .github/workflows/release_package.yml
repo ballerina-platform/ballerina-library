@@ -1,0 +1,112 @@
+name: Publish Release
+
+on:
+  workflow_call:
+    inputs:
+      package-name:
+        required: true
+        type: string
+      package-org:
+        required: true
+        type: string
+      additional-build-flags:
+        required: false
+        type: string
+      additional-publish-flags:
+        required: false
+        type: string
+
+jobs:
+  publish-release:
+    name: Release Package
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'ballerina-platform'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          distribution: "temurin"
+          java-version: 11
+
+      - name: Build without Tests
+        env:
+          packageUser: ${{ github.actor }}
+          packagePAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
+          git config --global user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
+          ./gradlew build -x check -x test ${{ inputs.additional-build-flags }}
+
+      - name: Create lib Directory if not Exists
+        run: mkdir -p ballerina/lib
+
+      - name: Run Trivy Vulnerability Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "rootfs"
+          scan-ref: "/github/workspace/ballerina/lib"
+          format: "table"
+          timeout: "10m0s"
+          exit-code: "1"
+
+      - name: Get Release Version
+        run: echo "VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties | rev | cut --complement -d- -f1 | rev)" >> $GITHUB_ENV
+
+      - name: Pre-Release Dependency Version Update
+        env:
+          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+        run: |
+          echo "Version: ${VERSION}"
+          git checkout -b release-${VERSION}
+          sed -i 's/ballerinaLangVersion=\(.*\)-SNAPSHOT/ballerinaLangVersion=\1/g' gradle.properties
+          sed -i 's/ballerinaLangVersion=\(.*\)-[0-9]\{8\}-[0-9]\{6\}-.*$/ballerinaLangVersion=\1/g' gradle.properties
+          sed -i 's/stdlib\(.*\)=\(.*\)-SNAPSHOT/stdlib\1=\2/g' gradle.properties
+          sed -i 's/stdlib\(.*\)=\(.*\)-[0-9]\{8\}-[0-9]\{6\}-.*$/stdlib\1=\2/g' gradle.properties
+          sed -i 's/observe\(.*\)=\(.*\)-SNAPSHOT/observe\1=\2/g' gradle.properties
+          sed -i 's/observe\(.*\)=\(.*\)-[0-9]\{8\}-[0-9]\{6\}-.*$/observe\1=\2/g' gradle.properties
+          git add gradle.properties
+          git commit -m "Move dependencies to stable versions" || echo "No changes to commit"
+
+      - name: Publish Package
+        env:
+          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ secrets.BALLERINA_CENTRAL_ACCESS_TOKEN }}
+          packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+          packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          publishUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+          publishPAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+        run: |
+          ./gradlew clean release -Prelease.useAutomaticVersion=true
+          ./gradlew -Pversion=${VERSION} publish -x test -PpublishToCentral=true ${{ inputs.additional-publish-flags }}
+
+      - name: Publish to Ballerina Central Dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ secrets.BALLERINA_CENTRAL_DEV_ACCESS_TOKEN }}
+          packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+          packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          publishUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+          publishPAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+        run: |
+          ./gradlew -Pversion=${VERSION} build -x test -PpublishToCentral=true ${{ inputs.additional-publish-flags }}
+
+      - name: Publish to Ballerina Central Stage
+        env:
+          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ secrets.BALLERINA_CENTRAL_STAGE_ACCESS_TOKEN }}
+          packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+          packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          publishUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+          publishPAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+        run: |
+          ./gradlew -Pversion=${VERSION} build -x test -PpublishToCentral=true ${{ inputs.additional-publish-flags }}
+
+      - name: GitHub Release and Release Sync PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+        run: |
+          gh release create v$VERSION --title "module-${{ inputs.package-org }}-${{ inputs.package-name }}-v$VERSION"
+          gh pr create --title "[Automated] Sync master after $VERSION release" --body "Sync master after $VERSION release"
