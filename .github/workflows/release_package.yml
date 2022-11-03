@@ -82,28 +82,6 @@ jobs:
           ./gradlew clean release -Prelease.useAutomaticVersion=true
           ./gradlew -Pversion=${VERSION} publish -x test -PpublishToCentral=true ${{ inputs.additional-publish-flags }}
 
-      - name: Publish to Ballerina Central Dev
-        env:
-          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
-          BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ secrets.BALLERINA_CENTRAL_DEV_ACCESS_TOKEN }}
-          packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
-          packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
-          publishUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
-          publishPAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
-        run: |
-          ./gradlew -Pversion=${VERSION} build -x test -PpublishToCentral=true ${{ inputs.additional-publish-flags }}
-
-      - name: Publish to Ballerina Central Stage
-        env:
-          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
-          BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ secrets.BALLERINA_CENTRAL_STAGE_ACCESS_TOKEN }}
-          packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
-          packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
-          publishUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
-          publishPAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
-        run: |
-          ./gradlew -Pversion=${VERSION} build -x test -PpublishToCentral=true ${{ inputs.additional-publish-flags }}
-
       - name: GitHub Release and Release Sync PR
         env:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
