@@ -1,0 +1,66 @@
+name: Pull Request Build
+
+on:
+  workflow_call:
+    additional-ubuntu-test-flags:
+      required: false
+      type: string
+    additional-windows-test-flags:
+      required: false
+      type: string
+
+
+# The `build` and `test` commands ran separately as the Ballerina Gradle plugin does not support skipping test groups
+# when the `gradlew build` is used. It is only supported for `gradlew test`.
+jobs:
+    ubuntu-build:
+        name: Build on Ubuntu
+        runs-on: ubuntu-latest
+        concurrency:
+          group: ${{ github.head_ref }}-ubuntu-build
+          cancel-in-progress: true
+        steps:
+            -   name: Checkout Repository
+                uses: actions/checkout@v1
+
+            -   name: Set up JDK 11
+                uses: actions/setup-java@v2
+                with:
+                    distribution: 'temurin'
+                    java-version: 11
+
+            -   name: Build the Package
+                env:
+                    packageUser: ${{ github.actor }}
+                    packagePAT: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                  ./gradlew build -x test
+                  ./gradlew test ${{ inputs.additional-ubuntu-build-flags }}
+
+            -   name: Generate Codecov Report
+                uses: codecov/codecov-action@v2
+
+    windows-build:
+        name: Build on Windows
+        runs-on: windows-latest
+        concurrency:
+          group: ${{ github.head_ref }}-windows-build
+          cancel-in-progress: true
+        steps:
+            -   name: Checkout Repository
+                uses: actions/checkout@v1
+
+            -   name: Set up JDK 11
+                uses: actions/setup-java@v2
+                with:
+                    distribution: 'temurin'
+                    java-version: 11
+
+            -   name: Build the Project
+                env:
+                    packageUser: ${{ github.actor }}
+                    packagePAT: ${{ secrets.GITHUB_TOKEN }}
+                    JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8
+                run: |
+                  ./gradlew.bat build -x test
+                  ./gradlew.bat test {{ inputs.additional-windows-build-flags }}
