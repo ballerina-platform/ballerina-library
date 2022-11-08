@@ -1,0 +1,163 @@
+name: Build with bal test native
+
+on:
+    workflow_call:
+        inputs:
+            lang_tag:
+                description: Branch/Release Tag of the Ballerina Lang
+                type: string
+                required: false
+                default: master
+            lang_version:
+                description: Ballerina Lang Version (If given ballerina lang buid will be skipped)
+                type: string
+                required: false
+                default: ''
+            native_image_options:
+                description: Default native-image options
+                type: string
+                required: false
+                default: ''
+            additional_ubuntu_build_flags:
+                required: false
+                type: string
+                default: ''
+            additional_windows_build_flags:
+                required: false
+                type: string
+                default: ''
+
+jobs:
+    ubuntu-build-with-bal-test-native:
+        name: Build with bal test native on Ubuntu
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Set up GraalVM
+              uses: graalvm/setup-graalvm@v1
+              with:
+                  version: 'latest'
+                  java-version: '11'
+                  components: 'native-image'
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Check GraalVM installation
+              run: |
+                  echo "GRAALVM_HOME: ${{ env.GRAALVM_HOME }}"
+                  echo "JAVA_HOME: ${{ env.JAVA_HOME }}"
+                  native-image --version
+
+            - name: Checkout Ballerina Lang Repository
+              if: ${{ inputs.lang_version == '' }}
+              uses: actions/checkout@v3
+              with:
+                  repository: 'ballerina-platform/ballerina-lang'
+                  ref: ${{ inputs.lang_tag || 'master' }}
+
+            - name: Set Ballerina Lang version
+              run: |
+                  if ${{ inputs.lang_version != ''}}; then
+                      LANG_VERSION=${{ inputs.lang_version }}
+                  else
+                      VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties | rev | cut --complement -d- -f1 | rev)
+                      LANG_VERSION=$VERSION-NATIVE
+                  fi
+                  echo "BALLERINA_LANG_VERSION=$LANG_VERSION" >> $GITHUB_ENV
+                  echo "BALLERINA_LANG_VERSION: $LANG_VERSION"
+
+            - name: Build Ballerina Lang
+              if: ${{ inputs.lang_version == '' }}
+              run: |
+                  perl -pi -e "s/^\s*version=.*/version=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
+                  ./gradlew build -x check -x test publishToMavenLocal --scan --no-daemon
+
+            - name: Checkout Module Repository
+              uses: actions/checkout@v3
+
+            - name: Set default native-image options
+              if: ${{  inputs.native_image_options != '' }}
+              run: |
+                  CURRENT_DIR=$(pwd)
+                  echo "NativeImageArgs = ${{ inputs.native_image_options }}" > default_native.properties
+                  echo "NATIVE_IMAGE_CONFIG_FILE=$CURRENT_DIR/default_native.properties" >> $GITHUB_ENV
+                  echo "NATIVE_IMAGE_CONFIG_FILE: $CURRENT_DIR/default_native.properties"
+
+            - name: Build with Gradle
+              env:
+                  packageUser: ${{ github.actor }}
+                  packagePAT: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
+                  ./gradlew build -PbalNativeTest ${{ inputs.additional_ubuntu_build_flags }}
+
+    windows-build-with-bal-test-native:
+        name: Build with bal test native on Windows
+        runs-on: windows-latest
+
+        steps:
+            - name: Set up GraalVM
+              uses: graalvm/setup-graalvm@v1
+              with:
+                  version: 'latest'
+                  java-version: '11'
+                  components: 'native-image'
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Check GraalVM installation
+              run: |
+                  Write-Output GRAALVM_HOME: "${{ env.GRAALVM_HOME }}"
+                  Write-Output JAVA_HOME: "${{ env.JAVA_HOME }}"
+                  native-image --version
+
+            - name: Checkout Ballerina Lang Repository
+              if: ${{ inputs.lang_version == '' }}
+              uses: actions/checkout@v3
+              with:
+                  repository: 'ballerina-platform/ballerina-lang'
+                  ref: ${{ inputs.lang_tag || 'master' }}
+
+            - name: Set Ballerina Lang version
+              run: |
+                  if ("${{ inputs.lang_version }}" -eq "") {
+                    $properties = convertfrom-stringdata (get-content ./gradle.properties -raw)
+                    $LANG_VERSION = $properties.'version'.split("-",2)[0] + "-NATIVE"
+                  } else {
+                    $LANG_VERSION = "${{ inputs.lang_version }}"
+                  }
+                  "BALLERINA_LANG_VERSION=$LANG_VERSION" >> $env:GITHUB_ENV
+                  Write-Output "BALLERINA_LANG_VERSION: $LANG_VERSION"
+
+            - name: Configure Pagefile
+              if: ${{ inputs.lang_version == '' }}
+              uses: al-cheb/configure-pagefile-action@v1.3
+              with:
+                  minimum-size: 8GB
+                  maximum-size: 16GB
+                  disk-root: "D:"
+
+            - name: Build Ballerina Lang
+              if: ${{ inputs.lang_version == '' }}
+              run: |
+                  perl -pi -e "s/^\s*version=.*/version=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
+                  ./gradlew.bat build -x check -x test publishToMavenLocal --continue -x createJavadoc --stacktrace -scan --console=plain --no-daemon --no-parallel
+
+            - name: Checkout Module Repository
+              uses: actions/checkout@v3
+
+            - name: Set default native-image options
+              if: ${{  inputs.native_image_options != '' }}
+              run: |
+                  $CURRENT_DIR = (Get-Location).tostring()
+                  $DEFAULT_PROPS = $CURRENT_DIR + "\" + "default_native.properties"
+                  $create_file = New-Item $DEFAULT_PROPS
+                  Set-Content $DEFAULT_PROPS "NativeImageArgs = ${{ inputs.native_image_options }}"
+                  "NATIVE_IMAGE_CONFIG_FILE=$DEFAULT_PROPS" >> $env:GITHUB_ENV
+                  Write-Output "NATIVE_IMAGE_CONFIG_FILE: $DEFAULT_PROPS"
+
+            - name: Build with Gradle
+              env:
+                  packageUser: ${{ github.actor }}
+                  packagePAT: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
+                  ./gradlew.bat build -PbalNativeTest ${{ inputs.additional_windows_build_flags }}
