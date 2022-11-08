@@ -34,7 +34,8 @@ function getDashboardRow(Module module, string level) returns string|error {
     string bugsBadge = check getBugsBadge(moduleName);
     string pullRequestsBadge = getPullRequestsBadge(moduleName);
     string loadTestsBadge = check getLoadTestsBadge(moduleName);
-    return string `|${level}|${repoLink}|${releaseBadge}|${buildStatusBadge}|${trivyBadge}|${codecovBadge}|${bugsBadge}|${pullRequestsBadge}|${loadTestsBadge}|`;
+    string balTestNativeBadge = check getBalTestNativeBadge(moduleName);
+    return string `|${level}|${repoLink}|${releaseBadge}|${buildStatusBadge}|${trivyBadge}|${codecovBadge}|${bugsBadge}|${pullRequestsBadge}|${loadTestsBadge}|${balTestNativeBadge}|`;
 }
 
 function getRepoLink(string moduleName) returns string {
@@ -124,6 +125,18 @@ function getLoadTestsBadge(string modName) returns string|error {
         badgeUrl = NABADGE;
     }
     return string `[![Load Tests](${badgeUrl})](${repoUrl})`;
+}
+
+function getBalTestNativeBadge(string moduleName) returns string|error {
+    string badgeUrl = string `${GITHUB_BADGE_URL}/workflow/status/${BALLERINA_ORG_NAME}/${moduleName}/Build%20with%20bal%20test%20native?label=`;
+    string repoUrl = string `${BALLERINA_ORG_URL}/${moduleName}/actions/workflows/build-with-bal-test-native.yml`;
+    string workflowFileUrl = string `/${BALLERINA_ORG_NAME}/${moduleName}/master/.github/workflows/build-with-bal-test-native.yml`;
+    http:Response openUrlResult = check openUrl(GITHUB_RAW_LINK, workflowFileUrl).ensureType();
+    string urlResult = check openUrlResult.getTextPayload();
+    if urlResult == "404: Not Found" {
+        badgeUrl = NABADGE;
+    }
+    return string `[![Build with bal test native](${badgeUrl})](${repoUrl})`;
 }
 
 function getModuleShortName(string moduleName) returns string {

@@ -49,7 +49,7 @@ const NABADGE = "https://img.shields.io/badge/-N%2FA-yellow";
 
 // README Contents
 const DASHBOARD_TITLE = "## Status Dashboard";
-const README_HEADER = "| Level | Modules | Latest Version | Build | Security Check | Code Coverage | Bugs | Open PRs | Load Test Results |\n";
-const README_HEADER_SEPARATOR = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n";
+const README_HEADER = "| Level | Modules | Latest Version | Build | Security Check | Code Coverage | Bugs | Open PRs | Load Test Results | Bal Test Native |\n";
+const README_HEADER_SEPARATOR = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n";
 const BAL_TITLE = "## Ballerina Modules";
 const BALX_TITLE = "## Ballerina Extended Modules";
