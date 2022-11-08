@@ -136,7 +136,7 @@ function getBalTestNativeBadge(string moduleName) returns string|error {
     if urlResult == "404: Not Found" {
         badgeUrl = NABADGE;
     }
-    return string `[![Build with bal test native](${badgeUrl})](${repoUrl})`;
+    return string `[![GraalVM Check](${badgeUrl})](${repoUrl})`;
 }
 
 function getModuleShortName(string moduleName) returns string {
