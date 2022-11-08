@@ -3,11 +3,6 @@ name: Build with bal test native
 on:
     workflow_call:
         inputs:
-            build_envs:
-                description: Test Environments
-                type: string
-                required: false
-                default: Ubuntu and Windows
             lang_tag:
                 description: Branch/Release Tag of the Ballerina Lang
                 type: string
@@ -35,7 +30,6 @@ on:
 jobs:
     ubuntu-build-with-bal-test-native:
         name: Build with bal test native on Ubuntu
-        if: ${{ inputs.build_envs != 'Windows' }}
         runs-on: ubuntu-latest
 
         steps:
@@ -98,7 +92,6 @@ jobs:
 
     windows-build-with-bal-test-native:
         name: Build with bal test native on Windows
-        if: ${{ inputs.build_envs != 'Ubuntu' }}
         runs-on: windows-latest
 
         steps:
