@@ -12,9 +12,11 @@ on:
       additional-build-flags:
         required: false
         type: string
+        default: ""
       additional-publish-flags:
         required: false
         type: string
+        default: ""
 
 jobs:
   publish-release:

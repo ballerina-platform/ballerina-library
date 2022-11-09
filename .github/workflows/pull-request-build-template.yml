@@ -6,9 +6,11 @@ on:
       additional-ubuntu-test-flags:
         required: false
         type: string
+        default: ""
       additional-windows-test-flags:
         required: false
         type: string
+        default: ""
 
 
 # The `build` and `test` commands ran separately as the Ballerina Gradle plugin does not support skipping test groups
