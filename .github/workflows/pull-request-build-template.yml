@@ -2,12 +2,13 @@ name: Pull Request Build
 
 on:
   workflow_call:
-    additional-ubuntu-test-flags:
-      required: false
-      type: string
-    additional-windows-test-flags:
-      required: false
-      type: string
+    inputs:
+      additional-ubuntu-test-flags:
+        required: false
+        type: string
+      additional-windows-test-flags:
+        required: false
+        type: string
 
 
 # The `build` and `test` commands ran separately as the Ballerina Gradle plugin does not support skipping test groups
