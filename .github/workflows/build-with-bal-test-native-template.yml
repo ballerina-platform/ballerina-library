@@ -46,6 +46,7 @@ jobs:
                   echo "GRAALVM_HOME: ${{ env.GRAALVM_HOME }}"
                   echo "JAVA_HOME: ${{ env.JAVA_HOME }}"
                   native-image --version
+                  git config --global core.longpaths true
 
             - name: Checkout Ballerina Lang Repository
               if: ${{ inputs.lang_version == '' }}
