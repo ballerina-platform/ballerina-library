@@ -108,6 +108,7 @@ jobs:
                   Write-Output GRAALVM_HOME: "${{ env.GRAALVM_HOME }}"
                   Write-Output JAVA_HOME: "${{ env.JAVA_HOME }}"
                   native-image --version
+                  git config --system core.longpaths true
 
             - name: Checkout Ballerina Lang Repository
               if: ${{ inputs.lang_version == '' }}
@@ -158,6 +159,7 @@ jobs:
               env:
                   packageUser: ${{ github.actor }}
                   packagePAT: ${{ secrets.GITHUB_TOKEN }}
+                  JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8
               run: |
                   perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
                   ./gradlew.bat build -PbalNativeTest ${{ inputs.additional_windows_build_flags }}
