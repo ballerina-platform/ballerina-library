@@ -28,13 +28,20 @@ function getDashboardRow(Module module, string level) returns string|error {
     }
     string repoLink = getRepoLink(moduleName);
     string releaseBadge = getReleaseBadge(moduleName);
-    string buildStatusBadge = getBuildStatusBadge(moduleName);
-    string trivyBadge = getTrivyBadge(moduleName);
+    string buildStatusBadge = getBuildStatusBadge(moduleName, defaultBranch);
+    string trivyBadge = getTrivyBadge(moduleName, defaultBranch);
     string codecovBadge = getCodecovBadge(moduleName, defaultBranch);
     string bugsBadge = check getBugsBadge(moduleName);
     string pullRequestsBadge = getPullRequestsBadge(moduleName);
-    string loadTestsBadge = check getLoadTestsBadge(moduleName);
-    string balTestNativeBadge = check getBalTestNativeBadge(moduleName);
+    string loadTestsBadge;
+    // websub/websubhub load tests are in websubhub module, hence `websub` load-test badge should be same as `websubhub` load-test badge
+    if moduleName == "module-ballerina-websub" {
+        loadTestsBadge = check getLoadTestsBadge("module-ballerina-websubhub", "main");
+    } else {
+        loadTestsBadge = check getLoadTestsBadge(moduleName, defaultBranch);
+    }
+
+    string balTestNativeBadge = check getBalTestNativeBadge(moduleName, defaultBranch);
     return string `|${level}|${repoLink}|${releaseBadge}|${buildStatusBadge}|${trivyBadge}|${codecovBadge}|${bugsBadge}|${pullRequestsBadge}|${loadTestsBadge}|${balTestNativeBadge}|`;
 }
 
@@ -49,15 +56,15 @@ function getReleaseBadge(string moduleName) returns string {
     return string `[![GitHub Release](${badgeUrl})](${repoUrl})`;
 }
 
-function getBuildStatusBadge(string moduleName) returns string {
-    string badgeUrl = string `${GITHUB_BADGE_URL}/workflow/status/${BALLERINA_ORG_NAME}/${moduleName}/Build?label=`;
-    string repoUrl = string `${BALLERINA_ORG_URL}/${moduleName}/actions/workflows/build-timestamped-master.yml`;
+function getBuildStatusBadge(string moduleName, string defaultBranch) returns string {
+    string badgeUrl = getGithubBadgeUrl(moduleName, WORKFLOW_MASTER_BUILD, defaultBranch, "");
+    string repoUrl = string `${BALLERINA_ORG_URL}/${moduleName}/actions/workflows/${WORKFLOW_MASTER_BUILD}`;
     return string `[![Build](${badgeUrl})](${repoUrl})`;
 }
 
-function getTrivyBadge(string moduleName) returns string {
-    string badgeUrl = string `${GITHUB_BADGE_URL}/workflow/status/${BALLERINA_ORG_NAME}/${moduleName}/Trivy?label=`;
-    string repoUrl = string `${BALLERINA_ORG_URL}/${moduleName}/actions/workflows/trivy-scan.yml`;
+function getTrivyBadge(string moduleName, string defaultBranch) returns string {
+    string badgeUrl = getGithubBadgeUrl(moduleName, WORKFLOW_TRIVY, defaultBranch, "");
+    string repoUrl = string `${BALLERINA_ORG_URL}/${moduleName}/actions/workflows/${WORKFLOW_TRIVY}`;
     return string `[![Trivy](${badgeUrl})](${repoUrl})`;
 }
 
@@ -110,15 +117,10 @@ function getPullRequestsBadge(string moduleName) returns string {
     return string `[![GitHub Pull Requests](${badgeUrl})](${repoUrl})`;
 }
 
-function getLoadTestsBadge(string modName) returns string|error {
-    // websub/websubhub load tests are in websubhub module, hence `websub` load-test badge should be same as `websubhub` load-test badge
-    string moduleName = modName;
-    if modName == "module-ballerina-websub" {
-        moduleName = "module-ballerina-websubhub";
-    }
-    string badgeUrl = string `${GITHUB_BADGE_URL}/workflow/status/${BALLERINA_ORG_NAME}/${moduleName}/Process%20load%20test%20results?label=`;
-    string repoUrl = string `${BALLERINA_ORG_URL}/${moduleName}/actions/workflows/process-load-test-result.yml`;
-    string workflowFileUrl = string `/${BALLERINA_ORG_NAME}/${moduleName}/master/.github/workflows/process-load-test-result.yml`;
+function getLoadTestsBadge(string moduleName, string defaultBranch) returns string|error {
+    string badgeUrl = getGithubBadgeUrl(moduleName, WORKFLOW_PROCESS_LOAD_TESTS, defaultBranch, "");
+    string repoUrl = string `${BALLERINA_ORG_URL}/${moduleName}/actions/workflows/${WORKFLOW_PROCESS_LOAD_TESTS}`;
+    string workflowFileUrl = string `/${BALLERINA_ORG_NAME}/${moduleName}/master/.github/workflows/${WORKFLOW_PROCESS_LOAD_TESTS}`;
     http:Response openUrlResult = check openUrl(GITHUB_RAW_LINK, workflowFileUrl).ensureType();
     string urlResult = check openUrlResult.getTextPayload();
     if urlResult == "404: Not Found" {
@@ -127,10 +129,10 @@ function getLoadTestsBadge(string modName) returns string|error {
     return string `[![Load Tests](${badgeUrl})](${repoUrl})`;
 }
 
-function getBalTestNativeBadge(string moduleName) returns string|error {
-    string badgeUrl = string `${GITHUB_BADGE_URL}/workflow/status/${BALLERINA_ORG_NAME}/${moduleName}/Build%20with%20bal%20test%20native?label=`;
-    string repoUrl = string `${BALLERINA_ORG_URL}/${moduleName}/actions/workflows/build-with-bal-test-native.yml`;
-    string workflowFileUrl = string `/${BALLERINA_ORG_NAME}/${moduleName}/master/.github/workflows/build-with-bal-test-native.yml`;
+function getBalTestNativeBadge(string moduleName, string defaultBranch) returns string|error {
+    string badgeUrl = getGithubBadgeUrl(moduleName, WORKFLOW_BAL_TEST_NATIVE, defaultBranch, "");
+    string repoUrl = string `${BALLERINA_ORG_URL}/${moduleName}/actions/workflows/${WORKFLOW_BAL_TEST_NATIVE}`;
+    string workflowFileUrl = string `/${BALLERINA_ORG_NAME}/${moduleName}/master/.github/workflows/${WORKFLOW_BAL_TEST_NATIVE}`;
     http:Response openUrlResult = check openUrl(GITHUB_RAW_LINK, workflowFileUrl).ensureType();
     string urlResult = check openUrlResult.getTextPayload();
     if urlResult == "404: Not Found" {
@@ -150,4 +152,12 @@ function getModuleShortName(string moduleName) returns string {
 // string formating
 function capitalize(string str) returns string {
     return str[0].toUpperAscii() + str.substring(1, str.length());
+}
+
+function getGithubBadgeUrl(string moduleName, string workflowFile, string defaultBranch, string? label = ()) returns string {
+    string labelParameter = "";
+    if label is string {
+        labelParameter = "&label=" + label;
+    }
+    return string `${GITHUB_BADGE_URL}/actions/workflow/status/${BALLERINA_ORG_NAME}/${moduleName}/${workflowFile}?branch=${defaultBranch}${labelParameter}`;
 }
