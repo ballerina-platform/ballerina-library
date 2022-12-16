@@ -9,7 +9,7 @@ dependencies-toml-version = "2"
 [[package]]
 org = "ballerina"
 name = "auth"
-version = "2.2.1"
+version = "2.5.0"
 dependencies = [
 	{org = "ballerina", name = "crypto"},
 	{org = "ballerina", name = "jballerina.java"},
@@ -22,8 +22,9 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "cache"
-version = "3.2.1"
+version = "3.3.0"
 dependencies = [
+	{org = "ballerina", name = "constraint"},
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "task"},
 	{org = "ballerina", name = "time"}
@@ -31,8 +32,16 @@ dependencies = [
 
 [[package]]
 org = "ballerina"
+name = "constraint"
+version = "1.0.1"
+dependencies = [
+	{org = "ballerina", name = "jballerina.java"}
+]
+
+[[package]]
+org = "ballerina"
 name = "crypto"
-version = "2.2.1"
+version = "2.3.0"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "time"}
@@ -41,7 +50,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "file"
-version = "1.2.2"
+version = "1.5.0"
 dependencies = [
 	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "jballerina.java"},
@@ -54,10 +63,11 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "http"
-version = "2.2.1"
+version = "2.5.1"
 dependencies = [
 	{org = "ballerina", name = "auth"},
 	{org = "ballerina", name = "cache"},
+	{org = "ballerina", name = "constraint"},
 	{org = "ballerina", name = "crypto"},
 	{org = "ballerina", name = "file"},
 	{org = "ballerina", name = "io"},
@@ -84,7 +94,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "io"
-version = "1.2.1"
+version = "1.3.1"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "lang.value"}
@@ -101,7 +111,7 @@ version = "0.0.0"
 [[package]]
 org = "ballerina"
 name = "jwt"
-version = "2.2.1"
+version = "2.5.0"
 dependencies = [
 	{org = "ballerina", name = "cache"},
 	{org = "ballerina", name = "crypto"},
@@ -157,6 +167,14 @@ version = "0.0.0"
 
 [[package]]
 org = "ballerina"
+name = "lang.regexp"
+version = "0.0.0"
+dependencies = [
+	{org = "ballerina", name = "jballerina.java"}
+]
+
+[[package]]
+org = "ballerina"
 name = "lang.runtime"
 version = "0.0.0"
 dependencies = [
@@ -168,7 +186,8 @@ org = "ballerina"
 name = "lang.string"
 version = "0.0.0"
 dependencies = [
-	{org = "ballerina", name = "jballerina.java"}
+	{org = "ballerina", name = "jballerina.java"},
+	{org = "ballerina", name = "lang.regexp"}
 ]
 
 [[package]]
@@ -182,7 +201,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "log"
-version = "2.2.1"
+version = "2.5.0"
 dependencies = [
 	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "jballerina.java"},
@@ -196,7 +215,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "mime"
-version = "2.2.2"
+version = "2.5.0"
 dependencies = [
 	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "jballerina.java"},
@@ -206,7 +225,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "oauth2"
-version = "2.2.1"
+version = "2.5.0"
 dependencies = [
 	{org = "ballerina", name = "cache"},
 	{org = "ballerina", name = "crypto"},
@@ -218,7 +237,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "observe"
-version = "1.0.4"
+version = "1.0.6"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
 ]
@@ -226,8 +245,9 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "os"
-version = "1.2.1"
+version = "1.5.0"
 dependencies = [
+	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "jballerina.java"}
 ]
 modules = [
@@ -237,9 +257,10 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "regex"
-version = "1.2.1"
+version = "1.3.2"
 dependencies = [
-	{org = "ballerina", name = "jballerina.java"}
+	{org = "ballerina", name = "jballerina.java"},
+	{org = "ballerina", name = "lang.string"}
 ]
 modules = [
 	{org = "ballerina", packageName = "regex", moduleName = "regex"}
@@ -247,8 +268,28 @@ modules = [
 
 [[package]]
 org = "ballerina"
+name = "stdlib_dashboard"
+version = "1.0.0"
+dependencies = [
+	{org = "ballerina", name = "http"},
+	{org = "ballerina", name = "io"},
+	{org = "ballerina", name = "lang.array"},
+	{org = "ballerina", name = "log"},
+	{org = "ballerina", name = "os"},
+	{org = "ballerina", name = "regex"},
+	{org = "ballerina", name = "test"},
+	{org = "ballerina", name = "url"},
+	{org = "ballerinai", name = "observe"},
+	{org = "ballerinax", name = "github"}
+]
+modules = [
+	{org = "ballerina", packageName = "stdlib_dashboard", moduleName = "stdlib_dashboard"}
+]
+
+[[package]]
+org = "ballerina"
 name = "task"
-version = "2.2.1"
+version = "2.3.0"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "time"}
@@ -269,7 +310,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "time"
-version = "2.2.1"
+version = "2.2.3"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
 ]
@@ -277,7 +318,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "url"
-version = "2.2.1"
+version = "2.2.3"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
 ]
@@ -299,37 +340,27 @@ modules = [
 
 [[package]]
 org = "ballerinax"
-name = "github"
-version = "4.0.0"
+name = "client.config"
+version = "1.0.1"
 dependencies = [
 	{org = "ballerina", name = "http"},
-	{org = "ballerina", name = "log"},
-	{org = "ballerina", name = "os"},
-	{org = "ballerina", name = "regex"},
-	{org = "ballerinai", name = "observe"}
-]
-modules = [
-	{org = "ballerinax", packageName = "github", moduleName = "github"}
+	{org = "ballerina", name = "oauth2"}
 ]
 
 [[package]]
-org = "root"
-name = "dashboard"
-version = "0.1.0"
+org = "ballerinax"
+name = "github"
+version = "4.3.0"
 dependencies = [
 	{org = "ballerina", name = "http"},
-	{org = "ballerina", name = "io"},
-	{org = "ballerina", name = "lang.array"},
 	{org = "ballerina", name = "log"},
 	{org = "ballerina", name = "os"},
 	{org = "ballerina", name = "regex"},
-	{org = "ballerina", name = "test"},
-	{org = "ballerina", name = "url"},
 	{org = "ballerinai", name = "observe"},
-	{org = "ballerinax", name = "github"}
+	{org = "ballerinax", name = "client.config"}
 ]
 modules = [
-	{org = "root", packageName = "dashboard", moduleName = "dashboard"}
+	{org = "ballerinax", packageName = "github", moduleName = "github"}
 ]
 
 

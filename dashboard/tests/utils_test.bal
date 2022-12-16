@@ -39,9 +39,7 @@ function getLoadTestsBadgeTest() {
     test:assertEquals(getLoadTestsBadge(JAVA_ARRAYS_MODULE, "master"), "[![Load Tests](https://img.shields.io/badge/-N%2FA-yellow)](https://github.com/ballerina-platform/module-ballerina-jballerina.java.arrays/actions/workflows/process-load-test-result.yml)");
 }
 
-@test:Config {
-    enable:false
-}
+@test:Config
 function getBugsBadgeTest() {
     test:assertEquals(getBugsBadge(JAVA_ARRAYS_MODULE), "[![Bugs](https://img.shields.io/github/issues-search/ballerina-platform/ballerina-standard-library?query=is%3Aopen%20label%3Amodule%2Fjava.arrays%20label%3AType%2FBug&label=&color=30c955)](https://github.com/ballerina-platform/ballerina-standard-library/issues?q=is%3Aopen%20label%3Amodule%2Fjava.arrays%20label%3AType%2FBug)");
 }
