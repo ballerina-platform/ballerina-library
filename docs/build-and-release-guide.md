@@ -39,7 +39,7 @@ Module owners should create needed branches for Language versions only if the la
 ### Handling Essential Breaking Changes
 
 The module, with a dependency on an older Language Distribution, will function on newer versions as long as there are no Essential Breaking Changes from the Language team for the upcoming Ballerina Update release.
->> Essential Changes cannot be added in Patch Releases.
+> Essential Changes cannot be added in Patch Releases.
 
 Compiler Team will handle all Essential Changes proactively. We have added a Pull Request check to all `ballerina-lang` Pull Requests. It is to validate that no downstream Standard Library modules are impacted.
 
@@ -56,7 +56,7 @@ Compiler Team will handle all Essential Changes proactively. We have added a Pul
     - Change the distribution in Ballerina.toml.
     - Bump to the next minor version (Skip this step if the development version is the next minor version to the last release)
 4. Developer opens a `ballerina-lang` PR and merges the change.
-      >> The developer should provide the Language timestamped version to module owners to merge the changes to default branch 
+      > The developer should provide the Language timestamped version to module owners to merge the changes to default branch 
 
 ### Release Process
 
@@ -85,6 +85,6 @@ Checklist,
    - Modules have the latest published/timestamped dependency versions.
    - Ballerina.toml has the correct distribution version.
 3. Use the [Extensions - Update Ballerina Version Workflow](https://github.com/ballerina-platform/ballerina-release/actions/workflows/update_dependency_version.yml) to update dependency versions to the latest for consecutive version updates if any (lang RC releases).
-   >> If the RM is releasing only a subset of modules, which have the latest Language version, they should update the [extensions.json](https://github.com/ballerina-platform/ballerina-release/blob/master/dependabot/resources/extensions.json) by removing unnecessary modules in a separate branch. They can run the workflow run on said branch
+   > If the RM is releasing only a subset of modules, which have the latest Language version, they should update the [extensions.json](https://github.com/ballerina-platform/ballerina-release/blob/master/dependabot/resources/extensions.json) by removing unnecessary modules in a separate branch. They can run the workflow run on said branch
 4. Ensure Ballerina Release Manager has released all modules to the Central Staging after each RC vote. The release Manager of the Ballerina Release will publish this. Module owners are responsible for the ballerinax components.
 5. Run the [stdlib test workflow](https://github.com/ballerina-platform/ballerina-standard-library/actions/workflows/test_stdlib_releases_with_staging.yml) to verify newly published modules are working in an integration scenario. (This is to ensure no standard library release will break the existing users' build)
