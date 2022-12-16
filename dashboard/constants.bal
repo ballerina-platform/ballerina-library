@@ -53,3 +53,9 @@ const README_HEADER = "| Level | Modules | Latest Version | Build | Security Che
 const README_HEADER_SEPARATOR = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n";
 const BAL_TITLE = "## Ballerina Modules";
 const BALX_TITLE = "## Ballerina Extended Modules";
+
+// Workflow files
+const WORKFLOW_MASTER_BUILD = "build-timestamped-master.yml";
+const WORKFLOW_TRIVY = "trivy-scan.yml";
+const WORKFLOW_PROCESS_LOAD_TESTS = "process-load-test-result.yml";
+const WORKFLOW_BAL_TEST_NATIVE = "build-with-bal-test-native.yml";

@@ -1,5 +1,8 @@
 [package]
+org = "ballerina"
+name = "stdlib_dashboard"
 distribution = "2201.0.3"
+version = "1.0.0"
 
 [build-options]
 observabilityIncluded = true

@@ -15,12 +15,12 @@ function getReleaseBadgeTest() {
 
 @test:Config
 function getBuildStatusBadgeTest() {
-    test:assertEquals(getBuildStatusBadge(IO_MODULE), "[![Build](https://img.shields.io/github/workflow/status/ballerina-platform/module-ballerina-io/Build?label=)](https://github.com/ballerina-platform/module-ballerina-io/actions/workflows/build-timestamped-master.yml)");
+    test:assertEquals(getBuildStatusBadge(IO_MODULE, "master"), "[![Build](https://img.shields.io/github/actions/workflow/status/ballerina-platform/module-ballerina-io/build-timestamped-master.yml?branch=master&label=)](https://github.com/ballerina-platform/module-ballerina-io/actions/workflows/build-timestamped-master.yml)");
 }
 
 @test:Config
 function getTrivyBadgeTest() {
-    test:assertEquals(getTrivyBadge(IO_MODULE), "[![Trivy](https://img.shields.io/github/workflow/status/ballerina-platform/module-ballerina-io/Trivy?label=)](https://github.com/ballerina-platform/module-ballerina-io/actions/workflows/trivy-scan.yml)");
+    test:assertEquals(getTrivyBadge(IO_MODULE, "master"), "[![Trivy](https://img.shields.io/github/actions/workflow/status/ballerina-platform/module-ballerina-io/trivy-scan.yml?branch=master&label=)](https://github.com/ballerina-platform/module-ballerina-io/actions/workflows/trivy-scan.yml)");
 }
 
 @test:Config
@@ -37,8 +37,8 @@ function getPullRequestsBadgeTest() {
     enable: false
 }
 function getLoadTestsBadgeTest() {
-    test:assertEquals(getLoadTestsBadge(IO_MODULE), "[![Load Tests](https://img.shields.io/github/workflow/status/ballerina-platform/module-ballerina-io/Process%20load%20test%20results?label=)](https://github.com/ballerina-platform/module-ballerina-io/actions/workflows/process-load-test-result.yml)");
-    test:assertEquals(getLoadTestsBadge(JAVA_ARRAYS_MODULE), "[![Load Tests](https://img.shields.io/badge/-N%2FA-yellow)](https://github.com/ballerina-platform/module-ballerina-jballerina.java.arrays/actions/workflows/process-load-test-result.yml)");
+    test:assertEquals(getLoadTestsBadge(IO_MODULE, "master"), "[![Load Tests](https://img.shields.io/github/workflow/status/ballerina-platform/module-ballerina-io/Process%20load%20test%20results?label=)](https://github.com/ballerina-platform/module-ballerina-io/actions/workflows/process-load-test-result.yml)");
+    test:assertEquals(getLoadTestsBadge(JAVA_ARRAYS_MODULE, "master"), "[![Load Tests](https://img.shields.io/badge/-N%2FA-yellow)](https://github.com/ballerina-platform/module-ballerina-jballerina.java.arrays/actions/workflows/process-load-test-result.yml)");
 }
 
 @test:Config {
