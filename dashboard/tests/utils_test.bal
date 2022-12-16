@@ -33,11 +33,9 @@ function getPullRequestsBadgeTest() {
     test:assertEquals(getPullRequestsBadge(IO_MODULE), "[![GitHub Pull Requests](https://img.shields.io/github/issues-pr-raw/ballerina-platform/module-ballerina-io.svg?label=)](https://github.com/ballerina-platform/module-ballerina-io/pulls)");
 }
 
-@test:Config {
-    enable: false
-}
+@test:Config
 function getLoadTestsBadgeTest() {
-    test:assertEquals(getLoadTestsBadge(IO_MODULE, "master"), "[![Load Tests](https://img.shields.io/github/workflow/status/ballerina-platform/module-ballerina-io/Process%20load%20test%20results?label=)](https://github.com/ballerina-platform/module-ballerina-io/actions/workflows/process-load-test-result.yml)");
+    test:assertEquals(getLoadTestsBadge(IO_MODULE, "master"), "[![Load Tests](https://img.shields.io/github/actions/workflow/status/ballerina-platform/module-ballerina-io/process-load-test-result.yml?branch=master&label=)](https://github.com/ballerina-platform/module-ballerina-io/actions/workflows/process-load-test-result.yml)");
     test:assertEquals(getLoadTestsBadge(JAVA_ARRAYS_MODULE, "master"), "[![Load Tests](https://img.shields.io/badge/-N%2FA-yellow)](https://github.com/ballerina-platform/module-ballerina-jballerina.java.arrays/actions/workflows/process-load-test-result.yml)");
 }
 
