@@ -26,6 +26,10 @@ on:
                 required: false
                 type: string
                 default: ''
+            java_tool_options:
+                required: false
+                type: string
+                default: ''
 
 jobs:
     ubuntu-build-with-bal-test-native:
@@ -159,7 +163,7 @@ jobs:
               env:
                   packageUser: ${{ github.actor }}
                   packagePAT: ${{ secrets.GITHUB_TOKEN }}
-                  JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8
+                  JAVA_TOOL_OPTIONS: ${{ inputs.java_tool_options }}
               run: |
                   perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
                   ./gradlew.bat build -PbalNativeTest ${{ inputs.additional_windows_build_flags }}
