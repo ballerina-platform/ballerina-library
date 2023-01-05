@@ -26,6 +26,10 @@ on:
                 required: false
                 type: string
                 default: ''
+            java_tool_options:
+                required: false
+                type: string
+                default: ''
 
 jobs:
     ubuntu-build-with-bal-test-native:
@@ -154,12 +158,17 @@ jobs:
                   Set-Content $DEFAULT_PROPS "NativeImageArgs = ${{ inputs.native_image_options }}"
                   "NATIVE_IMAGE_CONFIG_FILE=$DEFAULT_PROPS" >> $env:GITHUB_ENV
                   Write-Output "NATIVE_IMAGE_CONFIG_FILE: $DEFAULT_PROPS"
+                  
+            - name: Set JAVA tool options
+              if: ${{ inputs.java_tool_options != '' }}
+              run: |
+                  "JAVA_TOOL_OPTIONS=${{ inputs.java_tool_options }}" >> $env:GITHUB_ENV
+                  Write-Output "JAVA_TOOL_OPTIONS=${{ inputs.java_tool_options }}"
 
             - name: Build with Gradle
               env:
                   packageUser: ${{ github.actor }}
                   packagePAT: ${{ secrets.GITHUB_TOKEN }}
-                  JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8
               run: |
                   perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
                   ./gradlew.bat build -PbalNativeTest ${{ inputs.additional_windows_build_flags }}
