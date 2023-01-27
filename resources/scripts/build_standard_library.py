@@ -190,33 +190,33 @@ def main():
         module[FIELD_BRANCH] = branch if branch else module[FIELD_DEFAULT_BRANCH]
         return_code = process_module(module, commands, lang_version,
                                      use_snapshots, keep_local_changes)
+        exit_code = 0
         if return_code != 0:
+            exit_code = return_code
             if continue_on_error:
-                print_error("Build failed for module: " +
-                            module[FIELD_NAME] + ". Continuing the build")
-            else:
                 print_warn("Build failed for module: " +
-                           module[FIELD_NAME] + ". Exiting the build. (Use `--continue-on-error` flag to continue the build even if a module build fails)")
-                break
+                           module[FIELD_NAME] + ". Continuing the build")
+            else:
+                print_error("Build failed for module: " +
+                            module[FIELD_NAME] + ". Exiting the build. (Use `--continue-on-error` flag to continue the build even if a module build fails)")
 
         if module[FIELD_NAME] == up_to_module:
             break
 
-    exit(0)
+    exit(exit_code)
 
 
 def process_module(module, commands, lang_version, use_snapshots, keep_local_changes):
     print_block()
     if module[FIELD_SKIP]:
         print_info("Skipping: " + module[FIELD_NAME])
-        return 0
     else:
         print_info("Processing: " + module[FIELD_NAME])
     print_info("Branch: " + module[FIELD_BRANCH])
     print_block()
 
     if module[FIELD_SKIP]:
-        return
+        return 0
 
     if not os.path.exists(module[FIELD_NAME]):
         clone_module(module[FIELD_NAME])
