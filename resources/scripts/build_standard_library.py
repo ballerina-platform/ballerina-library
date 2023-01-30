@@ -18,6 +18,7 @@ FIELD_DEFAULT_BRANCH = "default_branch"
 FIELD_NAME = "name"
 FIELD_KEEP_LOCAL_CHANGES = "keep_local_changes"
 FIELD_SKIP = "skip"
+FIELD_VERSION_KEY = "version_key"
 
 # File Names
 TEMP_PROPERTIES = "temp.properties"
@@ -254,20 +255,17 @@ def replace_stdlibs_version(module_name, snapshots_build):
     global version_dict
     with open(TEMP_PROPERTIES, "w+") as temp, open(GRADLE_PROPERTIES) as properties:
         for line in properties:
-            if match := re.search("^stdlib(.*)Version=", line):
-                version_name = match.group(1)
-                if version_name in version_dict:
-                    version_string = line.split("=")[0].strip()
-                    version_number = version_dict[version_name].strip()
-                    line = version_string + "=" + version_number + "\n"
+            if re.match("^stdlib.*Version=", line):
+                version_key = line.split("=")[0].strip()
+                if version_key in version_dict:
+                    version_number = version_dict[version_key].strip()
+                    line = version_key + "=" + version_number + "\n"
                 else:
                     if snapshots_build:
                         print_warn(
-                            "Using default snapshot version for: " + match.group(0).replace("=", ""))
-                    version_string = line.split("=")[0].strip()
-                    version_number = line.split("=")[1].split(
-                        "-")[0].strip() + "-SNAPSHOT"
-                    line = version_string + "=" + version_number + "\n"
+                            "Using default snapshot version for: " + module_name)
+                    version_number = line.split("=")[1].split("-")[0].strip() + "-SNAPSHOT"
+                    line = version_key + "=" + version_number + "\n"
             temp.write(line)
 
     os.replace(TEMP_PROPERTIES, GRADLE_PROPERTIES)
@@ -292,14 +290,8 @@ def get_version(module):
     with open(GRADLE_PROPERTIES) as properties:
         for line in properties:
             if re.match("^version=", line):
-                module_name = module[FIELD_NAME].split("-")[-1]
-                if module_name == "jballerina.java.arrays":
-                    module_name = "JavaArrays"
-                elif module_name == "oauth2":
-                    module_name = "OAuth2"
-                else:
-                    module_name = module_name.capitalize()
-                version_dict[module_name] = line.split("=")[1].strip()
+                version_dict[module[FIELD_VERSION_KEY]] = line.split("=")[
+                    1].strip()
 
 
 def checkout_branch(branch, keep_local_changes):
