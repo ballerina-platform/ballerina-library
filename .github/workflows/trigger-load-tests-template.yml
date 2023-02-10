@@ -32,7 +32,7 @@ jobs:
             - name: Process cluster name
               id: processClusterName
               run: |
-                  clusterName="${{inputs.cluster_name}}"
+                  clusterName="${{ inputs.cluster_name }}"
                   if [ "$clusterName" = "" ]; then
                     clusterName="${{ inputs.repo_name }}-perf-cluster-test"
                   fi
@@ -42,7 +42,7 @@ jobs:
               shell: bash
               run: |
                   printf "runtimeUrl=%s" $(curl -H "Accept: application/vnd.github.v3+json" \
-                      "${{inputs.runtime_artifacts_url}}" | \
+                      "${{ inputs.runtime_artifacts_url }}" | \
                       jq '[.artifacts[] | select(.name=="ballerina-runtime" and .expired==false)]|max|.archive_download_url') >> $GITHUB_OUTPUT
             - name: Format test names
               id: formatTestNames
@@ -68,4 +68,4 @@ jobs:
                   repo: ballerina-platform/ballerina-performance-cloud
                   ref: refs/heads/main
                   token: ${{ secrets.BALLERINA_BOT_TOKEN }}
-                  inputs: '{ "repo-name": "${{ inputs.repo_name }}", "tests": "${{ steps.formatTestNames.outputs.testNames }}", "zipURL": ${{ steps.setRuntimeUrl.outputs.runtimeUrl}}, "clusterName": "${{ steps.processClusterName.outputs.clusterName }}", "dispatchType": "${{ inputs.dispatch_type }}" }'
+                  inputs: '{ "repo-name": "${{ inputs.repo_name }}", "tests": "${{ steps.formatTestNames.outputs.testNames }}", "zipURL": ${{ steps.setRuntimeUrl.outputs.runtimeUrl }}, "clusterName": "${{ steps.processClusterName.outputs.clusterName }}", "dispatchType": "${{ inputs.dispatch_type }}" }'
