@@ -27,6 +27,8 @@ jobs:
         runs-on: ubuntu-latest
         if: github.repository_owner == 'ballerina-platform'
         steps:
+            - name: Checkout
+              uses: actions/checkout@v2
             - name: Process cluster name
               id: processClusterName
               run: |
