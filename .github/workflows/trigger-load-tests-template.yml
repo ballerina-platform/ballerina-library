@@ -24,6 +24,10 @@ on:
                 required: false
                 type: string
                 default: ''
+        secrets:
+            ballerina_bot_token:
+                description: 'Ballerina bot token used to invoke the load test'
+                required: true
 
 jobs:
     invoke-load-tests:
@@ -71,5 +75,5 @@ jobs:
                   workflow: Stdlib Workflow
                   repo: ballerina-platform/ballerina-performance-cloud
                   ref: refs/heads/main
-                  token: ${{ secrets.BALLERINA_BOT_TOKEN }}
+                  token: ${{ secrets.ballerina_bot_token }}
                   inputs: '{ "repo-name": "${{ inputs.repo_name }}", "tests": "${{ steps.formatTestNames.outputs.testNames }}", "zipURL": ${{ steps.setRuntimeUrl.outputs.runtimeUrl }}, "clusterName": "${{ steps.processClusterName.outputs.clusterName }}", "dispatchType": "${{ inputs.dispatch_type }}", "branch": "${{ inputs.branch }}" }'
