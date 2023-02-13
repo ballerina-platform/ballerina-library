@@ -68,4 +68,4 @@ jobs:
                   repo: ballerina-platform/ballerina-performance-cloud
                   ref: refs/heads/main
                   token: ${{ secrets.BALLERINA_BOT_TOKEN }}
-                  inputs: '{ "repo-name": "${{ inputs.repo_name }}", "tests": "${{ steps.formatTestNames.outputs.testNames }}", "zipURL": ${{ steps.setRuntimeUrl.outputs.runtimeUrl }}, "clusterName": "${{ steps.processClusterName.outputs.clusterName }}", "dispatchType": "${{ inputs.dispatch_type }}" }'
+                  inputs: '{ "repo-name": "${{ inputs.repo_name }}", "tests": "${{ steps.formatTestNames.outputs.testNames }}", "zipURL": ${{ steps.setRuntimeUrl.outputs.runtimeUrl }}, "clusterName": "${{ steps.processClusterName.outputs.clusterName }}", "dispatchType": "${{ inputs.dispatch_type }}", "branch": "${{ inputs.branch }}" }'
