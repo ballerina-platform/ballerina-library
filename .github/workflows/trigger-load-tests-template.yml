@@ -1,0 +1,75 @@
+name: Trigger Load Tests
+
+on:
+    workflow_call:
+        inputs:
+            repo_name:
+                required: true
+                type: string
+            runtime_artifacts_url:
+                required: true
+                type: string
+            dispatch_type:
+                required: true
+                type: string
+            cluster_name:
+                required: false
+                type: string
+                default: ''
+            tests:
+                required: false
+                type: string
+                default: ''
+            branch:
+                required: false
+                type: string
+                default: ''
+
+jobs:
+    invoke-load-tests:
+        name: Trigger load tests
+        runs-on: ubuntu-latest
+        if: github.repository_owner == 'ballerina-platform'
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Process cluster name
+              id: processClusterName
+              run: |
+                  clusterName="${{ inputs.cluster_name }}"
+                  if [ "$clusterName" = "" ]; then
+                    clusterName="${{ inputs.repo_name }}-perf-cluster-test"
+                  fi
+                  printf "clusterName=%s" $clusterName >> $GITHUB_OUTPUT
+            - name: Get latest ballerina runtime artifact
+              id: setRuntimeUrl
+              shell: bash
+              run: |
+                  printf "runtimeUrl=%s" $(curl -H "Accept: application/vnd.github.v3+json" \
+                      "${{ inputs.runtime_artifacts_url }}" | \
+                      jq '[.artifacts[] | select(.name=="ballerina-runtime" and .expired==false)]|max|.archive_download_url') >> $GITHUB_OUTPUT
+            - name: Format test names
+              id: formatTestNames
+              shell: bash
+              run: |
+                  tests="${{inputs.tests}}"
+                  if [ ! "$tests" = "" ]; then
+                      testsInput=(${tests//,/ })
+                      testsCount=${#testsInput[@]}
+                      testsOutput=""
+                      for (( i=0; i<$testsCount; i++ ));
+                      do
+                          testsOutput+=\\'"'${testsInput[$i]}\\'"',
+                      done
+                      printf "testNames=%s" [${testsOutput:0:-1}] >> $GITHUB_OUTPUT
+                  else
+                      printf "testNames=%s" $tests >> $GITHUB_OUTPUT
+                  fi
+            - name: Invoke standard library load test workflow
+              uses: benc-uk/workflow-dispatch@v1
+              with:
+                  workflow: Stdlib Workflow
+                  repo: ballerina-platform/ballerina-performance-cloud
+                  ref: refs/heads/main
+                  token: ${{ secrets.BALLERINA_BOT_TOKEN }}
+                  inputs: '{ "repo-name": "${{ inputs.repo_name }}", "tests": "${{ steps.formatTestNames.outputs.testNames }}", "zipURL": ${{ steps.setRuntimeUrl.outputs.runtimeUrl }}, "clusterName": "${{ steps.processClusterName.outputs.clusterName }}", "dispatchType": "${{ inputs.dispatch_type }}", "branch": "${{ inputs.branch }}" }'
