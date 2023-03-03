@@ -30,8 +30,6 @@ on:
                 required: false
                 type: string
                 default: ''
-    pull_request:
-        types: [opened, synchronize, reopened, labeled, unlabeled]
 
 jobs:
     ubuntu-build-with-bal-test-native:
