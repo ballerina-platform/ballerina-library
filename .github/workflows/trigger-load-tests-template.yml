@@ -44,6 +44,7 @@ jobs:
                   if [ "$clusterName" = "" ]; then
                     clusterName="${{ inputs.repo_name }}-perf-cluster-test"
                   fi
+                  clusterName=`echo $clusterName | sed -r 's/[^-_0-9A-Za-z]/_/g'`
                   printf "clusterName=%s" $clusterName >> $GITHUB_OUTPUT
             - name: Get latest ballerina runtime artifact
               id: setRuntimeUrl
