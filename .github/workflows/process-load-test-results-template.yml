@@ -35,7 +35,7 @@ jobs:
             branch=$(echo "$result" | jq -r '.branch')
             if [[ $status == "success" && $checkedOut == false ]]
             then
-              git checkout -b "load-test-results" $branch
+              git checkout -b "load-test-results" "origin/"$branch
               printf "branch=$branch" >> $GITHUB_OUTPUT
               checkedOut=true
             fi
