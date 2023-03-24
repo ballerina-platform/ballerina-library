@@ -36,7 +36,7 @@ jobs:
             if [[ $status == "success" && $checkedOut == false ]]
             then
               git checkout -b "load-test-results" "origin/"$branch
-              printf "branch=%s" $branch >> $GITHUB_OUTPUT
+              echo "branch=%s" $branch >> $GITHUB_OUTPUT
               checkedOut=true
             fi
             if [[ $status == "success" ]]
@@ -44,7 +44,7 @@ jobs:
               echo $(echo "$result" | jq -r '.result') >> load-tests/$test_scenario/results/summary.csv
               git add load-tests/$test_scenario/results/summary.csv
               git commit -m "Update $test_scenario test results on $(date)"
-              printf "hasPassed=true" >> $GITHUB_OUTPUT
+              echo "hasPassed=true" >> $GITHUB_OUTPUT
             else
               echo $test_scenario "test has failed with error rate" $(echo "$result" | jq -r '.errorRate')
               printf "hasFailed=true" >> $GITHUB_OUTPUT
