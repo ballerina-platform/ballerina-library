@@ -57,13 +57,6 @@ jobs:
           done
         env:
           GITHUB_TOKEN: ${{ secrets.ballerina_bot_token }}
-      - name: Print values
-        run: |
-          echo "Printing values"
-          echo ${{ steps.processResults.outputs.hasPassed }}
-          echo ${{ steps.processResults.outputs.branch }}
-          echo ${{ steps.processResults.outputs.hasFailed }}
-          echo "Printed values"
       - name: Push results
         if: ${{ steps.processResults.outputs.hasPassed }}
         run: git push origin "load-test-results"
