@@ -26,7 +26,6 @@ jobs:
           git config --global user.email "ballerina-bot@ballerina.org"
           git config --global user.name "ballerina-bot"
           git pull
-          git checkout -b "load-test-results"
           checkedOut=false
           echo '${{ inputs.results }}' | jq -c '.[]' |
           while read -r result; do
