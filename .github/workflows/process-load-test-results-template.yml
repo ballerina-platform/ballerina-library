@@ -36,7 +36,7 @@ jobs:
             if [[ $status == "success" && $checkedOut == false ]]
             then
               git checkout -b "load-test-results" "origin/"$branch
-              printf "branch=$branch" >> $GITHUB_OUTPUT
+              printf "branch=%s" $branch >> $GITHUB_OUTPUT
               checkedOut=true
             fi
             if [[ $status == "success" ]]
