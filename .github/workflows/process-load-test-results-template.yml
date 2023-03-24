@@ -47,7 +47,7 @@ jobs:
               echo "hasPassed=true" >> $GITHUB_OUTPUT
             else
               echo $test_scenario "test has failed with error rate" $(echo "$result" | jq -r '.errorRate')
-              printf "hasFailed=true" >> $GITHUB_OUTPUT
+              echo "hasFailed=true" >> $GITHUB_OUTPUT
             fi
           done
         env:
@@ -57,6 +57,7 @@ jobs:
           echo "Printing values"
           echo ${{ steps.processResults.outputs.hasPassed }}
           echo ${{ steps.processResults.outputs.branch }}
+          echo ${{ steps.processResults.outputs.hasFailed }}
           echo "Printed values"
       - name: Push results
         if: ${{ steps.processResults.outputs.hasPassed }}
