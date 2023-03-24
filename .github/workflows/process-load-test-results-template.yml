@@ -109,4 +109,4 @@ jobs:
         run: |
           echo "One or more load tests have been failed"
           echo '${{ inputs.results }}'
-          exit
+          exit 1
