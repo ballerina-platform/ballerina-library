@@ -73,7 +73,7 @@ jobs:
         id: createPR
         if: ${{ steps.processResults.outputs.hasPassed }}
         run: |
-          if [[ ${{ steps.processResults.outputs.branch }} == "" ]]
+          if [[ ${{ steps.processResults.outputs.branch }} == "null" ]]
           then
               printf "prUrl=%s" $(gh pr create --title "[Automated] Update summary csv files" --body "Update summary csv files") >> $GITHUB_OUTPUT
           else
@@ -91,7 +91,7 @@ jobs:
       - name: Merge PR
         if: ${{ steps.processResults.outputs.hasPassed }}
         run: |
-          if [[ ${{ steps.processResults.outputs.branch }} == "" ]]
+          if [[ ${{ steps.processResults.outputs.branch }} == "null" ]]
           then
             checkCount="0"
             while [ "$checkCount" != "3" ]
