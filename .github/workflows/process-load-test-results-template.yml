@@ -101,7 +101,7 @@ jobs:
             done
             sleep 20
           fi
-          gh pr merge --merge --delete-branch
+          gh pr merge ${{ steps.createPR.outputs.prUrl }} --merge --delete-branch
         env:
           GITHUB_TOKEN: ${{ secrets.ballerina_bot_token }}
       - name: Fail workflow
