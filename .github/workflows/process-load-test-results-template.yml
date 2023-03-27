@@ -1,89 +1,111 @@
 name: Process load test results
 
 on:
-    workflow_call:
-        inputs:
-            results:
-                required: true
-                type: string
-        secrets:
-            ballerina_bot_token:
-                description: 'Ballerina bot token used to create and merge the PR'
-                required: true
-            ballerina_reviewer_bot_token:
-                description: 'Ballerina reviewer bot token used to approve the PR'
-                required: true
+  workflow_call:
+    inputs:
+      results:
+        required: true
+        type: string
+    secrets:
+      ballerina_bot_token:
+        description: 'Ballerina bot token used to create and merge the PR'
+        required: true
+      ballerina_reviewer_bot_token:
+        description: 'Ballerina reviewer bot token used to approve the PR'
+        required: true
 
 jobs:
-    process-results:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v2
-            - name: Process results
-              id: processResults
-              run: |
-                  git config --global user.email "ballerina-bot@ballerina.org"
-                  git config --global user.name "ballerina-bot"
-                  git pull
-                  git checkout -b "load-test-results"
-                  echo '${{ inputs.results }}' | jq -c '.[]' |
-                  while read -r result; do
-                    status=$(echo "$result" | jq -r '.status')
-                    test_scenario=$(echo "$result" | jq -r '.name')
-                    if [[ $status == "success" ]]
-                    then
-                      echo $(echo "$result" | jq -r '.result') >> load-tests/$test_scenario/results/summary.csv
-                      git add load-tests/$test_scenario/results/summary.csv
-                      git commit -m "Update $test_scenario test results on $(date)"
-                      printf "hasPassed=true" >> $GITHUB_OUTPUT
-                    else
-                      echo $test_scenario "test has failed with error rate" $(echo "$result" | jq -r '.errorRate')
-                      printf "hasFailed=true" >> $GITHUB_OUTPUT
-                    fi
-                  done
-              env:
-                  GITHUB_TOKEN: ${{ secrets.ballerina_bot_token }}
-            - name: Push results
-              if: ${{ steps.processResults.outputs.hasPassed }}
-              run: git push origin "load-test-results"
-              env:
-                  GITHUB_TOKEN: ${{ secrets.ballerina_bot_token }}
-            - name: Create pull request for new summary
-              id: createPR
-              if: ${{ steps.processResults.outputs.hasPassed }}
-              run: printf "prUrl=%s" $(gh pr create --title "[Automated] Update summary csv files" --body "Update summary csv files") >> $GITHUB_OUTPUT
-              env:
-                  GITHUB_TOKEN: ${{ secrets.ballerina_bot_token }}
-            - name: Approve PR
-              if: ${{ steps.processResults.outputs.hasPassed }}
-              run: |
-                  sleep 5
-                  gh pr review --approve ${{ steps.createPR.outputs.prUrl }}
-              env:
-                  GITHUB_TOKEN: ${{ secrets.ballerina_reviewer_bot_token }}
-            - name: Merge PR
-              if: ${{ steps.processResults.outputs.hasPassed }}
-              run: |
-                  checkCount="0"
-                  while [ "$checkCount" != "3" ]
-                  do
-                    sleep 20
-                    checkCount=$(gh pr status --jq '[.currentBranch .statusCheckRollup[] | select((.conclusion=="SUCCESS") and ((.name=="Build on Ubuntu") or (.name=="Build on Windows") or (.name=="codecov/project")))] | length' --json statusCheckRollup)
-                    failedCount=$(gh pr status --jq '[.currentBranch .statusCheckRollup[] | select((.conclusion=="FAILURE") and ((.name=="Build on Ubuntu") or (.name=="Build on Windows") or (.name=="codecov/project")))]|length' --json statusCheckRollup)
-                    if [[ "$failedCount" != "0" ]]
-                    then
-                      echo "PR Build has failed"
-                      exit 1
-                    fi
-                  done
-                  sleep 20
-                  gh pr merge --merge --delete-branch
-              env:
-                  GITHUB_TOKEN: ${{ secrets.ballerina_bot_token }}
-            - name: Fail workflow
-              if: ${{ steps.processResults.outputs.hasFailed }}
-              run: |
-                  echo "One or more load tests have been failed"
-                  echo '${{ inputs.results }}'
-                  exit
+  process-results:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Process results
+        id: processResults
+        run: |
+          git config --global user.email "ballerina-bot@ballerina.org"
+          git config --global user.name "ballerina-bot"
+          git pull
+          git fetch --all
+          checkedOut=false
+          echo '${{ inputs.results }}' | jq -c '.[]' |
+          while read -r result; do
+            status=$(echo "$result" | jq -r '.status')
+            test_scenario=$(echo "$result" | jq -r '.name')
+            branch=$(echo "$result" | jq -r '.branch')
+            if [[ $status == "success" && $checkedOut == false ]]
+            then
+              if [[ $branch != "null" ]]
+              then
+                git checkout -b "load-test-results" "origin/"$branch
+              else
+                git checkout -b "load-test-results"
+              fi
+              echo "branch="$branch >> $GITHUB_OUTPUT
+              checkedOut=true
+            fi
+            if [[ $status == "success" ]]
+            then
+              echo $(echo "$result" | jq -r '.result') >> load-tests/$test_scenario/results/summary.csv
+              git add load-tests/$test_scenario/results/summary.csv
+              git commit -m "Update $test_scenario test results on $(date)"
+              echo "hasPassed=true" >> $GITHUB_OUTPUT
+            else
+              echo $test_scenario "test has failed with error rate" $(echo "$result" | jq -r '.errorRate')
+              echo "hasFailed=true" >> $GITHUB_OUTPUT
+            fi
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.ballerina_bot_token }}
+      - name: Push results
+        if: ${{ steps.processResults.outputs.hasPassed }}
+        run: git push origin "load-test-results"
+        env:
+          GITHUB_TOKEN: ${{ secrets.ballerina_bot_token }}
+      - name: Create pull request for new summary
+        id: createPR
+        if: ${{ steps.processResults.outputs.hasPassed }}
+        run: |
+          if [[ ${{ steps.processResults.outputs.branch }} == "null" ]]
+          then
+              printf "prUrl=%s" $(gh pr create --title "[Automated] Update summary csv files" --body "Update summary csv files") >> $GITHUB_OUTPUT
+          else
+              printf "prUrl=%s" $(gh pr create --title "[Automated] Update summary csv files" --body "Update summary csv files" --base ${{ steps.processResults.outputs.branch }}) >> $GITHUB_OUTPUT
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.ballerina_bot_token }}
+      - name: Approve PR
+        if: ${{ steps.processResults.outputs.hasPassed }}
+        run: |
+          sleep 5
+          gh pr review --approve ${{ steps.createPR.outputs.prUrl }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.ballerina_reviewer_bot_token }}
+      - name: Merge PR
+        if: ${{ steps.processResults.outputs.hasPassed }}
+        run: |
+          if [[ ${{ steps.processResults.outputs.branch }} == "null" ]]
+          then
+            checkCount="0"
+            while [ "$checkCount" != "3" ]
+            do
+              sleep 20
+              checkCount=$(gh pr status --jq '[.currentBranch .statusCheckRollup[] | select((.conclusion=="SUCCESS") and ((.name=="Build on Ubuntu") or (.name=="Build on Windows") or (.name=="codecov/project")))] | length' --json statusCheckRollup)
+              failedCount=$(gh pr status --jq '[.currentBranch .statusCheckRollup[] | select((.conclusion=="FAILURE") and ((.name=="Build on Ubuntu") or (.name=="Build on Windows") or (.name=="codecov/project")))]|length' --json statusCheckRollup)
+              if [[ "$failedCount" != "0" ]]
+              then
+                echo "PR Build has failed"
+                exit 1
+              fi
+            done
+            sleep 20
+          fi
+          gh pr merge ${{ steps.createPR.outputs.prUrl }} --merge --delete-branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.ballerina_bot_token }}
+      - name: Fail workflow
+        if: ${{ steps.processResults.outputs.hasFailed }}
+        run: |
+          echo "One or more load tests have been failed"
+          echo '${{ inputs.results }}'
+          exit 1
