@@ -18,6 +18,7 @@ import ballerina/io;
 import ballerina/lang.array;
 import ballerina/log;
 import ballerina/regex;
+import thisarug/prettify;
 
 type List record {|
     Module[] modules;
@@ -41,7 +42,7 @@ public function main() returns error? {
     check calculateLevels(moduleDetails);
     Module[] sortedModules = moduleDetails.modules.sort(array:ASCENDING, a => a.level);
     moduleDetails = {modules: sortedModules};
-    updateModulesJsonFile(moduleDetails);
+    check writeToFile(STDLIB_MODULES_JSON, moduleDetails);
     List[] seperateModulesResult = seperateModules(moduleDetails);
     check updateStdlibDashboard(seperateModulesResult[0], seperateModulesResult[1]);
 }
@@ -57,7 +58,7 @@ function getSortedModuleNameList() returns List|error {
         select e;
     List sortedNameList = {modules: sortedModules};
 
-    check io:fileWriteJson(MODULE_LIST_JSON, sortedNameList.toJson());
+    check writeToFile(MODULE_LIST_JSON, sortedNameList);
 
     return sortedNameList;
 }
@@ -243,13 +244,6 @@ function removeModulesInIntermediatePaths(DiGraph dependencyGraph, string source
     }
 }
 
-function updateModulesJsonFile(List updatedJson) {
-    io:Error? fileWriteJson = io:fileWriteJson(STDLIB_MODULES_JSON, updatedJson.toJson());
-    if fileWriteJson is io:Error {
-        log:printError(string `Failed to write to the ${STDLIB_MODULES_JSON}`);
-    }
-}
-
 function seperateModules(List moduleDetails) returns List[] {
     Module[] ballerinaxSorted = from var e in moduleDetails.modules
         where regex:split(e.name, "-")[1] == "ballerinax"
@@ -311,4 +305,14 @@ function updateStdlibDashboard(List moduleDetailsBalX, List moduleDetailsBal) re
         log:printError(string `Failed to write to the ${README_FILE}`);
     }
     log:printInfo("Dashboard Updated");
+}
+
+isolated function writeToFile(string fileName, anydata content) returns error? {
+    string prettifiedContent = prettify:prettify(content.toJson());
+
+    error? result = io:fileWriteString(fileName, prettifiedContent);
+    if result is error {
+        log:printError("Error occurred while writing to the file: " + result.message());
+        return result;
+    }
 }
