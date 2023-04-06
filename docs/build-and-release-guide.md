@@ -76,7 +76,7 @@ Checklist for the release,
 
 ### Multiple module release
 
-The Standard Library Release Manager will use [Stdlib Release Workflow](https://github.com/ballerina-platform/ballerina-standard-library/actions/workflows/release_pipeline.yml) to release multiple modules(Usually during Ballerina Update releases). It will publish all modules in the [list](https://github.com/ballerina-platform/ballerina-standard-library/blob/main/dashboard/resources/stdlib_modules.json#L1). The Release Manager can override it by using the `release` property.
+The Standard Library Release Manager will use [Stdlib Release Workflow](https://github.com/ballerina-platform/ballerina-standard-library/actions/workflows/release_pipeline.yml) to release multiple modules(Usually during Ballerina Update releases). It will publish all modules in the [list](https://github.com/ballerina-platform/ballerina-standard-library/blob/main/release/resources/stdlib_modules.json). The Release Manager can override it by using the `release` property.
 
 Checklist,
 1. Verify if all modules with essential changes have updated language dependency and distribution versions. (All dependent versions)
