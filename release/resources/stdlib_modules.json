@@ -234,7 +234,7 @@
         },
         {
             "name": "module-ballerinax-nats",
-            "module_version": "2.7.0-SNAPSHOT",
+            "module_version": "2.7.1-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibNatsVersion",
@@ -243,7 +243,7 @@
         },
         {
             "name": "module-ballerinax-stan",
-            "module_version": "2.7.0-SNAPSHOT",
+            "module_version": "2.7.1-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibStanVersion",
@@ -342,7 +342,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "module_version": "1.7.0-SNAPSHOT",
+            "module_version": "1.7.1-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
@@ -393,7 +393,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "module_version": "1.7.0-SNAPSHOT",
+            "module_version": "1.7.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
@@ -402,7 +402,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "module_version": "3.7.0-SNAPSHOT",
+            "module_version": "3.7.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
@@ -411,7 +411,7 @@
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "module_version": "2.7.0-SNAPSHOT",
+            "module_version": "2.7.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibRabbitmqVersion",
