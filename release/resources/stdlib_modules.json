@@ -37,7 +37,7 @@
         },
         {
             "name": "module-ballerina-regex",
-            "module_version": "1.4.2-SNAPSHOT",
+            "module_version": "1.4.3-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibRegexVersion",
