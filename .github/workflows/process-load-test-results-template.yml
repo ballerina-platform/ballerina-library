@@ -68,9 +68,19 @@ jobs:
         run: |
           if [[ ${{ steps.processResults.outputs.branch }} == "null" ]]
           then
-              printf "prUrl=%s" $(gh pr create --title "[Automated] Update summary csv files" --body "Update summary csv files") >> $GITHUB_OUTPUT
+              if gh label list --json name -q ".[].name" | grep "Skip GraalVM Check"
+              then
+                  printf "prUrl=%s" $(gh pr create --title "[Automated] Update summary csv files" --body "Update summary csv files" --label "Skip GraalVM Check") >> $GITHUB_OUTPUT
+              else
+                  printf "prUrl=%s" $(gh pr create --title "[Automated] Update summary csv files" --body "Update summary csv files") >> $GITHUB_OUTPUT
+              fi
           else
-              printf "prUrl=%s" $(gh pr create --title "[Automated] Update summary csv files" --body "Update summary csv files" --base ${{ steps.processResults.outputs.branch }}) >> $GITHUB_OUTPUT
+              if gh label list --json name -q ".[].name" | grep "Skip GraalVM Check"
+              then
+                  printf "prUrl=%s" $(gh pr create --title "[Automated] Update summary csv files" --body "Update summary csv files" --base ${{ steps.processResults.outputs.branch }} --label "Skip GraalVM Check") >> $GITHUB_OUTPUT
+              else
+                  printf "prUrl=%s" $(gh pr create --title "[Automated] Update summary csv files" --body "Update summary csv files" --base ${{ steps.processResults.outputs.branch }}) >> $GITHUB_OUTPUT
+              fi
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.ballerina_bot_token }}
