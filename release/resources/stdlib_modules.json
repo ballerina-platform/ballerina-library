@@ -270,7 +270,7 @@
         },
         {
             "name": "module-ballerina-uuid",
-            "module_version": "1.5.0-SNAPSHOT",
+            "module_version": "1.5.1-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibUuidVersion",
