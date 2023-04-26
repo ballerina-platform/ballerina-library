@@ -68,14 +68,14 @@ jobs:
         run: |
           if [[ ${{ steps.processResults.outputs.branch }} == "null" ]]
           then
-              if gh label list --json name -q ".[].name" | grep "Skip GraalVM Check"
+              if gh label list --limit 80 --json name -q ".[].name" | grep "Skip GraalVM Check"
               then
                   printf "prUrl=%s" $(gh pr create --title "[Automated] Update summary csv files" --body "Update summary csv files" --label "Skip GraalVM Check") >> $GITHUB_OUTPUT
               else
                   printf "prUrl=%s" $(gh pr create --title "[Automated] Update summary csv files" --body "Update summary csv files") >> $GITHUB_OUTPUT
               fi
           else
-              if gh label list --json name -q ".[].name" | grep "Skip GraalVM Check"
+              if gh label list --limit 80 --json name -q ".[].name" | grep "Skip GraalVM Check"
               then
                   printf "prUrl=%s" $(gh pr create --title "[Automated] Update summary csv files" --body "Update summary csv files" --base ${{ steps.processResults.outputs.branch }} --label "Skip GraalVM Check") >> $GITHUB_OUTPUT
               else
