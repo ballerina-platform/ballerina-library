@@ -43,12 +43,16 @@
             "version_key": "stdlibRegexVersion",
             "release": true,
             "dependents": [
-                "module-ballerina-jwt"
+                "module-ballerina-grpc",
+                "module-ballerinai-transaction",
+                "module-ballerina-websocket",
+                "module-ballerina-websub",
+                "module-ballerina-websubhub"
             ]
         },
         {
             "name": "module-ballerina-time",
-            "module_version": "2.2.4-SNAPSHOT",
+            "module_version": "2.2.5-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibTimeVersion",
@@ -233,7 +237,7 @@
         },
         {
             "name": "module-ballerinax-nats",
-            "module_version": "2.7.1-SNAPSHOT",
+            "module_version": "2.7.2-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibNatsVersion",
@@ -295,7 +299,7 @@
         },
         {
             "name": "module-ballerina-email",
-            "module_version": "2.7.0-SNAPSHOT",
+            "module_version": "2.7.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibEmailVersion",
@@ -419,7 +423,7 @@
         },
         {
             "name": "module-ballerina-sql",
-            "module_version": "1.8.0-SNAPSHOT",
+            "module_version": "1.8.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
@@ -435,7 +439,7 @@
         },
         {
             "name": "module-ballerinax-java.jdbc",
-            "module_version": "1.8.0-SNAPSHOT",
+            "module_version": "1.8.1-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibJdbcVersion",
@@ -444,7 +448,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "module_version": "1.8.0-SNAPSHOT",
+            "module_version": "1.8.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
@@ -453,7 +457,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "module_version": "1.8.0-SNAPSHOT",
+            "module_version": "1.8.1-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
@@ -462,7 +466,7 @@
         },
         {
             "name": "module-ballerinax-oracledb",
-            "module_version": "1.8.0-SNAPSHOT",
+            "module_version": "1.8.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibOracledbVersion",
@@ -480,7 +484,7 @@
         },
         {
             "name": "module-ballerinax-postgresql",
-            "module_version": "1.8.0-SNAPSHOT",
+            "module_version": "1.8.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
