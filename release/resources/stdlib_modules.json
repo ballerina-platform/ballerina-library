@@ -43,11 +43,13 @@
             "version_key": "stdlibRegexVersion",
             "release": true,
             "dependents": [
-                "module-ballerina-grpc",
-                "module-ballerinai-transaction",
-                "module-ballerina-websocket",
-                "module-ballerina-websub",
-                "module-ballerina-websubhub"
+                "module-ballerina-graphql",
+                "module-ballerinax-java.jdbc",
+                "module-ballerinax-mssql",
+                "module-ballerinax-mysql",
+                "module-ballerinax-oracledb",
+                "module-ballerinax-postgresql",
+                "module-ballerinax-rabbitmq"
             ]
         },
         {
@@ -354,7 +356,7 @@
         },
         {
             "name": "module-ballerinai-transaction",
-            "module_version": "1.5.0-SNAPSHOT",
+            "module_version": "1.5.1-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibTransactionVersion",
