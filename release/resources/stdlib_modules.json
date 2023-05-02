@@ -42,15 +42,7 @@
             "default_branch": "main",
             "version_key": "stdlibRegexVersion",
             "release": true,
-            "dependents": [
-                "module-ballerina-graphql",
-                "module-ballerinax-java.jdbc",
-                "module-ballerinax-mssql",
-                "module-ballerinax-mysql",
-                "module-ballerinax-oracledb",
-                "module-ballerinax-postgresql",
-                "module-ballerinax-rabbitmq"
-            ]
+            "dependents": []
         },
         {
             "name": "module-ballerina-time",
