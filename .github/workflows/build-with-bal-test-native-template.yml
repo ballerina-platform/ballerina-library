@@ -97,7 +97,7 @@ jobs:
 
     windows-build-with-bal-test-native:
         name: Build with bal test native on Windows
-        runs-on: windows-latest
+        runs-on: windows-2019
         if: github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'Skip GraalVM Check')
 
         steps:
