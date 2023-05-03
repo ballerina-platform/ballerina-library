@@ -135,12 +135,13 @@ jobs:
                   Write-Output "BALLERINA_LANG_VERSION: $LANG_VERSION"
 
             - name: Configure Pagefile
-              if: ${{ inputs.lang_version == '' }}
               uses: al-cheb/configure-pagefile-action@v1.3
               with:
-                  minimum-size: 8GB
-                  maximum-size: 16GB
-                  disk-root: "D:"
+                  minimum-size: 10GB
+                  maximum-size: 12GB
+                  
+            - name: Get configured pagefile base size
+              run: (Get-CimInstance Win32_PageFileUsage).AllocatedBaseSize
 
             - name: Build Ballerina Lang
               if: ${{ inputs.lang_version == '' }}
