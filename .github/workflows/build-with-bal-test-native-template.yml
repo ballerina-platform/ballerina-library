@@ -138,7 +138,7 @@ jobs:
               uses: al-cheb/configure-pagefile-action@v1.3
               with:
                   minimum-size: 10GB
-                  maximum-size: 12GB
+                  maximum-size: 16GB
                   
             - name: Get configured pagefile base size
               run: (Get-CimInstance Win32_PageFileUsage).AllocatedBaseSize
