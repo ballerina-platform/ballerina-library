@@ -109,6 +109,9 @@
             "name": "module-ballerina-time"
         },
         {
+            "name": "module-ballerina-toml"
+        },
+        {
             "name": "module-ballerinai-transaction"
         },
         {
@@ -134,6 +137,9 @@
         },
         {
             "name": "module-ballerina-xslt"
+        },
+        {
+            "name": "module-ballerina-yaml"
         }
     ]
 }
