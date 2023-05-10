@@ -1,5 +1,9 @@
 # Adding a new Ballerina Module
 
+Authors: @ThisaruGuruge  
+Reviewers: @NipunaRanasinghe  
+
+
 This is a step-by-step guide on creating a new Ballerina module. This will guide you through how to setup build and workflow scripts, setting up the environment, and how to add a new module to the Ballerina daily build and release pipelines.
 
 ## Table of Contents
@@ -10,37 +14,37 @@ This is a step-by-step guide on creating a new Ballerina module. This will guide
 4. [Setting Up the Environment](#setting-up-the-environment)
 5. [Initializing the Repository](#initializing-the-repository)
 6. [Directory Structure](#directory-structure)
-    6.1 [The `.github` directory](#the-github-directory-required)
-        6.1.1 [The `workflows` directory](#the-workflows-directory-required)
-    6.2 [The `ballerina` directory](#the-ballerina-directory-gradle-submodulerequired)
-    6.3 [The `build-config` directory](#the-build-config-directory-required)
-        6.3.1 [The `checkstyle` directory](#the-checkstyle-directory-optional)
-        6.3.2 [The `resources` directory](#the-resources-directory-required)
-    6.4 [The `ballerina-tests` directory](#the-ballerina-tests-directory-gradle-submoduleoptional)
-    6.5 [The `compiler-plugin` directory](#the-compiler-plugin-directory-gradle-submoduleoptional)
-    6.6 [The `compiler-plugin-tests` directory](#the-compiler-plugin-tests-directory-gradle-submoduleoptional)
-    6.7 [The `docs` directory](#the-docs-directory-optional)
-    6.8 [The `examples` directory](#the-examples-directory-gradle-submoduleoptional)
-    6.9 [The `load-tests` directory](#the-load-tests-directory-optional)
-        6.9.1 [The `deployment` directory](#the-deployment-directory-required)
-        6.9.2 [The `results` directory](#the-results-directory-required)
-        6.9.3 [The `scripts` directory](#the-scripts-directory-required)
-        6.9.4 [The `src` directory](#the-src-directory-required)
-    6.10 [The `native` directory](#the-native-directory-gradle-submoduleoptional)
-    6.11 [Other Build Files](#other-build-files)
-        6.11.1 [The `LICENSE` file](#the-license-file-required)
-        6.11.2 [The `README.md` file](#the-readmemd-file-required)
-        6.11.3 [The `build.gradle` file](#the-buildgradle-file-required)
-        6.11.4 [The `changelog.md` file](#the-changelogmd-file-required)
-        6.11.5 [The `codecov.yml` file](#the-codecovyml-file-required)
-        6.11.6 [The `gradle.properties` file](#the-gradleproperties-file-required)
-        6.11.7 [The `gradlew` and `gradlew.bat` files](#the-gradlew-and-gradlewbat-files-required)
-        6.11.8 [The `settings.gradle` file](#the-settingsgradle-file-required)
-        6.11.9 [The `spotbugs-exclude.xml` file](#the-spotbugs-excludexml-file-optional)
+    * 6.1 [The `.github` directory](#the-github-directory-required)
+        * 6.1.1 [The `workflows` directory](#the-workflows-directory-required)
+    * 6.2 [The `ballerina` directory](#the-ballerina-directory-gradle-submodulerequired)
+    * 6.3 [The `build-config` directory](#the-build-config-directory-required)
+        * 6.3.1 [The `checkstyle` directory](#the-checkstyle-directory-optional)
+        * 6.3.2 [The `resources` directory](#the-resources-directory-required)
+    * 6.4 [The `ballerina-tests` directory](#the-ballerina-tests-directory-gradle-submoduleoptional)
+    * 6.5 [The `compiler-plugin` directory](#the-compiler-plugin-directory-gradle-submoduleoptional)
+    * 6.6 [The `compiler-plugin-tests` directory](#the-compiler-plugin-tests-directory-gradle-submoduleoptional)
+    * 6.7 [The `docs` directory](#the-docs-directory-optional)
+    * 6.8 [The `examples` directory](#the-examples-directory-gradle-submoduleoptional)
+    * 6.9 [The `load-tests` directory](#the-load-tests-directory-optional)
+        * 6.9.1 [The `deployment` directory](#the-deployment-directory-required)
+        * 6.9.2 [The `results` directory](#the-results-directory-required)
+        * 6.9.3 [The `scripts` directory](#the-scripts-directory-required)
+        * 6.9.4 [The `src` directory](#the-src-directory-required)
+    * 6.10 [The `native` directory](#the-native-directory-gradle-submoduleoptional)
+    * 6.11 [Other Build Files](#other-build-files)
+        * 6.11.1 [The `LICENSE` file](#the-license-file-required)
+        * 6.11.2 [The `README.md` file](#the-readmemd-file-required)
+        * 6.11.3 [The `build.gradle` file](#the-buildgradle-file-required)
+        * 6.11.4 [The `changelog.md` file](#the-changelogmd-file-required)
+        * 6.11.5 [The `codecov.yml` file](#the-codecovyml-file-required)
+        * 6.11.6 [The `gradle.properties` file](#the-gradleproperties-file-required)
+        * 6.11.7 [The `gradlew` and `gradlew.bat` files](#the-gradlew-and-gradlewbat-files-required)
+        * 6.11.8 [The `settings.gradle` file](#the-settingsgradle-file-required)
+        * 6.11.9 [The `spotbugs-exclude.xml` file](#the-spotbugs-excludexml-file-optional)
 7. [Adding a New Module](#adding-a-new-module)
-    7.1 [Adding the Module to the Ballerina Standard Library](#adding-the-module-to-the-ballerina-standard-library-optional)
-    7.2 [Adding the Module to Ballerina Daily Builds](#adding-the-module-to-ballerina-daily-builds-required)
-    7.3 [Adding the Module to Ballerina Distribution](#adding-the-module-to-ballerina-distribution-optional)
+    * 7.1 [Adding the Module to the Ballerina Standard Library](#adding-the-module-to-the-ballerina-standard-library-optional)
+    * 7.2 [Adding the Module to Ballerina Daily Full Build Pipeline](#adding-the-module-to-ballerina-daily-full-build-pipeline-required)
+    * 7.3 [Adding the Module to Ballerina Distribution](#adding-the-module-to-ballerina-distribution-optional)
 
 ## Introduction
 
@@ -93,16 +97,16 @@ Select type of project to generate:
   2: application
   3: library
   4: Gradle plugin
-Enter selection (default: basic) [1..4]
+Enter selection (default: basic) [1..4] -> Select Option 1 (Hit Enter)
 
 Select build script DSL:
   1: Groovy
   2: Kotlin
-Enter selection (default: Groovy) [1..2]
+Enter selection (default: Groovy) [1..2] -> Select Option 1 (Hit Enter)
 
-Project name (default: module-ballerina-sample):
+Project name (default: module-ballerina-sample): -> Select the repository name (Hit Enter)
 
-Generate build using new APIs and behavior (some features may change in the next minor release)? (default: no) [yes, no]
+Generate build using new APIs and behavior (some features may change in the next minor release)? (default: no) [yes, no] -> Select no (Hit Enter)
 ```
 
 Then create a new directory named `ballerina` inside the repository. This directory will contain the Ballerina module source code.
@@ -270,7 +274,7 @@ This directory is used to add load tests for the module. The `trigger-load-tests
 
 Each load test should be added as a separate directory. The following structure should be maintained in each load test directory.
 
-```shell
+```
 ├── deployment
 ├── results
 ├── scripts
@@ -299,11 +303,11 @@ This directory contains the Java native code of the module. This is required onl
 
 ### Other Build Files
 
-Apart from the above mentioned directories, there are other files that are required for the build. These files are required to be added to the root directory of the module.
+Apart from the above-mentioned directories, there are other files that are required for the build. These files are required to be added to the root directory of the module.
 
 Following are the files that are required for the build.
 
-```shell
+```
 .
 ├── LICENSE
 ├── README.md
@@ -396,7 +400,7 @@ Once the `module_list.json` file is updated, the [`Update Stdlib Dependency Grap
 
 Once updated this file, the module is ready to be released with the Ballerina Standard Library.
 
-### Adding the Module to Ballerina Daily Builds [Required]
+### Adding the Module to Ballerina Daily Full Build Pipeline [Required]
 
 This step is required to add a module to the Ballerina daily build process.
 
@@ -407,7 +411,7 @@ This Json file has two main fields.
 - `standard_library` - This field contains an array of modules that are part of the Ballerina distribution. Add the module to this list if the module is released along with the Ballerina distribution.
 - `extended_library` - This field contains an array of modules that are not part of the Ballerina distribution. Add the module to this list if the module is an extended Ballerina module which is not released along with the Ballerina distribution.
 
-Each entry in the above mentioned arrays has the following fields.
+Each entry in the above-mentioned arrays has the following fields.
 
 #### The `name` Field
 
@@ -439,7 +443,7 @@ This field defines whether to auto-merge the dependency update pull requests or 
 
 #### The `push_to_central` Field
 
-This field is used to define whether the module is be pushed to the Ballerina central or not. Default value is `true`. Set this to `false` for non-central repositories such as Ballerina tools repositories (Eg.: `ballerina-openapi-tools`, `ballerina-graphql-tools`).
+This field is used to define whether the module is being pushed to the Ballerina central or not. Default value is `true`. Set this to `false` for non-central repositories such as Ballerina tools repositories (Eg.: `ballerina-openapi-tools`, `ballerina-graphql-tools`).
 
 #### The `is_extended_library` Field
 
