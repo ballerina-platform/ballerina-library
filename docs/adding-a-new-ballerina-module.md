@@ -43,9 +43,9 @@ This is a step-by-step guide on creating a new Ballerina module. It will guide y
         * 6.11.8 [The `settings.gradle` file](#the-settingsgradle-file-required)
         * 6.11.9 [The `spotbugs-exclude.xml` file](#the-spotbugs-excludexml-file-optional)
 7. [Add the New Module](#add-the-new-module)
-    * 7.1 [Adding the Module to the Ballerina Standard Library](#adding-the-module-to-the-ballerina-standard-library-optional)
-    * 7.2 [Adding the Module to Ballerina Daily Full Build Pipeline](#adding-the-module-to-ballerina-daily-full-build-pipeline-required)
-    * 7.3 [Adding the Module to Ballerina Distribution](#adding-the-module-to-ballerina-distribution-optional)
+    * 7.1 [Add the Module to the Ballerina Standard Library](#add-the-module-to-the-ballerina-standard-library-optional)
+    * 7.2 [Add the Module to Ballerina Daily Full Build Pipeline](#add-the-module-to-ballerina-daily-full-build-pipeline-required)
+    * 7.3 [Add the Module to Ballerina Distribution](#add-the-module-to-ballerina-distribution-optional)
 
 ## Introduction
 
