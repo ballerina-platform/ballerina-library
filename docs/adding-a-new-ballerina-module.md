@@ -49,7 +49,7 @@ This is a step-by-step guide on creating a new Ballerina module. It will guide y
 
 ## Introduction
 
-Here is a corrected version of the paragraph: "This guide helps you understand the file structure, build scripts, and workflow scripts of a Ballerina module. It also explains how to add a new module to the Ballerina daily build and release pipelines. Each directory/file has tags defined inside [] to indicate whether it is required or optional and its relation to ballerina and ballerinax modules.
+Here is a corrected version of the paragraph: "This guide helps you understand the file structure, build scripts, and workflow scripts of a Ballerina module. It also explains how to add a new module to the Ballerina daily build and release pipelines.
 
 Examples of the directory structure and common files can be found in existing Ballerina Standard Library module repositories. The links to these repositories are available on the [Ballerina Standard Library Dashboard](https://github.com/ballerina-platform/ballerina-standard-library#status-dashboard).
 
