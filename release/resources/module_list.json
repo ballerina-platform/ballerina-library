@@ -91,9 +91,6 @@
             "name": "module-ballerina-regex"
         },
         {
-            "name": "module-ballerina-serdes"
-        },
-        {
             "name": "module-ballerina-sql"
         },
         {

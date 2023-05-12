@@ -22,7 +22,6 @@
             "dependents": [
                 "module-ballerina-log",
                 "module-ballerina-os",
-                "module-ballerina-serdes",
                 "module-ballerina-xslt"
             ]
         },
@@ -151,15 +150,6 @@
                 "module-ballerina-websub",
                 "module-ballerina-websubhub"
             ]
-        },
-        {
-            "name": "module-ballerina-serdes",
-            "module_version": "0.2.1-SNAPSHOT",
-            "level": 2,
-            "default_branch": "main",
-            "version_key": "stdlibSerdesVersion",
-            "release": true,
-            "dependents": []
         },
         {
             "name": "module-ballerina-task",
