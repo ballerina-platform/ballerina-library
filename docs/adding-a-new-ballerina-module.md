@@ -3,7 +3,7 @@
 Authors: @ThisaruGuruge  
 Reviewers: @NipunaRanasinghe  
 Created: 2023/05/09  
-Updated: 2023/05/10
+Updated: 2023/05/11
 
 This is a step-by-step guide on creating a new Ballerina module. It will guide you through setting up build and workflow scripts, preparing the environment, and adding a new module to the Ballerina daily build and release pipelines.
 
@@ -43,13 +43,13 @@ This is a step-by-step guide on creating a new Ballerina module. It will guide y
         * 6.11.8 [The `settings.gradle` file](#the-settingsgradle-file-required)
         * 6.11.9 [The `spotbugs-exclude.xml` file](#the-spotbugs-excludexml-file-optional)
 7. [Add the New Module](#add-the-new-module)
-    * 7.1 [Adding the Module to the Ballerina Standard Library](#adding-the-module-to-the-ballerina-standard-library-optional)
-    * 7.2 [Adding the Module to Ballerina Daily Full Build Pipeline](#adding-the-module-to-ballerina-daily-full-build-pipeline-required)
-    * 7.3 [Adding the Module to Ballerina Distribution](#adding-the-module-to-ballerina-distribution-optional)
+    * 7.1 [Add the Module to the Ballerina Standard Library](#add-the-module-to-the-ballerina-standard-library-optional)
+    * 7.2 [Add the Module to Ballerina Daily Full Build Pipeline](#add-the-module-to-ballerina-daily-full-build-pipeline-required)
+    * 7.3 [Add the Module to Ballerina Distribution](#add-the-module-to-ballerina-distribution-optional)
 
 ## Introduction
 
-Here is a corrected version of the paragraph: "This guide helps you understand the file structure, build scripts, and workflow scripts of a Ballerina module. It also explains how to add a new module to the Ballerina daily build and release pipelines.
+This guide helps you understand the file structure, build scripts, and workflow scripts of a Ballerina module. It also explains how to add a new module to the Ballerina daily build and release pipelines.
 
 Examples of the directory structure and common files can be found in existing Ballerina Standard Library module repositories. The links to these repositories are available on the [Ballerina Standard Library Dashboard](https://github.com/ballerina-platform/ballerina-standard-library#status-dashboard).
 
