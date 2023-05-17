@@ -11,10 +11,11 @@ This is a step-by-step guide on creating a new Ballerina module. It will guide y
 
 1. [Introduction](#introduction)
 2. [Prerequisites](#prerequisites)
-3. [Repository Naming](#repository-naming)
-4. [Set Up the Environment](#set-up-the-environment)
-5. [Initialize the Repository](#initialize-the-repository)
-6. [Directory Structure](#directory-structure)
+3. [Repository creation](#repository-creation)
+    * 3.1 [Repository naming convention](#repository-naming-convention)
+4. [Set up the environment](#set-up-the-environment)
+5. [Initialize the repository](#initialize-the-repository)
+6. [Directory structure](#directory-structure)
     * 6.1 [The `.github` directory](#the-github-directory-required)
         * 6.1.1 [The `workflows` directory](#the-workflows-directory-required)
     * 6.2 [The `ballerina` directory](#the-ballerina-directory-gradle-submodulerequired)
@@ -32,7 +33,7 @@ This is a step-by-step guide on creating a new Ballerina module. It will guide y
         * 6.9.3 [The `scripts` directory](#the-scripts-directory-required)
         * 6.9.4 [The `src` directory](#the-src-directory-required)
     * 6.10 [The `native` directory](#the-native-directory-gradle-submoduleoptional)
-    * 6.11 [Other Build Files](#other-build-files)
+    * 6.11 [Other build files](#other-build-files)
         * 6.11.1 [The `LICENSE` file](#the-license-file-required)
         * 6.11.2 [The `README.md` file](#the-readmemd-file-required)
         * 6.11.3 [The `build.gradle` file](#the-buildgradle-file-required)
@@ -42,10 +43,10 @@ This is a step-by-step guide on creating a new Ballerina module. It will guide y
         * 6.11.7 [The `gradlew` and `gradlew.bat` files](#the-gradlew-and-gradlewbat-files-required)
         * 6.11.8 [The `settings.gradle` file](#the-settingsgradle-file-required)
         * 6.11.9 [The `spotbugs-exclude.xml` file](#the-spotbugs-excludexml-file-optional)
-7. [Add the New Module](#add-the-new-module)
-    * 7.1 [Add the Module to the Ballerina Standard Library](#add-the-module-to-the-ballerina-standard-library-optional)
-    * 7.2 [Add the Module to Ballerina Daily Full Build Pipeline](#add-the-module-to-ballerina-daily-full-build-pipeline-required)
-    * 7.3 [Add the Module to Ballerina Distribution](#add-the-module-to-ballerina-distribution-optional)
+7. [Add the new module](#add-the-new-module)
+    * 7.1 [Add the module to the Ballerina Standard Library](#add-the-module-to-the-ballerina-standard-library-optional)
+    * 7.2 [Add the module to Ballerina daily full build pipeline](#add-the-module-to-ballerina-daily-full-build-pipeline-required)
+    * 7.3 [Add the module to Ballerina distribution](#add-the-module-to-ballerina-distribution-optional)
 
 ## Introduction
 
@@ -61,9 +62,15 @@ The [Ballerina `graphql` Module](https://github.com/ballerina-platform/module-ba
 - [Gradle](https://gradle.org/releases/) - Version 7.1 preferred in Ballerina Standard Libraries
 - [A GitHub access token](https://docs.github.com/en/enterprise-server@3.4/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 
-## Repository naming
+## Repository creation
+- The new repository should be created under the [Ballerina Platform Organization](https://github.com/balerina-platform).
+- The repository request can be created by filling out the **GitHub Repo Creation Request Form** in WSO2 internal apps.
+
+### Repository naming convention
 
 The repository name should start with the `module-` prefix, followed by the org name, either `ballerina-` or `ballerinax-`, and then the module name.
+
+>**Note:** The convention is to use `ballerinax` for the modules that depends on third-party libraries such as `ballerinax-kafka` and `ballerinax-mysql`. Other libraries use the `ballerina` prefix.
 
 Example Names:
 
@@ -80,11 +87,9 @@ Download and install the [prerequisites](#prerequisites) . Then, set up the foll
 
 ## Initialize the repository
 
-1. Create a new repository in the [Ballerina GitHub organization](https://github.com/ballerina-platform).
-
-2. Clone the repository.
-3. Navigate to the repository directory.
-4. Run the following command to initialize the Gradle build.
+1. Clone the repository.
+2. Navigate to the repository directory.
+3. Run the following command to initialize the Gradle build.
    ```shell
    gradle init
    ```
@@ -111,7 +116,7 @@ Download and install the [prerequisites](#prerequisites) . Then, set up the foll
    Generate build using new APIs and behavior (some features may change in the next minor release)? (default: no) [yes, no] -> Select no (Hit Enter)
    ```
 
-5. Create a new directory named `ballerina` inside the repository. This directory will contain the Ballerina module source code.
+4. Create a new directory named `ballerina` inside the repository. This directory will contain the Ballerina module source code.
 
 ```shell
 mkdir ballerina
