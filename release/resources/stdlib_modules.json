@@ -361,7 +361,7 @@
         },
         {
             "name": "module-ballerina-websocket",
-            "module_version": "2.7.1-SNAPSHOT",
+            "module_version": "2.7.2-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsocketVersion",
@@ -469,7 +469,7 @@
         },
         {
             "name": "module-ballerina-persist",
-            "module_version": "0.3.2-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibPersistVersion",
