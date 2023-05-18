@@ -30,7 +30,10 @@
             "default_branch": "main",
             "version_key": "stdlibRegexVersion",
             "release": true,
-            "dependents": []
+            "dependents": [
+                "module-ballerina-toml",
+                "module-ballerina-yaml"
+            ]
         },
         {
             "name": "module-ballerina-time",
@@ -206,7 +209,9 @@
             "release": true,
             "dependents": [
                 "module-ballerina-email",
-                "module-ballerina-http"
+                "module-ballerina-http",
+                "module-ballerina-toml",
+                "module-ballerina-yaml"
             ]
         },
         {
@@ -322,6 +327,24 @@
             "dependents": [
                 "module-ballerina-http"
             ]
+        },
+        {
+            "name": "module-ballerina-toml",
+            "module_version": "0.2.0",
+            "level": 4,
+            "default_branch": "main",
+            "version_key": "stdlibTomlVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerina-yaml",
+            "module_version": "0.1.0",
+            "level": 4,
+            "default_branch": "main",
+            "version_key": "stdlibYamlVersion",
+            "release": true,
+            "dependents": []
         },
         {
             "name": "module-ballerina-http",
