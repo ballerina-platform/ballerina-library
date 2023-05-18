@@ -1,18 +1,6 @@
 {
     "modules": [
         {
-            "name": "module-ballerina-constraint",
-            "module_version": "1.1.1-SNAPSHOT",
-            "level": 1,
-            "default_branch": "main",
-            "version_key": "stdlibConstraintVersion",
-            "release": true,
-            "dependents": [
-                "module-ballerina-cache",
-                "module-ballerinax-nats"
-            ]
-        },
-        {
             "name": "module-ballerina-io",
             "module_version": "1.4.1-SNAPSHOT",
             "level": 1,
@@ -52,6 +40,7 @@
             "version_key": "stdlibTimeVersion",
             "release": true,
             "dependents": [
+                "module-ballerina-constraint",
                 "module-ballerina-crypto",
                 "module-ballerina-file",
                 "module-ballerina-protobuf",
@@ -78,6 +67,18 @@
             "version_key": "stdlibXmldataVersion",
             "release": true,
             "dependents": []
+        },
+        {
+            "name": "module-ballerina-constraint",
+            "module_version": "1.1.1-SNAPSHOT",
+            "level": 2,
+            "default_branch": "main",
+            "version_key": "stdlibConstraintVersion",
+            "release": true,
+            "dependents": [
+                "module-ballerina-cache",
+                "module-ballerinax-nats"
+            ]
         },
         {
             "name": "module-ballerina-crypto",
