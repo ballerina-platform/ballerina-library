@@ -73,7 +73,7 @@
         },
         {
             "name": "module-ballerina-constraint",
-            "module_version": "1.1.1-SNAPSHOT",
+            "module_version": "1.2.0-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibConstraintVersion",
