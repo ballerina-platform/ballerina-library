@@ -64,7 +64,7 @@
         },
         {
             "name": "module-ballerina-xmldata",
-            "module_version": "2.4.3-SNAPSHOT",
+            "module_version": "2.5.0-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
@@ -133,7 +133,7 @@
         },
         {
             "name": "module-ballerina-protobuf",
-            "module_version": "1.3.3-SNAPSHOT",
+            "module_version": "1.4.0-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibProtobufVersion",
