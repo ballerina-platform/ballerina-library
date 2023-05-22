@@ -122,7 +122,7 @@
         },
         {
             "name": "module-ballerina-os",
-            "module_version": "1.6.0-SNAPSHOT",
+            "module_version": "1.6.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibOsVersion",
