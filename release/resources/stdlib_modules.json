@@ -339,7 +339,7 @@
         },
         {
             "name": "module-ballerina-yaml",
-            "module_version": "0.1.0",
+            "module_version": "0.2.0",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibYamlVersion",
