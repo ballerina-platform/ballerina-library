@@ -97,9 +97,6 @@
             "name": "module-ballerina-sql"
         },
         {
-            "name": "module-ballerinax-stan"
-        },
-        {
             "name": "module-ballerina-task"
         },
         {
