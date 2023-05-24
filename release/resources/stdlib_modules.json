@@ -385,7 +385,7 @@
         },
         {
             "name": "module-ballerina-websocket",
-            "module_version": "2.7.2-SNAPSHOT",
+            "module_version": "2.8.0-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsocketVersion",
