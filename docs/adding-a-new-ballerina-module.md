@@ -385,7 +385,7 @@ After creating the module repository with the above structure, the following ste
 
 This step is required only if the module is a part of the Ballerina Standard Library and if it should be added to the Ballerina Standard Library Dashboard and release process.
 
-To add a module to the Ballerina Standard Library, add an entry in the [`module_list.json`](https://github.com/ballerina-platform/ballerina-standard-library/blob/main/release/resources/module_list.json) file in the [`ballerina-standard-library`](https://github.com/ballerina-platform/ballerina-standrad-library) repository.
+To add a module to the Ballerina Standard Library, add an entry in the [`module_list.json`](https://github.com/ballerina-platform/ballerina-standard-library/blob/main/release/resources/module_list.json) file in the [`ballerina-standard-library`](https://github.com/ballerina-platform/ballerina-standard-library) repository.
 
 >**Note:** Do not edit the `stdlid_modules.json` file manually. It will be auto-generated once the `module_list.json` file is updated.
 
