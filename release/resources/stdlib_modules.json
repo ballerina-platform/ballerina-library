@@ -31,7 +31,6 @@
             "version_key": "stdlibRegexVersion",
             "release": true,
             "dependents": [
-                "module-ballerina-toml",
                 "module-ballerina-yaml"
             ]
         },
@@ -319,7 +318,7 @@
         },
         {
             "name": "module-ballerina-toml",
-            "module_version": "0.2.0",
+            "module_version": "0.3.0-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibTomlVersion",
@@ -361,7 +360,7 @@
         },
         {
             "name": "module-ballerinai-transaction",
-            "module_version": "1.5.1-SNAPSHOT",
+            "module_version": "1.6.0-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibTransactionVersion",
@@ -385,7 +384,7 @@
         },
         {
             "name": "module-ballerina-websub",
-            "module_version": "2.7.1-SNAPSHOT",
+            "module_version": "2.8.0-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibWebsubVersion",
@@ -394,7 +393,7 @@
         },
         {
             "name": "module-ballerina-websubhub",
-            "module_version": "1.7.1-SNAPSHOT",
+            "module_version": "1.8.0-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsubhubVersion",
@@ -412,7 +411,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "module_version": "3.7.1-SNAPSHOT",
+            "module_version": "3.8.0-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
@@ -421,7 +420,7 @@
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "module_version": "2.7.1-SNAPSHOT",
+            "module_version": "2.8.0-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibRabbitmqVersion",
@@ -430,7 +429,7 @@
         },
         {
             "name": "module-ballerina-sql",
-            "module_version": "1.8.1-SNAPSHOT",
+            "module_version": "1.9.0-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
@@ -446,7 +445,7 @@
         },
         {
             "name": "module-ballerinax-java.jdbc",
-            "module_version": "1.8.1-SNAPSHOT",
+            "module_version": "1.9.0-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibJdbcVersion",
@@ -455,7 +454,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "module_version": "1.8.1-SNAPSHOT",
+            "module_version": "1.9.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
@@ -464,7 +463,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "module_version": "1.8.1-SNAPSHOT",
+            "module_version": "1.9.0-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
@@ -473,7 +472,7 @@
         },
         {
             "name": "module-ballerinax-oracledb",
-            "module_version": "1.8.1-SNAPSHOT",
+            "module_version": "1.9.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibOracledbVersion",
@@ -491,7 +490,7 @@
         },
         {
             "name": "module-ballerinax-postgresql",
-            "module_version": "1.8.1-SNAPSHOT",
+            "module_version": "1.9.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
