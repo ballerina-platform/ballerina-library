@@ -30,9 +30,7 @@
             "default_branch": "main",
             "version_key": "stdlibRegexVersion",
             "release": true,
-            "dependents": [
-                "module-ballerina-yaml"
-            ]
+            "dependents": []
         },
         {
             "name": "module-ballerina-time",
@@ -327,7 +325,7 @@
         },
         {
             "name": "module-ballerina-yaml",
-            "module_version": "0.2.0",
+            "module_version": "0.3.0-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibYamlVersion",
