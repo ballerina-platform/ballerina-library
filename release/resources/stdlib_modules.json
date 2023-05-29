@@ -42,6 +42,7 @@
                 "module-ballerina-constraint",
                 "module-ballerina-crypto",
                 "module-ballerina-file",
+                "module-ballerina-persist",
                 "module-ballerina-protobuf",
                 "module-ballerina-random",
                 "module-ballerina-task"
@@ -124,6 +125,15 @@
             "dependents": [
                 "module-ballerina-file"
             ]
+        },
+        {
+            "name": "module-ballerina-persist",
+            "module_version": "1.0.0-SNAPSHOT",
+            "level": 2,
+            "default_branch": "main",
+            "version_key": "stdlibPersistVersion",
+            "release": true,
+            "dependents": []
         },
         {
             "name": "module-ballerina-protobuf",
@@ -427,7 +437,6 @@
                 "module-ballerinax-mssql",
                 "module-ballerinax-mysql",
                 "module-ballerinax-oracledb",
-                "module-ballerina-persist",
                 "module-ballerinax-postgresql"
             ]
         },
@@ -464,15 +473,6 @@
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibOracledbVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerina-persist",
-            "module_version": "1.0.0-SNAPSHOT",
-            "level": 8,
-            "default_branch": "main",
-            "version_key": "stdlibPersistVersion",
             "release": true,
             "dependents": []
         },
