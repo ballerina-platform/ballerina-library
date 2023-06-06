@@ -134,6 +134,15 @@
         },
         {
             "name": "module-ballerina-yaml"
+        },
+        {
+            "name": "module-ballerinax-persist.sql"
+        },
+        {
+            "name": "module-ballerinax-persist.inmemory"
+        },
+        {
+            "name": "module-ballerinax-persist.googlesheets"
         }
     ]
 }
