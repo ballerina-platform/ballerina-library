@@ -58,4 +58,4 @@ const BALX_TITLE = "## Ballerina Extended Modules";
 const WORKFLOW_MASTER_BUILD = "build-timestamped-master.yml";
 const WORKFLOW_TRIVY = "trivy-scan.yml";
 const WORKFLOW_PROCESS_LOAD_TESTS = "process-load-test-result.yml";
-const WORKFLOW_BAL_TEST_NATIVE = "build-with-bal-test-native.yml";
+const WORKFLOW_BAL_TEST_NATIVE = "build-with-bal-test-graalvm.yml";

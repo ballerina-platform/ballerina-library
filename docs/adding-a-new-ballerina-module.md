@@ -159,7 +159,7 @@ This directory contains the GitHub workflow scripts and other configurations req
 ├── pull_request_template.md
 └── workflows
     ├── build-timestamped-master.yml
-    ├── build-with-bal-test-native.yml
+    ├── build-with-bal-test-graalvm.yml
     ├── central-publish.yml
     ├── process-load-test-result.yml
     ├── publish-release.yml
@@ -181,7 +181,7 @@ This directory contains the GitHub workflow scripts. The following workflow scri
 
 This workflow script is used to build the module. This will run automatically on every push to the master branch. This will build the module and publish the artifacts to the GitHub packages as a timestamped version, which can be used in the daily builds. It can be run manually as well. The status of this workflow is displayed on the Standard Library Dashboard under the `Build` column.
 
-##### The `build-with-bal-test-native.yml` workflow script [Required]
+##### The `build-with-bal-test-graalvm.yml` workflow script [Required]
 
 This workflow script is used to run the tests using the native runtime. This will run automatically on a schedule and on pull requests. It can be run manually as well. The status of this workflow is displayed on the Standard Library Dashboard under the `GraalVM Check` column. To avoid running this workflow on pull requests, add the `Skip GraalVM Check` label to the pull request.
 
