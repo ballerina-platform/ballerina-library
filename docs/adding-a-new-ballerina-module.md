@@ -159,7 +159,7 @@ This directory contains the GitHub workflow scripts and other configurations req
 ├── pull_request_template.md
 └── workflows
     ├── build-timestamped-master.yml
-    ├── build-with-bal-test-native.yml
+    ├── build-with-bal-test-graalvm.yml
     ├── central-publish.yml
     ├── process-load-test-result.yml
     ├── publish-release.yml
