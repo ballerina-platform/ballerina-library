@@ -30,10 +30,6 @@ on:
                 required: false
                 type: string
                 default: ''
-            additional_secrets:
-                required: false
-                type: string
-                default: ''
 
 jobs:
     ubuntu-build-with-bal-test-graalvm:
@@ -55,15 +51,6 @@ jobs:
                   echo "GRAALVM_HOME: ${{ env.GRAALVM_HOME }}"
                   echo "JAVA_HOME: ${{ env.JAVA_HOME }}"
                   native-image --version
-                  
-            - name: Set additional environment variables from secrets
-              if: ${{ inputs.additional_secrets != '' }}
-              run: |
-                  for VAR in ${{ inputs.additional_secrets }}
-                  do
-                     SECRET_VALUE="${{ secrets[$VAR] }}"
-                     echo "$VAR=$SECRET_VALUE" >> $GITHUB_ENV
-                  done
 
             - name: Checkout Ballerina Lang Repository
               if: ${{ inputs.lang_version == '' }}
@@ -128,15 +115,6 @@ jobs:
                   Write-Output JAVA_HOME: "${{ env.JAVA_HOME }}"
                   native-image --version
                   git config --system core.longpaths true
-                  
-            - name: Set additional environment variables from secrets
-              if: ${{ inputs.additional_secrets != '' }}
-              run: |
-                  for VAR in ${{ inputs.additional_secrets }}
-                  do
-                     SECRET_VALUE="${{ secrets[$VAR] }}"
-                     echo "$VAR=$SECRET_VALUE" >> $GITHUB_ENV
-                  done
 
             - name: Checkout Ballerina Lang Repository
               if: ${{ inputs.lang_version == '' }}
