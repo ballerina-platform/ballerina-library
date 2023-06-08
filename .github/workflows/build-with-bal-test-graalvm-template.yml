@@ -1,4 +1,4 @@
-name: Build with bal test native
+name: Build with bal test graalvm
 
 on:
     workflow_call:
@@ -30,10 +30,14 @@ on:
                 required: false
                 type: string
                 default: ''
+            additional_secrets:
+                required: false
+                type: string
+                default: ''
 
 jobs:
-    ubuntu-build-with-bal-test-native:
-        name: Build with bal test native on Ubuntu
+    ubuntu-build-with-bal-test-graalvm:
+        name: Build with bal test graalvm on Ubuntu
         runs-on: ubuntu-latest
         if: github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'Skip GraalVM Check')
 
@@ -51,6 +55,15 @@ jobs:
                   echo "GRAALVM_HOME: ${{ env.GRAALVM_HOME }}"
                   echo "JAVA_HOME: ${{ env.JAVA_HOME }}"
                   native-image --version
+                  
+            - name: Set additional environment variables from secrets
+              if: ${{ inputs.additional_secrets != '' }}
+              run: |
+                  for VAR in ${{ inputs.additional_secrets }}
+                  do
+                     SECRET_VALUE="${{ secrets[$VAR] }}"
+                     echo "$VAR=$SECRET_VALUE" >> $GITHUB_ENV
+                  done
 
             - name: Checkout Ballerina Lang Repository
               if: ${{ inputs.lang_version == '' }}
@@ -93,10 +106,10 @@ jobs:
                   packagePAT: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
-                  ./gradlew build -PbalNativeTest ${{ inputs.additional_ubuntu_build_flags }}
+                  ./gradlew build -PbalGraalVMTest ${{ inputs.additional_ubuntu_build_flags }}
 
-    windows-build-with-bal-test-native:
-        name: Build with bal test native on Windows
+    windows-build-with-bal-test-graalvm:
+        name: Build with bal test graalvm on Windows
         runs-on: windows-2019
         if: github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'Skip GraalVM Check')
 
@@ -115,6 +128,15 @@ jobs:
                   Write-Output JAVA_HOME: "${{ env.JAVA_HOME }}"
                   native-image --version
                   git config --system core.longpaths true
+                  
+            - name: Set additional environment variables from secrets
+              if: ${{ inputs.additional_secrets != '' }}
+              run: |
+                  for VAR in ${{ inputs.additional_secrets }}
+                  do
+                     SECRET_VALUE="${{ secrets[$VAR] }}"
+                     echo "$VAR=$SECRET_VALUE" >> $GITHUB_ENV
+                  done
 
             - name: Checkout Ballerina Lang Repository
               if: ${{ inputs.lang_version == '' }}
@@ -174,4 +196,4 @@ jobs:
                   packagePAT: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
-                  ./gradlew.bat build -PbalNativeTest ${{ inputs.additional_windows_build_flags }}
+                  ./gradlew.bat build -PbalGraalVMTest ${{ inputs.additional_windows_build_flags }}
