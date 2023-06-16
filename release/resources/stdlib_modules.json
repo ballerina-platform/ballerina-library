@@ -362,7 +362,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "module_version": "1.8.1-SNAPSHOT",
+            "module_version": "1.9.0-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
@@ -405,7 +405,7 @@
         },
         {
             "name": "module-ballerina-websubhub",
-            "module_version": "1.8.1-SNAPSHOT",
+            "module_version": "1.9.0-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsubhubVersion",
@@ -414,7 +414,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "module_version": "1.8.1-SNAPSHOT",
+            "module_version": "1.9.0-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
@@ -423,7 +423,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "module_version": "3.8.1-SNAPSHOT",
+            "module_version": "3.9.0-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
@@ -441,7 +441,7 @@
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "module_version": "2.8.1-SNAPSHOT",
+            "module_version": "2.9.0-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibRabbitmqVersion",
@@ -466,7 +466,7 @@
         },
         {
             "name": "module-ballerinax-java.jdbc",
-            "module_version": "1.9.1-SNAPSHOT",
+            "module_version": "1.10.0-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibJdbcVersion",
@@ -475,7 +475,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "module_version": "1.9.1-SNAPSHOT",
+            "module_version": "1.10.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
@@ -484,7 +484,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "module_version": "1.9.1-SNAPSHOT",
+            "module_version": "1.10.0-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
@@ -511,7 +511,7 @@
         },
         {
             "name": "module-ballerinax-postgresql",
-            "module_version": "1.9.1-SNAPSHOT",
+            "module_version": "1.10.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
