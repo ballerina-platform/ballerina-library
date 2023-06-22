@@ -3,7 +3,7 @@
 Authors: @ThisaruGuruge  
 Reviewers: @NipunaRanasinghe  
 Created: 2023/05/09  
-Updated: 2023/05/17  
+Updated: 2023/06/23  
 
 This is a step-by-step guide on creating a new Ballerina module. It will guide you through setting up build and workflow scripts, preparing the environment, and adding a new module to the Ballerina daily build and release pipelines.
 
@@ -399,9 +399,9 @@ This field defines the name of the module. This should be the name of the reposi
 
 The version key of the module. This is related to the version prefix mentioned in the [`gradle.properties`](#the-gradleproperties-file-required) file. (e.g., ballerinaStdlibIo). It is used to add the module as a dependency to another repository including the [`ballerina-distribution`](https://github.com/ballerina-platform/ballerina-distribution).
 
-Version key is derived by default using the convention `<stdlib><ModuleName><Version>`. E.g.: (`stdlibIoVersion`).
+Version key is derived by default using the convention `stdlib<ModuleShortName>Version`. E.g.: (`stdlibIoVersion`).
 
-This field is optional. It is only required if the version key cannot be inferred from the module name (e.g., `module-ballerina-jballerina.java.arrays` -> `stdlibJavaArraysVersion`, `module-ballerina-oauth2` -> `stdlibOAuth2Version`). If the inferred version key is different or is not compatible, a custom `version_key` can be added to this file manually.
+This field is optional. It is only required if the version key cannot be inferred from the module name (e.g., `module-ballerina-jballerina.java.arrays` -> `stdlibJavaArraysVersion`, `module-ballerina-oauth2` -> `stdlibOAuth2Version`).
 
 >**Note:** The version key is case-sensitive and should be in the camel case format.
 
@@ -428,9 +428,7 @@ This field defines the name of the module. This should be the name of the reposi
 
 The version key of the module. This is related to the version prefix mentioned in the [`gradle.properties`](#the-gradleproperties-file-required) file. (e.g., `ballerinaStdlibIo`). It is used to add the module as a dependency to another repository including the [`ballerina-distribution`](https://github.com/ballerina-platform/ballerina-distribution) repository.
 
-Version key is derived by default using the convention `<stdlib><ModuleName><Version>`. E.g.: (`stdlibIoVersion`).
-
-This field is optional. It is only required if the version key cannot be inferred from the module name (e.g., `module-ballerina-jballerina.java.arrays` -> `stdlibJavaArraysVersion`, `module-ballerina-oauth2` -> `stdlibOAuth2Version`). If the inferred version key is different or is not compatible, a custom `version_key` can be added to this file manually.
+Refer the [`version_key`](#the-versionkey-field) section under [Add the module to the Ballerina Standard Library](#add-the-module-to-the-ballerina-standard-library-optional). 
 
 #### The `level` field
 
