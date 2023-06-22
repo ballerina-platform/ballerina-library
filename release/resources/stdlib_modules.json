@@ -248,7 +248,7 @@
             "module_version": "1.1.0-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
-            "version_key": "stdlibPersistInmemoryVersion",
+            "version_key": "stdlibPersist.inmemoryVersion",
             "release": true,
             "dependents": []
         },
@@ -435,7 +435,7 @@
             "module_version": "1.1.0-SNAPSHOT",
             "level": 7,
             "default_branch": "main",
-            "version_key": "stdlibPersistGoogleSheetVersion",
+            "version_key": "stdlibPersist.googlesheetsVersion",
             "release": true,
             "dependents": []
         },
@@ -505,7 +505,7 @@
             "module_version": "1.1.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
-            "version_key": "stdlibPersistSqlVersion",
+            "version_key": "stdlibPersist.sqlVersion",
             "release": true,
             "dependents": []
         },

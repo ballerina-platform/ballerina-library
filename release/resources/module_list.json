@@ -76,13 +76,16 @@
             "name": "module-ballerina-persist"
         },
         {
-            "name": "module-ballerinax-persist.googlesheets"
+            "name": "module-ballerinax-persist.googlesheets",
+            "version_key": "stdlibPersistGoogleSheetVersion"
         },
         {
-            "name": "module-ballerinax-persist.inmemory"
+            "name": "module-ballerinax-persist.inmemory",
+            "version_key": "stdlibPersistInmemoryVersion"
         },
         {
-            "name": "module-ballerinax-persist.sql"
+            "name": "module-ballerinax-persist.sql",
+            "version_key": "stdlibPersistSqlVersion"
         },
         {
             "name": "module-ballerinax-postgresql"
