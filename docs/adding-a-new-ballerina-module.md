@@ -399,7 +399,9 @@ This field defines the name of the module. This should be the name of the reposi
 
 The version key of the module. This is related to the version prefix mentioned in the [`gradle.properties`](#the-gradleproperties-file-required) file. (e.g., ballerinaStdlibIo). It is used to add the module as a dependency to another repository including the [`ballerina-distribution`](https://github.com/ballerina-platform/ballerina-distribution).
 
-This field is optional. It is only required if the version key cannot be inferred from the module name (e.g., `module-ballerina-jballerina.java.arrays` -> `stdlibJavaArraysVersion`, `module-ballerina-oauth2` -> `stdlibOAuth2Version`).
+Version key is derived by default using the convention `<stdlib><ModuleName><Version>`. E.g.: (`stdlibIoVersion`).
+
+This field is optional. It is only required if the version key cannot be inferred from the module name (e.g., `module-ballerina-jballerina.java.arrays` -> `stdlibJavaArraysVersion`, `module-ballerina-oauth2` -> `stdlibOAuth2Version`). If the inferred version key is different or is not compatible, a custom `version_key` can be added to this file manually.
 
 >**Note:** The version key is case-sensitive and should be in the camel case format.
 
@@ -425,6 +427,10 @@ This field defines the name of the module. This should be the name of the reposi
 #### The `version_key` field
 
 The version key of the module. This is related to the version prefix mentioned in the [`gradle.properties`](#the-gradleproperties-file-required) file. (e.g., `ballerinaStdlibIo`). It is used to add the module as a dependency to another repository including the [`ballerina-distribution`](https://github.com/ballerina-platform/ballerina-distribution) repository.
+
+Version key is derived by default using the convention `<stdlib><ModuleName><Version>`. E.g.: (`stdlibIoVersion`).
+
+This field is optional. It is only required if the version key cannot be inferred from the module name (e.g., `module-ballerina-jballerina.java.arrays` -> `stdlibJavaArraysVersion`, `module-ballerina-oauth2` -> `stdlibOAuth2Version`). If the inferred version key is different or is not compatible, a custom `version_key` can be added to this file manually.
 
 #### The `level` field
 
