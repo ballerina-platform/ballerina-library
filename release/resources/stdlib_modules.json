@@ -128,7 +128,7 @@
         },
         {
             "name": "module-ballerina-persist",
-            "module_version": "1.1.0-SNAPSHOT",
+            "module_version": "1.1.1-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibPersistVersion",
