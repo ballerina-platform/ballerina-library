@@ -215,7 +215,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "module_version": "2.8.0-SNAPSHOT",
+            "module_version": "2.8.1-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
@@ -362,7 +362,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "module_version": "1.9.0-SNAPSHOT",
+            "module_version": "1.9.1-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
@@ -423,7 +423,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "module_version": "3.9.0-SNAPSHOT",
+            "module_version": "3.9.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
