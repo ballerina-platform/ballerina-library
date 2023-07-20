@@ -7,7 +7,7 @@ on:
                 description: Branch/Release Tag of the Ballerina Lang
                 type: string
                 required: false
-                default: master
+                default: java_17_migration
             lang_version:
                 description: Ballerina Lang Version (If given ballerina lang buid will be skipped)
                 type: string
@@ -42,7 +42,7 @@ jobs:
               uses: graalvm/setup-graalvm@v1
               with:
                   version: 'latest'
-                  java-version: '11'
+                  java-version: '17'
                   components: 'native-image'
                   github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -108,7 +108,7 @@ jobs:
               uses: graalvm/setup-graalvm@v1
               with:
                   version: 'latest'
-                  java-version: '11'
+                  java-version: '17'
                   components: 'native-image'
                   github-token: ${{ secrets.GITHUB_TOKEN }}
 
