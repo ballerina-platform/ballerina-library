@@ -57,7 +57,7 @@ jobs:
               uses: actions/checkout@v3
               with:
                   repository: 'ballerina-platform/ballerina-lang'
-                  ref: ${{ inputs.lang_tag || 'master' }}
+                  ref: ${{ inputs.lang_tag || 'java_17_migration' }}
 
             - name: Set Ballerina Lang version
               run: |
