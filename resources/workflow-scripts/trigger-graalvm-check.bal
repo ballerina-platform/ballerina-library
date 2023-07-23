@@ -110,7 +110,7 @@ type ModuleStatus record {|
     CONCLUSION conclusion;
     string link;
     int workflow_id;
-    record {| JobStatus ubuntu; JobStatus windows;|} jobs?;
+    record {| JobStatus ubuntu?; JobStatus windows?;|} jobs;
 |};
 
 type LevelStatus record {|
@@ -142,7 +142,8 @@ function triggerGraalVMChecks(Data data) returns map<LevelStatus> {
                 status: IN_PROGRESS,
                 link: link,
                 workflow_id: id,
-                conclusion: NOT_APPLICABLE
+                conclusion: NOT_APPLICABLE,
+                jobs: {}
             };
 
             if !result.hasKey(module.level.toString()) {
@@ -262,8 +263,8 @@ function createReport(map<LevelStatus> result) returns error? {
                 ReportRecord rec = {
                     level: "Level " + level,
                     module: module,
-                    ubuntuStatus: string `[${moduleStatus.jobs?.ubuntu?.conclusion ?: NOT_APPLICABLE}](${moduleStatus.jobs?.ubuntu?.link ?: moduleStatus.link})`,
-                    windowsStatus: string `[${moduleStatus.jobs?.windows?.conclusion ?: NOT_APPLICABLE}](${moduleStatus.jobs?.windows?.link ?: moduleStatus.link})`
+                    ubuntuStatus: string `[${moduleStatus.jobs.ubuntu?.conclusion ?: NOT_APPLICABLE}](${moduleStatus.jobs?.ubuntu?.link ?: moduleStatus.link})`,
+                    windowsStatus: string `[${moduleStatus.jobs.windows?.conclusion ?: NOT_APPLICABLE}](${moduleStatus.jobs?.windows?.link ?: moduleStatus.link})`
                 };
                 resultTable.add(rec);
             }
