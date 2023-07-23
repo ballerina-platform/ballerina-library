@@ -1,0 +1,43 @@
+name: Trigger GraalVM check
+
+on:
+    workflow_dispatch:
+        inputs:
+            lang_tag:
+                description: Branch/Release Tag of the Ballerina Lang
+                type: string
+                required: false
+                default: master
+            lang_version:
+                description: Ballerina Lang Version (If given ballerina lang build will be skipped)
+                type: string
+                required: false
+                default: ''
+            native_image_options:
+                description: Default native-image options
+                type: string
+                required: false
+                default: ''
+
+jobs:
+    trigger-graalvm-checks:
+        name: Run workflows
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Module Repository
+              uses: actions/checkout@v3
+            
+            - name: Run GraalVM check trigger script
+              uses: ballerina-platform/ballerina-action@2201.7.0
+              with:
+                args: 
+                   run ./resources/scripts/trigger_graalvm_check.bal
+              env:
+                GITHUB_TOKEN: ${{ secrets.MY_GITHUB_PAT }}
+                LANG_TAG: ${{ inputs.lang_tag }}
+                LANG_VERSION: ${{ inputs.lang_version }}
+                NATIVE_IMAGE_OPTIONS: ${{ inputs.native_image_options }}
+
+            - name: Summarize workflow status
+              run:
+                cat ./graalvm_check_summary.md >> $GITHUB_STEP_SUMMARY
