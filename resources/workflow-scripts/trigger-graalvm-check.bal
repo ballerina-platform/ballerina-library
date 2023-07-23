@@ -205,7 +205,7 @@ function checkModuleStatus(ModuleStatus moduleStatus, string module_name) {
                 JobStatus jobStatus = {
                     status: jobRunStatus.status,
                     conclusion: jobRunStatus.conclusion ?: NOT_APPLICABLE,
-                    link: string `https://github.com/${ORG_NAME}/${module_name}/actions/runs/${moduleStatus.workflow_id}/jobs/${jobRunStatus.id}`
+                    link: string `https://github.com/${ORG_NAME}/${module_name}/actions/runs/${moduleStatus.workflow_id}/job/${jobRunStatus.id}`
                 };
                 if jobRunStatus.name.includes("Ubuntu") {
                     moduleStatus.jobs.ubuntu = jobStatus;
