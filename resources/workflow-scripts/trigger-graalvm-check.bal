@@ -110,7 +110,7 @@ type ModuleStatus record {|
     CONCLUSION conclusion;
     string link;
     int workflow_id;
-    record {| JobStatus ubuntu?; JobStatus windows?;|} jobs;
+    record {|JobStatus ubuntu?; JobStatus windows?;|} jobs;
 |};
 
 type LevelStatus record {|
@@ -168,12 +168,7 @@ function checkStatus(map<LevelStatus> result) {
     while !isComplete(result) {
         runtime:sleep(300);
         foreach [string, LevelStatus] [level, levelStatus] in result.entries() {
-            if levelStatus.status == COMPLETED {
-                continue;
-            }
-            if isLevelComplete(levelStatus) {
-                log:printInfo("Level " + level + " is completed");
-                levelStatus.status = COMPLETED;
+            if checkLevelStatus(levelStatus, level) {
                 continue;
             }
             foreach map<ModuleStatus> moduleStatusMap in levelStatus.modules {
@@ -183,8 +178,21 @@ function checkStatus(map<LevelStatus> result) {
                     }
                 }
             }
+            _ = checkLevelStatus(levelStatus, level);
         }
     }
+}
+
+function checkLevelStatus(LevelStatus levelStatus, string level) returns boolean {
+    if levelStatus.status == COMPLETED {
+        return true;
+    }
+    if isLevelComplete(levelStatus) {
+        log:printInfo("Level " + level + " is completed");
+        levelStatus.status = COMPLETED;
+        return true;
+    }
+    return false;
 }
 
 function checkModuleStatus(ModuleStatus moduleStatus, string module_name) {
@@ -224,7 +232,7 @@ function checkModuleStatus(ModuleStatus moduleStatus, string module_name) {
 }
 
 function getWorkflowJobStatuses(string module_name, int workflow_id) returns JobRunStatus[]|error {
-    record{JobRunStatus[] jobs;} jobRunStatuses = check gitHubClient->/[ORG_NAME]/[module_name]/actions/runs/[workflow_id]/jobs(headers);
+    record {JobRunStatus[] jobs;} jobRunStatuses = check gitHubClient->/[ORG_NAME]/[module_name]/actions/runs/[workflow_id]/jobs(headers);
     return jobRunStatuses.jobs;
 }
 
@@ -273,7 +281,7 @@ function createReport(map<LevelStatus> result) returns error? {
 
     string title = "GraalVM Check Report";
     string tableTitle = "| Level | Module | Ubuntu Build | Windows Build |";
-    string tableTitleSeparator = "| ----- | ------ | ---- | ---- |";
+    string tableTitleSeparator = "| ----- | ------ | :----: | :----: |";
     string[] rows = from ReportRecord reportRecord in resultTable
         select
         "| " + string:'join(" | ", reportRecord.level, reportRecord.module, reportRecord.ubuntuStatus, reportRecord.windowsStatus) + " |";
