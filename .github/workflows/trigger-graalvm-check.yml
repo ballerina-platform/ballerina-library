@@ -31,7 +31,7 @@ jobs:
               uses: ballerina-platform/ballerina-action@2201.7.0
               with:
                 args: 
-                   run ./resources/scripts/trigger_graalvm_check.bal
+                   run ./resources/workflow-scripts/trigger-graalvm-check.bal
               env:
                 GITHUB_TOKEN: ${{ secrets.MY_GITHUB_PAT }}
                 LANG_TAG: ${{ inputs.lang_tag }}
