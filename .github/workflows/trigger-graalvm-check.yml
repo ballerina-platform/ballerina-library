@@ -33,7 +33,7 @@ jobs:
                 args: 
                    run ./resources/workflow-scripts/trigger-graalvm-check.bal
               env:
-                GITHUB_TOKEN: ${{ secrets.MY_GITHUB_PAT }}
+                GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
                 LANG_TAG: ${{ inputs.lang_tag }}
                 LANG_VERSION: ${{ inputs.lang_version }}
                 NATIVE_IMAGE_OPTIONS: ${{ inputs.native_image_options }}
