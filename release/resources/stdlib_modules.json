@@ -451,7 +451,6 @@
                 "module-ballerinax-mssql",
                 "module-ballerinax-mysql",
                 "module-ballerinax-oracledb",
-                "module-ballerinax-persist.sql",
                 "module-ballerinax-postgresql"
             ]
         },
@@ -471,7 +470,9 @@
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
             "release": true,
-            "dependents": []
+            "dependents": [
+                "module-ballerinax-persist.sql"
+            ]
         },
         {
             "name": "module-ballerinax-mysql",
@@ -480,7 +481,9 @@
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
             "release": true,
-            "dependents": []
+            "dependents": [
+                "module-ballerinax-persist.sql"
+            ]
         },
         {
             "name": "module-ballerinax-oracledb",
@@ -492,20 +495,20 @@
             "dependents": []
         },
         {
-            "name": "module-ballerinax-persist.sql",
-            "module_version": "1.1.1-SNAPSHOT",
-            "level": 8,
-            "default_branch": "main",
-            "version_key": "stdlibPersistSqlVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
             "name": "module-ballerinax-postgresql",
             "module_version": "1.10.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerinax-persist.sql",
+            "module_version": "1.1.1-SNAPSHOT",
+            "level": 9,
+            "default_branch": "main",
+            "version_key": "stdlibPersistSqlVersion",
             "release": true,
             "dependents": []
         }
