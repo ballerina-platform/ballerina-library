@@ -23,15 +23,6 @@
             "dependents": []
         },
         {
-            "name": "module-ballerina-regex",
-            "module_version": "1.4.4-SNAPSHOT",
-            "level": 1,
-            "default_branch": "main",
-            "version_key": "stdlibRegexVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
             "name": "module-ballerina-time",
             "module_version": "2.3.1-SNAPSHOT",
             "level": 1,
