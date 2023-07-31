@@ -42,7 +42,7 @@ jobs:
               uses: graalvm/setup-graalvm@v1
               with:
                   version: 'latest'
-                  java-version: '11'
+                  java-version: '17'
                   components: 'native-image'
                   github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -100,7 +100,7 @@ jobs:
 
     windows-build-with-bal-test-graalvm:
         name: Build with bal test graalvm on Windows
-        runs-on: windows-2019
+        runs-on: windows-latest
         if: github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'Skip GraalVM Check')
 
         steps:
@@ -108,7 +108,7 @@ jobs:
               uses: graalvm/setup-graalvm@v1
               with:
                   version: 'latest'
-                  java-version: '11'
+                  java-version: '17'
                   components: 'native-image'
                   github-token: ${{ secrets.GITHUB_TOKEN }}
 
