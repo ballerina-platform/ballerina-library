@@ -7,7 +7,7 @@ on:
                 description: Branch/Release Tag of the Ballerina Lang
                 type: string
                 required: false
-                default: java_17_migration
+                default: master
             lang_version:
                 description: Ballerina Lang Version (If given ballerina lang buid will be skipped)
                 type: string
@@ -57,7 +57,7 @@ jobs:
               uses: actions/checkout@v3
               with:
                   repository: 'ballerina-platform/ballerina-lang'
-                  ref: ${{ inputs.lang_tag || 'java_17_migration' }}
+                  ref: ${{ inputs.lang_tag || 'master' }}
 
             - name: Set Ballerina Lang version
               run: |
@@ -124,7 +124,7 @@ jobs:
               uses: actions/checkout@v3
               with:
                   repository: 'ballerina-platform/ballerina-lang'
-                  ref: ${{ inputs.lang_tag || 'java_17_migration' }}
+                  ref: ${{ inputs.lang_tag || 'master' }}
 
             - name: Set Ballerina Lang version
               run: |
