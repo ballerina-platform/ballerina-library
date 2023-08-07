@@ -441,7 +441,7 @@
         },
         {
             "name": "module-ballerina-sql",
-            "module_version": "1.10.1-SNAPSHOT",
+            "module_version": "1.11.0-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
@@ -465,7 +465,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "module_version": "1.10.1-SNAPSHOT",
+            "module_version": "1.11.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
@@ -476,7 +476,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "module_version": "1.10.1-SNAPSHOT",
+            "module_version": "1.11.0-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
