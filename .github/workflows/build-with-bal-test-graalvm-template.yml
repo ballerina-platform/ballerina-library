@@ -75,6 +75,7 @@ jobs:
                   distribution: 'graalvm'
                   components: 'native-image'
                   github-token: ${{ secrets.GITHUB_TOKEN }}
+                  set-java-home: 'false'
 
             - name: Check GraalVM installation
               run: |
@@ -156,6 +157,7 @@ jobs:
                   distribution: 'graalvm'
                   components: 'native-image'
                   github-token: ${{ secrets.GITHUB_TOKEN }}
+                  set-java-home: 'false'
 
             - name: Check GraalVM installation
               run: |
