@@ -38,19 +38,11 @@ jobs:
         if: github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'Skip GraalVM Check')
 
         steps:
-            - name: Set up GraalVM
-              uses: graalvm/setup-graalvm@v1
+            - name: Set up JDK 17
+              uses: actions/setup-java@v3
               with:
-                  java-version: '17.0.7'
-                  distribution: 'graalvm'
-                  components: 'native-image'
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-
-            - name: Check GraalVM installation
-              run: |
-                  echo "GRAALVM_HOME: ${{ env.GRAALVM_HOME }}"
-                  echo "JAVA_HOME: ${{ env.JAVA_HOME }}"
-                  native-image --version
+                  distribution: 'temurin'
+                  java-version: '17'
 
             - name: Checkout Ballerina Lang Repository
               if: ${{ inputs.lang_version == '' }}
@@ -75,6 +67,21 @@ jobs:
               run: |
                   perl -pi -e "s/^\s*version=.*/version=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
                   ./gradlew build -x check -x test publishToMavenLocal --scan --no-daemon
+                  
+            - name: Set up GraalVM
+              uses: graalvm/setup-graalvm@v1
+              with:
+                  java-version: '17'
+                  distribution: 'graalvm-community'
+                  components: 'native-image'
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  set-java-home: 'false'
+
+            - name: Check GraalVM installation
+              run: |
+                  echo "GRAALVM_HOME: ${{ env.GRAALVM_HOME }}"
+                  echo "JAVA_HOME: ${{ env.JAVA_HOME }}"
+                  native-image --version
 
             - name: Checkout Module Repository
               uses: actions/checkout@v3
@@ -104,20 +111,11 @@ jobs:
         if: github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'Skip GraalVM Check')
 
         steps:
-            - name: Set up GraalVM
-              uses: graalvm/setup-graalvm@v1
+            - name: Set up JDK 17
+              uses: actions/setup-java@v3
               with:
-                  java-version: '17.0.7'
-                  distribution: 'graalvm'
-                  components: 'native-image'
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-
-            - name: Check GraalVM installation
-              run: |
-                  Write-Output GRAALVM_HOME: "${{ env.GRAALVM_HOME }}"
-                  Write-Output JAVA_HOME: "${{ env.JAVA_HOME }}"
-                  native-image --version
-                  git config --system core.longpaths true
+                  distribution: 'temurin'
+                  java-version: '17'
 
             - name: Checkout Ballerina Lang Repository
               if: ${{ inputs.lang_version == '' }}
@@ -152,6 +150,22 @@ jobs:
                   perl -pi -e "s/^\s*version=.*/version=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
                   ./gradlew.bat build -x check -x test publishToMavenLocal --continue -x createJavadoc --stacktrace -scan --console=plain --no-daemon --no-parallel
 
+            - name: Set up GraalVM
+              uses: graalvm/setup-graalvm@v1
+              with:
+                  java-version: '17'
+                  distribution: 'graalvm-community'
+                  components: 'native-image'
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  set-java-home: 'false'
+
+            - name: Check GraalVM installation
+              run: |
+                  Write-Output GRAALVM_HOME: "${{ env.GRAALVM_HOME }}"
+                  Write-Output JAVA_HOME: "${{ env.JAVA_HOME }}"
+                  native-image --version
+                  git config --system core.longpaths true
+                  
             - name: Checkout Module Repository
               uses: actions/checkout@v3
 
