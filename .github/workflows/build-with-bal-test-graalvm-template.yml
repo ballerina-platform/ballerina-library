@@ -116,6 +116,9 @@ jobs:
               with:
                   distribution: 'temurin'
                   java-version: '17'
+                  
+            - name: Git configure long path
+              run: git config --global core.longpaths true   
 
             - name: Checkout Ballerina Lang Repository
               if: ${{ inputs.lang_version == '' }}
