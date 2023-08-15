@@ -365,7 +365,7 @@
         },
         {
             "name": "module-ballerina-soap",
-            "module_version": "0.1.0-SNAPSHOT",
+            "module_version": "0.2.0-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibSoapVersion",
@@ -468,7 +468,7 @@
         },
         {
             "name": "module-ballerinax-java.jdbc",
-            "module_version": "1.10.1-SNAPSHOT",
+            "module_version": "1.11.0-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibJdbcVersion",
@@ -508,7 +508,7 @@
         },
         {
             "name": "module-ballerinax-postgresql",
-            "module_version": "1.10.1-SNAPSHOT",
+            "module_version": "1.11.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
