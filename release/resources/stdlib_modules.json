@@ -151,6 +151,7 @@
             "dependents": [
                 "module-ballerina-grpc",
                 "module-ballerinax-kafka",
+                "module-ballerinax-rabbitmq",
                 "module-ballerina-websub",
                 "module-ballerina-websubhub"
             ]
@@ -270,6 +271,7 @@
             "release": true,
             "dependents": [
                 "module-ballerina-grpc",
+                "module-ballerina-soap",
                 "module-ballerinai-transaction",
                 "module-ballerina-websocket",
                 "module-ballerina-websub",
@@ -345,6 +347,7 @@
             "release": true,
             "dependents": [
                 "module-ballerina-grpc",
+                "module-ballerina-soap",
                 "module-ballerinai-transaction",
                 "module-ballerina-websocket",
                 "module-ballerina-websub",
@@ -357,6 +360,15 @@
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerina-soap",
+            "module_version": "0.1.0-SNAPSHOT",
+            "level": 6,
+            "default_branch": "master",
+            "version_key": "stdlibSoapVersion",
             "release": true,
             "dependents": []
         },
@@ -423,7 +435,7 @@
         },
         {
             "name": "module-ballerinax-persist.googlesheets",
-            "module_version": "1.1.1-SNAPSHOT",
+            "module_version": "1.2.0-SNAPSHOT",
             "level": 7,
             "default_branch": "main",
             "version_key": "stdlibPersistGoogleSheetVersion",
@@ -432,7 +444,7 @@
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "module_version": "2.9.1-SNAPSHOT",
+            "module_version": "2.10.0-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibRabbitmqVersion",
