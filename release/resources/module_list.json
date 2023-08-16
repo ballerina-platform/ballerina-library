@@ -54,6 +54,9 @@
             "name": "module-ballerina-mime"
         },
         {
+            "name": "module-ballerina-mqtt"
+        },
+        {
             "name": "module-ballerinax-mssql"
         },
         {
