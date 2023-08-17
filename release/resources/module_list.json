@@ -38,7 +38,8 @@
             "version_key": "stdlibJdbcVersion"
         },
         {
-            "name": "module-ballerinax-java.jms"
+            "name": "module-ballerinax-java.jms",
+            "version_key": "stdlibJmsVersion"
         },
         {
             "name": "module-ballerina-jballerina.java.arrays",
