@@ -98,6 +98,7 @@
                 "module-ballerina-auth",
                 "module-ballerina-file",
                 "module-ballerina-ftp",
+                "module-ballerinax-java.jms",
                 "module-ballerina-jwt",
                 "module-ballerina-mime",
                 "module-ballerina-mqtt",
@@ -272,6 +273,7 @@
             "release": true,
             "dependents": [
                 "module-ballerina-grpc",
+                "module-ballerinax-java.jms",
                 "module-ballerina-mqtt",
                 "module-ballerina-soap",
                 "module-ballerinai-transaction",
@@ -297,6 +299,15 @@
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibEmailVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerinax-java.jms",
+            "module_version": "0.2.0-SNAPSHOT",
+            "level": 4,
+            "default_branch": "master",
+            "version_key": "stdlibJmsVersion",
             "release": true,
             "dependents": []
         },
