@@ -304,7 +304,7 @@
         },
         {
             "name": "module-ballerinax-java.jms",
-            "module_version": "0.2.0-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibJmsVersion",
