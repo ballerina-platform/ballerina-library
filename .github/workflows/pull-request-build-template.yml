@@ -73,5 +73,5 @@ jobs:
                     packagePAT: ${{ secrets.GITHUB_TOKEN }}
                     JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8
                 run: |
-                  ./gradlew.bat build -x test {{ inputs.additional-windows-build-flags }}
-                  ./gradlew.bat test {{ inputs.additional-windows-test-flags }}
+                  ./gradlew.bat build -x test ${{ inputs.additional-windows-build-flags }}
+                  ./gradlew.bat test ${{ inputs.additional-windows-test-flags }}
