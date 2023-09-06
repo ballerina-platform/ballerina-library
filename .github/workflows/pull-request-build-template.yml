@@ -3,7 +3,15 @@ name: Pull Request Build
 on:
   workflow_call:
     inputs:
+      additional-ubuntu-build-flags:
+        required: false
+        type: string
+        default: ""
       additional-ubuntu-test-flags:
+        required: false
+        type: string
+        default: ""
+      additional-windows-build-flags:
         required: false
         type: string
         default: ""
@@ -26,19 +34,19 @@ jobs:
             -   name: Checkout Repository
                 uses: actions/checkout@v1
 
-            -   name: Set up JDK 11
-                uses: actions/setup-java@v2
+            -   name: Set up JDK 17
+                uses: actions/setup-java@v3
                 with:
                     distribution: 'temurin'
-                    java-version: 11
+                    java-version: 17.0.7
 
             -   name: Build the Package
                 env:
                     packageUser: ${{ github.actor }}
                     packagePAT: ${{ secrets.GITHUB_TOKEN }}
                 run: |
-                  ./gradlew build -x test
-                  ./gradlew test ${{ inputs.additional-ubuntu-build-flags }}
+                  ./gradlew build -x test ${{ inputs.additional-ubuntu-build-flags }}
+                  ./gradlew test ${{ inputs.additional-ubuntu-test-flags }}
 
             -   name: Generate Codecov Report
                 uses: codecov/codecov-action@v2
@@ -53,11 +61,11 @@ jobs:
             -   name: Checkout Repository
                 uses: actions/checkout@v1
 
-            -   name: Set up JDK 11
-                uses: actions/setup-java@v2
+            -   name: Set up JDK 17
+                uses: actions/setup-java@v3
                 with:
                     distribution: 'temurin'
-                    java-version: 11
+                    java-version: 17.0.7
 
             -   name: Build the Project
                 env:
@@ -65,5 +73,5 @@ jobs:
                     packagePAT: ${{ secrets.GITHUB_TOKEN }}
                     JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8
                 run: |
-                  ./gradlew.bat build -x test
-                  ./gradlew.bat test {{ inputs.additional-windows-build-flags }}
+                  ./gradlew.bat build -x test {{ inputs.additional-windows-build-flags }}
+                  ./gradlew.bat test {{ inputs.additional-windows-test-flags }}
