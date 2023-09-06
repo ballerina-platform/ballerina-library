@@ -73,7 +73,6 @@ jobs:
               with:
                   java-version: '17'
                   distribution: 'graalvm-community'
-                  components: 'native-image'
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   set-java-home: 'false'
 
@@ -158,7 +157,6 @@ jobs:
               with:
                   java-version: '17'
                   distribution: 'graalvm-community'
-                  components: 'native-image'
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   set-java-home: 'false'
 
