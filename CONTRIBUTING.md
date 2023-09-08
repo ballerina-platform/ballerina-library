@@ -23,7 +23,7 @@ We appreciate your help!
 
 ## Build the source code
 
-Check the module repository you are working on for the build instructions.
+Refer to the `README` of the relevant module repository for prerequisites and the build instructions.
 
 ## Set up the development environment
 
