@@ -13,7 +13,8 @@ However, to enable instant releases of each standard library, each standard libr
 Both Parent and Child repositories are owned and maintained by the Ballerina standard library team who is responsible for governing, ensuring security and quality, doing timely releases, maintaining backward compatibility, etc.
 
 ## Contributing to Ballerina
-As an open-source project, Ballerina welcomes contributions from the community. To start contributing, read these [contribution guidelines](https://github.com/ballerina-platform/ballerina-lang/blob/master/CONTRIBUTING.md) for information on how you should go about contributing to our project.
+
+As an open-source project, Ballerina welcomes contributions from the community. To start contributing, read these [contribution guidelines](https://github.com/ballerina-platform/ballerina-standard-library/blob/main/CONTRIBUTING.md) for information on how you should go about contributing to our project.
 
 Check the issue tracker for open issues that interest you. We look forward to receiving your contributions.
 
