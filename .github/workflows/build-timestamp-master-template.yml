@@ -3,6 +3,12 @@ name: Build
 on:
   workflow_call:
     inputs:
+      ballerina-bot-username:
+        required: true
+        type: string
+      ballerina-bot-token:
+        required: true
+        type: string
       additional-build-flags:
         required: false
         type: string
@@ -36,10 +42,10 @@ jobs:
 
       - name: Build with Gradle
         env:
-          packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
-          packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
-          publishUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
-          publishPAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          packageUser: ${{ inputs.ballerina-bot-username }}
+          packagePAT: ${{ inputs.ballerina-bot-token }}
+          publishUser: ${{ inputs.ballerina-bot-username }}
+          publishPAT: ${{ inputs.ballerina-bot-token}}
         run: ./gradlew publish --no-daemon --scan ${{ inputs.additional-build-flags }}
 
       - name: Generate CodeCov Report

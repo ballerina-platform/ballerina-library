@@ -9,6 +9,18 @@ on:
       package-org:
         required: true
         type: string
+      ballerina-bot-username:
+        required: true
+        type: string
+      ballerina-bot-email:
+        required: true
+        type: string
+      ballerina-bot-token:
+        required: true
+        type: string
+      ballerina-central-access-token:
+        required: true
+        type: string
       additional-build-flags:
         required: false
         type: string
@@ -38,8 +50,8 @@ jobs:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --global user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
-          git config --global user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
+          git config --global user.name ${{ inputs.ballerina-bot-username }}
+          git config --global user.email ${{ inputs.ballerina-bot-email }}
           ./gradlew build -x check -x test ${{ inputs.additional-build-flags }}
 
       - name: Create lib Directory if not Exists
@@ -59,7 +71,7 @@ jobs:
 
       - name: Pre-Release Dependency Version Update
         env:
-          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ inputs.ballernia-bot-token }}
         run: |
           echo "Version: ${VERSION}"
           git checkout -b release-${VERSION}
@@ -74,19 +86,19 @@ jobs:
 
       - name: Publish Package
         env:
-          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
-          BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ secrets.BALLERINA_CENTRAL_ACCESS_TOKEN }}
-          packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
-          packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
-          publishUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
-          publishPAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ inputs.ballerina-bot-token }}
+          BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ inputs.ballerina-central-access-token }}
+          packageUser: ${{ inputs.ballerina-bot-username }}
+          packagePAT: ${{ inputs.ballerina-bot-token }}
+          publishUser: ${{ inputs.ballerina-bot-username }}
+          publishPAT: ${{ inputs.ballerina-bot-token }}
         run: |
           ./gradlew clean release -Prelease.useAutomaticVersion=true
           ./gradlew -Pversion=${VERSION} publish -x test -PpublishToCentral=true ${{ inputs.additional-publish-flags }}
 
       - name: GitHub Release and Release Sync PR
         env:
-          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ inputs.ballerina-bot-token }}
         run: |
           gh release create v$VERSION --title "module-${{ inputs.package-org }}-${{ inputs.package-name }}-v$VERSION"
           gh pr create --title "[Automated] Sync master after $VERSION release" --body "Sync master after $VERSION release"

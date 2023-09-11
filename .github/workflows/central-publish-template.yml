@@ -6,14 +6,28 @@ on:
       environment:
         type: string
         required: true
+      ballerina-bot-username:
+        required: true
+        type: string
+      ballerina-bot-token:
+        required: true
+        type: string
       additional-build-flags:
         required: false
         type: string
-        default: ""
+        default: ''
       additional-publish-flags:
         required: false
         type: string
-        default: ""
+        default: ''
+      ballerina-central-dev-access-token:
+        required: false
+        type: string
+        default: ''
+      ballerina-central-stage-access-token:
+        required: false
+        type: string
+        default: ''
 
 jobs:
   publish-release:
@@ -52,10 +66,10 @@ jobs:
         env:
           BALLERINA_DEV_CENTRAL: true
           BALLERINA_STAGE_CENTRAL: false
-          BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ secrets.BALLERINA_CENTRAL_DEV_ACCESS_TOKEN }}
-          packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
-          packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ inputs.ballerina-central-dev-access-token }}
+          packageUser: ${{ inputs.ballerina-bot-username }}
+          packagePAT: ${{ inputs.ballerina-bot-token }}
+          GITHUB_TOKEN: ${{ inputs.ballerina-bot-token }}
         run: |
           sed -i 's/version=\(.*\)-SNAPSHOT/version=\1/g' gradle.properties
           ./gradlew clean build -PpublishToCentral=true ${{ inputs.additional-publish-flags }}
@@ -65,10 +79,10 @@ jobs:
         env:
           BALLERINA_DEV_CENTRAL: false
           BALLERINA_STAGE_CENTRAL: true
-          BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ secrets.BALLERINA_CENTRAL_STAGE_ACCESS_TOKEN }}
-          packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
-          packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ inputs.ballerina-central-stage-access-token }}
+          packageUser: ${{ inputs.ballerina-bot-username }}
+          packagePAT: ${{ inputs.ballerina-bot-token }}
+          GITHUB_TOKEN: ${{ inputs.ballerina-bot-token }}
         run: |
           sed -i 's/version=\(.*\)-SNAPSHOT/version=\1/g' gradle.properties
           ./gradlew clean build -PpublishToCentral=true ${{ inputs.additional-publish-flags }}
