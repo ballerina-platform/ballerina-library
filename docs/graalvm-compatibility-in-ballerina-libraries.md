@@ -1,7 +1,7 @@
 # GraalVM Compatibility in Ballerina Libraries
 
 ## Overview of GraalVM
-GraalVM is a high-performance, cloud-native, and polyglot JDK designed to accelerate the execution of applications. There are four different distributions of GraalVM: GraalVM Community Edition (CE), GraalVM Enterprise Edition (EE), Oracle GraalVM and Mandrel. You can install any to use the Ballerina GraalVM native functionality.
+GraalVM is a high-performance, cloud-native, and polyglot JDK designed to accelerate the execution of applications. There are four different distributions of GraalVM: GraalVM Community Edition (CE), GraalVM Enterprise Edition (EE), Oracle GraalVM, and Mandrel. You can install any to use the Ballerina GraalVM native functionality.
 
 - **GraalVM CE** is the free version of GraalVM, which is distributed under GPLv2+CE.
 - **GraaLVM EE** is the paid version of GraalVM, which comes with a few additional features such as options for GC, debugging, and other optimizations.
@@ -24,15 +24,31 @@ As depicted in the image, AOT compilation with GraalVM provides the following ad
 - Can be packaged into lightweight container images for faster and more efficient deployments.
 - Reduced attack surface.
 
-One downside is that the GraalVM native image build is a highly complicated process, which may consume a lot of memory and CPU resulting in an extended build time. However, the GraalVM community is continuously working on improving its performance. In addition, the GraalVM native image assumes a closed-world assumption, where it should know all the classes and resources at compile time. Due to this limitation, Java dynamic features such as reflection are not directly supported. But we can configure the properties related to these dynamic features at compile time to make them work. For more information, see [Native Image compatiblity Guide](https://www.graalvm.org/jdk17/reference-manual/native-image/metadata/Compatibility/).
+One downside is that the GraalVM native image build is a highly complicated process, which may consume a lot of memory and CPU resulting in an extended build time. However, the GraalVM community is continuously working on improving its performance. In addition, the GraalVM native image assumes a closed-world assumption, where it should know all the classes and resources at compile time. Due to this limitation, Java dynamic features such as reflection are not directly supported. But we can configure the properties related to these dynamic features at compile time to make them work. For more information, see [Native Image Compatibility Guide](https://www.graalvm.org/jdk17/reference-manual/native-image/metadata/Compatibility/).
 
 ### Ballerina GraalVM executable
 From Ballerina 2201.7.0 (SwanLake) onwards, Ballerina supports GraalVM AOT compilation to generate standalone executables by passing the `graalvm` flag in the build command: `bal build --graalvm`. The generated executable contains the modules in the current package, their dependencies, Ballerina runtime, and statically linked native code from the JDK.
 
 Ballerina runtime, [standard libraries](https://ballerina.io/learn/ballerina-specifications/#standard-library-specifications), and the Ballerina extended modules are GraalVM-compatible. Therefore packages developed only using these libraries are also GraalVM-compatible. Furthermore, Ballerina reports warnings when the GraalVM build is executed for a project with GraalVM-incompatible packages.
 
+```
+**********************************************************************************
+* WARNING: Package is not verified with GraalVM.                                 *
+**********************************************************************************
+
+The GraalVM compatibility property has not been defined for the package
+'<package-name>. This could potentially lead to compatibility issues with GraalVM.
+
+To resolve this warning, please ensure that all Java dependencies of this
+package are compatible with GraalVM. Subsequently, update the Ballerina.toml
+file under the section '[platform.<java*>]' with the attribute
+'graalvmCompatible = true'.
+
+**********************************************************************************
+```
+
 ### Analyzing the code base for Java dynamic features
-Since native-image tool assumes the closed-world assumption, the following [dynamic features](https://www.graalvm.org/jdk17/reference-manual/native-image/dynamic-features/) of Java should be handled explicitly through configuration files.
+Since the native-image tool assumes the closed-world assumption, the following [dynamic features](https://www.graalvm.org/jdk17/reference-manual/native-image/dynamic-features/) of Java should be handled explicitly through configuration files.
 - [Accessing Resources](https://www.graalvm.org/jdk17/reference-manual/native-image/dynamic-features/Resources/)
 - [Certificate Management](https://www.graalvm.org/jdk17/reference-manual/native-image/dynamic-features/CertificateManagement/)
 - [Dynamic Proxy](https://www.graalvm.org/jdk17/reference-manual/native-image/dynamic-features/DynamicProxy/)
@@ -41,9 +57,9 @@ Since native-image tool assumes the closed-world assumption, the following [dyna
 - [Reflection](https://www.graalvm.org/jdk17/reference-manual/native-image/dynamic-features/Reflection/)
 - [URL Protocols](https://www.graalvm.org/jdk17/reference-manual/native-image/dynamic-features/URLProtocols/)
 
-The analysis should be also done to the third-party libraries used in the module. Some third-party libraries might be already GraalVM compatible, this should be verified with the third-party library owners. You can also refer the configurations for some of the commonly used libraries in [graalvm-reachability-metadata repository](https://github.com/oracle/graalvm-reachability-metadata/tree/master/metadata).
+The analysis should be also done on the third-party libraries used in the module. Some third-party libraries might be already GraalVM compatible, this should be verified with the third-party library owners. You can also refer to the configurations for some of the commonly used libraries in [graalvm-reachability-metadata repository](https://github.com/oracle/graalvm-reachability-metadata/tree/master/metadata).
 
-### Testing a sample application with GraalVM
+### Test a sample application with GraalVM
 #### Prerequisites
 1. Latest [Ballerina Swan Lake](https://ballerina.io/downloads/) distribution
    >**Note:** If you are using macOS with an ARM64 processor, then, install Ballerina using the [ARM64 installer](https://ballerina.io/downloads/).
@@ -69,7 +85,7 @@ The analysis should be also done to the third-party libraries used in the module
 > - The GraalVM native-image tool support for Apple M1 (darwin-aarch64) is still experimental. For more updates, see [Support for Apple M1](https://github.com/oracle/graal/issues/2666).
 
 #### Build with GraalVM
-1. Run the following command to build a native exectable for the sample application
+1. Run the following command to build a native executable for the sample application
    ```
    $ bal build --graalvm
    ```
@@ -87,21 +103,21 @@ The analysis should be also done to the third-party libraries used in the module
    $ bal test --graalvm
    ```
 
-#### Handling errors
+#### Handle errors
 There may be errors when building the native image due to [class initialization](https://www.graalvm.org/jdk17/reference-manual/native-image/optimizations-and-performance/ClassInitialization/). Fix these errors using the error logs and tracing the class initialization. For more information, see [Updates on Class Initialization in GraalVM Native Image Generation](https://medium.com/graalvm/updates-on-class-initialization-in-graalvm-native-image-generation-c61faca461f7).
 
-Even though the build passes, running the executable may end-up in unexpected errors. This could happen if we have not added all the necessary configurations related to the Java dynamic features. The necessary configurations needed for this particular sample application can be automatically found by engaging the [tracing agent](https://www.graalvm.org/jdk17/reference-manual/native-image/metadata/AutomaticMetadataCollection/) when running the jar file.
+Even though the build passes, running the executable may end up in unexpected errors. This could happen if we have not added all the necessary configurations related to the Java dynamic features. The necessary configurations needed for this particular sample application can be automatically found by engaging the [tracing agent](https://www.graalvm.org/jdk17/reference-manual/native-image/metadata/AutomaticMetadataCollection/) when running the jar file.
 
 #### The GraalVM Tracing agent
 GraalVM provides a Tracing Agent to easily gather metadata and prepare configuration files. The agent tracks all usages of dynamic features during application execution on a regular Java VM.
 
-##### Engaging the Tracing agent when running the JAR file
+##### Engage the Tracing agent when running the JAR file
 1. Build the JAR file for the application
    ```
    $ bal build
    ```
    
-2. Run the following Java command with the generated JAR file. In addtion, you can replace `config-dir` to a custom path where you want to save the generated configurations
+2. Run the following Java command with the generated JAR file. In addition, you can replace `config-dir` with a custom path where you want to save the generated configurations
    ```
    $ $GRAALVM_HOME/bin/java -agentlib:native-image-agent=config-output-dir=config-dir -jar target/bin/sample.jar
    ```
@@ -113,7 +129,7 @@ GraalVM provides a Tracing Agent to easily gather metadata and prepare configura
 
 5.  The generated configurations can be found in `config-dir`
 
-6.  Build the native executable with the generated configuration files. In addition, you can replace `config-dir` to the path where you have generated the configurations
+6.  Build the native executable with the generated configuration files. In addition, you can replace `config-dir` with the path where you have generated the configurations
     ```
     $ bal build --graalvm --graalvm-build-options="-H:ConfigurationFileDirectories=config-dir"
     ```
@@ -123,18 +139,47 @@ GraalVM provides a Tracing Agent to easily gather metadata and prepare configura
    $ ./target/sample
    ```
 
-##### Engaging the Tracing agent when running the Ballerina tests
-This is not straight forward since Ballerina tests are not executed by a single uber jar. In order to engage the tracing agent with Ballerina tests, we need to know the classpath, main class and the runtime arguments. 
-1. Run the tests with GraalVM to obtain class path
+##### Engage the Tracing agent when running the Ballerina tests
+This is not straightforward since Ballerina tests are not executed by a single Uber jar. In order to engage the tracing agent with Ballerina tests, we need to know the classpath, main class, and runtime arguments. 
+1. Run the tests with GraalVM to obtain classpath
    ```
    $ bal test --graalvm
    ```
    
-2. The class path can be found in the `target/cache/tests_cache/native-config/native-image-args.txt` file
-
-3. Run the following script file to run Ballerina tests with the tracing agent
-   ```sh
-   echo $(sed -n 's/.*-cp \([^ ]*\).*/\1/p' target/cache/tests_cache/native-config/native-image-args.txt) > class-path.txt
-
-   $GRAALVM_HOME/bin/java -agentlib:native-image-agent=config-output-dir=config-dir -cp @class-path.txt "org.ballerinalang.test.runtime.BTestMain" "target" "" true false "" "" "" false false
+2. The class path can be found in the `target/cache/tests_cache/native-config/native-image-args.txt` file. Execute the following command to extract the classpath
    ```
+   $ echo $(sed -n 's/.*-cp \([^ ]*\).*/\1/p' target/cache/tests_cache/native-config/native-image-args.txt) > class-path.txt
+   ```
+
+3. Run the following command to run Ballerina tests with the tracing agent
+   ```
+   $ $GRAALVM_HOME/bin/java -agentlib:native-image-agent=config-output-dir=config-dir -cp @class-path.txt "org.ballerinalang.test.runtime.BTestMain" "target" "" true false "" "" "" false false
+   ```
+
+4. Run the tests with GraalVM after adding the generated configurations
+   ```
+   $ bal test --graalvm --graalvm-build-options="-H:ConfigurationFileDirectories=config-dir"
+   ```
+
+### Evaluate the GraalVM compatibility
+**Once there are enough tests to ensure the functionalities**, execute the `bal test --graalvm` command to run all the tests with the GraalVM native executable.
+
+- If there are any build-time warnings regarding the GraalVM compatibility, review the modules and if possible update the module versions if there is a GraalVM compatible version.
+
+- If there are any build-time errors, refer to the previous section to resolve the issues.
+
+- If there are any run-time errors, run the tests with the tracing agent as mentioned in the previous section to find all the required configurations.
+
+### Pack the additional native image configurations
+If the library requires any additional configurations that are generated by the tracing agent, then review the configurations and filter the required ones. The filtered configurations should be packed with the module to make it GraalVM compatible.
+
+1. If you have a `native` directory that holds the Java native code, then you can pack this configuration files in the `resources/META_INF/native-image/<group-id>/<artifact-id>/` directory.
+
+3. If you do not have a `native` directory, then you should create one and add the configuration files in the `resources/META_INF/native-image/<group-id>/<artifact-id>/` directory, build and add the native jar to the library by specifying the dependency in the `Ballerina.toml`.
+
+### Mark the library as GraalVM compatible
+If you get GraalVM compatibility warnings when building or packing the library, then that means the library has to be marked as GraalVM compatible after making it GraalVM compatible. This can be achieved by adding the following to the `Ballerina.toml`
+```
+[platform.java17]
+graalvmCompatible = true
+```
