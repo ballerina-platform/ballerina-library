@@ -153,6 +153,7 @@
             "dependents": [
                 "module-ballerina-grpc",
                 "module-ballerinax-kafka",
+                "module-ballerina-mqtt",
                 "module-ballerinax-rabbitmq",
                 "module-ballerina-websub",
                 "module-ballerina-websubhub"
