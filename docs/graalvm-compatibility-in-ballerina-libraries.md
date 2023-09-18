@@ -9,7 +9,7 @@ GraalVM is a high-performance, cloud-native, and polyglot JDK designed to accele
 - **Mandrel** is a downstream distribution of the Oracle GraalVM CE, which is maintained by Red Hat.
 
 ### GraalVM executable Vs Uber JAR
-When compiling a  Ballerina application using the `bal build` command the output is an uber JAR file. As you already know, running the JAR requires a JVM. JVM uses a Just In Time (JIT) compiler to generate native code during runtime.
+When compiling a Ballerina application using the `bal build` command the output is an uber JAR file. As you already know, running the JAR requires a JVM. JVM uses a Just In Time (JIT) compiler to generate native code during runtime.
 
 On the other hand, when compiling a Ballerina application using `bal build --graalvm`, the output is the GraalVM executable local to the host machine. In order to build the GraalVM executable, GraalVM uses Ahead Of Time compilation (AOT), which requires the generated uber JAR as the input to produce the native executable. Native Image generation performs aggressive optimizations such as unused code elimination in the JDK and its dependencies, heap snapshotting, and static code initializations.
 
@@ -106,7 +106,7 @@ The analysis should be also done on the third-party libraries used in the module
 #### Handle errors
 There may be errors when building the native image due to [class initialization](https://www.graalvm.org/jdk17/reference-manual/native-image/optimizations-and-performance/ClassInitialization/). Fix these errors using the error logs and tracing the class initialization. For more information, see [Updates on Class Initialization in GraalVM Native Image Generation](https://medium.com/graalvm/updates-on-class-initialization-in-graalvm-native-image-generation-c61faca461f7).
 
-Even though the build passes, running the executable may end up in unexpected errors. This could happen if we have not added all the necessary configurations related to the Java dynamic features. The necessary configurations needed for this particular sample application can be automatically found by engaging the [tracing agent](https://www.graalvm.org/jdk17/reference-manual/native-image/metadata/AutomaticMetadataCollection/) when running the jar file.
+Even though the build passes, running the executable may end up in unexpected errors. This could happen if you have not added all the necessary configurations related to the Java dynamic features. The necessary configurations needed for this particular sample application can be automatically found by engaging the [tracing agent](https://www.graalvm.org/jdk17/reference-manual/native-image/metadata/AutomaticMetadataCollection/) when running the jar file.
 
 #### The GraalVM Tracing agent
 GraalVM provides a Tracing Agent to easily gather metadata and prepare configuration files. The agent tracks all usages of dynamic features during application execution on a regular Java VM.
