@@ -79,18 +79,20 @@ The analysis should be also done on the third-party libraries used in the module
 
 #### Configure GraalVM locally
 
-1. Install GraalVM using [SDKMAN!](https://sdkman.io/).
-   >**Tip:** For additional download options, see [Get Started with GraalVM](https://www.graalvm.org/jdk17/docs/getting-started/).
-
-      ```console
-      $ sdk install java 17.0.7-graalce
-      ```
-
-      > **Note:** If you have installed Ballerina Swan Lake Update 7(2201.7.x) or lower, you have to install GraalVM JDK 11. For download options, see [Get Started with GraalVM](https://www.graalvm.org/22.3/docs/getting-started/macos/).
+1. Install GraalVM.
+   >**Tip:** Use [SDKMAN!](https://sdkman.io/) to install GraalVM.
+   >
+   >   ```console
+   >   $ sdk install java 17.0.7-graalce
+   >   ```
+   >
+   For additional download options, see [Get Started with GraalVM](https://www.graalvm.org/jdk17/docs/getting-started/).
+   > **Note:** If you have installed Ballerina Swan Lake Update 7(2201.7.x) or lower, you have to install GraalVM JDK 11. For download options, see [Get Started with GraalVM](https://www.graalvm.org/22.3/docs/getting-started/macos/).
 
 2. Set the `GRAALVM_HOME` environment variable to the GraalVM installation directory. If you have installed using SDKMAN! you can set it to `JAVA_HOME`.
 
 > **Note:**
+>
 > - On Windows, the native image requires Visual Studio Code and Microsoft Visual C++ (MSVC). For more details, see [Prerequisites for Native Image on Windows](https://www.graalvm.org/latest/docs/getting-started/windows/#prerequisites-for-native-image-on-windows).
 > - The GraalVM native-image tool support for Apple M1 (darwin-aarch64) is still experimental. For more updates, see [Support for Apple M1](https://github.com/oracle/graal/issues/2666).
 
