@@ -52,7 +52,7 @@
         },
         {
             "name": "module-ballerina-xmldata",
-            "module_version": "2.7.0-SNAPSHOT",
+            "module_version": "2.7.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
@@ -183,7 +183,7 @@
         },
         {
             "name": "module-ballerina-cache",
-            "module_version": "3.7.0-SNAPSHOT",
+            "module_version": "3.7.1-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibCacheVersion",
@@ -210,7 +210,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "module_version": "2.9.0-SNAPSHOT",
+            "module_version": "2.9.1-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
@@ -325,7 +325,7 @@
         },
         {
             "name": "module-ballerina-mqtt",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibMqttVersion",
@@ -379,7 +379,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "module_version": "1.10.0-SNAPSHOT",
+            "module_version": "1.10.1-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
@@ -449,7 +449,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "module_version": "3.10.0-SNAPSHOT",
+            "module_version": "3.10.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
