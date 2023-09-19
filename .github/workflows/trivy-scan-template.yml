@@ -1,0 +1,35 @@
+name: Trivy
+
+on:
+  workflow_call:
+
+jobs:
+  ubuntu-build:
+    name: Build on Ubuntu
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'ballerina-platform'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: 17.0.7
+
+      - name: Build with Gradle
+        env:
+          packageUser: ${{ github.actor }}
+          packagePAT: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew build -x check -x test
+
+      - name: Create lib directory if not exists
+        run: mkdir -p ballerina/lib
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "rootfs"
+          scan-ref: "/github/workspace/ballerina/lib"
+          format: "table"
+          timeout: "10m0s"
+          exit-code: "1"
