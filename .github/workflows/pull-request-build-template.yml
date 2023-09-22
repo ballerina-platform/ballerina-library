@@ -73,8 +73,7 @@ jobs:
 
             -   name: Set ENV Variables
                 run: |
-                  echo '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + \"=\" + .value' \
-                    | Out-File -FilePath $env:GITHUB_ENV -Append
+                  echo '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + \"=\" + .value' | Out-File -FilePath $env:GITHUB_ENV -Append
 
             -   name: Build the Project
                 env:
