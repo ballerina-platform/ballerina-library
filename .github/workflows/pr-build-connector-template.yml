@@ -48,4 +48,4 @@ jobs:
                   ./gradlew test ${{ inputs.additional-test-flags }}
 
             -   name: Generate Codecov Report
-                uses: codecov/codecov-action@v2
+                uses: codecov/codecov-action@v3
