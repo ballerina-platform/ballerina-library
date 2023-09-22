@@ -40,10 +40,6 @@ jobs:
                     distribution: 'temurin'
                     java-version: 17.0.7
 
-            -   name: Set ENV Variables
-                run: |
-                  echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV 
-
             -   name: Build the Package
                 env:
                     packageUser: ${{ github.actor }}
@@ -70,10 +66,6 @@ jobs:
                 with:
                     distribution: 'temurin'
                     java-version: 17.0.7
-
-            -   name: Set ENV Variables
-                run: |
-                  echo '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + \"=\" + .value' | Out-File -FilePath $env:GITHUB_ENV -Append
 
             -   name: Build the Project
                 env:
