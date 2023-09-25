@@ -15,7 +15,7 @@ on:
 
 jobs:
     ubuntu-build:
-        name: Build on Ubuntu
+        name: Build
         runs-on: ubuntu-latest
         concurrency:
           group: ${{ github.head_ref }}-ubuntu-build
