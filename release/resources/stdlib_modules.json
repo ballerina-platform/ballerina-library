@@ -27,7 +27,7 @@
             "module_version": "1.0.3-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
-            "version_key": "stdlibMath.vectorVersion",
+            "version_key": "stdlibMathVectorVersion",
             "release": true,
             "dependents": []
         },
