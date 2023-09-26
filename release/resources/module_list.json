@@ -153,6 +153,9 @@
         },
         {
             "name": "module-ballerina-yaml"
+        },
+        {
+            "name": "module-ballerina-math.vector"
         }
     ]
 }
