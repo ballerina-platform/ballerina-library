@@ -23,6 +23,15 @@
             "dependents": []
         },
         {
+            "name": "module-ballerina-math.vector",
+            "module_version": "1.0.3-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibMath.vectorVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
             "name": "module-ballerina-time",
             "module_version": "2.4.0-SNAPSHOT",
             "level": 1,

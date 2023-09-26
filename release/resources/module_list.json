@@ -55,6 +55,9 @@
             "name": "module-ballerina-log"
         },
         {
+            "name": "module-ballerina-math.vector"
+        },
+        {
             "name": "module-ballerina-mime"
         },
         {
@@ -153,9 +156,6 @@
         },
         {
             "name": "module-ballerina-yaml"
-        },
-        {
-            "name": "module-ballerina-math.vector"
         }
     ]
 }
