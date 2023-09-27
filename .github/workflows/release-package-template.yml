@@ -89,4 +89,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
         run: |
           gh release create v$VERSION --title "module-${{ inputs.package-org }}-${{ inputs.package-name }}-v$VERSION"
-          gh pr create --base ${GITHUB_REF##*/} --title "[Automated] Sync master after $VERSION release" --body "Sync master after $VERSION release"
+          gh pr create --base ${GITHUB_REF##*/} --title "[Automated] Sync ${GITHUB_REF##*/} after $VERSION release" --body "Sync ${GITHUB_REF##*/} after $VERSION release"
