@@ -93,11 +93,6 @@ jobs:
                   echo "NATIVE_IMAGE_CONFIG_FILE=$CURRENT_DIR/default_native.properties" >> $GITHUB_ENV
                   echo "NATIVE_IMAGE_CONFIG_FILE: $CURRENT_DIR/default_native.properties"
 
-            # Set env for connector modules
-            - name: Set ENV Variables
-              run: |
-                  echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV 
-
             - name: Build with Gradle
               env:
                   packageUser: ${{ github.actor }}
@@ -190,11 +185,6 @@ jobs:
               run: |
                   "JAVA_TOOL_OPTIONS=${{ inputs.java_tool_options }}" >> $env:GITHUB_ENV
                   Write-Output "JAVA_TOOL_OPTIONS=${{ inputs.java_tool_options }}"
-
-            # Set env for connector modules
-            - name: Set ENV Variables
-              run: |
-                echo '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + \"=\" + .value' | Out-File -FilePath $env:GITHUB_ENV -Append 
 
             - name: Build with Gradle
               env:
