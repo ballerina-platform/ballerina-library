@@ -45,6 +45,14 @@ jobs:
       - name: Create lib Directory if not Exists
         run: mkdir -p ballerina/lib
 
+      - name: Run Trivy Vulnerability Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "rootfs"
+          format: "table"
+          timeout: "10m0s"
+          exit-code: "1"
+
       - name: Get Release Version
         run: echo "VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties | rev | cut --complement -d- -f1 | rev)" >> $GITHUB_ENV
 
