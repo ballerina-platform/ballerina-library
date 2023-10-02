@@ -27,7 +27,7 @@ jobs:
         with:
           java-version: "17"
           distribution: "graalvm-community"
-          set-java-home: false
+          set-java-home: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check GraalVM installation
