@@ -36,3 +36,6 @@ jobs:
 
       - name: Build Using GraalVM
         run: ./gradlew build -PbalGraalVMTest ${{ inputs.additional-build-flags }}
+        env:
+          packageUser: ${{ github.actor }}
+          packagePAT: ${{ secrets.GITHUB_TOKEN }}
