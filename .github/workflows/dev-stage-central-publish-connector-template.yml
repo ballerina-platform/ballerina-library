@@ -1,4 +1,4 @@
-name: Publish to the Ballerina central (Connector)
+name: Publish to the Ballerina DEV/STAGE Central (Connector)
 
 on:
   workflow_call:
