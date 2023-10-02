@@ -1,0 +1,64 @@
+name: Publish to the Ballerina central (Connector)
+
+on:
+  workflow_call:
+      environment:
+        type: string
+        required: true
+      additional-build-flags:
+        required: false
+        type: string
+        default: ""
+      additional-publish-flags:
+        required: false
+        type: string
+        default: ""
+
+jobs:
+  publish-release:
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'ballerina-platform'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: 17.0.7
+
+      - name: Build with Gradle
+        env:
+          packageUser: ${{ github.actor }}
+          packagePAT: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew build -x check -x test ${{ inputs.additional-build-flags }}
+
+      - name: Create lib directory if not exists
+        run: mkdir -p ballerina/lib
+
+      - name: Ballerina Central Dev Push
+        if: ${{ inputs.environment == 'DEV CENTRAL' }}
+        env:
+          BALLERINA_DEV_CENTRAL: true
+          BALLERINA_STAGE_CENTRAL: false
+          BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ secrets.BALLERINA_CENTRAL_DEV_ACCESS_TOKEN }}
+          packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+          packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+        run: |
+          sed -i 's/version=\(.*\)-SNAPSHOT/version=\1/g' gradle.properties
+          ./gradlew clean build -PpublishToCentral=true ${{ inputs.additional-publish-flags }}
+
+      - name: Ballerina Central Stage Push
+        if: ${{ inputs.environment == 'STAGE CENTRAL' }}
+        env:
+          BALLERINA_DEV_CENTRAL: false
+          BALLERINA_STAGE_CENTRAL: true
+          BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ secrets.BALLERINA_CENTRAL_STAGE_ACCESS_TOKEN }}
+          packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+          packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+        run: |
+          sed -i 's/version=\(.*\)-SNAPSHOT/version=\1/g' gradle.properties
+          ./gradlew clean build -PpublishToCentral=true ${{ inputs.additional-publish-flags }}
