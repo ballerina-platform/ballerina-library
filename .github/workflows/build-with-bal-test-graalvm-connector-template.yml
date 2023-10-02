@@ -2,10 +2,11 @@ name: Build with bal test graalvm (Connector)
 
 on:
   workflow_call:
-    additional-build-flags:
-      required: false
-      type: string
-      default: ""
+    inputs:
+      additional-build-flags:
+        required: false
+        type: string
+        default: ""
 
 jobs:
   build:

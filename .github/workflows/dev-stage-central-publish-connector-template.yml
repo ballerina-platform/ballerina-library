@@ -2,14 +2,11 @@ name: Publish to the Ballerina DEV/STAGE Central (Connector)
 
 on:
   workflow_call:
+    inputs:
       environment:
         type: string
         required: true
       additional-build-flags:
-        required: false
-        type: string
-        default: ""
-      additional-publish-flags:
         required: false
         type: string
         default: ""
