@@ -15,7 +15,7 @@
         },
         {
             "name": "module-ballerina-jballerina.java.arrays",
-            "module_version": "1.4.0-SNAPSHOT",
+            "module_version": "1.4.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibJavaArraysVersion",
@@ -33,7 +33,7 @@
         },
         {
             "name": "module-ballerina-time",
-            "module_version": "2.4.0-SNAPSHOT",
+            "module_version": "2.4.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibTimeVersion",
@@ -98,7 +98,7 @@
         },
         {
             "name": "module-ballerina-log",
-            "module_version": "2.9.0-SNAPSHOT",
+            "module_version": "2.9.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibLogVersion",
@@ -119,7 +119,7 @@
         },
         {
             "name": "module-ballerina-os",
-            "module_version": "1.8.0-SNAPSHOT",
+            "module_version": "1.8.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibOsVersion",
@@ -143,7 +143,7 @@
         },
         {
             "name": "module-ballerina-protobuf",
-            "module_version": "1.6.0-SNAPSHOT",
+            "module_version": "1.6.1-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibProtobufVersion",
@@ -154,7 +154,7 @@
         },
         {
             "name": "module-ballerina-random",
-            "module_version": "1.5.0-SNAPSHOT",
+            "module_version": "1.5.1-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibRandomVersion",
@@ -205,7 +205,7 @@
         },
         {
             "name": "module-ballerina-file",
-            "module_version": "1.9.0-SNAPSHOT",
+            "module_version": "1.9.1-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibFileVersion",
@@ -276,7 +276,7 @@
         },
         {
             "name": "module-ballerina-uuid",
-            "module_version": "1.7.0-SNAPSHOT",
+            "module_version": "1.7.1-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibUuidVersion",
@@ -388,7 +388,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "module_version": "1.10.1-SNAPSHOT",
+            "module_version": "1.10.2-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
