@@ -1,6 +1,6 @@
-# Contributing to Ballerina Libraries
+# Contributing to Ballerina Library
 
-Ballerina is an open source programming language and platform for cloud-era application programmers to easily write software. It is licensed under the [Apache License](https://www.apache.org/licenses/LICENSE-2.0) and is nurtured by all the contributors of the Ballerina community. The Ballerina libraries are a set of libraries that are developed by the Ballerina team and the Ballerina community. The Ballerina Library repo is used to track all the issues related to Ballerina libraries maintained by the Ballerina team. Each library has its own repository and the issues related to each library are tracked by the label `module/<module-name>`.
+Ballerina is an open source programming language and platform for cloud-era application programmers to easily write software. It is licensed under the [Apache License](https://www.apache.org/licenses/LICENSE-2.0) and is nurtured by all the contributors of the Ballerina community. The Ballerina library are a set of Ballerina packages that are developed by the Ballerina team and the Ballerina community. The Ballerina Library repo is used to track all the issues related to Ballerina packages maintained by the Ballerina team. Each package has its own repository and the issues related to each package are tracked by the label `module/<module-name>`.
 
 We appreciate your help!
 
