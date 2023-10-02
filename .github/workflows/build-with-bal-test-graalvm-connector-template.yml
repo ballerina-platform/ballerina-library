@@ -17,12 +17,17 @@ jobs:
       - name: Checkout the Repository
         uses: actions/checkout@v3
 
+      - name: Set Up Ballerina
+        uses: ballerina-platform/setup-ballerina@v1.1.0
+        with:
+          version: latest
+
       - name: Set up GraalVM
         uses: graalvm/setup-graalvm@v1
         with:
           java-version: "17"
           distribution: "graalvm-community"
-          set-java-home: false
+          set-java-home: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check GraalVM installation
