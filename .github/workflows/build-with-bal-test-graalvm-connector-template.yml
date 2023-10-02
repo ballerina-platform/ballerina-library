@@ -1,0 +1,38 @@
+name: Build with bal test graalvm (Connector)
+
+on:
+  workflow_call:
+    additional-build-flags:
+      required: false
+      type: string
+      default: ""
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'Skip GraalVM Check')
+
+    steps:
+      - name: Checkout the Repository
+        uses: actions/checkout@v3
+
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: "17"
+          distribution: "graalvm-community"
+          set-java-home: false
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check GraalVM installation
+        run: |
+          echo "GRAALVM_HOME: ${{ env.GRAALVM_HOME }}"
+          echo "JAVA_HOME: ${{ env.JAVA_HOME }}"
+          native-image --version
+
+      - name: Set ENV Variables
+        run: |
+          echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
+
+      - name: Build Using GraalVM
+        run: ./gradlew build -PbalGraalVMTest ${{ inputs.additional-build-flags }}
