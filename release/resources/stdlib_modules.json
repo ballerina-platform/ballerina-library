@@ -305,7 +305,7 @@
         },
         {
             "name": "module-ballerina-email",
-            "module_version": "2.9.0-SNAPSHOT",
+            "module_version": "2.9.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibEmailVersion",
@@ -314,7 +314,7 @@
         },
         {
             "name": "module-ballerinax-java.jms",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibJmsVersion",
@@ -323,7 +323,7 @@
         },
         {
             "name": "module-ballerina-jwt",
-            "module_version": "2.10.0-SNAPSHOT",
+            "module_version": "2.10.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibJwtVersion",
@@ -431,7 +431,7 @@
         },
         {
             "name": "module-ballerina-websub",
-            "module_version": "2.10.0-SNAPSHOT",
+            "module_version": "2.10.1-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibWebsubVersion",
@@ -440,7 +440,7 @@
         },
         {
             "name": "module-ballerina-websubhub",
-            "module_version": "1.10.0-SNAPSHOT",
+            "module_version": "1.10.1-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsubhubVersion",
@@ -485,7 +485,7 @@
         },
         {
             "name": "module-ballerina-sql",
-            "module_version": "1.11.0-SNAPSHOT",
+            "module_version": "1.11.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
