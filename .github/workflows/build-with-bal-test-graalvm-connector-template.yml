@@ -7,6 +7,10 @@ on:
         required: false
         type: string
         default: ""
+      additional-test-flags:
+        required: false
+        type: string
+        default: ""
 
 jobs:
   build:
@@ -40,8 +44,13 @@ jobs:
         run: |
           echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
 
-      - name: Build Using GraalVM
-        run: ./gradlew build -PbalGraalVMTest ${{ inputs.additional-build-flags }}
+      - name: Build Package
+        run: ./gradlew build ${{ inputs.additional-build-flags }}
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test with GraalVM
+        run: |
+          cd ballerina
+          bal test --graalvm ${{ inputs.additional-test-flags }}
