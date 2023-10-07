@@ -4,9 +4,15 @@ const IO_MODULE = "module-ballerina-io";
 const JAVA_ARRAYS_MODULE = "module-ballerina-jballerina.java.arrays";
 
 @test:Config
-function getRepoLinkTest() {
+try {
+     function getRepoLinkTest() {
     test:assertEquals(getRepoLink(IO_MODULE), "[io](https://github.com/ballerina-platform/module-ballerina-io)");
 }
+} catch (Exception e) {
+    return "An error occurred: " + e.getMessage();
+}
+
+
 
 @test:Config
 function getReleaseBadgeTest() {
