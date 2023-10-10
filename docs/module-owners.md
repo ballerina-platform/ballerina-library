@@ -11,6 +11,7 @@ Each package has a primary owner, who is responsible for managing and maintainin
 The responsibilities of a package owner include:
 
 - Maintaining the stability and the quality of the package
+- Checking the daily build status, Trivy scan results, load tests, and GraalVM checks
 - Coming up with proposals to improve the package
 - Reviewing and merging pull requests
 - Responding to issues and add relevant labels
