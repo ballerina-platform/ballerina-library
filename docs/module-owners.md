@@ -1,27 +1,33 @@
 # Ballerina Library Package Owners
 
-This document lists the owners of the Ballerina Library packages.
+This document serves as a comprehensive guide to the owners of the Ballerina Library packages.
 
 ## Primary and Secondary Owners
 
-Each package has a primary owner, who is responsible for managing and maintaining the package. Each package should have a secondary owner, who should assist the primary owner in managing and maintaining the package. In case the primary owner is unavailable, the secondary owner should be able to take over the responsibilities of the primary owner. It is assumed that the secondary owner would attend only to the urgent issues when the primary owner is available. The secondary owner should be able to take over the responsibilities of the primary owner only when the primary owner is unavailable for a long period of time.
+### Primary Owner
+
+The primary owner of a Ballerina Library package holds the core responsibility for managing and maintaining the package. Their tasks include overseeing the stability and quality of the package, monitoring essential metrics such as daily build status, Trivy scan results, load tests, and GraalVM checks. They are also responsible for evaluating proposals to enhance the package, reviewing and merging pull requests, addressing issues, and ensuring timely responses to inquiries on the Discord server. Furthermore, the primary owner manages individual releases and collaborates with release managers to facilitate the release process.
+
+### Secondary Owner
+
+The secondary owner of a Ballerina Library package plays a vital supportive role. In the absence of the primary owner, they assume responsibility for urgent matters and assist in managing and maintaining the package. While they may not handle the package's core duties on a regular basis, they should be prepared to take over the primary owner's responsibilities if the latter becomes unavailable for an extended period. The secondary owner's tasks include monitoring the package's status, assisting in reviewing pull requests, and promptly responding to urgent issues in collaboration with the primary owner.
 
 ## Responsibilities of a Package Owner
 
-The responsibilities of a package owner include:
+A package owner's duties encompass:
 
-- Maintaining the stability and the quality of the package
-- Checking the daily build status, Trivy scan results, load tests, and GraalVM checks
-- Coming up with proposals to improve the package
+- Ensuring the package's stability and quality
+- Monitoring daily build status, Trivy scan results, load tests, and GraalVM checks
+- Formulating proposals to enhance the package
 - Reviewing and merging pull requests
-- Responding to issues and add relevant labels
-- Responding to questions in the Discord server
-- Responding to internal and external queries and issues related to the package
-- Handling individual releases and help release managers with the release process
+- Addressing issues and applying relevant labels
+- Responding to inquiries on the Discord server
+- Handling internal and external queries and issues related to the package
+- Overseeing individual releases and assisting release managers in the release process
 
-When there is a change of ownership, the new owner should be responsible for updating this document.
+In the event of a change in ownership, the new owner is accountable for updating this document promptly.
 
->**Note:** When adding a new package, please add it according to the alphabetical order, disregarding the organization name.
+> **Note:** When introducing a new package, kindly arrange it alphabetically, disregarding the organization name."
 
 ## List of Owners
 
