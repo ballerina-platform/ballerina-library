@@ -66,12 +66,6 @@ jobs:
                 with:
                     distribution: 'temurin'
                     java-version: 17.0.7
-            
-            - name: Set Java Tool Options
-              run: |
-                if [[ ${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/} != "module-ballerina-log" ]]; then
-                  echo "JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8" | Out-File -FilePath $env:GITHUB_ENV -Append
-                fi
 
             -   name: Build the Project
                 env:
