@@ -34,11 +34,11 @@ In the event of a change in ownership, the new owner is accountable for updating
 | Package Name | Primary Owner | Secondary Owner |
 | :---: | :---: | :---: |
 | [auth](https://github.com/ballerina-platform/module-ballerina-auth) | [@DimuthuMadushan](https://github.com/DimuthuMadushan) |  |
-| [cache](https://github.com/ballerina-platform/module-ballerina-cache) |  |  |
+| [cache](https://github.com/ballerina-platform/module-ballerina-cache) |[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@Bhashinee](https://github.com/Bhashinee)|
 | [constraint](https://github.com/ballerina-platform/module-ballerina-constraint) |  |  |
 | [crypto](https://github.com/ballerina-platform/module-ballerina-crypto) |  |  |
 | [email](https://github.com/ballerina-platform/module-ballerina-email) |  |  |
-| [file](https://github.com/ballerina-platform/module-ballerina-file) |  |  |
+| [file](https://github.com/ballerina-platform/module-ballerina-file) |[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@Bhashinee](https://github.com/Bhashinee)|
 | [ftp](https://github.com/ballerina-platform/module-ballerina-ftp) |  |  |
 | [graphql](https://github.com/ballerina-platform/module-ballerina-graphql) | [@ThisaruGuruge](https://github.com/ThisaruGuruge) | [@DimuthuMadushan](https://github.com/DimuthuMadushan) |
 | [grpc](https://github.com/ballerina-platform/module-ballerina-grpc) |  |  |
@@ -47,7 +47,7 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [java.arrays](https://github.com/ballerina-platform/module-ballerina-java.arrays) |  |  |
 | [jwt](https://github.com/ballerina-platform/module-ballerina-jwt) |  |  |
 | [kafka](https://github.com/ballerina-platform/module-ballerinax-kafka) |  |  |
-| [log](https://github.com/ballerina-platform/module-ballerina-log) |  |  |
+| [log](https://github.com/ballerina-platform/module-ballerina-log) |[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@Bhashinee](https://github.com/Bhashinee)|
 | [math.vector](https://github.com/ballerina-platform/module-ballerina-math.vector) | [@ThisaruGuruge](https://github.com/ThisaruGuruge) |  |
 | [mime](https://github.com/ballerina-platform/module-ballerina-mime) |  |  |
 | [mqtt](https://github.com/ballerina-platform/module-ballerina-mqtt) |  |  |
@@ -60,7 +60,7 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [random](https://github.com/ballerina-platform/module-ballerina-random) |  |  |
 | [soap](https://github.com/ballerina-platform/module-ballerina-soap) |  |  |
 | [sql](https://github.com/ballerina-platform/module-ballerina-sql) |  |  |
-| [task](https://github.com/ballerina-platform/module-ballerina-task) |  |  |
+| [task](https://github.com/ballerina-platform/module-ballerina-task) |[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@Bhashinee](https://github.com/Bhashinee)|
 | [tcp](https://github.com/ballerina-platform/module-ballerina-tcp) |  |  |
 | [time](https://github.com/ballerina-platform/module-ballerina-time) |  |  |
 | [toml](https://github.com/ballerina-platform/module-ballerina-toml) | [@RDPerera](https://github.com/RDPerera) | |
@@ -70,6 +70,6 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [websocket](https://github.com/ballerina-platform/module-ballerina-websocket) |  |  |
 | [websub](https://github.com/ballerina-platform/module-ballerina-websub) |  |  |
 | [websubhub](https://github.com/ballerina-platform/module-ballerina-websubhub) |  |  |
-| [xmlutils](https://github.com/ballerina-platform/module-ballerina-xmlutils) |  |  |
+| [xmldata](https://github.com/ballerina-platform/module-ballerina-xmldata)|[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@sahanHe](https://github.com/sahanHe)|
 | [xslt](https://github.com/ballerina-platform/module-ballerina-xslt) |  |  |
 | [yaml](https://github.com/ballerina-platform/module-ballerina-yaml) | [@RDPerera](https://github.com/RDPerera) |  |
