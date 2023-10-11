@@ -63,7 +63,7 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [task](https://github.com/ballerina-platform/module-ballerina-task) |  |  |
 | [tcp](https://github.com/ballerina-platform/module-ballerina-tcp) |  |  |
 | [time](https://github.com/ballerina-platform/module-ballerina-time) |  |  |
-| [toml](https://github.com/ballerina-platform/module-ballerina-toml) |  |  |
+| [toml](https://github.com/ballerina-platform/module-ballerina-toml) | [@RDPerera](https://github.com/RDPerera) | |
 | [udp](https://github.com/ballerina-platform/module-ballerina-udp) |  |  |
 | [url](https://github.com/ballerina-platform/module-ballerina-url) |  |  |
 | [uuid](https://github.com/ballerina-platform/module-ballerina-uuid) |  |  |
@@ -72,4 +72,4 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [websubhub](https://github.com/ballerina-platform/module-ballerina-websubhub) |  |  |
 | [xmlutils](https://github.com/ballerina-platform/module-ballerina-xmlutils) |  |  |
 | [xslt](https://github.com/ballerina-platform/module-ballerina-xslt) |  |  |
-| [yaml](https://github.com/ballerina-platform/module-ballerina-yaml) |  |  |
+| [yaml](https://github.com/ballerina-platform/module-ballerina-yaml) | [@RDPerera](https://github.com/RDPerera) |  |
