@@ -37,15 +37,15 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [cache](https://github.com/ballerina-platform/module-ballerina-cache) |  |  |
 | [constraint](https://github.com/ballerina-platform/module-ballerina-constraint) |  |  |
 | [crypto](https://github.com/ballerina-platform/module-ballerina-crypto) |  |  |
-| [email](https://github.com/ballerina-platform/module-ballerina-email) |  |  |
+| [email](https://github.com/ballerina-platform/module-ballerina-email) |[ayeshLK](https://github.com/ayeshLK)|  |
 | [file](https://github.com/ballerina-platform/module-ballerina-file) |  |  |
 | [ftp](https://github.com/ballerina-platform/module-ballerina-ftp) |  |  |
 | [graphql](https://github.com/ballerina-platform/module-ballerina-graphql) | [@ThisaruGuruge](https://github.com/ThisaruGuruge) | [@DimuthuMadushan](https://github.com/DimuthuMadushan) |
 | [grpc](https://github.com/ballerina-platform/module-ballerina-grpc) |  |  |
-| [http](https://github.com/ballerina-platform/module-ballerina-http) |  |  |
+| [http](https://github.com/ballerina-platform/module-ballerina-http) |  |[ayeshLK](https://github.com/ayeshLK)|
 | [io](https://github.com/ballerina-platform/module-ballerina-io) |  |  |
 | [java.arrays](https://github.com/ballerina-platform/module-ballerina-java.arrays) |  |  |
-| [jwt](https://github.com/ballerina-platform/module-ballerina-jwt) |  |  |
+| [jwt](https://github.com/ballerina-platform/module-ballerina-jwt) |[ayeshLK](https://github.com/ayeshLK)|  |
 | [kafka](https://github.com/ballerina-platform/module-ballerinax-kafka) |  |  |
 | [log](https://github.com/ballerina-platform/module-ballerina-log) |  |  |
 | [math.vector](https://github.com/ballerina-platform/module-ballerina-math.vector) | [@ThisaruGuruge](https://github.com/ThisaruGuruge) |  |
@@ -68,8 +68,8 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [url](https://github.com/ballerina-platform/module-ballerina-url) |  |  |
 | [uuid](https://github.com/ballerina-platform/module-ballerina-uuid) |  |  |
 | [websocket](https://github.com/ballerina-platform/module-ballerina-websocket) |  |  |
-| [websub](https://github.com/ballerina-platform/module-ballerina-websub) |  |  |
-| [websubhub](https://github.com/ballerina-platform/module-ballerina-websubhub) |  |  |
+| [websub](https://github.com/ballerina-platform/module-ballerina-websub) |[ayeshLK](https://github.com/ayeshLK)|  |
+| [websubhub](https://github.com/ballerina-platform/module-ballerina-websubhub) |[ayeshLK](https://github.com/ayeshLK)|  |
 | [xmlutils](https://github.com/ballerina-platform/module-ballerina-xmlutils) |  |  |
 | [xslt](https://github.com/ballerina-platform/module-ballerina-xslt) |  |  |
 | [yaml](https://github.com/ballerina-platform/module-ballerina-yaml) | [@RDPerera](https://github.com/RDPerera) |  |
