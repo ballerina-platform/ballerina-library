@@ -66,12 +66,12 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [postgresql](https://github.com/ballerina-platform/module-ballerinax-postgresql) | [@niveathika](https://github.com/niveathika) | [@kaneeldias](https://github.com/kaneeldias) |
 | [protobuf](https://github.com/ballerina-platform/module-ballerina-protobuf) |  |  |
 | [rabbitmq](https://github.com/ballerina-platform/module-ballerinax-rabbitmq) | [@aashikam](https://github.com/aashikam) |  |
-| [random](https://github.com/ballerina-platform/module-ballerina-random) | [@daneshk](https://github.com/daneshk) | [@sahanHe](https://github.com/sahanHe) | 
-| [soap](https://github.com/ballerina-platform/module-ballerina-soap) |  |  |
+| [random](https://github.com/ballerina-platform/module-ballerina-random) | [@daneshk](https://github.com/daneshk) | [@sahanHe](https://github.com/sahanHe) |
+| [soap](https://github.com/ballerina-platform/module-ballerina-soap) | [@Nuvindu](https://github.com/Nuvindu) |  |
 | [sql](https://github.com/ballerina-platform/module-ballerina-sql) | [@niveathika](https://github.com/niveathika) | [@kaneeldias](https://github.com/kaneeldias) |
 | [task](https://github.com/ballerina-platform/module-ballerina-task) |[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@Bhashinee](https://github.com/Bhashinee)|
 | [tcp](https://github.com/ballerina-platform/module-ballerina-tcp) | [@Bhashinee](https://github.com/Bhashinee) |  |
-| [time](https://github.com/ballerina-platform/module-ballerina-time) | [@sahanHe](https://github.com/sahanHe) | [@daneshk](https://github.com/daneshk) | 
+| [time](https://github.com/ballerina-platform/module-ballerina-time) | [@sahanHe](https://github.com/sahanHe) | [@daneshk](https://github.com/daneshk) |
 | [toml](https://github.com/ballerina-platform/module-ballerina-toml) | [@RDPerera](https://github.com/RDPerera) | |
 | [udp](https://github.com/ballerina-platform/module-ballerina-udp) | [@Bhashinee](https://github.com/Bhashinee) |  |
 | [url](https://github.com/ballerina-platform/module-ballerina-url) |  |  |
