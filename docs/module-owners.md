@@ -35,22 +35,22 @@ In the event of a change in ownership, the new owner is accountable for updating
 | :---: | :---: | :---: |
 | [auth](https://github.com/ballerina-platform/module-ballerina-auth) | [@DimuthuMadushan](https://github.com/DimuthuMadushan) |  |
 | [cache](https://github.com/ballerina-platform/module-ballerina-cache) |[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@Bhashinee](https://github.com/Bhashinee)|
-| [constraint](https://github.com/ballerina-platform/module-ballerina-constraint) |  |  |
-| [crypto](https://github.com/ballerina-platform/module-ballerina-crypto) |  |  |
-| [email](https://github.com/ballerina-platform/module-ballerina-email) |[ayeshLK](https://github.com/ayeshLK)|  |
+| [constraint](https://github.com/ballerina-platform/module-ballerina-constraint) | [@TharmiganK](https://github.com/TharmiganK) |  |
+| [crypto](https://github.com/ballerina-platform/module-ballerina-crypto) | [@Bhashinee](https://github.com/Bhashinee) | [@MohamedSabthar](https://github.com/MohamedSabthar) |
+| [email](https://github.com/ballerina-platform/module-ballerina-email) |[@ayeshLK](https://github.com/ayeshLK)|  |
 | [file](https://github.com/ballerina-platform/module-ballerina-file) |[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@Bhashinee](https://github.com/Bhashinee)|
-| [ftp](https://github.com/ballerina-platform/module-ballerina-ftp) |  |  |
+| [ftp](https://github.com/ballerina-platform/module-ballerina-ftp) | [@dilanSachi](https://github.com/dilanSachi) | [@DimuthuMadushan](https://github.com/DimuthuMadushan) |
 | [graphql](https://github.com/ballerina-platform/module-ballerina-graphql) | [@ThisaruGuruge](https://github.com/ThisaruGuruge) | [@DimuthuMadushan](https://github.com/DimuthuMadushan) |
-| [grpc](https://github.com/ballerina-platform/module-ballerina-grpc) |  |  |
-| [http](https://github.com/ballerina-platform/module-ballerina-http) |  |[ayeshLK](https://github.com/ayeshLK)|
+| [grpc](https://github.com/ballerina-platform/module-ballerina-grpc) | [@daneshk](https://github.com/daneshk) | [@dilanSachi](https://github.com/dilanSachi) |
+| [http](https://github.com/ballerina-platform/module-ballerina-http) | [@TharmiganK](https://github.com/TharmiganK) |[ayeshLK](https://github.com/ayeshLK), [@dilanSachi](https://github.com/dilanSachi)|
 | [io](https://github.com/ballerina-platform/module-ballerina-io) |  |  |
 | [java.arrays](https://github.com/ballerina-platform/module-ballerina-java.arrays) |  |  |
 | [jwt](https://github.com/ballerina-platform/module-ballerina-jwt) |[ayeshLK](https://github.com/ayeshLK)|  |
-| [kafka](https://github.com/ballerina-platform/module-ballerinax-kafka) |  |  |
+| [kafka](https://github.com/ballerina-platform/module-ballerinax-kafka) | [@dilanSachi](https://github.com/dilanSachi) | [@DimuthuMadushan](https://github.com/DimuthuMadushan) |
 | [log](https://github.com/ballerina-platform/module-ballerina-log) |[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@Bhashinee](https://github.com/Bhashinee)|
 | [math.vector](https://github.com/ballerina-platform/module-ballerina-math.vector) | [@ThisaruGuruge](https://github.com/ThisaruGuruge) |  |
-| [mime](https://github.com/ballerina-platform/module-ballerina-mime) |  |  |
-| [mqtt](https://github.com/ballerina-platform/module-ballerina-mqtt) |  |  |
+| [mime](https://github.com/ballerina-platform/module-ballerina-mime) |[@TharmiganK](https://github.com/TharmiganK) |[ayeshLK](https://github.com/ayeshLK), [@dilanSachi](https://github.com/dilanSachi)|
+| [mqtt](https://github.com/ballerina-platform/module-ballerina-mqtt) | [@dilanSachi](https://github.com/dilanSachi) |  |
 | [nats](https://github.com/ballerina-platform/module-ballerinax-nats) | [@aashikam](https://github.com/aashikam) |  |
 | [oauth2](https://github.com/ballerina-platform/module-ballerina-oauth2) | [@MohamedSabthar](https://github.com/MohamedSabthar) |  |
 | [os](https://github.com/ballerina-platform/module-ballerina-os) |  |  |
@@ -58,16 +58,16 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [protobuf](https://github.com/ballerina-platform/module-ballerina-protobuf) |  |  |
 | [rabbitmq](https://github.com/ballerina-platform/module-ballerinax-rabbitmq) | [@aashikam](https://github.com/aashikam) |  |
 | [random](https://github.com/ballerina-platform/module-ballerina-random) |  |  |
-| [soap](https://github.com/ballerina-platform/module-ballerina-soap) |  |  |
+| [soap](https://github.com/ballerina-platform/module-ballerina-soap) | [@Nuvindu](https://github.com/Nuvindu) |  |
 | [sql](https://github.com/ballerina-platform/module-ballerina-sql) |  |  |
 | [task](https://github.com/ballerina-platform/module-ballerina-task) |[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@Bhashinee](https://github.com/Bhashinee)|
-| [tcp](https://github.com/ballerina-platform/module-ballerina-tcp) |  |  |
+| [tcp](https://github.com/ballerina-platform/module-ballerina-tcp) | [@Bhashinee](https://github.com/Bhashinee) | [@MohamedSabthar](https://github.com/MohamedSabthar) |
 | [time](https://github.com/ballerina-platform/module-ballerina-time) |  |  |
 | [toml](https://github.com/ballerina-platform/module-ballerina-toml) | [@RDPerera](https://github.com/RDPerera) | |
-| [udp](https://github.com/ballerina-platform/module-ballerina-udp) |  |  |
-| [url](https://github.com/ballerina-platform/module-ballerina-url) |  |  |
+| [udp](https://github.com/ballerina-platform/module-ballerina-udp) | [@Bhashinee](https://github.com/Bhashinee) | [@MohamedSabthar](https://github.com/MohamedSabthar) |
+| [url](https://github.com/ballerina-platform/module-ballerina-url) |[@TharmiganK](https://github.com/TharmiganK) |[ayeshLK](https://github.com/ayeshLK), [@dilanSachi](https://github.com/dilanSachi)|
 | [uuid](https://github.com/ballerina-platform/module-ballerina-uuid) |  |  |
-| [websocket](https://github.com/ballerina-platform/module-ballerina-websocket) |  |  |
+| [websocket](https://github.com/ballerina-platform/module-ballerina-websocket) | [@Bhashinee](https://github.com/Bhashinee) | [@MohamedSabthar](https://github.com/MohamedSabthar) |
 | [websub](https://github.com/ballerina-platform/module-ballerina-websub) |[ayeshLK](https://github.com/ayeshLK)|  |
 | [websubhub](https://github.com/ballerina-platform/module-ballerina-websubhub) |[ayeshLK](https://github.com/ayeshLK)|  |
 | [xmldata](https://github.com/ballerina-platform/module-ballerina-xmldata)|[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@sahanHe](https://github.com/sahanHe)|
