@@ -164,6 +164,7 @@
                 "module-ballerinax-kafka",
                 "module-ballerina-mqtt",
                 "module-ballerinax-rabbitmq",
+                "module-ballerina-soap",
                 "module-ballerina-websub",
                 "module-ballerina-websubhub"
             ]
@@ -285,7 +286,6 @@
                 "module-ballerina-grpc",
                 "module-ballerinax-java.jms",
                 "module-ballerina-mqtt",
-                "module-ballerina-soap",
                 "module-ballerinai-transaction",
                 "module-ballerina-websocket",
                 "module-ballerina-websub",
@@ -379,7 +379,6 @@
             "release": true,
             "dependents": [
                 "module-ballerina-grpc",
-                "module-ballerina-soap",
                 "module-ballerinai-transaction",
                 "module-ballerina-websocket",
                 "module-ballerina-websub",
@@ -396,15 +395,6 @@
             "dependents": []
         },
         {
-            "name": "module-ballerina-soap",
-            "module_version": "0.2.0-SNAPSHOT",
-            "level": 6,
-            "default_branch": "master",
-            "version_key": "stdlibSoapVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
             "name": "module-ballerinai-transaction",
             "module_version": "1.8.0-SNAPSHOT",
             "level": 6,
@@ -415,6 +405,7 @@
                 "module-ballerinax-kafka",
                 "module-ballerinax-persist.googlesheets",
                 "module-ballerinax-rabbitmq",
+                "module-ballerina-soap",
                 "module-ballerina-sql"
             ]
         },
@@ -484,8 +475,17 @@
             "dependents": []
         },
         {
+            "name": "module-ballerina-soap",
+            "module_version": "0.8.0-SNAPSHOT",
+            "level": 7,
+            "default_branch": "master",
+            "version_key": "stdlibSoapVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
             "name": "module-ballerina-sql",
-            "module_version": "1.11.1-SNAPSHOT",
+            "module_version": "1.11.2-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
