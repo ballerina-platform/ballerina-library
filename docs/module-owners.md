@@ -36,38 +36,47 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [auth](https://github.com/ballerina-platform/module-ballerina-auth) | [@DimuthuMadushan](https://github.com/DimuthuMadushan) |  |
 | [cache](https://github.com/ballerina-platform/module-ballerina-cache) |[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@Bhashinee](https://github.com/Bhashinee)|
 | [constraint](https://github.com/ballerina-platform/module-ballerina-constraint) |  |  |
-| [crypto](https://github.com/ballerina-platform/module-ballerina-crypto) |  |  |
+| [crypto](https://github.com/ballerina-platform/module-ballerina-crypto) | [@Bhashinee](https://github.com/Bhashinee) |  |
 | [email](https://github.com/ballerina-platform/module-ballerina-email) |[ayeshLK](https://github.com/ayeshLK)|  |
 | [file](https://github.com/ballerina-platform/module-ballerina-file) |[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@Bhashinee](https://github.com/Bhashinee)|
 | [ftp](https://github.com/ballerina-platform/module-ballerina-ftp) |  |  |
 | [graphql](https://github.com/ballerina-platform/module-ballerina-graphql) | [@ThisaruGuruge](https://github.com/ThisaruGuruge) | [@DimuthuMadushan](https://github.com/DimuthuMadushan) |
 | [grpc](https://github.com/ballerina-platform/module-ballerina-grpc) |  |  |
 | [http](https://github.com/ballerina-platform/module-ballerina-http) |  |[ayeshLK](https://github.com/ayeshLK)|
-| [io](https://github.com/ballerina-platform/module-ballerina-io) |  |  |
-| [java.arrays](https://github.com/ballerina-platform/module-ballerina-java.arrays) |  |  |
+| [io](https://github.com/ballerina-platform/module-ballerina-io) | [@sahanHe](https://github.com/sahanHe) | [@daneshk](https://github.com/daneshk) |
+| [java.arrays](https://github.com/ballerina-platform/module-ballerina-java.arrays) | [@sahanHe](https://github.com/sahanHe) | [@daneshk](https://github.com/daneshk) |
+| [java.jdbc](https://github.com/ballerina-platform/module-ballerinax-java.jdbc) | [@kaneeldias](https://github.com/kaneeldias) | [@niveathika](https://github.com/niveathika) |
 | [jwt](https://github.com/ballerina-platform/module-ballerina-jwt) |[ayeshLK](https://github.com/ayeshLK)|  |
 | [kafka](https://github.com/ballerina-platform/module-ballerinax-kafka) |  |  |
 | [log](https://github.com/ballerina-platform/module-ballerina-log) |[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@Bhashinee](https://github.com/Bhashinee)|
 | [math.vector](https://github.com/ballerina-platform/module-ballerina-math.vector) | [@ThisaruGuruge](https://github.com/ThisaruGuruge) |  |
 | [mime](https://github.com/ballerina-platform/module-ballerina-mime) |  |  |
+| [mssql](https://github.com/ballerina-platform/module-ballerinax-mssql) | [@kaneeldias](https://github.com/kaneeldias) | [@niveathika](https://github.com/niveathika) |
+| [mysql](https://github.com/ballerina-platform/module-ballerinax-mysql) | [@kaneeldias](https://github.com/kaneeldias) | [@niveathika](https://github.com/niveathika) |
 | [mqtt](https://github.com/ballerina-platform/module-ballerina-mqtt) |  |  |
 | [nats](https://github.com/ballerina-platform/module-ballerinax-nats) | [@aashikam](https://github.com/aashikam) |  |
 | [oauth2](https://github.com/ballerina-platform/module-ballerina-oauth2) | [@MohamedSabthar](https://github.com/MohamedSabthar) |  |
-| [os](https://github.com/ballerina-platform/module-ballerina-os) |  |  |
-| [persist](https://github.com/ballerina-platform/module-ballerina-persist) |  |  |
+| [oracledb](https://github.com/ballerina-platform/module-ballerinax-oracledb) | [@niveathika](https://github.com/niveathika) | [@kaneeldias](https://github.com/kaneeldias) |
+| [os](https://github.com/ballerina-platform/module-ballerina-os) | [@daneshk](https://github.com/daneshk) | [@sahanHe](https://github.com/sahanHe) |
+| [persist](https://github.com/ballerina-platform/module-ballerina-persist) | [@niveathika](https://github.com/niveathika) | [@kaneeldias](https://github.com/kaneeldias) |
+| [persist.googlesheets](https://github.com/ballerina-platform/module-ballerinax-persist.googlesheets) | [@sahanHe](https://github.com/sahanHe) | [@kaneeldias](https://github.com/kaneeldias)  |
+| [persist.inmemory](https://github.com/ballerina-platform/module-ballerinax-persist.inmemory) | [@kaneeldias](https://github.com/kaneeldias) |[@sahanHe](https://github.com/sahanHe) |
+| [persist.sql](https://github.com/ballerina-platform/module-ballerinax-persist.sql) | [@kaneeldias](https://github.com/kaneeldias) | [@niveathika](https://github.com/niveathika) |
+| [persist.tools](https://github.com/ballerina-platform/persist-tools) | [@sahanHe](https://github.com/sahanHe) | [@kaneeldias](https://github.com/kaneeldias)  |
+| [postgresql](https://github.com/ballerina-platform/module-ballerinax-postgresql) | [@niveathika](https://github.com/niveathika) | [@kaneeldias](https://github.com/kaneeldias) |
 | [protobuf](https://github.com/ballerina-platform/module-ballerina-protobuf) |  |  |
 | [rabbitmq](https://github.com/ballerina-platform/module-ballerinax-rabbitmq) | [@aashikam](https://github.com/aashikam) |  |
-| [random](https://github.com/ballerina-platform/module-ballerina-random) |  |  |
+| [random](https://github.com/ballerina-platform/module-ballerina-random) | [@daneshk](https://github.com/daneshk) | [@sahanHe](https://github.com/sahanHe) | 
 | [soap](https://github.com/ballerina-platform/module-ballerina-soap) |  |  |
-| [sql](https://github.com/ballerina-platform/module-ballerina-sql) |  |  |
+| [sql](https://github.com/ballerina-platform/module-ballerina-sql) | [@niveathika](https://github.com/niveathika) | [@kaneeldias](https://github.com/kaneeldias) |
 | [task](https://github.com/ballerina-platform/module-ballerina-task) |[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@Bhashinee](https://github.com/Bhashinee)|
-| [tcp](https://github.com/ballerina-platform/module-ballerina-tcp) |  |  |
-| [time](https://github.com/ballerina-platform/module-ballerina-time) |  |  |
+| [tcp](https://github.com/ballerina-platform/module-ballerina-tcp) | [@Bhashinee](https://github.com/Bhashinee) |  |
+| [time](https://github.com/ballerina-platform/module-ballerina-time) | [@sahanHe](https://github.com/sahanHe) | [@daneshk](https://github.com/daneshk) | 
 | [toml](https://github.com/ballerina-platform/module-ballerina-toml) | [@RDPerera](https://github.com/RDPerera) | |
-| [udp](https://github.com/ballerina-platform/module-ballerina-udp) |  |  |
+| [udp](https://github.com/ballerina-platform/module-ballerina-udp) | [@Bhashinee](https://github.com/Bhashinee) |  |
 | [url](https://github.com/ballerina-platform/module-ballerina-url) |  |  |
-| [uuid](https://github.com/ballerina-platform/module-ballerina-uuid) |  |  |
-| [websocket](https://github.com/ballerina-platform/module-ballerina-websocket) |  |  |
+| [uuid](https://github.com/ballerina-platform/module-ballerina-uuid) | [@daneshk](https://github.com/daneshk) | [@Bhashinee](https://github.com/Bhashinee) |
+| [websocket](https://github.com/ballerina-platform/module-ballerina-websocket) | [@Bhashinee](https://github.com/Bhashinee) |  |
 | [websub](https://github.com/ballerina-platform/module-ballerina-websub) |[ayeshLK](https://github.com/ayeshLK)|  |
 | [websubhub](https://github.com/ballerina-platform/module-ballerina-websubhub) |[ayeshLK](https://github.com/ayeshLK)|  |
 | [xmldata](https://github.com/ballerina-platform/module-ballerina-xmldata)|[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@sahanHe](https://github.com/sahanHe)|
