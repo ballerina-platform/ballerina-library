@@ -372,7 +372,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "module_version": "2.10.3-SNAPSHOT",
+            "module_version": "2.10.4-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibHttpVersion",
@@ -387,7 +387,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "module_version": "1.10.2-SNAPSHOT",
+            "module_version": "1.10.3-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
@@ -476,7 +476,7 @@
         },
         {
             "name": "module-ballerina-soap",
-            "module_version": "0.8.0-SNAPSHOT",
+            "module_version": "0.8.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibSoapVersion",
