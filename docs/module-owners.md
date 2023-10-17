@@ -66,21 +66,7 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [persist.sql](https://github.com/ballerina-platform/module-ballerinax-persist.sql) | [@kaneeldias](https://github.com/kaneeldias) | [@niveathika](https://github.com/niveathika) |
 | [persist.tools](https://github.com/ballerina-platform/persist-tools) | [@sahanHe](https://github.com/sahanHe) | [@kaneeldias](https://github.com/kaneeldias)  |
 | [postgresql](https://github.com/ballerina-platform/module-ballerinax-postgresql) | [@niveathika](https://github.com/niveathika) | [@kaneeldias](https://github.com/kaneeldias) |
-| [protobuf](https://github.com/ballerina-platform/module-ballerina-protobuf) |  |  |
-| [rabbitmq](https://github.com/ballerina-platform/module-ballerinax-rabbitmq) | [@aashikam](https://github.com/aashikam) |  |
-| [random](https://github.com/ballerina-platform/module-ballerina-random) |  |  |
-| [soap](https://github.com/ballerina-platform/module-ballerina-soap) | [@Nuvindu](https://github.com/Nuvindu) |  |
-| [sql](https://github.com/ballerina-platform/module-ballerina-sql) |  |  |
-| [task](https://github.com/ballerina-platform/module-ballerina-task) |[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@Bhashinee](https://github.com/Bhashinee)|
-| [tcp](https://github.com/ballerina-platform/module-ballerina-tcp) | [@Bhashinee](https://github.com/Bhashinee) | [@MohamedSabthar](https://github.com/MohamedSabthar) |
-| [time](https://github.com/ballerina-platform/module-ballerina-time) |  |  |
-| [toml](https://github.com/ballerina-platform/module-ballerina-toml) | [@RDPerera](https://github.com/RDPerera) | |
-| [udp](https://github.com/ballerina-platform/module-ballerina-udp) | [@Bhashinee](https://github.com/Bhashinee) | [@MohamedSabthar](https://github.com/MohamedSabthar) |
-| [url](https://github.com/ballerina-platform/module-ballerina-url) |[@TharmiganK](https://github.com/TharmiganK) |[ayeshLK](https://github.com/ayeshLK), [@dilanSachi](https://github.com/dilanSachi)|
-| [uuid](https://github.com/ballerina-platform/module-ballerina-uuid) |  |  |
-| [websocket](https://github.com/ballerina-platform/module-ballerina-websocket) | [@Bhashinee](https://github.com/Bhashinee) | [@MohamedSabthar](https://github.com/MohamedSabthar) |
-| [websub](https://github.com/ballerina-platform/module-ballerina-websub) |[ayeshLK](https://github.com/ayeshLK)|  |
-| [websubhub](https://github.com/ballerina-platform/module-ballerina-websubhub) |[ayeshLK](https://github.com/ayeshLK)|  |
+| [protobuf](https://github.com/ballerina-platform/module-ballerina-protobuf) | [@daneshk](https://github.com/daneshk) |  |
 | [rabbitmq](https://github.com/ballerina-platform/module-ballerinax-rabbitmq) | [@aashikam](https://github.com/aashikam) | [@dilanSachi](https://github.com/dilanSachi)|
 | [random](https://github.com/ballerina-platform/module-ballerina-random) | [@daneshk](https://github.com/daneshk) | [@sahanHe](https://github.com/sahanHe) |
 | [soap](https://github.com/ballerina-platform/module-ballerina-soap) | [@Nuvindu](https://github.com/Nuvindu) |  |
@@ -96,5 +82,5 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [websub](https://github.com/ballerina-platform/module-ballerina-websub) |[ayeshLK](https://github.com/ayeshLK)| [@TharmiganK](https://github.com/TharmiganK) |
 | [websubhub](https://github.com/ballerina-platform/module-ballerina-websubhub) |[ayeshLK](https://github.com/ayeshLK)| [@TharmiganK](https://github.com/TharmiganK) |
 | [xmldata](https://github.com/ballerina-platform/module-ballerina-xmldata)|[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@sahanHe](https://github.com/sahanHe)|
-| [xslt](https://github.com/ballerina-platform/module-ballerina-xslt) |  |  |
+| [xslt](https://github.com/ballerina-platform/module-ballerina-xslt) | [@sahanHe](https://github.com/sahanHe) | [@daneshk](https://github.com/daneshk) |
 | [yaml](https://github.com/ballerina-platform/module-ballerina-yaml) | [@RDPerera](https://github.com/RDPerera) |  |
