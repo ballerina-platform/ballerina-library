@@ -66,7 +66,7 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [persist.sql](https://github.com/ballerina-platform/module-ballerinax-persist.sql) | [@kaneeldias](https://github.com/kaneeldias) | [@niveathika](https://github.com/niveathika) |
 | [persist.tools](https://github.com/ballerina-platform/persist-tools) | [@sahanHe](https://github.com/sahanHe) | [@kaneeldias](https://github.com/kaneeldias)  |
 | [postgresql](https://github.com/ballerina-platform/module-ballerinax-postgresql) | [@niveathika](https://github.com/niveathika) | [@kaneeldias](https://github.com/kaneeldias) |
-| [protobuf](https://github.com/ballerina-platform/module-ballerina-protobuf) | [@daneshk](https://github.com/daneshk) |  |
+| [protobuf](https://github.com/ballerina-platform/module-ballerina-protobuf) | [@daneshk](https://github.com/daneshk) | [@dilanSachi](https://github.com/dilanSachi)  |
 | [rabbitmq](https://github.com/ballerina-platform/module-ballerinax-rabbitmq) | [@aashikam](https://github.com/aashikam) | [@dilanSachi](https://github.com/dilanSachi)|
 | [random](https://github.com/ballerina-platform/module-ballerina-random) | [@daneshk](https://github.com/daneshk) | [@sahanHe](https://github.com/sahanHe) |
 | [soap](https://github.com/ballerina-platform/module-ballerina-soap) | [@Nuvindu](https://github.com/Nuvindu) |  |
