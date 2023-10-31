@@ -94,4 +94,4 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [graphql-tools](https://github.com/ballerina-platform/graphql-tools) | [@DimuthuMadushan](https://github.com/DimuthuMadushan) |  |
 | [persist-tools](https://github.com/ballerina-platform/persist-tools) | [@sahanHe](https://github.com/sahanHe) | [@kaneeldias](https://github.com/kaneeldias) |
 | [protoc-tools](https://github.com/ballerina-platform/protoc-tools) | [@dilanSachi](https://github.com/dilanSachi) |  |
-| [asynapi-tools](https://github.com/ballerina-platform/asyncapi-tools) | [@dilanSachi](https://github.com/dilanSachi) |  |
+| [asyncapi-tools](https://github.com/ballerina-platform/asyncapi-tools) |  |  |
