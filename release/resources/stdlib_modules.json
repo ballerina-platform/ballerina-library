@@ -509,7 +509,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "module_version": "1.11.1-SNAPSHOT",
+            "module_version": "1.11.2-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
