@@ -31,6 +31,8 @@ In the event of a change in ownership, the new owner is accountable for updating
 
 ## List of Owners
 
+### Ballerina Packages
+
 | Package Name | Primary Owner | Secondary Owner |
 | :---: | :---: | :---: |
 | [auth](https://github.com/ballerina-platform/module-ballerina-auth) | [@DimuthuMadushan](https://github.com/DimuthuMadushan) |  |
@@ -64,7 +66,6 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [persist.googlesheets](https://github.com/ballerina-platform/module-ballerinax-persist.googlesheets) | [@sahanHe](https://github.com/sahanHe) | [@kaneeldias](https://github.com/kaneeldias)  |
 | [persist.inmemory](https://github.com/ballerina-platform/module-ballerinax-persist.inmemory) | [@kaneeldias](https://github.com/kaneeldias) |[@sahanHe](https://github.com/sahanHe) |
 | [persist.sql](https://github.com/ballerina-platform/module-ballerinax-persist.sql) | [@kaneeldias](https://github.com/kaneeldias) | [@niveathika](https://github.com/niveathika) |
-| [persist.tools](https://github.com/ballerina-platform/persist-tools) | [@sahanHe](https://github.com/sahanHe) | [@kaneeldias](https://github.com/kaneeldias)  |
 | [postgresql](https://github.com/ballerina-platform/module-ballerinax-postgresql) | [@niveathika](https://github.com/niveathika) | [@kaneeldias](https://github.com/kaneeldias) |
 | [protobuf](https://github.com/ballerina-platform/module-ballerina-protobuf) | [@daneshk](https://github.com/daneshk) | [@dilanSachi](https://github.com/dilanSachi)  |
 | [rabbitmq](https://github.com/ballerina-platform/module-ballerinax-rabbitmq) | [@aashikam](https://github.com/aashikam) | [@dilanSachi](https://github.com/dilanSachi)|
@@ -84,3 +85,13 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [xmldata](https://github.com/ballerina-platform/module-ballerina-xmldata)|[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@sahanHe](https://github.com/sahanHe)|
 | [xslt](https://github.com/ballerina-platform/module-ballerina-xslt) | [@sahanHe](https://github.com/sahanHe) | [@daneshk](https://github.com/daneshk) |
 | [yaml](https://github.com/ballerina-platform/module-ballerina-yaml) | [@RDPerera](https://github.com/RDPerera) |  |
+
+### Ballerina Tools
+
+| Tool Name | Primary Owner | Secondary Owner
+| :---: | :---: | :---: |
+| [openapi-tools](https://github.com/ballerina-platform/openapi-tools) | [@lnash94](https://github.com/lnash94) |  |
+| [graphql-tools](https://github.com/ballerina-platform/graphql-tools) | [@DimuthuMadushan](https://github.com/DimuthuMadushan) |  |
+| [persist-tools](https://github.com/ballerina-platform/persist-tools) | [@sahanHe](https://github.com/sahanHe) | [@kaneeldias](https://github.com/kaneeldias) |
+| [protoc-tools](https://github.com/ballerina-platform/protoc-tools) | [@dilanSachi](https://github.com/dilanSachi) |  |
+| [asynapi-tools](https://github.com/ballerina-platform/asyncapi-tools) | [@dilanSachi](https://github.com/dilanSachi) |  |
