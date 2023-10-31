@@ -48,7 +48,7 @@ The three components below are used to materialize the above.
 
 ## Linking BBEs from API Docs 
 
-At the moment, some of the BBEs are authored, maintained, and governed by the Standard Library team.
+At the moment, some BBEs are authored, maintained, and governed by the Standard Library team.
 
 The purpose of the BBEs is to give a quick look and feel of Ballerina. These examples need to be short and sweet. You can start trying out Ballerina using these examples. Also, they can be used as reminders or quick reference. One BBE should only be used to explain one concept. You can dig deeper by referring API Docs or by using the Visual Studio Code tool itself, which provides other suggestions. Therefore, BBEs do not have to include every minor detail of the module. A good example would be the [UDP Client](https://ballerina.io/learn/by-example/udp-client.html). 
 
@@ -74,7 +74,7 @@ In fact, as BBEs are short and do not explain the complete picture, they should 
       -  When you have more than one returned items:
          -  \# + return - Generated string token,  an `auth:Error` occurred while generating the token, or else () if nothing is to be returned
          -  \# + return - `true` if authentication is successful, `false` otherwise, or else an `auth:Error` occurred while authenticating the credentials.
-5.  Do NOT use "we" or "please" anywhere in technical docs. Always, use the passive form or direct form to say "you need to...".
+5.  Do NOT use "we" or "please" anywhere in technical docs. Always use the passive form or direct form to say "you need to...".
       -  **Incorrect:** # For details, please see the WebSocket module.
       -  **Correct:**   # For details, see the WebSocket module.
 6.  Keep comments in the singular form (e.g., "# Attaches..").
@@ -107,7 +107,7 @@ In fact, as BBEs are short and do not explain the complete picture, they should 
 13. For names of third party technologies, use the exact way they write it (Google and check). 
       -  **Examples:** `MySQL` not `Mysql` 
 14.  Add one-line code snippets where possible. E.g., https://ballerina.io/v1-2/learn/api-docs/ballerina/java/index.html#annotations.
-15.  All the referrences of records/objects/functions/methods inside the API docs and `Module.md` should have the representation as `<module-name>:<type-name>` instead of `<type-name>`.
+15.  All the references of records/objects/functions/methods inside the API docs and `Module.md` should have the representation as `<module-name>:<type-name>` instead of `<type-name>`.
 16.  Any description related to the parameter, which goes beyond a single line should start with the starting position of the 1st line.
       - **Example:** # + httpClient - Chain of different HTTP clients which provides the capability   
     \# 		   for initiating contact with a remote HTTP service in resilient  
@@ -127,7 +127,7 @@ For information on how to write better Ballerina code, see [Ballerina Anti-Patte
 
 3. Module-level documentation page needs to introduce the general concept of the module and the main APIs that are used. For example, in the I/O module, this would be the aspects such as the channels concept, how we have different types of channels etc., and their common behavior. 
 
-   Rust’s I/O API documentation](https://doc.rust-lang.org/std/io/index.html) is a good example for how similar communities have done this. After the module overview, for each object, record, function, a separate documentation page is added, which will contain their individual details and also their specific examples. For example, see [Struct std::io::Cursor](https://doc.rust-lang.org/std/io/struct.Cursor.html) and [Struct std::io::BufReader](https://doc.rust-lang.org/std/io/struct.BufReader.html). Some APIs that were featured in the main module page will need to again have their own examples in their respective page. Therefore, there will be some overlap of information in that area. 
+   [Rust’s I/O API documentation](https://doc.rust-lang.org/std/io/index.html) is a good example for how similar communities have done this. After the module overview, for each object, record, function, a separate documentation page is added, which will contain their individual details and also their specific examples. For example, see [Struct std::io::Cursor](https://doc.rust-lang.org/std/io/struct.Cursor.html) and [Struct std::io::BufReader](https://doc.rust-lang.org/std/io/struct.BufReader.html). Some APIs that were featured in the main module page will need to again have their own examples in their respective page. Therefore, there will be some overlap of information in that area.
 
 4. The examples in the API Docs need to be short. Mostly, shorter than BBEs. They usually explain a quick API operation and not a complete, end to end scenario. The same [Ballerina By Examples Guidelines](https://github.com/ballerina-platform/ballerina-distribution/blob/master/doc-guidelines.md#ballerina-by-examples-guidelines) should be used for API Docs as well to keep the examples simple and precise. 
 

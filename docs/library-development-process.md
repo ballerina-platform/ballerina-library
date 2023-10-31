@@ -25,7 +25,7 @@ I think this step is pretty obvious. It is basically the implementation of the d
 
 ## Test Coverage
 
-Each library must have at least 80% test coverage. 90% would be even better. Here the goal is not to reach some number but to make sure most code we’ve written is validated against the intended usage. There is no difference between the test code and production code; both are the same. Therefore the same effort needs to be made for both. Remember any code that is not covered with a test usually ends up as a bug. 
+Each library must have at least 80% test coverage. 90% would be even better. Here the goal is not to reach some number but to make sure most code we’ve written is validated against the intended usage. There is no difference between the test code and production code; both are the same. Therefore, the same effort needs to be made for both. Remember any code that is not covered with a test usually ends up as a bug.
 
 At the moment package level Ballerina integration test is not possible but once the support is added there should be integration test as well. However, we must stick to the standard test pyramid; meaning a lot of unit tests and a few integration tests.
 
@@ -46,7 +46,7 @@ The standard set of API documentation guidelines can be found [here](https://doc
 When it comes to API documentation we need to keep in mind three things
 - Docs that goes to Ballerina Central
 - Docs that goes to Ballerina Website 
-- Docs that goes to Github readme.md
+- Docs that goes to GitHub readme.md
 
 All three docs need to be up to the required standard. 
 
@@ -54,7 +54,7 @@ All three docs need to be up to the required standard.
 
 Another form of documentation each library must have is Ballerina By Examples (BBEs). BBEs must only cover one and only one concept. Therefore, BBEs must be short and sweet. There is no particular limit on the number of BBEs each library should have. That is totally up to the library owner.
 
-For more on BBEs guide lines see [here](https://docs.google.com/document/d/1OMLpw5eTVWSqyd55jIZoAJu7Hr6FltRZvReEVAvT5C0/edit?usp=sharing).
+For more on BBEs guidelines see [here](https://docs.google.com/document/d/1OMLpw5eTVWSqyd55jIZoAJu7Hr6FltRZvReEVAvT5C0/edit?usp=sharing).
 
 ## Zero Bugs
 
@@ -72,13 +72,13 @@ For an example see [here](https://github.com/ballerina-platform/module-ballerina
 
 ## Usability Check
 
-Any identified usability issues must be reported in the form of an issue and then summarized into one issue. These usability issues must be addressed before releasing the GA library. Following are some of the examples for usability issues.
+Any identified usability issues must be reported in the form of an issue and then summarized into one issue. These usability issues must be addressed before releasing the GA library. Following are some examples for usability issues.
 
 - WebSubHub remote method arguments cannot be serialized to store in a kafka topic. Main reason for this was that arguments were not anydata. This was because records that were passed in by the WebSubHub listener had object references. 
-- The Websocket `caller` object was not isolated. Therefore it was difficult to store it in a map and then use it somewhere else. 
+- The Websocket `caller` object was not isolated. Therefore, it was difficult to store it in a map and then use it somewhere else.
 - Having meaningful errors to identify the root cause. 
 
-Also usability issues could be feature limitations as well. For example, not having the `mutation` operation in GraphQL is a usability issue. Those types usability issues need to be addressed before releasing it as GA.
+Also, usability issues could be feature limitations as well. For example, not having the `mutation` operation in GraphQL is a usability issue. Those types usability issues need to be addressed before releasing it as GA.
 
 ## Tooling Check 
 
@@ -86,14 +86,14 @@ Library developers must verify if adequate tooling support is available for a gi
 
 Failing to do so would lead to bad developer experience. Therefore, librarie developers must make sure they use the tool in the best possible way.
 
-The relevant issue must tick all of the below,
+The relevant issue must tick all the below,
 - Diagnostics
 - Code completions
 - Code actions
 - Formatting
 - Hover
 
-Also the issue must be tagged with the relevant milestone.
+Also, the issue must be tagged with the relevant milestone.
 
 ## Load Test Report
 

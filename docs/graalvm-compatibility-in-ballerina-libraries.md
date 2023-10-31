@@ -33,7 +33,7 @@ One downside is that the GraalVM native image build is a highly complicated proc
 
 From Ballerina 2201.7.0 (SwanLake) onwards, Ballerina supports GraalVM AOT compilation to generate standalone executables by passing the `graalvm` flag in the build command: `bal build --graalvm`. The generated executable contains the modules in the current package, their dependencies, Ballerina runtime, and statically linked native code from the JDK.
 
-Ballerina runtime, [standard libraries](https://ballerina.io/learn/ballerina-specifications/#standard-library-specifications), and the Ballerina extended modules are GraalVM-compatible. Therefore packages developed only using these libraries are also GraalVM-compatible. Furthermore, Ballerina reports warnings when the GraalVM build is executed for a project with GraalVM-incompatible packages.
+Ballerina runtime, [standard libraries](https://ballerina.io/learn/ballerina-specifications/#standard-library-specifications), and the Ballerina extended modules are GraalVM-compatible. Therefore, packages developed only using these libraries are also GraalVM-compatible. Furthermore, Ballerina reports warnings when the GraalVM build is executed for a project with GraalVM-incompatible packages.
 
 ```console
 **********************************************************************************
@@ -63,7 +63,7 @@ Since the native-image tool assumes the closed-world assumption, the following [
 - [Reflection](https://www.graalvm.org/jdk17/reference-manual/native-image/dynamic-features/Reflection/)
 - [URL Protocols](https://www.graalvm.org/jdk17/reference-manual/native-image/dynamic-features/URLProtocols/)
 
-The analysis should be also done on the third-party libraries used in the module. Some third-party libraries might be already GraalVM compatible, this should be verified with the third-party library owners. You can also refer to the configurations for some of the commonly used libraries in [graalvm-reachability-metadata repository](https://github.com/oracle/graalvm-reachability-metadata/tree/master/metadata).
+The analysis should be also done on the third-party libraries used in the module. Some third-party libraries might be already GraalVM compatible, this should be verified with the third-party library owners. You can also refer to the configurations for some commonly used libraries in [graalvm-reachability-metadata repository](https://github.com/oracle/graalvm-reachability-metadata/tree/master/metadata).
 
 ### Test a sample application with GraalVM
 

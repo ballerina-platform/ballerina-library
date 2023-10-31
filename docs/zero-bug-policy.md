@@ -10,7 +10,7 @@ Usually before we merge any feature to master, spec and implementation needs to 
 
 However, even after that if the library user does report bugs, those bugs get priority over anything else. Because that is a direct hit on quality. Something we do not want to tolerate. In other words, somewhere in the process we have made a mistake which resulted in an incomplete feature. An incomplete feature shouldn’t have been merged to master in the first place. 
 
-After all, remember our goal is to make the Ballerina user’s life fun and having to deal with bugs is certainly not fun. Therefore, the second best thing we can do is immediately fix it and minimize damage. 
+After all, remember our goal is to make the Ballerina user’s life fun and having to deal with bugs is certainly not fun. Therefore, the second-best thing we can do is immediately fix it and minimize damage.
 
 Also doing so would make sure any other users won’t come across the same bug either. 
 

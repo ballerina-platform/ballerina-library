@@ -41,7 +41,7 @@ name="test_sample" # Docker image name should be same as package name
 # max_replicas=1
 ```
 3. The `deployment` directory should contain the additional kubernetes artifacts that should be applied on top of
-   c2c genrated yaml. This will be done using Kustomize. `ingress.yaml` and `kustomization.yaml` is mandatory here.
+   c2c generated yaml. This will be done using Kustomize. `ingress.yaml` and `kustomization.yaml` is mandatory here.
    You can add any additional yamls you require for the deployment in this directory (helper pods, mysql etc).
 
 kustomization.yaml
@@ -109,7 +109,7 @@ Label,# Samples,Average,Median,90% Line,95% Line,99% Line,Min,Max,Error %,Throug
 * Instead of manually invoking the above workflow, we have added a [`trigger-load-tests`](https://github.com/ballerina-platform/module-ballerina-grpc/blob/master/.github/workflows/trigger-load-tests.yml) workflow 
 to each stdlib repo to trigger the load test from the stdlib repo, and it is configured to automatically run the load test daily.
 
-* Once the load test is run, the results from the load test will be sent to the relevant stdlib via `repository_dispatch` in github workflows. 
+* Once the load test is run, the results from the load test will be sent to the relevant stdlib via `repository_dispatch` in GitHub workflows.
 This triggers the workflow [`process-load-test-result`](https://github.com/ballerina-platform/module-ballerina-grpc/blob/master/.github/workflows/process-load-test-result.yml) and this workflow will create a PR to automatically merge the load test results to the `results.csv` in the relevant load test.
 If the load test failed for some reason, above workflow will fail, and it will be displayed in the [stdlib dashboard](https://github.com/ballerina-platform/ballerina-standard-library).
 
