@@ -90,8 +90,8 @@ In the event of a change in ownership, the new owner is accountable for updating
 
 | Tool Name | Primary Owner | Secondary Owner
 | :---: | :---: | :---: |
-| [openapi-tools](https://github.com/ballerina-platform/openapi-tools) | [@lnash94](https://github.com/lnash94) |  |
+| [asyncapi-tools](https://github.com/ballerina-platform/asyncapi-tools) |  |  |
 | [graphql-tools](https://github.com/ballerina-platform/graphql-tools) | [@DimuthuMadushan](https://github.com/DimuthuMadushan) |  |
+| [openapi-tools](https://github.com/ballerina-platform/openapi-tools) | [@lnash94](https://github.com/lnash94) |  |
 | [persist-tools](https://github.com/ballerina-platform/persist-tools) | [@sahanHe](https://github.com/sahanHe) | [@kaneeldias](https://github.com/kaneeldias) |
 | [protoc-tools](https://github.com/ballerina-platform/protoc-tools) | [@dilanSachi](https://github.com/dilanSachi) |  |
-| [asyncapi-tools](https://github.com/ballerina-platform/asyncapi-tools) |  |  |
