@@ -476,7 +476,7 @@
         },
         {
             "name": "module-ballerina-soap",
-            "module_version": "0.8.1-SNAPSHOT",
+            "module_version": "0.8.2-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibSoapVersion",
