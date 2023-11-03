@@ -53,11 +53,10 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [log](https://github.com/ballerina-platform/module-ballerina-log) |[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@Bhashinee](https://github.com/Bhashinee)|
 | [math.vector](https://github.com/ballerina-platform/module-ballerina-math.vector) | [@ThisaruGuruge](https://github.com/ThisaruGuruge) |  |
 | [mime](https://github.com/ballerina-platform/module-ballerina-mime) |[@TharmiganK](https://github.com/TharmiganK) |[@ayeshLK](https://github.com/ayeshLK), [@dilanSachi](https://github.com/dilanSachi)|
-| [mqtt](https://github.com/ballerina-platform/module-ballerina-mqtt) | [@dilanSachi](https://github.com/dilanSachi) |  |
 | [nats](https://github.com/ballerina-platform/module-ballerinax-nats) | [@aashikam](https://github.com/aashikam) |  |
 | [mssql](https://github.com/ballerina-platform/module-ballerinax-mssql) | [@kaneeldias](https://github.com/kaneeldias) | [@niveathika](https://github.com/niveathika) |
-| [mysql](https://github.com/ballerina-platform/module-ballerinax-mysql) | [@kaneeldias](https://github.com/kaneeldias) | [@niveathika](https://github.com/niveathika) |
 | [mqtt](https://github.com/ballerina-platform/module-ballerina-mqtt) | [@dilanSachi](https://github.com/dilanSachi) |  |
+| [mysql](https://github.com/ballerina-platform/module-ballerinax-mysql) | [@kaneeldias](https://github.com/kaneeldias) | [@niveathika](https://github.com/niveathika) |
 | [nats](https://github.com/ballerina-platform/module-ballerinax-nats) | [@aashikam](https://github.com/aashikam) | [@dilanSachi](https://github.com/dilanSachi) |
 | [oauth2](https://github.com/ballerina-platform/module-ballerina-oauth2) | [@MohamedSabthar](https://github.com/MohamedSabthar) |  |
 | [oracledb](https://github.com/ballerina-platform/module-ballerinax-oracledb) | [@niveathika](https://github.com/niveathika) | [@kaneeldias](https://github.com/kaneeldias) |
