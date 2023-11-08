@@ -14,6 +14,10 @@ on:
         required: false
         type: string
         default: ""
+      publish-required:
+        required: false
+        type: boolean
+        default: false
 
 
 jobs:
@@ -37,6 +41,16 @@ jobs:
                 with:
                     distribution: 'temurin'
                     java-version: 17.0.7
+
+            -   name: Change to Timestamped Version
+                if: ${{ inputs.publish-required == true }}
+                run: |
+                  startTime=$(TZ="Asia/Kolkata" date +'%Y%m%d-%H%M00')
+                  latestCommit=$(git log -n 1 --pretty=format:"%h")
+                  VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties | rev | cut --complement -d- -f1 | rev)
+                  updatedVersion=$VERSION-$startTime-$latestCommit
+                  echo $updatedVersion
+                  sed -i "s/version=\(.*\)/version=$updatedVersion/g" gradle.properties
             
             -   name: Set ENV Variables
                 run: |
@@ -52,6 +66,15 @@ jobs:
 
             -   name: Generate Codecov Report
                 uses: codecov/codecov-action@v3
+
+            -   name: Publish Connector
+                if: ${{ inputs.publish-required == true }}
+                env:
+                  packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+                  packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+                  publishUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+                  publishPAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+                run: ./gradlew publish --no-daemon --scan ${{ inputs.additional-build-flags }}
 
             # Send notification when build fails
             - name: Alert notifier on failure
