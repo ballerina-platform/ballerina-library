@@ -25,6 +25,9 @@
             "name": "module-ballerina-graphql"
         },
         {
+            "name": "module-ballerinax-googleapis.gmail"
+        },
+        {
             "name": "module-ballerina-grpc"
         },
         {
