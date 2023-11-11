@@ -16,7 +16,7 @@
 
 // Names
 const BALLERINA_ORG_NAME = "ballerina-platform";
-const BALLERINA_STANDARD_LIBRARY = "ballerina-standard-library";
+const BALLERINA_STANDARD_LIBRARY = "ballerina-library";
 
 // Links
 const BALLERINA_ORG_URL = "https://github.com/ballerina-platform";
