@@ -69,7 +69,7 @@ function count(github:Issue issue) {
     issueCount += 1;
 }
 
-function openUrl(string page, string url) returns http:Response|error? {
+function openUrl(string page, string url) returns http:Response|error {
     http:Client httpClient = check new (page, config = {
         auth: {
             token: os:getEnv(BALLERINA_BOT_TOKEN)

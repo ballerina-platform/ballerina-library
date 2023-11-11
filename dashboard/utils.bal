@@ -28,7 +28,7 @@ function getDashboardRow(Module module, string level) returns string|error {
     }
     string repoLink = getRepoLink(moduleName);
     string releaseBadge = getReleaseBadge(moduleName);
-    string buildStatusBadge = getBuildStatusBadge(moduleName, defaultBranch);
+    string buildStatusBadge = check getBuildStatusBadge(moduleName, defaultBranch);
     string trivyBadge = getTrivyBadge(moduleName, defaultBranch);
     string codecovBadge = getCodecovBadge(moduleName, defaultBranch);
     string bugsBadge = check getBugsBadge(moduleName);
@@ -56,9 +56,15 @@ function getReleaseBadge(string moduleName) returns string {
     return string `[![GitHub Release](${badgeUrl})](${repoUrl})`;
 }
 
-function getBuildStatusBadge(string moduleName, string defaultBranch) returns string {
-    string badgeUrl = getGithubBadgeUrl(moduleName, WORKFLOW_MASTER_BUILD, defaultBranch, "");
-    string repoUrl = string `${BALLERINA_ORG_URL}/${moduleName}/actions/workflows/${WORKFLOW_MASTER_BUILD}`;
+function getBuildStatusBadge(string moduleName, string defaultBranch) returns string|error {
+    string workflowName = WORKFLOW_MASTER_BUILD;
+    string workflowFileUrl = string `/${BALLERINA_ORG_NAME}/${moduleName}/master/.github/workflows/${workflowName}`;
+    http:Response openUrlResponse = check openUrl(GITHUB_RAW_LINK, workflowFileUrl);
+    if openUrlResponse.statusCode == http:STATUS_NOT_FOUND {
+        workflowName = WORKFLOW_MASTER_CI_BUILD;
+    }
+    string repoUrl = string `${BALLERINA_ORG_URL}/${moduleName}/actions/workflows/${workflowName}`;
+    string badgeUrl = getGithubBadgeUrl(moduleName, workflowName, defaultBranch, "");
     return string `[![Build](${badgeUrl})](${repoUrl})`;
 }
 
