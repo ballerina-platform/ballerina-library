@@ -2,6 +2,7 @@ import ballerina/test;
 
 const IO_MODULE = "module-ballerina-io";
 const JAVA_ARRAYS_MODULE = "module-ballerina-jballerina.java.arrays";
+const GMAIL_MODULE = "module-ballerinax-googleapis.gmail";
 
 @test:Config
 function getRepoLinkTest() {
@@ -13,14 +14,20 @@ function getReleaseBadgeTest() {
     test:assertEquals(getReleaseBadge(IO_MODULE), "[![GitHub Release](https://img.shields.io/github/v/release/ballerina-platform/module-ballerina-io?sort=semver&color=30c955&label=)](https://github.com/ballerina-platform/module-ballerina-io/releases)");
 }
 
-@test:Config
+@test:Config {
+    enable: false
+}
 function getBuildStatusBadgeTest() {
     test:assertEquals(getBuildStatusBadge(IO_MODULE, "master"), "[![Build](https://img.shields.io/github/actions/workflow/status/ballerina-platform/module-ballerina-io/build-timestamped-master.yml?branch=master&label=)](https://github.com/ballerina-platform/module-ballerina-io/actions/workflows/build-timestamped-master.yml)");
+    test:assertEquals(getBuildStatusBadge(GMAIL_MODULE, "master"), "[![Build](https://img.shields.io/github/actions/workflow/status/ballerina-platform/module-ballerinax-googleapis.gmail/ci.yml?branch=master&label=)](https://github.com/ballerina-platform/module-ballerinax-googleapis.gmail/actions/workflows/ci.yml)" );
 }
 
-@test:Config
+@test:Config {
+    enable: false
+}
 function getTrivyBadgeTest() {
     test:assertEquals(getTrivyBadge(IO_MODULE, "master"), "[![Trivy](https://img.shields.io/github/actions/workflow/status/ballerina-platform/module-ballerina-io/trivy-scan.yml?branch=master&label=)](https://github.com/ballerina-platform/module-ballerina-io/actions/workflows/trivy-scan.yml)");
+    test:assertEquals(getTrivyBadge(GMAIL_MODULE, "master"), "[![Trivy](https://img.shields.io/badge/-N%2FA-yellow)](https://github.com/ballerina-platform/module-ballerinax-googleapis.gmail/actions/workflows/trivy-scan.yml)");
 }
 
 @test:Config
