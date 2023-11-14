@@ -6,7 +6,7 @@ on:
       environment:
         type: string
         required: true
-      additional-build-flags:
+      additional-publish-flags:
         required: false
         type: string
         default: ""
@@ -29,15 +29,6 @@ jobs:
         with:
           distribution: "temurin"
           java-version: 17.0.7
-
-      - name: Build with Gradle
-        env:
-          packageUser: ${{ github.actor }}
-          packagePAT: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew build -x check -x test ${{ inputs.additional-build-flags }}
-
-      - name: Create lib directory if not exists
-        run: mkdir -p ballerina/lib
 
       - name: Ballerina Central Dev Push
         if: ${{ inputs.environment == 'DEV CENTRAL' }}
