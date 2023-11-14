@@ -10,7 +10,7 @@ from colorama import Style
 from pathlib import Path
 from urllib import request
 
-MODULE_LIST = "https://raw.githubusercontent.com/ballerina-platform/ballerina-standard-library/main/release/resources/stdlib_modules.json"
+MODULE_LIST = "https://raw.githubusercontent.com/ballerina-platform/ballerina-library/main/release/resources/stdlib_modules.json"
 
 # Module Fields
 FIELD_BRANCH = "branch"

@@ -189,7 +189,7 @@ public function publishModule(Module module, string accessToken, http:Client htt
 public function checkCurrentPublishWorkflows() {
     log:printInfo("Checking for already running workflows");
     http:Request request = createRequest();
-    string apiPath = "/ballerina-standard-library/actions/workflows/build_stdlib_modules.yml/runs?per_page=2";
+    string apiPath = "/ballerina-library/actions/workflows/build_stdlib_modules.yml/runs?per_page=2";
     var result = trap httpClient->get(apiPath, request);
     if (result is error) {
         log:printWarn("Error occurred while checking the current workflow status");
@@ -209,7 +209,7 @@ public function checkCurrentPublishWorkflows() {
 }
 
 function cancelWorkflow(string id) {
-    string path = "/ballerina-standard-library/actions/runs/" + id + "/cancel";
+    string path = "/ballerina-library/actions/runs/" + id + "/cancel";
     http:Request request = createRequest();
     var result = trap httpClient->post(path, request);
     if (result is error) {
