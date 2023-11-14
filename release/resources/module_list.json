@@ -22,10 +22,10 @@
             "name": "module-ballerina-ftp"
         },
         {
-            "name": "module-ballerina-graphql"
+            "name": "module-ballerinax-googleapis.gmail"
         },
         {
-            "name": "module-ballerinax-googleapis.gmail"
+            "name": "module-ballerina-graphql"
         },
         {
             "name": "module-ballerina-grpc"
