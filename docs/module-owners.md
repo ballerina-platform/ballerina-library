@@ -43,6 +43,7 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [file](https://github.com/ballerina-platform/module-ballerina-file) |[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@Bhashinee](https://github.com/Bhashinee)|
 | [ftp](https://github.com/ballerina-platform/module-ballerina-ftp) | [@dilanSachi](https://github.com/dilanSachi) | [@DimuthuMadushan](https://github.com/DimuthuMadushan) |
 | [graphql](https://github.com/ballerina-platform/module-ballerina-graphql) | [@ThisaruGuruge](https://github.com/ThisaruGuruge) | [@DimuthuMadushan](https://github.com/DimuthuMadushan) |
+| [gmail](https://github.com/ballerina-platform/module-ballerinax-googleapis.gmail) | [@niveathika](https://github.com/niveathika) |  |
 | [grpc](https://github.com/ballerina-platform/module-ballerina-grpc) | [@daneshk](https://github.com/daneshk) | [@dilanSachi](https://github.com/dilanSachi) |
 | [http](https://github.com/ballerina-platform/module-ballerina-http) | [@TharmiganK](https://github.com/TharmiganK) |[@ayeshLK](https://github.com/ayeshLK), [@dilanSachi](https://github.com/dilanSachi)|
 | [io](https://github.com/ballerina-platform/module-ballerina-io) | [@sahanHe](https://github.com/sahanHe) | [@daneshk](https://github.com/daneshk) |
