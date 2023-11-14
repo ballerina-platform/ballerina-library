@@ -31,7 +31,7 @@ jobs:
           java-version: 17.0.7
   
       - name: Set ENV Variables
-         run: |
+        run: |
            echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV 
 
       - name: Ballerina Central Dev Push
