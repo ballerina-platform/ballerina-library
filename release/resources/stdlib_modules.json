@@ -2,7 +2,7 @@
     "modules": [
         {
             "name": "module-ballerinax-googleapis.gmail",
-            "module_version": "3.5.0-SNAPSHOT",
+            "module_version": "4.0.0-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibGoogleapis.gmailVersion",
