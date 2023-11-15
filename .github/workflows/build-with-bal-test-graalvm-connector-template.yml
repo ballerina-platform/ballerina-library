@@ -53,4 +53,4 @@ jobs:
       - name: Test with GraalVM
         run: |
           cd ballerina
-          bal test --graalvm ${{ inputs.additional-test-flags }}
+          sudo bal test --graalvm ${{ inputs.additional-test-flags }}
