@@ -49,3 +49,8 @@ jobs:
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Test with GraalVM
+        run: |
+          cd ballerina
+          bal test --graalvm ${{ inputs.additional-test-flags }}
