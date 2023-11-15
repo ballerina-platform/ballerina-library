@@ -50,6 +50,10 @@ jobs:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set Permissions
+        run: |
+          chmod -R 777 ballerina/target
+
       - name: Test with GraalVM
         run: |
           cd ballerina
