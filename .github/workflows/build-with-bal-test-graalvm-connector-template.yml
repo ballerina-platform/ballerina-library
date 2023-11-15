@@ -45,16 +45,7 @@ jobs:
           echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
 
       - name: Build Package
-        run: ./gradlew build ${{ inputs.additional-build-flags }}
+        run: ./gradlew build -P balGraalVMTest ${{ inputs.additional-build-flags }}
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set Permissions
-        run: |
-          chmod -R 777 ballerina/target
-
-      - name: Test with GraalVM
-        run: |
-          cd ballerina
-          bal test --graalvm ${{ inputs.additional-test-flags }}
