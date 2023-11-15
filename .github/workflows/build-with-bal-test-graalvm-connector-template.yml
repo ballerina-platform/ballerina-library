@@ -50,7 +50,10 @@ jobs:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Remove Target Directory
+        run: sudo rm -rf ballerina/target
+
       - name: Test with GraalVM
         run: |
           cd ballerina
-          sudo bal test --graalvm ${{ inputs.additional-test-flags }}
+          bal test --graalvm ${{ inputs.additional-test-flags }}
