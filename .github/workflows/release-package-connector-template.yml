@@ -55,7 +55,9 @@ jobs:
           skip-dirs: "examples"
 
       - name: Get Release Version
-        run: echo "VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties | rev | cut --complement -d- -f1 | rev)" >> $GITHUB_ENV
+        run: |
+            echo "VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties | rev | cut --complement -d- -f1 | rev)" >> $GITHUB_ENV
+            git checkout -b release-${VERSION}
 
       - name: Remove Target Directory
         run: |
