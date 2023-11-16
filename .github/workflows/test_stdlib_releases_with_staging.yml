@@ -25,7 +25,7 @@ jobs:
           distribution: "temurin"
           java-version: 17.0.7
 
-      - name: Run Ballerina library Tests
+      - name: Run Ballerina Library Tests
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}

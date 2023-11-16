@@ -19,7 +19,7 @@ _Updated_: 2023/06/23
 
 ## Overview
 
-This guide explains the build and release process of the Standard Libraries. The goal is that everyone in the team should be able to release any Ballerina library with the help of this guide.
+This guide explains the build and release process of the Ballerina Library packages. The goal is that everyone in the team should be able to release any Ballerina package with the help of this guide.
 
 ## Build Process
 
