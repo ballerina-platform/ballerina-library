@@ -31,7 +31,7 @@ At the moment package level Ballerina integration test is not possible but once 
 
 ## Code Quality Check
 
-This basically means that both Java and Ballerina code standards are met. We use `Clean Code` (The Book) as our guideline. The standard library code will always be used as a reference for ideal code that could be written using Ballerina so it must be top notch. 
+This basically means that both Java and Ballerina code standards are met. We use `Clean Code` (The Book) as our guideline. The Ballerina library code will always be used as a reference for ideal code that could be written using Ballerina so it must be top notch. 
 
 Apart from `Clean Code` guidelines, check these [anti-patterns](https://docs.google.com/document/d/1y6QVqaZzZt9jMpYV4jP5WRS_W_KoC4y40Uuoh1ALu8E/edit?usp=sharing) as well.
 
@@ -39,7 +39,7 @@ Of Course most of the code quality checks are done while reviewing the PR. This 
 
 ## API Docs
 
-Unlike other libraries out there this is a key differentiator when it comes to the standard library. This is a key outcome of each library. Just like the code is production ready, the API documentation needs to be production ready as well. However the challenge we have with API documentation is there is no objective measurement. Therefore, each library owner should be able to make proper judgments as to what is good and bad. 
+Unlike other libraries out there this is a key differentiator when it comes to the Ballerina library. This is a key outcome of each library. Just like the code is production ready, the API documentation needs to be production ready as well. However the challenge we have with API documentation is there is no objective measurement. Therefore, each library owner should be able to make proper judgments as to what is good and bad. 
 
 The standard set of API documentation guidelines can be found [here](https://docs.google.com/document/d/1OMLpw5eTVWSqyd55jIZoAJu7Hr6FltRZvReEVAvT5C0/edit?usp=sharing).
 
@@ -64,7 +64,7 @@ Each library should not have any reported bugs. All the bugs should be addressed
 
 Each library should have an `example` folder which includes examples written using real world use-cases. Adding examples helps library owners identify any usability issues, bugs and at the same time build github-centric learning materials. 
 
-At least five real world use-cases, is just a number to set some goal. The more you write, the better it gets. Examples could include one more other standard library, which is fine. Depending on the library examples could be small or large but that is not the point. The point is to write real world use-cases, the size doesn’t matter. 
+At least five real world use-cases, is just a number to set some goal. The more you write, the better it gets. Examples could include one more other Ballerina library, which is fine. Depending on the library examples could be small or large but that is not the point. The point is to write real world use-cases, the size doesn’t matter. 
 
 Better to organize a code review for each use-case before merging to the repo.
 

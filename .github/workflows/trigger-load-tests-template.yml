@@ -70,7 +70,7 @@ jobs:
                   else
                       printf "testNames=%s" $tests >> $GITHUB_OUTPUT
                   fi
-            - name: Invoke standard library load test workflow
+            - name: Invoke Ballerina library load test workflow
               uses: benc-uk/workflow-dispatch@v1
               with:
                   workflow: Stdlib Workflow

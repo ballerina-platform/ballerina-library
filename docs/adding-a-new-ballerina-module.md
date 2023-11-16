@@ -44,7 +44,7 @@ This is a step-by-step guide on creating a new Ballerina module. It will guide y
         * 6.11.8 [The `settings.gradle` file](#the-settingsgradle-file-required)
         * 6.11.9 [The `spotbugs-exclude.xml` file](#the-spotbugs-excludexml-file-optional)
 7. [Add the new module](#add-the-new-module)
-    * 7.1 [Add the module to the Ballerina Standard Library](#add-the-module-to-the-ballerina-standard-library-optional)
+    * 7.1 [Add the module to the Ballerina library](#add-the-module-to-the-ballerina-standard-library-optional)
     * 7.2 [Add the module to Ballerina daily full build pipeline](#add-the-module-to-ballerina-daily-full-build-pipeline-required)
     * 7.3 [Add the module to Ballerina distribution](#add-the-module-to-ballerina-distribution-optional)
 
@@ -52,7 +52,7 @@ This is a step-by-step guide on creating a new Ballerina module. It will guide y
 
 This guide helps you understand the file structure, build scripts, and workflow scripts of a Ballerina module. It also explains how to add a new module to the Ballerina daily build and release pipelines.
 
-Examples of the directory structure and common files can be found in existing Ballerina Standard Library module repositories. The links to these repositories are available on the [Ballerina Standard Library Dashboard](https://github.com/ballerina-platform/ballerina-standard-library#status-dashboard).
+Examples of the directory structure and common files can be found in existing Ballerina library module repositories. The links to these repositories are available on the [Ballerina library Dashboard](https://github.com/ballerina-platform/ballerina-standard-library#status-dashboard).
 
 The [Ballerina `graphql` Module](https://github.com/ballerina-platform/module-ballerina-graphql) would be a reference to follow along with this guide.
 
@@ -179,11 +179,11 @@ This directory contains the GitHub workflow scripts. The following workflow scri
 
 ##### The `build-timestamped-master.yml` workflow script [Required]
 
-This workflow script is used to build the module. This will run automatically on every push to the master branch. This will build the module and publish the artifacts to the GitHub packages as a timestamped version, which can be used in the daily builds. It can be run manually as well. The status of this workflow is displayed on the Standard Library Dashboard under the `Build` column.
+This workflow script is used to build the module. This will run automatically on every push to the master branch. This will build the module and publish the artifacts to the GitHub packages as a timestamped version, which can be used in the daily builds. It can be run manually as well. The status of this workflow is displayed on the Ballerina Library Dashboard under the `Build` column.
 
 ##### The `build-with-bal-test-graalvm.yml` workflow script [Required]
 
-This workflow script is used to run the tests using the native runtime. This will run automatically on a schedule and on pull requests. It can be run manually as well. The status of this workflow is displayed on the Standard Library Dashboard under the `GraalVM Check` column. To avoid running this workflow on pull requests, add the `Skip GraalVM Check` label to the pull request.
+This workflow script is used to run the tests using the native runtime. This will run automatically on a schedule and on pull requests. It can be run manually as well. The status of this workflow is displayed on the Ballerina Library Dashboard under the `GraalVM Check` column. To avoid running this workflow on pull requests, add the `Skip GraalVM Check` label to the pull request.
 
 >**Note:** It is recommended to disable the GraalVM check on the pull requests until they are ready to be merged.
 
@@ -193,7 +193,7 @@ This workflow script is used to publish the module to the [Ballerina Central](ht
 
 ##### The `process-load-test-result.yml` workflow script [Optional]
 
-This workflow script is used to process the load test results of a module. It is needed only if the module has load tests. The status of this workflow is displayed on the Standard Library Dashboard under the `Load Test Results` column.
+This workflow script is used to process the load test results of a module. It is needed only if the module has load tests. The status of this workflow is displayed on the Ballerina Library Dashboard under the `Load Test Results` column.
 
 >**Note:** In case of a failure of this workflow due to non-persistent issue, close the failed pull request, delete the branch that sent the pull request, and re-run the failed workflow.
 
@@ -203,7 +203,7 @@ This workflow script is used to release the module. It will create a new git tag
 
 ##### The `pull-request.yml` workflow script [Required]
 
-This workflow script is used to build and run tests on pull requests. It has two main jobs, `Build on Ubuntu` and `Build on Windows`, which are required checks for a pull request. This workflow script is triggered automatically when a pull request is created or updated. It also uploads a code coverage report per each pull request, which is also a required check on all the Standard Library modules. A code coverage check is considered passed if the coverage is above 80%.
+This workflow script is used to build and run tests on pull requests. It has two main jobs, `Build on Ubuntu` and `Build on Windows`, which are required checks for a pull request. This workflow script is triggered automatically when a pull request is created or updated. It also uploads a code coverage report per each pull request, which is also a required check on all the Ballerina library modules. A code coverage check is considered passed if the coverage is above 80%.
 
 To reduce failures in the code coverage check, the `CODECOV_TOKEN` should be added to the repository as a secret.
 
@@ -219,7 +219,7 @@ This workflow script is used to trigger the load tests of a module. It is needed
 
 ##### The `trivy-scan.yml` workflow script [Required]
 
-This workflow script is used to scan the module for vulnerabilities using Trivy. This workflow script is triggered automatically on a schedule and can be triggered manually as well. The status of this workflow is displayed on the Standard Library Dashboard under the `Security Check` column.
+This workflow script is used to scan the module for vulnerabilities using Trivy. This workflow script is triggered automatically on a schedule and can be triggered manually as well. The status of this workflow is displayed on the Ballerina Library Dashboard under the `Security Check` column.
 
 ##### The `update-spec.yml` workflow script [Optional]
 
@@ -330,7 +330,7 @@ Following are the files that are required for the build.
 
 ### The `LICENSE` file [Required]
 
-This file contains the license of the module. All the Ballerina Standard Library modules use the `Apache-2` license.
+This file contains the license of the module. All the Ballerina library modules use the `Apache-2` license.
 
 ### The `README.md` file [Required]
 
@@ -381,11 +381,11 @@ This file is used to skip specific spotbugs warnings/errors. This is required on
 
 After creating the module repository with the above structure, the following steps should be followed.
 
-### Add the module to the Ballerina Standard Library [Optional]
+### Add the module to the Ballerina library [Optional]
 
-This step is required only if the module is a part of the Ballerina Standard Library and if it should be added to the Ballerina Standard Library Dashboard and release process.
+This step is required only if the module is a part of the Ballerina library and if it should be added to the Ballerina library dashboard and release process.
 
-To add a module to the Ballerina Standard Library, add an entry in the [`module_list.json`](https://github.com/ballerina-platform/ballerina-standard-library/blob/main/release/resources/module_list.json) file in the [`ballerina-standard-library`](https://github.com/ballerina-platform/ballerina-standard-library) repository.
+To add a module to the Ballerina library, add an entry in the [`module_list.json`](https://github.com/ballerina-platform/ballerina-standard-library/blob/main/release/resources/module_list.json) file in the [`ballerina-standard-library`](https://github.com/ballerina-platform/ballerina-standard-library) repository.
 
 >**Note:** Do not edit the `stdlid_modules.json` file manually. It will be auto-generated once the `module_list.json` file is updated.
 
@@ -405,9 +405,9 @@ This field is optional. It is only required if the version key cannot be inferre
 
 >**Note:** The version key is case-sensitive and should be in the camel case format.
 
-Once the `module_list.json` file is updated, the [`Update Stdlib Dependency Graph`](https://github.com/ballerina-platform/ballerina-standard-library/actions/workflows/update_dependencies.yml) workflow will run automatically to update the Standard Library Dashboard.
+Once the `module_list.json` file is updated, the [`Update Stdlib Dependency Graph`](https://github.com/ballerina-platform/ballerina-standard-library/actions/workflows/update_dependencies.yml) workflow will run automatically to update the Ballerina library Dashboard.
 
-Once updated this file, the module is ready to be released with the Ballerina Standard Library.
+Once updated this file, the module is ready to be released with the Ballerina library.
 
 ### Add the module to Ballerina daily full build pipeline [Required]
 
@@ -428,7 +428,7 @@ This field defines the name of the module. This should be the name of the reposi
 
 The version key of the module. This is related to the version prefix mentioned in the [`gradle.properties`](#the-gradleproperties-file-required) file. (e.g., `ballerinaStdlibIo`). It is used to add the module as a dependency to another repository including the [`ballerina-distribution`](https://github.com/ballerina-platform/ballerina-distribution) repository.
 
-Refer the [`version_key`](#the-versionkey-field) section under [Add the module to the Ballerina Standard Library](#add-the-module-to-the-ballerina-standard-library-optional). 
+Refer the [`version_key`](#the-versionkey-field) section under [Add the module to the Ballerina library](#add-the-module-to-the-ballerina-standard-library-optional). 
 
 #### The `level` field
 

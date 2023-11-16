@@ -12,7 +12,7 @@ on:
 
 jobs:
     dependency_graph:
-        name: Update the Standard Library Dependency Graph
+        name: Update the Ballerina Library Dependency Graph
         runs-on: ubuntu-latest
         steps:
 
@@ -57,7 +57,7 @@ jobs:
             -   name: Create Pull Request to Update the Dashboard
                 id: createPR
                 if: ${{ steps.commitFiles.outputs.hasChanged == 'true' }}
-                run: printf "::set-output name=prUrl::$(gh pr create --title "[Automated] Update the Standard Library Dashboard" --body "Updating the standard library dashboard with latest changes")"
+                run: printf "::set-output name=prUrl::$(gh pr create --title "[Automated] Update the Ballerina Library Dashboard" --body "Updating the Ballerina library dashboard with latest changes")"
                 env:
                     GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
 

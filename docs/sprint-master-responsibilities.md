@@ -13,7 +13,7 @@ Sprint master is responsible for managing and tracking the sprint. Alphabetical 
 - Milestones are closed accordingly 
 - External queries are answered 
 - Every PR is tied to an issue
-- Doing the standard library release (if needed)
+- Doing the Ballerina library release (if needed)
   - This swings between two teams, say this release is done by PCM team then the next release will be done by DUI team
 - Make sure automated and other PRs are merged in timely manner 
   - This includes PRs sent to distribution as well

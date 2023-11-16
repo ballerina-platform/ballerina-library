@@ -11,7 +11,7 @@ public function main() {
         failedModules: []
     };
 
-    log:printInfo("Publishing all the standard library snapshots");
+    log:printInfo("Publishing all the Ballerina library snapshots");
     commons:checkCurrentPublishWorkflows();
     commons:handlePublish(modules, workflowStatus);
 

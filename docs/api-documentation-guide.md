@@ -1,4 +1,4 @@
-# Standard Library API Documentation Guide
+# Ballerina Library API Documentation Guide
 
 _Authors_: @shafreenAnfar @daneshk @praneesha  
 _Reviewers_: @chamil321  
@@ -15,9 +15,9 @@ _Updated_: 2021/10/08
 
 ## Overview
 
-API Docs is another attribute of Ballerina that is authored, maintained, and governed by the Standard Library team. This is the only official way in which the Standard Library team communicates the details of its modules in the form of documentation. 
+API Docs is another attribute of Ballerina that is authored, maintained, and governed by the Ballerina library team. This is the only official way in which the Ballerina library team communicates the details of its modules in the form of documentation. 
 
-The key purpose of API Docs is to help developers understand a Standard Library module in a quick and easy way. Therefore, the structure of them is organized in a top-down approach similar to a well written research paper, book, or newspaper article. Every module starts with the synopsis at the top and have all the fine-grained details explained towards the bottom. Basically, as you continue downwards, the details increase gradually until you have all the information. 
+The key purpose of API Docs is to help developers understand a Ballerina library module in a quick and easy way. Therefore, the structure of them is organized in a top-down approach similar to a well written research paper, book, or newspaper article. Every module starts with the synopsis at the top and have all the fine-grained details explained towards the bottom. Basically, as you continue downwards, the details increase gradually until you have all the information. 
 
 The following is the high-level structure of API Documentation.
 
@@ -34,7 +34,7 @@ The three components below are used to materialize the above.
 
 1.  `Package.md` documentation 
       -  This is all about the distribution of the modules. The content of this is rendered in Ballerina Central (but not in API Docs of [lib.ballerina.io`](https://lib.ballerina.io/)). 
-      -  This can include elements such as a banner mentioning that this is owned by the Standard Library team, the version compatibility, release dates, governing principles, security validations, etc.
+      -  This can include elements such as a banner mentioning that this is owned by the Ballerina library team, the version compatibility, release dates, governing principles, security validations, etc.
 2. `Module.md` documentation 
    -  Default `Module.md` file 
        - By default, the `Module.md` file acts as the root description. Basically, this corresponds to the `Overview` section in API Docs. This includes the synopsis of this module. 
@@ -48,13 +48,13 @@ The three components below are used to materialize the above.
 
 ## Linking BBEs from API Docs 
 
-At the moment, some BBEs are authored, maintained, and governed by the Standard Library team.
+At the moment, some BBEs are authored, maintained, and governed by the Ballerina library team.
 
 The purpose of the BBEs is to give a quick look and feel of Ballerina. These examples need to be short and sweet. You can start trying out Ballerina using these examples. Also, they can be used as reminders or quick reference. One BBE should only be used to explain one concept. You can dig deeper by referring API Docs or by using the Visual Studio Code tool itself, which provides other suggestions. Therefore, BBEs do not have to include every minor detail of the module. A good example would be the [UDP Client](https://ballerina.io/learn/by-example/udp-client.html). 
 
 BBEs and API Docs are two documents are completely different from each other and serve completely two different purposes. Therefore, linking API Docs to BBEs sort of breaks the flow of API Docs. If examples are needed to solidify the message, better to write them then and there.
 
-Also, BBEs could be owned by an external entity (e.g., the DevRel team) and be evolved on their own whereas, API docs are always authored, maintained, and governed by the Standard Library team. However, if required, BBEs can be added as another section in API Docs as similar communities (e.g., GoLang) have done it.
+Also, BBEs could be owned by an external entity (e.g., the DevRel team) and be evolved on their own whereas, API docs are always authored, maintained, and governed by the Ballerina library team. However, if required, BBEs can be added as another section in API Docs as similar communities (e.g., GoLang) have done it.
 
 In fact, as BBEs are short and do not explain the complete picture, they should be linked to API docs so that you can refer API docs to know more information about the particular module. 
 

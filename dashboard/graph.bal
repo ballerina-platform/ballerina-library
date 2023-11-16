@@ -47,7 +47,7 @@ public function main() returns error? {
     check updateStdlibDashboard(seperateModulesResult[0], seperateModulesResult[1]);
 }
 
-//  Sorts the ballerina standard library module list in ascending order
+//  Sorts the ballerina Ballerina library module list in ascending order
 function getSortedModuleNameList() returns List|error {
 
     json nameListJson = check io:fileReadJson(MODULE_LIST_JSON);

@@ -7,14 +7,14 @@ on:
 
 jobs:
     publish-stdlib-modules:
-        name: Publish Standard Library Modules
+        name: Publish Ballerina library Modules
         runs-on: ubuntu-latest
         if: github.repository_owner == 'ballerina-platform'
         steps:
             -   name: Checkout Repository
                 uses: actions/checkout@v2
 
-            -   name: Trigger the Standard Library Module Builds
+            -   name: Trigger the Ballerina library Module Builds
                 if: github.event.action != 'stdlib-module-push'
                 uses: ballerina-platform/ballerina-action@1.2.x
                 with:
