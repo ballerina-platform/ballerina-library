@@ -57,6 +57,9 @@ jobs:
       - name: Get Release Version
         run: echo "VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties | rev | cut --complement -d- -f1 | rev)" >> $GITHUB_ENV
 
+      - name: Remove Target Directory
+        run: sudo rm -rf ballerina/target
+
       - name: Publish Package
         env:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
