@@ -40,7 +40,7 @@ jobs:
         run: |
           git config --global user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
           git config --global user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
-          ./gradlew build -x check -x test ${{ inputs.additional-build-flags }}
+          ./gradlew build -x test ${{ inputs.additional-build-flags }}
 
       - name: Create lib Directory if not Exists
         run: mkdir -p ballerina/lib
@@ -56,6 +56,9 @@ jobs:
 
       - name: Get Release Version
         run: echo "VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties | rev | cut --complement -d- -f1 | rev)" >> $GITHUB_ENV
+
+      - name: Remove Target Directory
+        run: sudo rm -rf ballerina/target
 
       - name: Publish Package
         env:

@@ -25,7 +25,7 @@ jobs:
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew build -x check -x test ${{ inputs.additional-build-flags }}
+        run: ./gradlew build -x test ${{ inputs.additional-build-flags }}
 
       - name: Create lib directory if not exists
         run: mkdir -p ballerina/lib
