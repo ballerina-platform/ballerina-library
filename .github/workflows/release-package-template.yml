@@ -32,10 +32,10 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17.0.7
-      
+
       - name: Set ENV Variables
         run: |
-          echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV 
+          echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
 
       - name: Build without Tests
         env:
@@ -44,7 +44,7 @@ jobs:
         run: |
           git config --global user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
           git config --global user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
-          ./gradlew build -x check -x test ${{ inputs.additional-build-flags }}
+          ./gradlew build -x test ${{ inputs.additional-build-flags }}
 
       - name: Create lib Directory if not Exists
         run: mkdir -p ballerina/lib
