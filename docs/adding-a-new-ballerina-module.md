@@ -405,7 +405,7 @@ This field is optional. It is only required if the version key cannot be inferre
 
 >**Note:** The version key is case-sensitive and should be in the camel case format.
 
-Once the `module_list.json` file is updated, the [`Update Stdlib Dependency Graph`](https://github.com/ballerina-platform/ballerina-standard-library/actions/workflows/update_dependencies.yml) workflow will run automatically to update the Ballerina library Dashboard.
+Once the `module_list.json` file is updated, the [`Update Library Dependency Graph`](https://github.com/ballerina-platform/ballerina-library/actions/workflows/update_dependencies.yml) workflow will run automatically to update the Ballerina library Dashboard.
 
 Once updated this file, the module is ready to be released with the Ballerina library.
 
