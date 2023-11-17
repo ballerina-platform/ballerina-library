@@ -456,7 +456,7 @@ This field is used to define whether the module is being pushed to the Ballerina
 
 #### The `is_extended_library` field
 
-This field is used to define whether the module is an extended library or not. The default value is `true`. Set this to `false` for repositories that are released along with the [`ballerina-distribution`](https://github.com/ballerina-platform/ballerina-distribution).
+This field is used to define whether the module is an extended library package or not. The default value is `true`. Set this to `false` for repositories that are released along with the [`ballerina-distribution`](https://github.com/ballerina-platform/ballerina-distribution).
 
 #### The `build_action_file` field
 
