@@ -52,7 +52,7 @@ This is a step-by-step guide on creating a new Ballerina module. It will guide y
 
 This guide helps you understand the file structure, build scripts, and workflow scripts of a Ballerina module. It also explains how to add a new module to the Ballerina daily build and release pipelines.
 
-Examples of the directory structure and common files can be found in the existing Ballerina library module repositories. The links to these repositories are available on the [Ballerina Library Dashboard](https://github.com/ballerina-platform/ballerina-standard-library#status-dashboard).
+Examples of the directory structure and common files can be found in the existing Ballerina library module repositories. The links to these repositories are available on the [Ballerina Library Dashboard](https://github.com/ballerina-platform/ballerina-library#status-dashboard).
 
 The [Ballerina `graphql` Module](https://github.com/ballerina-platform/module-ballerina-graphql) would be a reference to follow along with this guide.
 
@@ -428,7 +428,7 @@ This field defines the name of the module. This should be the name of the reposi
 
 The version key of the module. This is related to the version prefix mentioned in the [`gradle.properties`](#the-gradleproperties-file-required) file. (e.g., `ballerinaStdlibIo`). It is used to add the module as a dependency to another repository including the [`ballerina-distribution`](https://github.com/ballerina-platform/ballerina-distribution) repository.
 
-Refer the [`version_key`](#the-versionkey-field) section under [Add the module to the Ballerina library](#add-the-module-to-the-ballerina-standard-library-optional). 
+Refer the [`version_key`](#the-versionkey-field) section under [Add the module to the Ballerina library](#add-the-module-to-the-ballerina-library-optional). 
 
 #### The `level` field
 
