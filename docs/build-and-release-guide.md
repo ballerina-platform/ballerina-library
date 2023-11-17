@@ -30,17 +30,17 @@ Ballerina distribution depends on multiple components.
 Standard Libraries are built on top of the base Ballerina Language distribution.
 
 The build includes the following tasks,
-1. Create an intermediate Ballerina Distribution consisting of Language and any dependent Ballerina library.
+1. Create an intermediate Ballerina Distribution consisting of Language and any dependent Ballerina library package.
 2. Build and Run unit tests.
 3. Create an intermediate distribution, including the module.
 4. Run any Integration Tests or Compiler Plugin Tests.
 5. Publish the module to GitHub Packages.
 
-The [Gradle Plugin](https://github.com/ballerina-platform/plugin-gradle) executes tasks 1, 2 and 3. This plugin includes all build, test and publish tasks of the Ballerina library to Ballerina Central. Publish of Ballerina module or native components depend on GitHub packages.
+The [Gradle Plugin](https://github.com/ballerina-platform/plugin-gradle) executes tasks 1, 2 and 3. This plugin includes all build, test and publish tasks of the Ballerina library packages to Ballerina Central. Publish of Ballerina module or native components depend on GitHub packages.
 
 ## Branching Strategy
 
-The Ballerina library branches are intended to maintain releasable state all the time. The default branch of the repository *should* be the latest release branch. Patch branches are used to do patches on top of a given distribution version.
+The Ballerina library branches are intended to maintain a releasable state all the time. The default branch of the repository *should* be the latest release branch. Patch branches are used to do patches on top of a given distribution version.
 
 ### Branch Naming
 
