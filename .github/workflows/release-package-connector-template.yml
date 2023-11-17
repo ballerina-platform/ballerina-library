@@ -13,6 +13,10 @@ on:
         required: false
         type: string
         default: ""
+      additional-release-flags:
+        required: false
+        type: string
+        default: ""
       additional-publish-flags:
         required: false
         type: string
@@ -74,7 +78,7 @@ jobs:
           publishUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
           publishPAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
         run: |
-          ./gradlew clean release -Prelease.useAutomaticVersion=true
+          ./gradlew clean release -Prelease.useAutomaticVersion=true ${{ inputs.additional-release-flags }}
           ./gradlew -Pversion=${VERSION} publish -x test -PpublishToCentral=true ${{ inputs.additional-publish-flags }}
 
       - name: GitHub Release and Release Sync PR
