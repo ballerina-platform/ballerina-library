@@ -1,12 +1,12 @@
-# Standard Library Related Scripts
+# Ballerina Library Related Scripts
 
 ## Build Script
 
 > File Name: build_standard_library.py
 
-This script can be used to build the Ballerina Standard Library locally. It will build all the modules incrementally.
+This script can be used to build the Ballerina library locally. It will build all the modules incrementally.
 
-If you already have cloned the standard library repos, you can provide the root directory of all the standard library repos to the script, so it will use the cloned repos. If any of the required repositories are not found, the script will clone them automatically to the provided location. This is a one-time thing.
+If you already have cloned the Ballerina library repos, you can provide the root directory of all the Ballerina library repos to the script, so it will use the cloned repos. If any of the required repositories are not found, the script will clone them automatically to the provided location. This is a one-time thing.
 
 ### Usage
 
@@ -20,7 +20,7 @@ python build_standard_library.py /Users/ballerina/standard-library --branch auto
 
 | Parameter | Type | Functionality | Sample Usage |
 | :---: | :---: | :---: | :---: |
-| Path | Mandatory | Provide the path to build the standard library modules. This will be the root directory, and if it is not found, it will be auto-created.| `python build_standard_library.py /path/to/stdlib/root/directory` |
+| Path | Mandatory | Provide the path to build the Ballerina library modules. This will be the root directory, and if it is not found, it will be auto-created.| `python build_standard_library.py /path/to/stdlib/root/directory` |
 | Lang Version | Optional | Provide a specific lang version to use in builds | `--lang-version <version>` |
 | Branch | Optional | Provide a specific branch to build. This will try to build the specified branch in all the module repos. If not provided, the default branch will be used| `--branch <branch_name>` |
 | Snapshot Build | Optional | To build and publish all the modules as SNAPSHOT versions locally. Then each depending module will use these SNAPSHOT versions as their dependencies. | `--snapshots-build` |
@@ -47,7 +47,7 @@ python build_standard_library.py /Users/ballerina/standard-library --branch auto
   ./gradlew build publishToMavenLocal
   ```
 
-* Then run the script with the `--lang-version <lang-snapshot-version>` flag. This will replace the `ballerinaLangVersion` entry in every `gradle.properties` file of the standard library module when building them. For example, the following command will build the standard library repos using the `2.0.0-SNAPSHOT` version of the lang.
+* Then run the script with the `--lang-version <lang-snapshot-version>` flag. This will replace the `ballerinaLangVersion` entry in every `gradle.properties` file of the Ballerina library module when building them. For example, the following command will build the Ballerina library repos using the `2.0.0-SNAPSHOT` version of the lang.
 
   ```shell
   python build_standard_library.py /Users/ballerina/standard-library --lang-version 2.0.0-SNAPSHOT
@@ -66,7 +66,7 @@ python build_standard_library.py /Users/ballerina/standard-library --branch auto
   python build_standard_library.py /Users/ballerina/standard-library --skip-modules "nats, stan, kafka, rabbitmq"
   ```
 
-* If you want to use the `SNAPSHOT` versions of the standard library modules to be used in the upper-level modules, use the `--snapshots-build` flag. This will publish all the standard library modules to the local maven repository, and replace the timestamp versions of the standard library module versions with SNAPSHOT versions in the `gradle.properties` files.
+* If you want to use the `SNAPSHOT` versions of the Ballerina library modules to be used in the upper-level modules, use the `--snapshots-build` flag. This will publish all the Ballerina library modules to the local maven repository, and replace the timestamp versions of the Ballerina library module versions with SNAPSHOT versions in the `gradle.properties` files.
 
   ```shell
   python build_standard_library.py /Users/ballerina/standard-library --snapshots-build

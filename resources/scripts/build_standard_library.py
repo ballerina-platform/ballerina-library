@@ -26,11 +26,11 @@ GRADLE_PROPERTIES = "gradle.properties"
 
 # Argument Parser
 parser = argparse.ArgumentParser(
-    description='Incrementally Build the Ballerina Standard Library')
+    description='Incrementally Build the Ballerina library')
 
 # Mandatory Arguments
 parser.add_argument(
-    'path', help='Path to the directory where the standard library modules are (need to be) cloned')
+    'path', help='Path to the directory where the Ballerina library modules are (need to be) cloned')
 
 # Optional arguments
 parser.add_argument(
@@ -38,7 +38,7 @@ parser.add_argument(
 parser.add_argument(
     '--branch', help='Branch to build. (Build will fail if the branch not found')
 parser.add_argument('--snapshots-build', action="store_true",
-                    help="Replace all the standard library dependent versions with 'SNAPSHOT' versions. This is helpful to incrementally build libraries on top of a local change")
+                    help="Replace all the Ballerina library dependent versions with 'SNAPSHOT' versions. This is helpful to incrementally build libraries on top of a local change")
 parser.add_argument('--publish-to-local-central', action="store_true",
                     help="Publish all the modules to the local ballerina central repository")
 parser.add_argument('--skip-tests', action="store_true",
@@ -78,11 +78,11 @@ def main():
     continue_on_error = False
 
     print_block()
-    print_info("Building Standard Library Modules")
+    print_info("Building Ballerina Library Modules")
 
     if not os.path.isdir(args.path):
         print_info(
-            "Provided standard library module root directory does not exist. Creating the directory and cloning the repositories")
+            "Provided Ballerina library module root directory does not exist. Creating the directory and cloning the repositories")
         create_directory(args.path)
 
     os.chdir(args.path)

@@ -1,4 +1,4 @@
-name: Test Standard Library Releases with Staging Central
+name: Test Ballerina Library Package Releases with Staging Central
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   test-patch-versions:
-    name: Test Patch Standard Library Releases
+    name: Test Ballerina Library Package Patch Releases
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -25,14 +25,14 @@ jobs:
           distribution: "temurin"
           java-version: 17.0.7
 
-      - name: Run Standard Library Tests
+      - name: Run Ballerina Library Package Tests
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
           devCentralToken: ${{ secrets.BALLERINA_DEV_CENTRAL_ACCESS_TOKEN }}
         run: ./gradlew clean testStdlibs --stacktrace --scan --console=plain --no-daemon --continue
 
-      - name: Run Standard Library Tests w/ Staging
+      - name: Run Ballerina Library Package Tests w/ Staging
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
@@ -40,7 +40,7 @@ jobs:
         run: ./gradlew testStdlibsWithStaging --stacktrace --scan --console=plain --no-daemon --continue
 
   test-minor-versions:
-    name: Test Minor Standard Library Releases
+    name: Test Minor Ballerina Library Package Releases
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -55,14 +55,14 @@ jobs:
           distribution: "temurin"
           java-version: 17.0.7
 
-      - name: Run Standard Library Tests
+      - name: Run Ballerina Library Package Tests
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
           devCentralToken: ${{ secrets.BALLERINA_DEV_CENTRAL_ACCESS_TOKEN }}
         run: ./gradlew clean testStdlibs --stacktrace --scan --console=plain --no-daemon --continue
 
-      - name: Run Standard Library Tests w/ Staging
+      - name: Run Ballerina Library Package Tests w/ Staging
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}

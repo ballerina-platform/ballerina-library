@@ -1,17 +1,17 @@
-# Process of adding a load test to a standard library repository
+# Process of adding a load test to a Ballerina library package repository
 
 _Authors_: @dilanSachi  
 _Reviewers_: @shafreenAnfar @daneshk  
 _Created_: 2022/08/15  
 _Updated_: 2021/08/15
 
-This section describes the steps to add a load test to a standard library repository. The tests are running in an AKS cluster.
+This section describes the steps to add a load test to a Ballerina package repository. The tests are running in an AKS cluster.
 
 <img src="_resources/load-test-setup.png" alt="drawing"/>
 
 Most of the following steps are adapted from [here](https://github.com/ballerina-platform/ballerina-performance-cloud/blob/main/README.md).
 
-1. All the tests in the standard library should reside inside `load-tests` directory in the repository root.
+1. All the tests in the Ballerina library package should reside inside `load-tests` directory in the repository root.
 
 2. Create a directory inside `load-tests` for the test. We will call it `test_sample` here.
 
