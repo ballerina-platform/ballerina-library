@@ -17,11 +17,14 @@
 import ballerina/io;
 import ballerina/lang.array;
 import ballerina/log;
-import ballerina/regex;
+
 import thisarug/prettify;
 
 type List record {|
     Module[] modules;
+    Module[] extended_modules;
+    Module[] connectors;
+    Module[] tools;
 |};
 
 type Module record {|
@@ -37,41 +40,61 @@ type Module record {|
 
 public function main() returns error? {
     List moduleNameList = check getSortedModuleNameList();
-    List moduleDetails = check initializeModuleDteails(moduleNameList);
+    List moduleDetails = check initializeModuleDetails(moduleNameList);
+
     check getImmediateDependencies(moduleDetails);
     check calculateLevels(moduleDetails);
-    Module[] sortedModules = moduleDetails.modules.sort(array:ASCENDING, a => a.level);
-    moduleDetails = {modules: sortedModules};
-    check writeToFile(STDLIB_MODULES_JSON, moduleDetails);
-    List[] seperateModulesResult = seperateModules(moduleDetails);
-    check updateStdlibDashboard(seperateModulesResult[0], seperateModulesResult[1]);
+    moduleDetails.modules = moduleDetails.modules.sort(array:ASCENDING, a => a.level);
+
+    List filteredList = {
+        modules: removePropertiesFile(moduleDetails.modules),
+        extended_modules: removePropertiesFile(moduleDetails.extended_modules),
+        connectors: removePropertiesFile(moduleDetails.connectors),
+        tools: removePropertiesFile(moduleDetails.tools)
+    };
+    check writeToFile(STDLIB_MODULES_JSON, filteredList);
+    check updateStdlibDashboard(filteredList);
 }
 
 //  Sorts the Ballerina library module list in ascending order
 function getSortedModuleNameList() returns List|error {
+    json moduleListJson = check io:fileReadJson(MODULE_LIST_JSON);
+    List moduleList = check moduleListJson.cloneWithType();
 
-    json nameListJson = check io:fileReadJson(MODULE_LIST_JSON);
-    List nameList = check nameListJson.cloneWithType();
+    List sortedList = {
+        modules: sortModuleArray(moduleList.modules, 2),
+        extended_modules: sortModuleArray(moduleList.extended_modules, 2),
+        connectors: sortModuleArray(moduleList.connectors, 2),
+        tools: sortModuleArray(moduleList.tools, 0)
+    };
 
-    Module[] sortedModules = from var e in nameList.modules
-        order by regex:split(e.name, "-")[2] ascending
-        select e;
-    List sortedNameList = {modules: sortedModules};
-
-    check writeToFile(MODULE_LIST_JSON, sortedNameList);
-
-    return sortedNameList;
+    check writeToFile(MODULE_LIST_JSON, sortedList);
+    return sortedList;
 }
 
-function initializeModuleDteails(List moduleNameList) returns List|error {
-    log:printInfo("Initializing the module information");
-    List moduleDetails = {modules: []};
+function sortModuleArray(Module[] moduleArray, int nameIndex) returns Module[] {
+    Module[] sortedModuleArray = from Module module in moduleArray
+        order by re `-`.split(module.name)[nameIndex] ascending
+        select module;
+    return sortedModuleArray;
+}
 
-    foreach var module in moduleNameList.modules {
+function initializeModuleDetails(List moduleNameList) returns List|error {
+    return {
+        modules: check initializeModuleList(moduleNameList.modules),
+        extended_modules: check initializeModuleList(moduleNameList.extended_modules),
+        connectors: check initializeModuleList(moduleNameList.connectors),
+        tools: check initializeModuleList(moduleNameList.tools)
+    };
+}
+
+function initializeModuleList(Module[] modules) returns Module[]|error {
+    Module[] moduleList = [];
+    foreach Module module in modules {
         Module initialModule = check initializeModuleInfo(module);
-        moduleDetails.modules.push(initialModule);
+        moduleList.push(initialModule);
     }
-    return moduleDetails;
+    return moduleList;
 }
 
 function initializeModuleInfo(Module module) returns Module|error {
@@ -79,10 +102,8 @@ function initializeModuleInfo(Module module) returns Module|error {
     string defaultBranch = check getDefaultBranch(moduleName);
     string gradleProperties =
         check git->get(string `/${BALLERINA_ORG_NAME}/${moduleName}/${defaultBranch}/${GRADLE_PROPERTIES}`);
-    string nameInVesrsionKey = capitalize(getModuleShortName(moduleName));
-    string defaultVersionKey = string `stdlib${nameInVesrsionKey}Version`;
-    string? versionKey = module.version_key;
-    defaultVersionKey = versionKey == () ? defaultVersionKey : versionKey;
+
+    string versionKey = getVersionKey(module);
     string moduleVersion = check getVersion(moduleName, gradleProperties);
 
     return {
@@ -90,19 +111,28 @@ function initializeModuleInfo(Module module) returns Module|error {
         module_version: moduleVersion,
         level: 1,
         default_branch: defaultBranch,
-        version_key: defaultVersionKey,
+        version_key: versionKey,
         release: true,
         dependents: [],
         gradle_properties: gradleProperties
     };
 }
 
+function getVersionKey(Module module) returns string {
+    string? versionKey = module.version_key;
+    if versionKey is string {
+        return versionKey;
+    }
+    string nameInVesrsionKey = capitalize(getModuleShortName(module.name));
+    return string `stdlib${nameInVesrsionKey}Version`;
+}
+
 function getVersion(string moduleName, string gradleProperties) returns string|error {
-    string[] gradlePropertiesLines = regex:split(gradleProperties, "\n");
+    string[] gradlePropertiesLines = re `\n`.split(gradleProperties);
     string moduleVersion = "";
-    foreach var line in gradlePropertiesLines {
+    foreach string line in gradlePropertiesLines {
         if line.startsWith("version") {
-            moduleVersion = regex:split(line, "=")[1];
+            moduleVersion = re `=`.split(line)[1];
             break;
         }
     }
@@ -115,7 +145,6 @@ function getVersion(string moduleName, string gradleProperties) returns string|e
 // Get the modules list which use the specific module
 function getImmediateDependencies(List moduleDetails) returns error? {
     foreach Module module in moduleDetails.modules {
-        log:printInfo(string `Finding dependents of module ${module.name}`);
         string[] dependees = check getDependencies(module, moduleDetails);
 
         // Get the dependecies modules which use module in there package
@@ -136,7 +165,7 @@ function getDependencies(Module module, List moduleDetails) returns string[]|err
     string moduleName = module.name;
     string? propertiesFile = module.gradle_properties;
     if propertiesFile is string {
-        propertiesFileArr = regex:split(propertiesFile, "\n");
+        propertiesFileArr = re `\n`.split(propertiesFile);
     }
     string[] dependencies = [];
 
@@ -147,13 +176,12 @@ function getDependencies(Module module, List moduleDetails) returns string[]|err
                 continue;
             }
             string? versionKey = item.version_key;
-            if versionKey is string && regex:matches(line, "^.*" + versionKey + ".*$") {
+            if versionKey is string && re `^.*${versionKey}.*$`.isFullMatch(line) {
                 dependencies.push(dependentName);
                 break;
             }
         }
     }
-    _ = module.remove("gradle_properties");
     return dependencies;
 }
 
@@ -207,7 +235,7 @@ function calculateLevels(List moduleDetails) returns error? {
 }
 
 function processCurrentLevel(DiGraph dependencyGraph, string[] processing, List moduleDetails,
-    int currentLevel, string node) {
+        int currentLevel, string node) {
     string[]? successorsOfNode = dependencyGraph.successor(node);
     string[] successors = [];
 
@@ -225,7 +253,7 @@ function processCurrentLevel(DiGraph dependencyGraph, string[] processing, List 
 }
 
 function removeModulesInIntermediatePaths(DiGraph dependencyGraph, string sourceNode,
-    string destinationNode, string[] successors, List moduleDetails) {
+        string destinationNode, string[] successors, List moduleDetails) {
     string[] longestPath = dependencyGraph.getLongestPath(sourceNode, destinationNode);
     foreach string n in longestPath.slice(1, longestPath.length() - 1) {
         if (successors.indexOf(n) is int) {
@@ -244,61 +272,26 @@ function removeModulesInIntermediatePaths(DiGraph dependencyGraph, string source
     }
 }
 
-function seperateModules(List moduleDetails) returns List[] {
-    Module[] ballerinaxSorted = from var e in moduleDetails.modules
-        where regex:split(e.name, "-")[1] == "ballerinax"
-        order by e.level ascending
-        select e;
-    Module[] ballerinaSorted = from var e in moduleDetails.modules
-        where regex:split(e.name, "-")[1] == "ballerina"
-        order by e.level ascending
-        select e;
-    List sortedNameListX = {modules: ballerinaxSorted};
-    List sortedNameList = {modules: ballerinaSorted};
-
-    return [sortedNameListX, sortedNameList];
-}
-
 // Updates the stdlib dashboard in README.md
-function updateStdlibDashboard(List moduleDetailsBalX, List moduleDetailsBal) returns error? {
-    string[] readmeFile = regex:split(check io:fileReadString(README_FILE), "\n");
+function updateStdlibDashboard(List moduleDetails) returns error? {
+    string readmeFile = check io:fileReadString(README_FILE);
+    string[] readmeFileLines = re `\n`.split(readmeFile);
     string updatedReadmeFile = "";
-    foreach string line in readmeFile {
+
+    foreach string line in readmeFileLines {
         updatedReadmeFile += line + "\n";
-        if regex:matches(line, "^.*" + DASHBOARD_TITLE + ".*$") {
-            updatedReadmeFile += "\n" + BAL_TITLE + "\n";
-            updatedReadmeFile += README_HEADER;
-            updatedReadmeFile += README_HEADER_SEPARATOR;
+        if line == DASHBOARD_TITLE {
             break;
         }
     }
-    // Modules in levels 0 and 1 are categorized under level 1
-    // A single row in the table is created for each module in the module list
-    string levelColumn = "1";
-    int currentLevel = 1;
 
-    foreach Module module in moduleDetailsBal.modules {
-        int? moduleLevel = module.level;
-        if moduleLevel is int && moduleLevel > currentLevel {
-            currentLevel = moduleLevel;
-            levelColumn = currentLevel.toString();
-        }
-        string row = check getDashboardRow(module, levelColumn);
-        updatedReadmeFile += row;
-        updatedReadmeFile += "\n";
-        levelColumn = "";
-    }
-
-    levelColumn = "";
-    updatedReadmeFile += "\n" + BALX_TITLE + "\n";
-    updatedReadmeFile += README_HEADER;
-    updatedReadmeFile += README_HEADER_SEPARATOR;
-
-    foreach Module module in moduleDetailsBalX.modules {
-        string row = check getDashboardRow(module, levelColumn);
-        updatedReadmeFile += row;
-        updatedReadmeFile += "\n";
-    }
+    updatedReadmeFile += check getBallerinaDashboard(moduleDetails.modules);
+    updatedReadmeFile += "\n";
+    updatedReadmeFile += check getBallerinaExtendedDashboard(moduleDetails.extended_modules);
+    updatedReadmeFile += "\n";
+    updatedReadmeFile += check getBallerinaConnectorDashboard(moduleDetails.connectors);
+    updatedReadmeFile += "\n";
+    updatedReadmeFile += check getBallerinaToolsDashboard(moduleDetails.tools);
 
     io:Error? fileWriteString = io:fileWriteString(README_FILE, updatedReadmeFile);
     if fileWriteString is io:Error {
@@ -307,12 +300,90 @@ function updateStdlibDashboard(List moduleDetailsBalX, List moduleDetailsBal) re
     log:printInfo("Dashboard Updated");
 }
 
-isolated function writeToFile(string fileName, anydata content) returns error? {
-    string prettifiedContent = prettify:prettify(content.toJson());
+isolated function getBallerinaDashboard(Module[] modules) returns string|error {
+    string dashboard = string `
+${BAL_TITLE}
+
+${LIBRARY_DASHBOARD_HEDER}
+${LIBRARY_HEADER_SEPARATOR}`;
+    string levelColumn = "1";
+    int currentLevel = 1;
+
+    foreach Module module in modules {
+        int? moduleLevel = module.level;
+        if moduleLevel is int && moduleLevel > currentLevel {
+            currentLevel = moduleLevel;
+            levelColumn = currentLevel.toString();
+        }
+        string row = check getLibraryDashboardRow(module, levelColumn);
+        dashboard += row;
+        dashboard += "\n";
+        levelColumn = "";
+    }
+    return dashboard;
+}
+
+isolated function getBallerinaExtendedDashboard(Module[] modules) returns string|error {
+    string dashboard = string `
+${BALX_TITLE}
+
+${EXTENDED_DASHBOARD_HEDER}
+${HEADER_SEPARATOR}`;
+
+    foreach Module module in modules {
+        string row = check getDashboardRow(module);
+        dashboard += row + "\n";
+    }
+    return dashboard;
+}
+
+isolated function getBallerinaConnectorDashboard(Module[] modules) returns string|error {
+    string dashboard = string `
+${CONNECTOR_TITLE}
+
+${CONNECTOR_DASHBOARD_HEDER}
+${HEADER_SEPARATOR}`;
+
+    foreach Module module in modules {
+        string row = check getDashboardRow(module);
+        dashboard += row + "\n";
+    }
+    return dashboard;
+}
+
+isolated function getBallerinaToolsDashboard(Module[] modules) returns string|error {
+    string dashboard = string `
+${TOOLS_TITLE}
+
+${TOOLS_DASHBOARD_HEDER}
+${TOOLS_HEADER_SEPARATOR}`;
+
+    foreach Module module in modules {
+        string row = check getToolsDashboardRow(module);
+        dashboard += row + "\n";
+    }
+    return dashboard;
+}
+
+isolated function writeToFile(string fileName, json content) returns error? {
+    string prettifiedContent = prettify:prettify(content);
 
     error? result = io:fileWriteString(fileName, prettifiedContent);
     if result is error {
         log:printError("Error occurred while writing to the file: " + result.message());
         return result;
     }
+}
+
+isolated function removePropertiesFile(Module[] modules) returns Module[] {
+    return from Module module in modules
+    select {
+        name: module.name,
+        module_version: module.module_version,
+        level: module.level,
+        default_branch: module.default_branch,
+        version_key: module.version_key,
+        release: module.release,
+        dependents: module.dependents
+    };
 }

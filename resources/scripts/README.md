@@ -34,6 +34,9 @@ python build_standard_library.py /Users/ballerina/standard-library --branch auto
 | Using custom commands | Optional | The script uses `./gradlew clean build` as the default command (with skip tests, and publish flags when required). If a custom command is needed to be executed inside each repo, it can be provided using this flag | `--commands "./gradlew clean"` |
 | Skip Modules | Optional | To skip modules from building. The argument should be a comma separated list or a common word for the modules. Eg.: "nats, stan" or "ballerinax" | `--skip-modules <comma separated list of modules or a common string>` |
 | Continue on Fail | Optional | To continue when a particular module build fails. Default behavior is to stop the build | `--continue-on-error` |
+| Build Extended Modules | Optional | To build the extended modules. | `--build-extended-modules` |
+| Build Connectors | Optional | To build the connectors. | `--build-connectors` |
+| Build Tools | Optional | To build the Ballerina CLI tools. | `--build-tools` |
 
 > Note: This script will only work with Python3. Some additional Python libraries may have to be downloaded before
   running the script. If there are any missing libraries, script will fail and the error will show what libraries

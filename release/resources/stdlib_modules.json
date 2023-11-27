@@ -1,15 +1,6 @@
 {
     "modules": [
         {
-            "name": "module-ballerinax-googleapis.gmail",
-            "module_version": "4.0.0-SNAPSHOT",
-            "level": 1,
-            "default_branch": "master",
-            "version_key": "stdlibGoogleapis.gmailVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
             "name": "module-ballerina-io",
             "module_version": "1.6.1-SNAPSHOT",
             "level": 1,
@@ -85,8 +76,7 @@
             "version_key": "stdlibConstraintVersion",
             "release": true,
             "dependents": [
-                "module-ballerina-cache",
-                "module-ballerinax-nats"
+                "module-ballerina-cache"
             ]
         },
         {
@@ -99,7 +89,6 @@
             "dependents": [
                 "module-ballerina-auth",
                 "module-ballerina-jwt",
-                "module-ballerinax-nats",
                 "module-ballerina-oauth2",
                 "module-ballerina-tcp",
                 "module-ballerina-uuid"
@@ -116,11 +105,9 @@
                 "module-ballerina-auth",
                 "module-ballerina-file",
                 "module-ballerina-ftp",
-                "module-ballerinax-java.jms",
                 "module-ballerina-jwt",
                 "module-ballerina-mime",
                 "module-ballerina-mqtt",
-                "module-ballerinax-nats",
                 "module-ballerina-oauth2",
                 "module-ballerina-tcp",
                 "module-ballerina-udp"
@@ -144,11 +131,7 @@
             "default_branch": "main",
             "version_key": "stdlibPersistVersion",
             "release": true,
-            "dependents": [
-                "module-ballerinax-persist.googlesheets",
-                "module-ballerinax-persist.inmemory",
-                "module-ballerinax-persist.sql"
-            ]
+            "dependents": []
         },
         {
             "name": "module-ballerina-protobuf",
@@ -170,9 +153,7 @@
             "release": true,
             "dependents": [
                 "module-ballerina-grpc",
-                "module-ballerinax-kafka",
                 "module-ballerina-mqtt",
-                "module-ballerinax-rabbitmq",
                 "module-ballerina-soap",
                 "module-ballerina-websub",
                 "module-ballerina-websubhub"
@@ -249,24 +230,6 @@
             ]
         },
         {
-            "name": "module-ballerinax-nats",
-            "module_version": "2.10.1-SNAPSHOT",
-            "level": 3,
-            "default_branch": "master",
-            "version_key": "stdlibNatsVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerinax-persist.inmemory",
-            "module_version": "1.2.1-SNAPSHOT",
-            "level": 3,
-            "default_branch": "main",
-            "version_key": "stdlibPersistInmemoryVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
             "name": "module-ballerina-tcp",
             "module_version": "1.9.2-SNAPSHOT",
             "level": 3,
@@ -293,7 +256,6 @@
             "release": true,
             "dependents": [
                 "module-ballerina-grpc",
-                "module-ballerinax-java.jms",
                 "module-ballerina-mqtt",
                 "module-ballerinai-transaction",
                 "module-ballerina-websocket",
@@ -318,15 +280,6 @@
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibEmailVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerinax-java.jms",
-            "module_version": "1.0.1-SNAPSHOT",
-            "level": 4,
-            "default_branch": "master",
-            "version_key": "stdlibJmsVersion",
             "release": true,
             "dependents": []
         },
@@ -411,9 +364,6 @@
             "version_key": "stdlibTransactionVersion",
             "release": true,
             "dependents": [
-                "module-ballerinax-kafka",
-                "module-ballerinax-persist.googlesheets",
-                "module-ballerinax-rabbitmq",
                 "module-ballerina-soap",
                 "module-ballerina-sql"
             ]
@@ -457,33 +407,6 @@
             "dependents": []
         },
         {
-            "name": "module-ballerinax-kafka",
-            "module_version": "3.10.1-SNAPSHOT",
-            "level": 7,
-            "default_branch": "master",
-            "version_key": "stdlibKafkaVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerinax-persist.googlesheets",
-            "module_version": "1.2.0-SNAPSHOT",
-            "level": 7,
-            "default_branch": "main",
-            "version_key": "stdlibPersistGoogleSheetVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerinax-rabbitmq",
-            "module_version": "2.10.1-SNAPSHOT",
-            "level": 7,
-            "default_branch": "master",
-            "version_key": "stdlibRabbitmqVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
             "name": "module-ballerina-soap",
             "module_version": "0.9.1-SNAPSHOT",
             "level": 7,
@@ -499,49 +422,115 @@
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
             "release": true,
-            "dependents": [
-                "module-ballerinax-java.jdbc",
-                "module-ballerinax-mssql",
-                "module-ballerinax-mysql",
-                "module-ballerinax-oracledb",
-                "module-ballerinax-postgresql"
-            ]
+            "dependents": []
+        }
+    ],
+    "extended_modules": [
+        {
+            "name": "module-ballerinax-copybook",
+            "module_version": "0.1.3-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibCopybookVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerinax-persist.googlesheets",
+            "module_version": "1.2.0-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibPersistGoogleSheetVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerinax-persist.inmemory",
+            "module_version": "1.2.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibPersistInmemoryVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerinax-persist.sql",
+            "module_version": "1.2.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibPersistSqlVersion",
+            "release": true,
+            "dependents": []
+        }
+    ],
+    "connectors": [
+        {
+            "name": "module-ballerinax-googleapis.gmail",
+            "module_version": "4.0.0-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibGoogleapis.gmailVersion",
+            "release": true,
+            "dependents": []
         },
         {
             "name": "module-ballerinax-java.jdbc",
             "module_version": "1.11.1-SNAPSHOT",
-            "level": 8,
+            "level": 1,
             "default_branch": "master",
             "version_key": "stdlibJdbcVersion",
             "release": true,
             "dependents": []
         },
         {
+            "name": "module-ballerinax-java.jms",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibJmsVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerinax-kafka",
+            "module_version": "3.10.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibKafkaVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
             "name": "module-ballerinax-mssql",
             "module_version": "1.11.2-SNAPSHOT",
-            "level": 8,
+            "level": 1,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
             "release": true,
-            "dependents": [
-                "module-ballerinax-persist.sql"
-            ]
+            "dependents": []
         },
         {
             "name": "module-ballerinax-mysql",
             "module_version": "1.11.1-SNAPSHOT",
-            "level": 8,
+            "level": 1,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
             "release": true,
-            "dependents": [
-                "module-ballerinax-persist.sql"
-            ]
+            "dependents": []
+        },
+        {
+            "name": "module-ballerinax-nats",
+            "module_version": "2.10.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibNatsVersion",
+            "release": true,
+            "dependents": []
         },
         {
             "name": "module-ballerinax-oracledb",
             "module_version": "1.11.1-SNAPSHOT",
-            "level": 8,
+            "level": 1,
             "default_branch": "main",
             "version_key": "stdlibOracledbVersion",
             "release": true,
@@ -550,18 +539,65 @@
         {
             "name": "module-ballerinax-postgresql",
             "module_version": "1.11.1-SNAPSHOT",
-            "level": 8,
+            "level": 1,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
             "release": true,
             "dependents": []
         },
         {
-            "name": "module-ballerinax-persist.sql",
-            "module_version": "1.2.1-SNAPSHOT",
-            "level": 9,
+            "name": "module-ballerinax-rabbitmq",
+            "module_version": "2.10.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibRabbitmqVersion",
+            "release": true,
+            "dependents": []
+        }
+    ],
+    "tools": [
+        {
+            "name": "asyncapi-tools",
+            "module_version": "0.7.1-SNAPSHOT",
+            "level": 1,
             "default_branch": "main",
-            "version_key": "stdlibPersistSqlVersion",
+            "version_key": "stdlibAsyncapi-toolsVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "copybook-tools",
+            "module_version": "0.1.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibCopybook-toolsVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "graphql-tools",
+            "module_version": "0.8.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibGraphql-toolsVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "openapi-tools",
+            "module_version": "1.9.0-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibOpenapi-toolsVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "protoc-tools",
+            "module_version": "0.2.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibProtoc-toolsVersion",
             "release": true,
             "dependents": []
         }

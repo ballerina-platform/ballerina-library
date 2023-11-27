@@ -15,17 +15,31 @@
 // under the License.
 
 import ballerina/http;
-import ballerina/regex;
 import ballerina/url;
 
-function getDashboardRow(Module module, string level) returns string|error {
-    string moduleName = module.name;
+isolated function getLibraryDashboardRow(Module module, string level) returns string|error {
+    string dashboardLine = check getDashboardRow(module);
+    return string `|${level}${dashboardLine}`;
+}
 
-    string defaultBranch = "";
-    string? branch = module.default_branch;
-    if branch is string {
-        defaultBranch = branch;
-    }
+isolated function getToolsDashboardRow(Module module) returns string|error {
+    string moduleName = module.name;
+    string defaultBranch = module.default_branch ?: "";
+
+    string repoLink = getRepoLink(moduleName);
+    string releaseBadge = getReleaseBadge(moduleName);
+    string buildStatusBadge = check getBuildStatusBadge(moduleName, defaultBranch);
+    string trivyBadge = check getTrivyBadge(moduleName, defaultBranch);
+    string codecovBadge = getCodecovBadge(moduleName, defaultBranch);
+    string bugsBadge = check getBugsBadge(moduleName);
+    string pullRequestsBadge = getPullRequestsBadge(moduleName);
+
+    return string `|${repoLink}|${releaseBadge}|${buildStatusBadge}|${trivyBadge}|${codecovBadge}|${bugsBadge}|${pullRequestsBadge}|`;
+}
+
+isolated function getDashboardRow(Module module) returns string|error {
+    string moduleName = module.name;
+    string defaultBranch = module.default_branch ?: "";
     string repoLink = getRepoLink(moduleName);
     string releaseBadge = getReleaseBadge(moduleName);
     string buildStatusBadge = check getBuildStatusBadge(moduleName, defaultBranch);
@@ -34,6 +48,7 @@ function getDashboardRow(Module module, string level) returns string|error {
     string bugsBadge = check getBugsBadge(moduleName);
     string pullRequestsBadge = getPullRequestsBadge(moduleName);
     string loadTestsBadge;
+
     // websub/websubhub load tests are in websubhub module, hence `websub` load-test badge should be same as `websubhub` load-test badge
     if moduleName == "module-ballerina-websub" {
         loadTestsBadge = check getLoadTestsBadge("module-ballerina-websubhub", "main");
@@ -42,21 +57,21 @@ function getDashboardRow(Module module, string level) returns string|error {
     }
 
     string balTestNativeBadge = check getBalTestNativeBadge(moduleName, defaultBranch);
-    return string `|${level}|${repoLink}|${releaseBadge}|${buildStatusBadge}|${trivyBadge}|${codecovBadge}|${bugsBadge}|${pullRequestsBadge}|${loadTestsBadge}|${balTestNativeBadge}|`;
+    return string `|${repoLink}|${releaseBadge}|${buildStatusBadge}|${trivyBadge}|${codecovBadge}|${bugsBadge}|${pullRequestsBadge}|${loadTestsBadge}|${balTestNativeBadge}|`;
 }
 
-function getRepoLink(string moduleName) returns string {
+isolated function getRepoLink(string moduleName) returns string {
     string shortName = getModuleShortName(moduleName);
     return string `[${shortName}](${BALLERINA_ORG_URL}/${moduleName})`;
 }
 
-function getReleaseBadge(string moduleName) returns string {
+isolated function getReleaseBadge(string moduleName) returns string {
     string badgeUrl = string `${GITHUB_BADGE_URL}/v/release/${BALLERINA_ORG_NAME}/${moduleName}?sort=semver&color=${BADGE_COLOR_GREEN}&label=`;
     string repoUrl = string `${BALLERINA_ORG_URL}/${moduleName}/releases`;
     return string `[![GitHub Release](${badgeUrl})](${repoUrl})`;
 }
 
-function getBuildStatusBadge(string moduleName, string defaultBranch) returns string|error {
+isolated function getBuildStatusBadge(string moduleName, string defaultBranch) returns string|error {
     string workflowName = WORKFLOW_MASTER_BUILD;
     string workflowFileUrl = string `/${BALLERINA_ORG_NAME}/${moduleName}/master/.github/workflows/${workflowName}`;
     http:Response openUrlResponse = check openUrl(GITHUB_RAW_LINK, workflowFileUrl);
@@ -68,7 +83,7 @@ function getBuildStatusBadge(string moduleName, string defaultBranch) returns st
     return string `[![Build](${badgeUrl})](${repoUrl})`;
 }
 
-function getTrivyBadge(string moduleName, string defaultBranch) returns string|error {
+isolated function getTrivyBadge(string moduleName, string defaultBranch) returns string|error {
     string workflowFileUrl = string `/${BALLERINA_ORG_NAME}/${moduleName}/master/.github/workflows/${WORKFLOW_TRIVY}`;
     http:Response openUrlResponse = check openUrl(GITHUB_RAW_LINK, workflowFileUrl);
     string badgeUrl = getGithubBadgeUrl(moduleName, WORKFLOW_TRIVY, defaultBranch, "");
@@ -79,13 +94,13 @@ function getTrivyBadge(string moduleName, string defaultBranch) returns string|e
     return string `[![Trivy](${badgeUrl})](${repoUrl})`;
 }
 
-function getCodecovBadge(string moduleName, string defaultBranch) returns string {
+isolated function getCodecovBadge(string moduleName, string defaultBranch) returns string {
     string badgeUrl = string `${CODECOV_BADGE_URL}/${BALLERINA_ORG_NAME}/${moduleName}/branch/${defaultBranch}/graph/badge.svg`;
     string repoUrl = string `${CODECOV_BADGE_URL}/${BALLERINA_ORG_NAME}/${moduleName}`;
     return string `[![CodeCov](${badgeUrl})](${repoUrl})`;
 }
 
-function getBugsBadge(string moduleName) returns string|error {
+isolated function getBugsBadge(string moduleName) returns string|error {
     string query = check getBugQuery(moduleName);
     string shortName = getModuleShortName(moduleName);
     string issueFilter = string `is:open label:module/${shortName} label:Type/Bug`;
@@ -97,7 +112,7 @@ function getBugsBadge(string moduleName) returns string|error {
     return string `[![Bugs](${badgeUrl})](${repoUrl})`;
 }
 
-function getBugQuery(string moduleName) returns string|error {
+isolated function getBugQuery(string moduleName) returns string|error {
     string shortName = getModuleShortName(moduleName);
     string labelColour = "";
     int issuesCount = -1;
@@ -121,14 +136,14 @@ function getBugQuery(string moduleName) returns string|error {
     return string `${encodedFilter}&label=&color=${labelColour}`;
 }
 
-function getPullRequestsBadge(string moduleName) returns string {
+isolated function getPullRequestsBadge(string moduleName) returns string {
     string badgeUrl = string `${GITHUB_BADGE_URL}/issues-pr-raw/${BALLERINA_ORG_NAME}/${moduleName}.svg?label=`;
     string repoUrl = string `${BALLERINA_ORG_URL}/${moduleName}/pulls`;
 
     return string `[![GitHub Pull Requests](${badgeUrl})](${repoUrl})`;
 }
 
-function getLoadTestsBadge(string moduleName, string defaultBranch) returns string|error {
+isolated function getLoadTestsBadge(string moduleName, string defaultBranch) returns string|error {
     string badgeUrl = getGithubBadgeUrl(moduleName, WORKFLOW_PROCESS_LOAD_TESTS, defaultBranch, "");
     string repoUrl = string `${BALLERINA_ORG_URL}/${moduleName}/actions/workflows/${WORKFLOW_PROCESS_LOAD_TESTS}`;
     string workflowFileUrl = string `/${BALLERINA_ORG_NAME}/${moduleName}/master/.github/workflows/${WORKFLOW_PROCESS_LOAD_TESTS}`;
@@ -140,7 +155,7 @@ function getLoadTestsBadge(string moduleName, string defaultBranch) returns stri
     return string `[![Load Tests](${badgeUrl})](${repoUrl})`;
 }
 
-function getBalTestNativeBadge(string moduleName, string defaultBranch) returns string|error {
+isolated function getBalTestNativeBadge(string moduleName, string defaultBranch) returns string|error {
     string badgeUrl = getGithubBadgeUrl(moduleName, WORKFLOW_BAL_TEST_NATIVE, defaultBranch, "");
     string repoUrl = string `${BALLERINA_ORG_URL}/${moduleName}/actions/workflows/${WORKFLOW_BAL_TEST_NATIVE}`;
     string workflowFileUrl = string `/${BALLERINA_ORG_NAME}/${moduleName}/master/.github/workflows/${WORKFLOW_BAL_TEST_NATIVE}`;
@@ -152,20 +167,24 @@ function getBalTestNativeBadge(string moduleName, string defaultBranch) returns 
     return string `[![GraalVM Check](${badgeUrl})](${repoUrl})`;
 }
 
-function getModuleShortName(string moduleName) returns string {
-    string shortName = regex:split(moduleName, "-")[2];
-    if shortName == "jballerina.java.arrays" {
-        return "java.arrays";
+isolated function getModuleShortName(string moduleName) returns string {
+    string[] nameSplit = re `-`.split(moduleName);
+    if nameSplit.length() == 3 {
+        string shortName = nameSplit[2];
+        if shortName == "jballerina.java.arrays" {
+            return "java.arrays";
+        }
+        return shortName;
     }
-    return shortName;
+    return moduleName; // Tools
 }
 
 // string formating
-function capitalize(string str) returns string {
+isolated function capitalize(string str) returns string {
     return str[0].toUpperAscii() + str.substring(1, str.length());
 }
 
-function getGithubBadgeUrl(string moduleName, string workflowFile, string defaultBranch, string? label = ()) returns string {
+isolated function getGithubBadgeUrl(string moduleName, string workflowFile, string defaultBranch, string? label = ()) returns string {
     string labelParameter = "";
     if label is string {
         labelParameter = "&label=" + label;
