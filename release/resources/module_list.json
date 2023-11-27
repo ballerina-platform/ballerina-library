@@ -22,9 +22,6 @@
             "name": "module-ballerina-ftp"
         },
         {
-            "name": "module-ballerinax-googleapis.gmail"
-        },
-        {
             "name": "module-ballerina-graphql"
         },
         {
@@ -37,22 +34,11 @@
             "name": "module-ballerina-io"
         },
         {
-            "name": "module-ballerinax-java.jdbc",
-            "version_key": "stdlibJdbcVersion"
-        },
-        {
-            "name": "module-ballerinax-java.jms",
-            "version_key": "stdlibJmsVersion"
-        },
-        {
             "name": "module-ballerina-jballerina.java.arrays",
             "version_key": "stdlibJavaArraysVersion"
         },
         {
             "name": "module-ballerina-jwt"
-        },
-        {
-            "name": "module-ballerinax-kafka"
         },
         {
             "name": "module-ballerina-log"
@@ -68,20 +54,8 @@
             "name": "module-ballerina-mqtt"
         },
         {
-            "name": "module-ballerinax-mssql"
-        },
-        {
-            "name": "module-ballerinax-mysql"
-        },
-        {
-            "name": "module-ballerinax-nats"
-        },
-        {
             "name": "module-ballerina-oauth2",
             "version_key": "stdlibOAuth2Version"
-        },
-        {
-            "name": "module-ballerinax-oracledb"
         },
         {
             "name": "module-ballerina-os"
@@ -90,25 +64,7 @@
             "name": "module-ballerina-persist"
         },
         {
-            "name": "module-ballerinax-persist.googlesheets",
-            "version_key": "stdlibPersistGoogleSheetVersion"
-        },
-        {
-            "name": "module-ballerinax-persist.inmemory",
-            "version_key": "stdlibPersistInmemoryVersion"
-        },
-        {
-            "name": "module-ballerinax-persist.sql",
-            "version_key": "stdlibPersistSqlVersion"
-        },
-        {
-            "name": "module-ballerinax-postgresql"
-        },
-        {
             "name": "module-ballerina-protobuf"
-        },
-        {
-            "name": "module-ballerinax-rabbitmq"
         },
         {
             "name": "module-ballerina-random"
@@ -160,6 +116,74 @@
         },
         {
             "name": "module-ballerina-yaml"
+        }
+    ],
+    "extendedModules": [
+        {
+            "name": "module-ballerinax-copybook"
+        },
+        {
+            "name": "module-ballerinax-persist.googlesheets",
+            "version_key": "stdlibPersistGoogleSheetVersion"
+        },
+        {
+            "name": "module-ballerinax-persist.inmemory",
+            "version_key": "stdlibPersistInmemoryVersion"
+        },
+        {
+            "name": "module-ballerinax-persist.sql",
+            "version_key": "stdlibPersistSqlVersion"
+        }
+    ],
+    "connectors": [
+        {
+            "name": "module-ballerinax-googleapis.gmail"
+        },
+        {
+            "name": "module-ballerinax-java.jdbc",
+            "version_key": "stdlibJdbcVersion"
+        },
+        {
+            "name": "module-ballerinax-java.jms",
+            "version_key": "stdlibJmsVersion"
+        },
+        {
+            "name": "module-ballerinax-kafka"
+        },
+        {
+            "name": "module-ballerinax-mssql"
+        },
+        {
+            "name": "module-ballerinax-mysql"
+        },
+        {
+            "name": "module-ballerinax-nats"
+        },
+        {
+            "name": "module-ballerinax-oracledb"
+        },
+        {
+            "name": "module-ballerinax-postgresql"
+        },
+        {
+            "name": "module-ballerinax-rabbitmq"
+        }
+    ],
+    "tools": [
+        {
+            "name": "asyncapi-tools"
+        },
+        {
+            "name": "copybook-tools"
+        },
+        {
+            "name": "graphql-tools"
+        },
+        {
+            "name": "openapi-tools"
+        },
+        {
+            "name": "protoc-tools"
         }
     ]
 }

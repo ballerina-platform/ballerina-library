@@ -49,10 +49,19 @@ const NABADGE = "https://img.shields.io/badge/-N%2FA-yellow";
 
 // README Contents
 const DASHBOARD_TITLE = "## Status Dashboard";
-const README_HEADER = "| Level | Modules | Latest Version | Build | Security Check | Code Coverage | Bugs | Open PRs | Load Test Results | GraalVM Check |\n";
-const README_HEADER_SEPARATOR = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n";
-const BAL_TITLE = "## Ballerina Modules";
-const BALX_TITLE = "## Ballerina Extended Modules";
+const LIBRARY_DASHBOARD_HEDER = "| Level | Name | Latest Version | Build | Security Check | Code Coverage | Bugs | Open PRs | Load Test Results | GraalVM Check |";
+const EXTENDED_DASHBOARD_HEDER = "| Name | Latest Version | Build | Security Check | Code Coverage | Bugs | Open PRs | Load Test Results | GraalVM Check |";
+const CONNECTOR_DASHBOARD_HEDER = "| Name | Latest Version | Build | Security Check | Code Coverage | Bugs | Open PRs | Load Test Results | GraalVM Check |";
+const TOOLS_DASHBOARD_HEDER = "| Name | Latest Version | Build | Security Check | Code Coverage | Bugs | Open PRs |";
+
+const LIBRARY_HEADER_SEPARATOR = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n";
+const HEADER_SEPARATOR = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n";
+const TOOLS_HEADER_SEPARATOR = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n";
+
+const BAL_TITLE = "### Ballerina Modules";
+const BALX_TITLE = "### Ballerina Extended Modules";
+const CONNECTOR_TITLE = "### Ballerina Connector Modules";
+const TOOLS_TITLE = "### Ballerina Tools";
 
 // Workflow files
 const WORKFLOW_MASTER_BUILD = "build-timestamped-master.yml";

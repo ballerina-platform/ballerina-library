@@ -1,15 +1,6 @@
 {
     "modules": [
         {
-            "name": "module-ballerinax-googleapis.gmail",
-            "module_version": "4.0.0-SNAPSHOT",
-            "level": 1,
-            "default_branch": "master",
-            "version_key": "stdlibGoogleapis.gmailVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
             "name": "module-ballerina-io",
             "module_version": "1.6.1-SNAPSHOT",
             "level": 1,
@@ -85,8 +76,7 @@
             "version_key": "stdlibConstraintVersion",
             "release": true,
             "dependents": [
-                "module-ballerina-cache",
-                "module-ballerinax-nats"
+                "module-ballerina-cache"
             ]
         },
         {
@@ -99,7 +89,6 @@
             "dependents": [
                 "module-ballerina-auth",
                 "module-ballerina-jwt",
-                "module-ballerinax-nats",
                 "module-ballerina-oauth2",
                 "module-ballerina-tcp",
                 "module-ballerina-uuid"
@@ -116,11 +105,9 @@
                 "module-ballerina-auth",
                 "module-ballerina-file",
                 "module-ballerina-ftp",
-                "module-ballerinax-java.jms",
                 "module-ballerina-jwt",
                 "module-ballerina-mime",
                 "module-ballerina-mqtt",
-                "module-ballerinax-nats",
                 "module-ballerina-oauth2",
                 "module-ballerina-tcp",
                 "module-ballerina-udp"
@@ -144,11 +131,7 @@
             "default_branch": "main",
             "version_key": "stdlibPersistVersion",
             "release": true,
-            "dependents": [
-                "module-ballerinax-persist.googlesheets",
-                "module-ballerinax-persist.inmemory",
-                "module-ballerinax-persist.sql"
-            ]
+            "dependents": []
         },
         {
             "name": "module-ballerina-protobuf",
@@ -170,9 +153,7 @@
             "release": true,
             "dependents": [
                 "module-ballerina-grpc",
-                "module-ballerinax-kafka",
                 "module-ballerina-mqtt",
-                "module-ballerinax-rabbitmq",
                 "module-ballerina-soap",
                 "module-ballerina-websub",
                 "module-ballerina-websubhub"
@@ -249,24 +230,6 @@
             ]
         },
         {
-            "name": "module-ballerinax-nats",
-            "module_version": "2.10.1-SNAPSHOT",
-            "level": 3,
-            "default_branch": "master",
-            "version_key": "stdlibNatsVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerinax-persist.inmemory",
-            "module_version": "1.2.1-SNAPSHOT",
-            "level": 3,
-            "default_branch": "main",
-            "version_key": "stdlibPersistInmemoryVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
             "name": "module-ballerina-tcp",
             "module_version": "1.9.2-SNAPSHOT",
             "level": 3,
@@ -293,7 +256,6 @@
             "release": true,
             "dependents": [
                 "module-ballerina-grpc",
-                "module-ballerinax-java.jms",
                 "module-ballerina-mqtt",
                 "module-ballerinai-transaction",
                 "module-ballerina-websocket",
@@ -318,15 +280,6 @@
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibEmailVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerinax-java.jms",
-            "module_version": "1.0.1-SNAPSHOT",
-            "level": 4,
-            "default_branch": "master",
-            "version_key": "stdlibJmsVersion",
             "release": true,
             "dependents": []
         },
@@ -411,9 +364,6 @@
             "version_key": "stdlibTransactionVersion",
             "release": true,
             "dependents": [
-                "module-ballerinax-kafka",
-                "module-ballerinax-persist.googlesheets",
-                "module-ballerinax-rabbitmq",
                 "module-ballerina-soap",
                 "module-ballerina-sql"
             ]
@@ -457,33 +407,6 @@
             "dependents": []
         },
         {
-            "name": "module-ballerinax-kafka",
-            "module_version": "3.10.1-SNAPSHOT",
-            "level": 7,
-            "default_branch": "master",
-            "version_key": "stdlibKafkaVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerinax-persist.googlesheets",
-            "module_version": "1.2.0-SNAPSHOT",
-            "level": 7,
-            "default_branch": "main",
-            "version_key": "stdlibPersistGoogleSheetVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerinax-rabbitmq",
-            "module_version": "2.10.1-SNAPSHOT",
-            "level": 7,
-            "default_branch": "master",
-            "version_key": "stdlibRabbitmqVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
             "name": "module-ballerina-soap",
             "module_version": "0.9.1-SNAPSHOT",
             "level": 7,
@@ -499,71 +422,203 @@
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
             "release": true,
-            "dependents": [
-                "module-ballerinax-java.jdbc",
-                "module-ballerinax-mssql",
-                "module-ballerinax-mysql",
-                "module-ballerinax-oracledb",
-                "module-ballerinax-postgresql"
-            ]
-        },
-        {
-            "name": "module-ballerinax-java.jdbc",
-            "module_version": "1.11.1-SNAPSHOT",
-            "level": 8,
-            "default_branch": "master",
-            "version_key": "stdlibJdbcVersion",
-            "release": true,
             "dependents": []
-        },
+        }
+    ],
+    "extendedModules": [
         {
-            "name": "module-ballerinax-mssql",
-            "module_version": "1.11.2-SNAPSHOT",
-            "level": 8,
+            "name": "module-ballerinax-copybook",
+            "module_version": "0.1.3-SNAPSHOT",
+            "level": 1,
             "default_branch": "main",
-            "version_key": "stdlibMssqlVersion",
+            "version_key": "stdlibCopybookVersion",
             "release": true,
-            "dependents": [
-                "module-ballerinax-persist.sql"
-            ]
+            "dependents": [],
+            "gradle_properties": "org.gradle.caching=true\ngroup=io.ballerina.lib\nversion=0.1.3-SNAPSHOT\nballerinaLangVersion=2201.8.0\n\ncheckstylePluginVersion=10.12.0\nspotbugsPluginVersion=5.0.14\nshadowJarPluginVersion=8.1.1\ndownloadPluginVersion=5.4.0\nreleasePluginVersion=2.8.0\ntestngVersion=7.6.1\neclipseLsp4jVersion=0.12.0\nballerinaGradlePluginVersion=2.1.6\nextraJavaModuleInfoPluginVersion=1.5\njacocoVersion=0.8.10\n\nantlrVersion=4.13.1\n"
         },
         {
-            "name": "module-ballerinax-mysql",
-            "module_version": "1.11.1-SNAPSHOT",
-            "level": 8,
-            "default_branch": "master",
-            "version_key": "stdlibMysqlVersion",
-            "release": true,
-            "dependents": [
-                "module-ballerinax-persist.sql"
-            ]
-        },
-        {
-            "name": "module-ballerinax-oracledb",
-            "module_version": "1.11.1-SNAPSHOT",
-            "level": 8,
+            "name": "module-ballerinax-persist.googlesheets",
+            "module_version": "1.2.0-SNAPSHOT",
+            "level": 1,
             "default_branch": "main",
-            "version_key": "stdlibOracledbVersion",
+            "version_key": "stdlibPersistGoogleSheetVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "gradle_properties": "group=io.ballerina.stdlib\nversion=1.2.0-SNAPSHOT\n\npuppycrawlCheckstyleVersion=10.12.1\ncheckstyleToolVersion=10.12.1\ngithubSpotbugsVersion=5.0.14\ngithubJohnrengelmanShadowVersion=8.1.1\nunderCouchDownloadVersion=5.4.0\nresearchgateReleaseVersion=2.8.0\ntestngVersion=7.6.1\ngsonVersion=2.10\nballerinaGradlePluginVersion=2.0.1\n\nballerinaLangVersion=2201.8.0-20230726-145300-b2bdf796\n\n# Direct Dependencies\n\n# Level 01\nstdlibIoVersion=1.6.0-20230810-115500-2e569f5\nstdlibTimeVersion=2.4.0-20230810-115600-b28bb07\nstdlibUrlVersion=2.4.0-20230810-111000-683c6e4\n\n# Level 02\nstdlibLogVersion=2.9.0-20230810-161500-6d3d1df\nstdlibOsVersion=1.8.0-20230810-161400-624a2aa\n\n# Level 03\nstdlibFileVersion=1.9.0-20230811-093200-875a787\n\n# Level 05\nstdlibHttpVersion=2.10.0-20230811-144100-cac5d57\n\n# Level 08\nstdlibPersistVersion=1.2.0-20230810-161400-f232e8d\n\n# Ballerinax Observer\nobserveVersion=1.2.0-20230810-105500-5841859\nobserveInternalVersion=1.2.0-20230810-141300-a348751\n\n# Transitive Dependencies\n# Level 01\nstdlibConstraintVersion=1.4.0-20230810-133100-e09cfc1\n\n#Level 02\nstdlibCryptoVersion=2.5.0-20230810-124300-ddf6788\nstdlibTaskVersion=2.5.0-20230810-145800-b191831\n\n# Level 03\nstdlibCacheVersion=3.7.0-20230811-093200-b83e72c\nstdlibMimeVersion=2.9.0-20230810-183500-af95101\nstdlibUuidVersion=1.7.0-20230811-093200-dc65fdd\n\n# Level 04\nstdlibAuthVersion=2.10.0-20230811-110600-2428623\nstdlibJwtVersion=2.10.0-20230811-114700-d48ab2f\nstdlibOAuth2Version=2.10.0-20230811-111300-5550652\n\n# Level 06\nstdlibTransactionVersion=1.8.0-20230814-091700-0011487\n\n# Enabled publishing insecure checksums, due to fail to publish to maven central\n# Refer https:\/\/github.com\/gradle\/gradle\/issues\/11308\nsystemProp.org.gradle.internal.publish.checksums.insecure=true\n"
         },
         {
-            "name": "module-ballerinax-postgresql",
-            "module_version": "1.11.1-SNAPSHOT",
-            "level": 8,
+            "name": "module-ballerinax-persist.inmemory",
+            "module_version": "1.2.1-SNAPSHOT",
+            "level": 1,
             "default_branch": "main",
-            "version_key": "stdlibPostgresqlVersion",
+            "version_key": "stdlibPersistInmemoryVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "gradle_properties": "group=io.ballerina.stdlib\nversion=1.2.1-SNAPSHOT\n\npuppycrawlCheckstyleVersion=10.12.0\ncheckstyleToolVersion=10.12.0\ngithubSpotbugsVersion=5.0.14\ngithubJohnrengelmanShadowVersion=8.1.1\nunderCouchDownloadVersion=5.4.0\nresearchgateReleaseVersion=2.8.0\ntestngVersion=7.6.1\ngsonVersion=2.10\nballerinaGradlePluginVersion=2.0.1\n\nballerinaLangVersion=2201.8.0\n\n# Direct Dependencies\n\n# Level 01\nstdlibTimeVersion=2.4.0\n\n# Level 08\nstdlibPersistVersion=1.2.0\n\n# Ballerinax Observer\nobserveVersion=1.2.0\nobserveInternalVersion=1.2.0\n\n# Enabled publishing insecure checksums, due to fail to publish to maven central\n# Refer https:\/\/github.com\/gradle\/gradle\/issues\/11308\nsystemProp.org.gradle.internal.publish.checksums.insecure=true\n"
         },
         {
             "name": "module-ballerinax-persist.sql",
             "module_version": "1.2.1-SNAPSHOT",
-            "level": 9,
+            "level": 1,
             "default_branch": "main",
             "version_key": "stdlibPersistSqlVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "gradle_properties": "group=io.ballerina.stdlib\nversion=1.2.1-SNAPSHOT\n\npuppycrawlCheckstyleVersion=10.12.1\ncheckstyleToolVersion=10.12.1\ngithubSpotbugsVersion=5.0.14\ngithubJohnrengelmanShadowVersion=8.1.1\nunderCouchDownloadVersion=5.4.0\nresearchgateReleaseVersion=2.8.0\ntestngVersion=7.6.1\ngsonVersion=2.10\nballerinaGradlePluginVersion=2.0.1\njacocoVersion=0.8.10\n\nballerinaLangVersion=2201.8.0\n\n# Direct Dependencies\n# Level 01\nstdlibIoVersion=1.6.0\nstdlibTimeVersion=2.4.0\nstdlibUrlVersion=2.4.0\n\n# Level 02\nstdlibLogVersion=2.9.0\nstdlibOsVersion=1.8.0\n\n# Level 03\nstdlibFileVersion=1.9.0\n\n# Level 05\nstdlibHttpVersion=2.10.0\n\n# Level 08\nstdlibSqlVersion=1.11.0\n\n# Level 09\nstdlibPersistVersion=1.2.0\n\n# Ballerina external dependency\nstdlibMysqlDriverVersion=1.5.0\nstdlibMssqlDriverVersion=1.5.0\n\n# Ballerinax Observer\nobserveVersion=1.2.0\nobserveInternalVersion=1.2.0\n\n# Transitive Dependencies\n# Level 01\nstdlibConstraintVersion=1.4.0\n\n#Level 02\nstdlibCryptoVersion=2.5.0\nstdlibTaskVersion=2.5.0\n\n# Level 03\nstdlibCacheVersion=3.7.0\nstdlibMimeVersion=2.9.0\nstdlibUuidVersion=1.7.0\n\n# Level 04\nstdlibAuthVersion=2.10.0\nstdlibJwtVersion=2.10.0\nstdlibOAuth2Version=2.10.0\n\n# Level 06\nstdlibTransactionVersion=1.8.0\n\n# Test Dependencies\nstdlibMysqlVersion=1.11.0\nstdlibMssqlVersion=1.11.0\n\n\n# Enabled publishing insecure checksums, due to fail to publish to maven central\n# Refer https:\/\/github.com\/gradle\/gradle\/issues\/11308\nsystemProp.org.gradle.internal.publish.checksums.insecure=true\n"
+        }
+    ],
+    "connectors": [
+        {
+            "name": "module-ballerinax-googleapis.gmail",
+            "module_version": "4.0.0-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibGoogleapis.gmailVersion",
+            "release": true,
+            "dependents": [],
+            "gradle_properties": "org.gradle.caching=true\ngroup=io.ballerina.stdlib\nversion=4.0.0-SNAPSHOT\n\ncheckstylePluginVersion=10.12.0\nspotbugsPluginVersion=5.0.14\nshadowJarPluginVersion=8.1.1\ndownloadPluginVersion=5.4.0\nreleasePluginVersion=2.8.0\ntestngVersion=7.6.1\neclipseLsp4jVersion=0.12.0\nballerinaGradlePluginVersion=2.1.8\n"
+        },
+        {
+            "name": "module-ballerinax-java.jdbc",
+            "module_version": "1.11.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibJdbcVersion",
+            "release": true,
+            "dependents": [],
+            "gradle_properties": "group=io.ballerina.stdlib\nversion=1.11.1-SNAPSHOT\n\npuppycrawlCheckstyleVersion=10.12.1\ncheckstyleToolVersion=10.12.1\ngithubSpotbugsVersion=5.0.14\ngithubJohnrengelmanShadowVersion=8.1.1\nunderCouchDownloadVersion=5.4.0\nresearchgateReleaseVersion=2.8.0\nballerinaGradlePluginVersion=2.0.1\ntestngVersion=7.6.1\nh2DriverVersion=2.2.220\n\nballerinaLangVersion=2201.8.0\n\nstdlibSqlVersion=1.11.0\n\n# Direct Dependencies\n# Level 01\nstdlibIoVersion=1.6.0\nstdlibTimeVersion=2.4.0\n\n# Level 02\nstdlibLogVersion=2.9.0\nstdlibOsVersion=1.8.0\n\n# Level 03\nstdlibFileVersion=1.9.0\n\n# Ballerinax Observer\nobserveVersion=1.2.0\nobserveInternalVersion=1.2.0\n\n# Transitive Dependencies\n# Level 01\nstdlibConstraintVersion=1.4.0\nstdlibUrlVersion=2.4.0\n\n# Level 02\nstdlibCryptoVersion=2.5.0\nstdlibTaskVersion=2.5.0\n\n# Level 03\nstdlibCacheVersion=3.7.0\nstdlibMimeVersion=2.9.0\nstdlibUuidVersion=1.7.0\n\n# Level 04\nstdlibAuthVersion=2.10.0\nstdlibJwtVersion=2.10.0\nstdlibOAuth2Version=2.10.0\n\n# Level 05\nstdlibHttpVersion=2.10.0\n\n# Level 06\nstdlibTransactionVersion=1.8.0\n\n# Ballerina extended library\nstdlibH2DriverVersion=1.1.0\n"
+        },
+        {
+            "name": "module-ballerinax-java.jms",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibJmsVersion",
+            "release": true,
+            "dependents": [],
+            "gradle_properties": "org.gradle.caching=true\ngroup=io.ballerina.stdlib\nversion=1.0.1-SNAPSHOT\nballerinaLangVersion=2201.8.0\n\ncheckstylePluginVersion=10.12.1\nspotbugsPluginVersion=5.0.14\nshadowJarPluginVersion=8.1.1\ndownloadPluginVersion=5.4.0\nreleasePluginVersion=2.8.0\nballerinaGradlePluginVersion=2.0.1\n\n# JMS dependencies\njavaxJmsVersion=2.0.1\nslf4jVersion=2.0.7\n\n# Test dependenices\nactiveMQDriverVersion=1.0.0-20230817-164000-786c647\n\n#stdlib dependencies\n\n# Level 01\nstdlibTimeVersion=2.4.0\nstdlibIoVersion=1.6.0\n\n# Level 02\nstdlibLogVersion=2.9.0\nstdlibCryptoVersion=2.5.0\n\n# Level 03\nstdlibUuidVersion=1.7.0\n\nobserveVersion=1.2.0\nobserveInternalVersion=1.2.0\n"
+        },
+        {
+            "name": "module-ballerinax-kafka",
+            "module_version": "3.10.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibKafkaVersion",
+            "release": true,
+            "dependents": [],
+            "gradle_properties": "org.gradle.caching=true\ngroup=io.ballerina.stdlib\nversion=3.10.1-SNAPSHOT\nkafkaVersion=3.5.1\nballerinaLangVersion=2201.8.0\nballerinaGradlePluginVersion=2.0.1\n\npuppycrawlCheckstyleVersion=10.12.1\nawaitalityVersion=3.1.6\nslf4jVersion=1.7.30\ntestngVersion=7.6.1\ngsonVersion=2.8.8\njacocoVersion=0.8.10\n\nstdlibIoVersion=1.6.0\nstdlibTimeVersion=2.4.0\nstdlibUrlVersion=2.4.0\n\nstdlibConstraintVersion=1.4.0\nstdlibCryptoVersion=2.5.0\nstdlibLogVersion=2.9.0\nstdlibOsVersion=1.8.0\nstdlibRandomVersion=1.5.0\nstdlibTaskVersion=2.5.0\n\nstdlibCacheVersion=3.7.0\nstdlibFileVersion=1.9.0\nstdlibMimeVersion=2.9.0\nstdlibUuidVersion=1.7.0\n\nstdlibAuthVersion=2.10.0\nstdlibJwtVersion=2.10.0\nstdlibOAuth2Version=2.10.0\n\nstdlibHttpVersion=2.10.0\n\nstdlibTransactionVersion=1.8.0\n\n# Ballerinax Observer\nobserveVersion=1.2.0\nobserveInternalVersion=1.2.0\n"
+        },
+        {
+            "name": "module-ballerinax-mssql",
+            "module_version": "1.11.2-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibMssqlVersion",
+            "release": true,
+            "dependents": [],
+            "gradle_properties": "group=io.ballerina.stdlib\nversion=1.11.2-SNAPSHOT\n\npuppycrawlCheckstyleVersion=10.12.0\nmsSQLDriverVersion=10.2.0.jre17\ncheckstyleToolVersion=10.12.0\ngithubSpotbugsVersion=5.0.14\ngithubJohnrengelmanShadowVersion=8.1.0\nunderCouchDownloadVersion=5.4.0\nresearchgateReleaseVersion=2.8.0\ntestngVersion=7.6.1\nballerinaGradlePluginVersion=2.0.1\n\nballerinaLangVersion=2201.8.0\n\nstdlibSqlVersion=1.11.0\n\n# Direct Dependencies\n# Level 01\nstdlibIoVersion=1.6.0\nstdlibTimeVersion=2.4.0\n\n# Level 02\nstdlibLogVersion=2.9.0\nstdlibOsVersion=1.8.0\n\n# Level 03\nstdlibFileVersion=1.9.0\n\n# Ballerinax Observer\nobserveVersion=1.2.0\nobserveInternalVersion=1.2.0\n\n# Transitive Dependencies\n# Level 01\nstdlibConstraintVersion=1.4.0\nstdlibUrlVersion=2.4.0\n\n# Level 02\nstdlibCryptoVersion=2.5.0\nstdlibTaskVersion=2.5.0\n\n# Level 03\nstdlibCacheVersion=3.7.0\nstdlibMimeVersion=2.9.0\nstdlibUuidVersion=1.7.0\n\n# Level 04\nstdlibAuthVersion=2.10.0\nstdlibJwtVersion=2.10.0\nstdlibOAuth2Version=2.10.0\n\n# Level 05\nstdlibHttpVersion=2.10.0\n\n# Level 06\nstdlibTransactionVersion=1.8.0\n\n# Ballerina library\nstdlibMssqlDriverVersion=1.6.0\n\n"
+        },
+        {
+            "name": "module-ballerinax-mysql",
+            "module_version": "1.11.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibMysqlVersion",
+            "release": true,
+            "dependents": [],
+            "gradle_properties": "group=io.ballerina.stdlib\nversion=1.11.1-SNAPSHOT\n\npuppycrawlCheckstyleVersion=10.12.0\ncheckstyleToolVersion=10.12.0\ngithubSpotbugsVersion=5.0.14\ngithubJohnrengelmanShadowVersion=8.1.0\nunderCouchDownloadVersion=5.4.0\nresearchgateReleaseVersion=2.8.0\ntestngVersion=7.6.1\nballerinaGradlePluginVersion=2.0.1\n\nballerinaLangVersion=2201.8.0\n\nstdlibSqlVersion=1.11.0\n\n# Direct Dependencies\n# Level 01\nstdlibIoVersion=1.6.0\nstdlibTimeVersion=2.4.0\n\n# Level 02\nstdlibLogVersion=2.9.0\nstdlibOsVersion=1.8.0\n\n# Level 03\nstdlibFileVersion=1.9.0\n\n# Ballerinax Observer\nobserveVersion=1.2.0\nobserveInternalVersion=1.2.0\n\n# Transitive Dependencies\n# Level 01\nstdlibConstraintVersion=1.4.0\nstdlibUrlVersion=2.4.0\n\n# Level 02\nstdlibCryptoVersion=2.5.0\nstdlibTaskVersion=2.5.0\n\n# Level 03\nstdlibCacheVersion=3.7.0\nstdlibMimeVersion=2.9.0\nstdlibUuidVersion=1.7.0\n\n# Level 04\nstdlibAuthVersion=2.10.0\nstdlibJwtVersion=2.10.0\nstdlibOAuth2Version=2.10.0\n\n# Level 05\nstdlibHttpVersion=2.10.0\n\n# Level 06\nstdlibTransactionVersion=1.8.0\n\n# Ballerina library\nstdlibMysqlDriverVersion=1.5.0\n"
+        },
+        {
+            "name": "module-ballerinax-nats",
+            "module_version": "2.10.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibNatsVersion",
+            "release": true,
+            "dependents": [],
+            "gradle_properties": "org.gradle.caching=true\ngroup=io.ballerina.stdlib\n\nversion=2.10.1-SNAPSHOT\nballerinaLangVersion=2201.8.0\nballerinaGradlePluginVersion=2.0.1\n\nnatsVersion=2.16.0\npuppycrawlCheckstyleVersion=10.12.1\ntestngVersion=7.6.1\ngsonVersion=2.8.8\n\nstdlibIoVersion=1.6.0\nstdlibTimeVersion=2.4.0\n\nstdlibConstraintVersion=1.4.0\nstdlibLogVersion=2.9.0\nstdlibCryptoVersion=2.5.0\n\nobserveVersion=1.2.0\nobserveInternalVersion=1.2.0\n\njacocoVersion=0.8.10\n"
+        },
+        {
+            "name": "module-ballerinax-oracledb",
+            "module_version": "1.11.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibOracledbVersion",
+            "release": true,
+            "dependents": [],
+            "gradle_properties": "group=io.ballerina.stdlib\nversion=1.11.1-SNAPSHOT\n\npuppycrawlCheckstyleVersion=10.12.1\noracleDBDriverVersion=23.2.0.0\ncheckstyleToolVersion=10.12.1\ngithubSpotbugsVersion=5.0.14\ngithubJohnrengelmanShadowVersion=8.1.1\nunderCouchDownloadVersion=5.4.0\nresearchgateReleaseVersion=2.8.0\ntestngVersion=7.6.1\nballerinaGradlePluginVersion=2.0.1\n\nballerinaLangVersion=2201.8.0\n\nstdlibSqlVersion=1.11.0\n\n# Direct Dependencies\n# Level 01\nstdlibIoVersion=1.6.0\nstdlibTimeVersion=2.4.0\n\n# Level 02\nstdlibLogVersion=2.9.0\nstdlibOsVersion=1.8.0\n\n# Level 03\nstdlibFileVersion=1.9.0\n\n# Ballerinax Observer\nobserveVersion=1.2.0\nobserveInternalVersion=1.2.0\n\n# Transitive Dependencies\n# Level 01\nstdlibConstraintVersion=1.4.0\nstdlibUrlVersion=2.4.0\n\n# Level 02\nstdlibCryptoVersion=2.5.0\nstdlibTaskVersion=2.5.0\n\n# Level 03\nstdlibCacheVersion=3.7.0\nstdlibMimeVersion=2.9.0\nstdlibUuidVersion=1.7.0\n\n# Level 04\nstdlibAuthVersion=2.10.0\nstdlibJwtVersion=2.10.0\nstdlibOAuth2Version=2.10.0\n\n# Level 05\nstdlibHttpVersion=2.10.0\n\n# Level 06\nstdlibTransactionVersion=1.8.0\n\n# Ballerina extended library\nstdlibOracledbDriverVersion=1.4.0\n"
+        },
+        {
+            "name": "module-ballerinax-postgresql",
+            "module_version": "1.11.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibPostgresqlVersion",
+            "release": true,
+            "dependents": [],
+            "gradle_properties": "group=io.ballerina.stdlib\nversion=1.11.1-SNAPSHOT\n\npuppycrawlCheckstyleVersion=10.12.1\npostgreSQLDriverVersion=42.6.0\ncheckstyleToolVersion=10.12.1\ngithubSpotbugsVersion=5.0.14\ngithubJohnrengelmanShadowVersion=8.1.1\nunderCouchDownloadVersion=5.4.0\nresearchgateReleaseVersion=2.8.0\ntestngVersion=7.6.1\nballerinaGradlePluginVersion=2.0.1\n\nballerinaLangVersion=2201.8.0\n\nstdlibSqlVersion=1.11.0\n\n# Direct Dependencies\n# Level 01\nstdlibIoVersion=1.6.0\nstdlibTimeVersion=2.4.0\n\n# Level 02\nstdlibLogVersion=2.9.0\nstdlibOsVersion=1.8.0\n\n# Level 03\nstdlibFileVersion=1.9.0\n\n# Ballerinax Observer\nobserveVersion=1.2.0\nobserveInternalVersion=1.2.0\n\n# Transitive Dependencies\n# Level 01\nstdlibConstraintVersion=1.4.0\nstdlibUrlVersion=2.4.0\n\n# Level 02\nstdlibCryptoVersion=2.5.0\nstdlibTaskVersion=2.5.0\n\n# Level 03\nstdlibCacheVersion=3.7.0\nstdlibMimeVersion=2.9.0\nstdlibUuidVersion=1.7.0\n\n# Level 04\nstdlibAuthVersion=2.10.0\nstdlibJwtVersion=2.10.0\nstdlibOAuth2Version=2.10.0\n\n# Level 05\nstdlibHttpVersion=2.10.0\n\n# Level 06\nstdlibTransactionVersion=1.8.0\n\n# Ballerina extended library\nstdlibPostgresqlDriverVersion=1.5.0\n"
+        },
+        {
+            "name": "module-ballerinax-rabbitmq",
+            "module_version": "2.10.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibRabbitmqVersion",
+            "release": true,
+            "dependents": [],
+            "gradle_properties": "org.gradle.caching=true\ngroup=io.ballerina.stdlib\nversion=2.10.1-SNAPSHOT\nballerinaLangVersion=2201.8.0\n\namqpClientVersion=5.18.0\npuppycrawlCheckstyleVersion=10.12.1\ntestngVersion=7.6.1\nballerinaGradlePluginVersion=2.0.1\n\ngsonVersion=2.8.8\n\n# stdlib dependencies\nstdlibIoVersion=1.6.0\nstdlibTimeVersion=2.4.0\nstdlibUrlVersion=2.4.0\n\nstdlibConstraintVersion=1.4.0\nstdlibCryptoVersion=2.5.0\nstdlibLogVersion=2.9.0\nstdlibOsVersion=1.8.0\nstdlibRandomVersion=1.5.0\nstdlibTaskVersion=2.5.0\n\nstdlibCacheVersion=3.7.0\nstdlibFileVersion=1.9.0\nstdlibMimeVersion=2.9.0\nstdlibUuidVersion=1.7.0\n\nstdlibAuthVersion=2.10.0\nstdlibJwtVersion=2.10.0\nstdlibOAuth2Version=2.10.0\n\nstdlibHttpVersion=2.10.0\n\nstdlibTransactionVersion=1.8.0\n\n# Ballerinax Observer\nobserveVersion=1.2.0\nobserveInternalVersion=1.2.0\n"
+        }
+    ],
+    "tools": [
+        {
+            "name": "asyncapi-tools",
+            "module_version": "0.7.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibAsyncapi-toolsVersion",
+            "release": true,
+            "dependents": [],
+            "gradle_properties": "org.gradle.caching=true\ngroup=io.ballerina\nversion=0.7.1-SNAPSHOT\n\n#dependency\nballerinaLangVersion=2201.8.3\ntestngVersion=7.6.1\nslf4jVersion=1.7.30\npuppycrawlCheckstyleVersion=10.12.0\njacksonDataformatYamlVersion=2.15.3\norg.gradle.jvmargs=-Xmx4096M\n\n# Stdlib Level 01\nstdlibIoVersion=1.6.0\nstdlibRegexVersion=1.4.3\nstdlibTimeVersion=2.4.0\nstdlibUrlVersion=2.4.0\nstdlibXmldataVersion=2.7.0\n\n# Stdlib Level 02\nstdlibCryptoVersion=2.5.0\nstdlibLogVersion=2.9.0\nstdlibOsVersion=1.8.0\nstdlibTaskVersion=2.5.0\n\n# Stdlib Level 03\nstdlibCacheVersion=3.7.0\nstdlibFileVersion=1.9.0\nstdlibMimeVersion=2.9.0\nstdlibUuidVersion=1.7.0\n\n# Stdlib Level 04\nstdlibAuthVersion=2.10.0\nstdlibJwtVersion=2.10.0\nstdlibOAuth2Version=2.10.0\n\n# Stdlib Level 05\nstdlibHttpVersion=2.10.0\n"
+        },
+        {
+            "name": "copybook-tools",
+            "module_version": "0.1.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibCopybook-toolsVersion",
+            "release": true,
+            "dependents": [],
+            "gradle_properties": "org.gradle.parallel=true\norg.gradle.caching=true\n\ngroup=io.ballerina\nversion=0.1.1-SNAPSHOT\n\nspotbugsPluginVersion=5.0.14\nreleasePluginVersion=2.8.0\ncheckstylePluginVersion=10.12.0\ndownloadPluginVersion=5.4.0\nballerinaLangVersion=2201.8.0\npicocliVersion=4.7.4\ntestngVersion=7.7.0\nslf4jVersion=2.0.9\nantlrVersion=4.13.1\njacocoVersion=0.8.10\n\n# Ballerinax\ncopybookParserVersion=0.1.1\n"
+        },
+        {
+            "name": "graphql-tools",
+            "module_version": "0.8.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibGraphql-toolsVersion",
+            "release": true,
+            "dependents": [],
+            "gradle_properties": "org.gradle.caching=true\ngroup=io.ballerina\nversion=0.8.1-SNAPSHOT\n\n#dependency\nballerinaLangVersion=2201.8.3-20231119-151400-9cb79da7\npuppycrawlCheckstyleVersion=10.12.1\ngithubJohnrengelmanShadowVersion=8.1.1\nunderCouchDownloadVersion=5.4.0\nresearchgateReleaseVersion=2.8.0\ntestngVersion=7.6.1\nslf4jVersion=1.7.30\ncommonsLang3Version=3.9\ncommonsLoggingVersion=1.2\ncommonsIoVersion=2.11.0\ngraphqlJavaVersion=17.2\nsnakeYamlVersion=2.0\norgJsonVersion=20231013\npicocliVersion=4.7.4\norg.gradle.jvmargs=-Xmx4096M\n\n# Standard Library Dependencies\n# Level 01\nstdlibIoVersion=1.6.0\nstdlibTimeVersion=2.4.0\nstdlibUrlVersion=2.4.0\n\n# Level 02\nstdlibConstraintVersion=1.4.0\nstdlibCryptoVersion=2.5.0\nstdlibLogVersion=2.9.0\nstdlibOsVersion=1.8.0\nstdlibTaskVersion=2.5.0\n\n# Level 03\nstdlibCacheVersion=3.7.0\nstdlibFileVersion=1.9.0\nstdlibMimeVersion=2.9.0\nstdlibUuidVersion=1.7.0\n\n# Level 04\nstdlibAuthVersion=2.10.0\nstdlibJwtVersion=2.10.0\nstdlibOAuth2Version=2.10.0\n\n# Level 05\nstdlibHttpVersion=2.10.4\n\n# Level 06\nstdlibWebsocketVersion=2.10.1\n\n# Level 07\nstdlibGraphqlVersion=1.10.0\n\n# Ballerinax Observer\nobserveVersion=1.2.0\nobserveInternalVersion=1.2.1\n"
+        },
+        {
+            "name": "openapi-tools",
+            "module_version": "1.9.0-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibOpenapi-toolsVersion",
+            "release": true,
+            "dependents": [],
+            "gradle_properties": "org.gradle.caching=true\ngroup=io.ballerina\nversion=1.9.0-SNAPSHOT\n\n#dependency\nballerinaLangVersion=2201.8.0\ntestngVersion=7.6.1\nslf4jVersion=1.7.30\norg.gradle.jvmargs=-Xmx4096M -Dfile.encoding=UTF-8\ncommonsLang3Version=3.9\ncommonsIoVersion=2.6\nnetLingalaZip4jVersion=2.8.0\njacocoVersion=0.8.10\nswaggerParserVersion=2.1.16\npuppycrawlCheckstyleVersion = 10.12.1\n\n# Stdlib Level 01\nstdlibIoVersion=1.6.0\nstdlibRegexVersion=1.4.3\nstdlibTimeVersion=2.4.0\nstdlibUrlVersion=2.4.0\nstdlibXmldataVersion=2.7.0\n\n# Stdlib Level 02\nstdlibConstraintVersion=1.4.0\nstdlibCryptoVersion=2.5.0\nstdlibLogVersion=2.9.0\nstdlibOsVersion=1.8.0\nstdlibTaskVersion=2.5.0\n\n# Stdlib Level 03\nstdlibCacheVersion=3.7.0\nstdlibFileVersion=1.9.0\nstdlibMimeVersion=2.9.0\nstdlibUuidVersion=1.7.0\n\n# Stdlib Level 04\nstdlibAuthVersion=2.10.0\nstdlibJwtVersion=2.10.0\nstdlibOAuth2Version=2.10.0\n\n# Stdlib Level 05\nstdlibHttpVersion=2.10.0\n\n# Stdlib Level 06\nstdlibGrpcVersion=1.10.0\nstdlibWebsocketVersion=2.10.0\nstdlibWebsubVersion=2.10.0\n\n# Stdlib Level 07\nstdlibGraphqlVersion=1.10.0\n\n# Ballerinax Observer\nobserveVersion=1.2.0\nobserveInternalVersion=1.2.0\n"
+        },
+        {
+            "name": "protoc-tools",
+            "module_version": "0.2.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibProtoc-toolsVersion",
+            "release": true,
+            "dependents": [],
+            "gradle_properties": "org.gradle.caching=true\ngroup=io.ballerina\nversion=0.2.1-SNAPSHOT\n#dependency versions\nballerinaLangVersion=2201.8.0\ncheckstylePluginVersion=10.12.1\ncommonsLang3Version=3.8.1\nslf4jVersion=1.7.30\nprotoGoogleCommonsVersion=1.17.0\nprotobufJavaVersion=3.23.4\npicocliVersion=4.0.1\ngithubSpotbugsVersion=5.0.14\ngithubJohnrengelmanShadowVersion=8.1.1\nunderCouchDownloadVersion=5.4.0\nresearchgateReleaseVersion=2.8.0\ntestngVersion=7.6.1\njacocoVersion=0.8.10\n\nstdlibGrpcVersion=1.10.0\nstdlibIoVersion=1.6.0\nstdlibTimeVersion=2.4.0\nstdlibUrlVersion=2.4.0\n\nstdlibConstraintVersion=1.4.0\nstdlibCryptoVersion=2.5.0\nstdlibLogVersion=2.9.0\nstdlibOsVersion=1.8.0\nstdlibProtobufVersion=1.6.0\nstdlibRandomVersion=1.5.0\nstdlibTaskVersion=2.5.0\n\nstdlibCacheVersion=3.7.0\nstdlibFileVersion=1.9.0\nstdlibMimeVersion=2.9.0\nstdlibUuidVersion=1.7.0\n\nstdlibAuthVersion=2.10.0\nstdlibJwtVersion=2.10.0\nstdlibOAuth2Version=2.10.0\n\nstdlibHttpVersion=2.10.0\n\n# Ballerinax Observer\nobserveVersion=1.2.0-20230911-133500-b3d8db3\nobserveInternalVersion=1.2.0-20230911-141700-4c0454a\n"
         }
     ]
 }

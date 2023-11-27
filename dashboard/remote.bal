@@ -45,6 +45,9 @@ github:ConnectionConfig config = {
 github:Client githubClient = check new (config);
 
 function getDefaultBranch(string moduleName) returns string|error {
+    // record { string default_branch; } response = check git->/repos/[BALLERINA_ORG_NAME]/[moduleName];
+    // return response.default_branch;
+
     stream<github:Branch, github:Error?> branches = check githubClient->getBranches(BALLERINA_ORG_NAME, moduleName);
     stream<github:Branch, github:Error?> filter = branches.filter(filterBranch);
 
@@ -69,7 +72,7 @@ function count(github:Issue issue) {
     issueCount += 1;
 }
 
-function openUrl(string page, string url) returns http:Response|error {
+isolated function openUrl(string page, string url) returns http:Response|error {
     http:Client httpClient = check new (page, config = {
         auth: {
             token: os:getEnv(BALLERINA_BOT_TOKEN)
