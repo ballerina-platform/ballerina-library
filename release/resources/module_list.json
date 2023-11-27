@@ -118,7 +118,7 @@
             "name": "module-ballerina-yaml"
         }
     ],
-    "extendedModules": [
+    "extended_modules": [
         {
             "name": "module-ballerinax-copybook"
         },

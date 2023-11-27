@@ -48,7 +48,7 @@ parser.add_argument('--keep-local-changes', action="store_true",
 parser.add_argument('--up-to-module', help="Build up to the specified module")
 parser.add_argument('--from-module', help="Build from the specified module")
 parser.add_argument(
-    '--module-list', help="Path to the module list JSON file. If not provided, the existing 'stdlib_modules.json' from the GitHub will be used")
+    '--module-list', help="Full path to the module list JSON file. If not provided, the existing 'stdlib_modules.json' from the GitHub will be used")
 parser.add_argument('--build-distribution', action="store_true",
                     help="If the distribution should be built on top of the changes been done. This has to be used with '--snapshots-build' to be affective")
 parser.add_argument(
@@ -57,6 +57,10 @@ parser.add_argument(
     '--skip-modules', help="To provide a list of modules to be skipped. Provide this as a comma separated list. Even a part of the module name will be sufficient")
 parser.add_argument('--continue-on-error', action="store_true",
                     help="Whether to continue the subsequent builds when a module build fails")
+parser.add_argument('--build-extended-modules', action="store_false", help="Set this flag to build Ballerina extended modules")
+parser.add_argument('--build-connectors', action="store_false", help="Set this flag to build Ballerina connectors")
+parser.add_argument('--build-tools', action="store_false", help="Set this flag to build Ballerina CLI tools")
+
 version_dict = {}
 
 
@@ -76,6 +80,10 @@ def main():
     skip_modules = []
     build_distribution = args.build_distribution
     continue_on_error = False
+    build_extended_modules = False
+    build_connectors = False
+    build_tools = False
+    is_custom_module_list = False
 
     print_block()
     print_info("Building Ballerina Library Modules")
@@ -136,6 +144,7 @@ def main():
 
     if args.module_list:
         if os.path.isfile(args.module_list):
+            is_custom_module_list = True
             print_info("Using provided custom module list JSON file")
             MODULE_LIST = args.module_list
         else:
@@ -165,12 +174,10 @@ def main():
             print_warn(
                 f'Skipping modules may result in build failures due to missing dependencies')
 
-    module_list = get_stdlib_module_list(build_distribution)
-
     if args.up_to_module:
         if build_distribution:
             print_error(
-                "'--build-distribution' and '--module' flags are mutually exclusive")
+                "'--build-distribution' and '--up-to-module' flags are mutually exclusive")
         up_to_module = get_required_module(args.up_to_module, module_list)
         print_info("Building up to the module: " + args.up_to_module)
 
@@ -178,7 +185,28 @@ def main():
         from_module = get_required_module(args.from_module, module_list)
         print_info("Building from the module: " + args.from_module)
 
+    if args.build_extended_modules:
+        build_extended_modules = True
+        print_info("Building Ballerina extended modules")
+    else:
+        print_info("Skipping Ballerina extended modules")
+
+    if args.build_connectors:
+        build_connectors = True
+        print_info("Building Ballerina connectors")
+    else:
+        print_info("Skipping Ballerina connectors")
+
+    if args.build_tools:
+        build_tools = True
+        print_info("Building Ballerina CLI tools")
+    else:
+        print_info("Skipping Ballerina CLI tools")
+
     start_build = False
+    module_list = get_stdlib_module_list(
+        build_distribution, build_extended_modules, build_connectors, build_tools, is_custom_module_list)
+
     for module in module_list:
         if not start_build and from_module and module[FIELD_NAME] != from_module:
             continue
@@ -309,20 +337,40 @@ def create_directory(directory_name):
     Path(directory_name).mkdir(parents=True, exist_ok=True)
 
 
-def get_stdlib_module_list(build_distribution):
+def get_stdlib_module_list(build_distribution, build_extended_modules, build_connectors, build_tools, is_custom_module_list):
     try:
-        data = open_file_from_url(MODULE_LIST)
+        data = None
+        if is_custom_module_list:
+            data = open(MODULE_LIST)
+        else:
+            data = open_file_from_url(MODULE_LIST)
         module_list = json.load(data)
+        modules = module_list["modules"]
 
         if build_distribution:
-            module_list["modules"].append({
+            modules.append({
                 'name': 'ballerina-distribution',
                 'default_branch': 'master'
             })
+
+        print("append extended modules")
+        if build_extended_modules:
+            print(module_list["extended_modules"])
+            modules = modules + module_list["extended_modules"]
+
+        print("append connectors")
+        if build_connectors:
+            modules = modules + module_list["connectors"]
+
+        print("append tools")
+        if build_tools:
+            modules = modules + module_list["tools"]
         return module_list["modules"]
     except Exception as e:
         print("Failed to read the module list JSON file: " + str(e))
         sys.exit()
+    finally:
+        data.close()
 
 
 def open_file_from_url(url):

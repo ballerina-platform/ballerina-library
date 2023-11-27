@@ -22,7 +22,7 @@ import thisarug/prettify;
 
 type List record {|
     Module[] modules;
-    Module[] extendedModules;
+    Module[] extended_modules;
     Module[] connectors;
     Module[] tools;
 |};
@@ -44,10 +44,16 @@ public function main() returns error? {
 
     check getImmediateDependencies(moduleDetails);
     check calculateLevels(moduleDetails);
-    Module[] sortedModules = moduleDetails.modules.sort(array:ASCENDING, a => a.level);
-    moduleDetails.modules = sortedModules;
-    check writeToFile(STDLIB_MODULES_JSON, moduleDetails);
-    check updateStdlibDashboard(moduleDetails);
+    moduleDetails.modules = moduleDetails.modules.sort(array:ASCENDING, a => a.level);
+
+    List filteredList = {
+        modules: removePropertiesFile(moduleDetails.modules),
+        extended_modules: removePropertiesFile(moduleDetails.extended_modules),
+        connectors: removePropertiesFile(moduleDetails.connectors),
+        tools: removePropertiesFile(moduleDetails.tools)
+    };
+    check writeToFile(STDLIB_MODULES_JSON, filteredList);
+    check updateStdlibDashboard(filteredList);
 }
 
 //  Sorts the Ballerina library module list in ascending order
@@ -57,7 +63,7 @@ function getSortedModuleNameList() returns List|error {
 
     List sortedList = {
         modules: sortModuleArray(moduleList.modules, 2),
-        extendedModules: sortModuleArray(moduleList.extendedModules, 2),
+        extended_modules: sortModuleArray(moduleList.extended_modules, 2),
         connectors: sortModuleArray(moduleList.connectors, 2),
         tools: sortModuleArray(moduleList.tools, 0)
     };
@@ -76,7 +82,7 @@ function sortModuleArray(Module[] moduleArray, int nameIndex) returns Module[] {
 function initializeModuleDetails(List moduleNameList) returns List|error {
     return {
         modules: check initializeModuleList(moduleNameList.modules),
-        extendedModules: check initializeModuleList(moduleNameList.extendedModules),
+        extended_modules: check initializeModuleList(moduleNameList.extended_modules),
         connectors: check initializeModuleList(moduleNameList.connectors),
         tools: check initializeModuleList(moduleNameList.tools)
     };
@@ -176,7 +182,6 @@ function getDependencies(Module module, List moduleDetails) returns string[]|err
             }
         }
     }
-    _ = module.remove("gradle_properties");
     return dependencies;
 }
 
@@ -282,7 +287,7 @@ function updateStdlibDashboard(List moduleDetails) returns error? {
 
     updatedReadmeFile += check getBallerinaDashboard(moduleDetails.modules);
     updatedReadmeFile += "\n";
-    updatedReadmeFile += check getBallerinaExtendedDashboard(moduleDetails.extendedModules);
+    updatedReadmeFile += check getBallerinaExtendedDashboard(moduleDetails.extended_modules);
     updatedReadmeFile += "\n";
     updatedReadmeFile += check getBallerinaConnectorDashboard(moduleDetails.connectors);
     updatedReadmeFile += "\n";
@@ -360,12 +365,25 @@ ${TOOLS_HEADER_SEPARATOR}`;
     return dashboard;
 }
 
-isolated function writeToFile(string fileName, anydata content) returns error? {
-    string prettifiedContent = prettify:prettify(content.toJson());
+isolated function writeToFile(string fileName, json content) returns error? {
+    string prettifiedContent = prettify:prettify(content);
 
     error? result = io:fileWriteString(fileName, prettifiedContent);
     if result is error {
         log:printError("Error occurred while writing to the file: " + result.message());
         return result;
     }
+}
+
+isolated function removePropertiesFile(Module[] modules) returns Module[] {
+    return from Module module in modules
+    select {
+        name: module.name,
+        module_version: module.module_version,
+        level: module.level,
+        default_branch: module.default_branch,
+        version_key: module.version_key,
+        release: module.release,
+        dependents: module.dependents
+    };
 }

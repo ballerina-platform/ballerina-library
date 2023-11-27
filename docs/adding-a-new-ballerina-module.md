@@ -1,9 +1,9 @@
 # Adding a new Ballerina Module
 
-Authors: @ThisaruGuruge  
-Reviewers: @NipunaRanasinghe  
-Created: 2023/05/09  
-Updated: 2023/06/23  
+Authors: @ThisaruGuruge
+Reviewers: @NipunaRanasinghe
+Created: 2023/05/09
+Updated: 2023/06/23
 
 This is a step-by-step guide on creating a new Ballerina module. It will guide you through setting up build and workflow scripts, preparing the environment, and adding a new module to the Ballerina daily build and release pipelines.
 
@@ -93,11 +93,11 @@ Download and install the [prerequisites](#prerequisites) . Then, set up the foll
    ```shell
    gradle init
    ```
-   
+
    This will open an interactive Gradle CLI to initialize the repository. Use the *default options* to generate the Gradle scripts.
-   
+
    Example output of the `gradle init` command:
-   
+
    ```
    Select type of project to generate:
      1: basic
@@ -105,14 +105,14 @@ Download and install the [prerequisites](#prerequisites) . Then, set up the foll
      3: library
      4: Gradle plugin
    Enter selection (default: basic) [1..4] -> Select Option 1 (Hit Enter)
-   
+
    Select build script DSL:
      1: Groovy
      2: Kotlin
    Enter selection (default: Groovy) [1..2] -> Select Option 1 (Hit Enter)
-   
+
    Project name (default: module-ballerina-sample): -> Select the repository name (Hit Enter)
-   
+
    Generate build using new APIs and behavior (some features may change in the next minor release)? (default: no) [yes, no] -> Select no (Hit Enter)
    ```
 
@@ -387,7 +387,7 @@ This step is required only if the module is a part of the Ballerina library and 
 
 To add a module to the Ballerina library, add an entry in the [`module_list.json`](https://github.com/ballerina-platform/ballerina-library/blob/main/release/resources/module_list.json) file in the [`ballerina-library`](https://github.com/ballerina-platform/ballerina-library) repository.
 
->**Note:** Do not edit the `stdlid_modules.json` file manually. It will be auto-generated once the `module_list.json` file is updated.
+>**Note:** Do not edit the `stdlib_modules.json` file manually. It will be auto-generated once the `module_list.json` file is updated.
 
 The JSON entry has two fields.
 
@@ -428,7 +428,7 @@ This field defines the name of the module. This should be the name of the reposi
 
 The version key of the module. This is related to the version prefix mentioned in the [`gradle.properties`](#the-gradleproperties-file-required) file. (e.g., `ballerinaStdlibIo`). It is used to add the module as a dependency to another repository including the [`ballerina-distribution`](https://github.com/ballerina-platform/ballerina-distribution) repository.
 
-Refer the [`version_key`](#the-versionkey-field) section under [Add the module to the Ballerina library](#add-the-module-to-the-ballerina-library-optional). 
+Refer the [`version_key`](#the-versionkey-field) section under [Add the module to the Ballerina library](#add-the-module-to-the-ballerina-library-optional).
 
 #### The `level` field
 
