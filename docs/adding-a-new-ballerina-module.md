@@ -1,9 +1,9 @@
 # Adding a new Ballerina Module
 
-Authors: @ThisaruGuruge
-Reviewers: @NipunaRanasinghe
-Created: 2023/05/09
-Updated: 2023/06/23
+Authors: @ThisaruGuruge \
+Reviewers: @NipunaRanasinghe \
+Created: 2023/05/09 \
+Updated: 2023/06/23 \
 
 This is a step-by-step guide on creating a new Ballerina module. It will guide you through setting up build and workflow scripts, preparing the environment, and adding a new module to the Ballerina daily build and release pipelines.
 
@@ -385,7 +385,14 @@ After creating the module repository with the above structure, the following ste
 
 This step is required only if the module is a part of the Ballerina library and if it should be added to the Ballerina library dashboard and release process.
 
-To add a module to the Ballerina library, add an entry in the [`module_list.json`](https://github.com/ballerina-platform/ballerina-library/blob/main/release/resources/module_list.json) file in the [`ballerina-library`](https://github.com/ballerina-platform/ballerina-library) repository.
+To add a module to the Ballerina library, add an entry in the [`module_list.json`](https://github.com/ballerina-platform/ballerina-library/blob/main/release/resources/module_list.json) file in the [`ballerina-library`](https://github.com/ballerina-platform/ballerina-library) repository. This JSON file has 4 main fields.
+
+* `modules` - The `ballerina` modules that are packed with the Ballerina distribution
+* `extended_modules` - The `ballerinax` modules that are not packed with the Ballerina distribution
+* `connectors` - The `ballerinax` connector modules that are published to the central
+* `tools` - The `ballerina` CLI tools
+
+Add the module to the relevant array based on the type of the module.
 
 >**Note:** Do not edit the `stdlib_modules.json` file manually. It will be auto-generated once the `module_list.json` file is updated.
 
