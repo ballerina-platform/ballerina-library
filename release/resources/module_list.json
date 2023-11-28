@@ -183,6 +183,9 @@
             "name": "openapi-tools"
         },
         {
+            "name": "persist-tools"
+        },
+        {
             "name": "protoc-tools"
         }
     ]
