@@ -593,6 +593,15 @@
             "dependents": []
         },
         {
+            "name": "persist-tools",
+            "module_version": "1.2.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibPersist-toolsVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
             "name": "protoc-tools",
             "module_version": "0.2.1-SNAPSHOT",
             "level": 1,
