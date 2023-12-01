@@ -37,6 +37,11 @@ jobs:
           distribution: 'temurin'
           java-version: 17.0.7
 
+      - name: Set Up Ballerina
+        uses: ballerina-platform/setup-ballerina@v1.1.0
+        with:
+          version: latest
+          
       - name: Build without Tests
         env:
           packageUser: ${{ github.actor }}
