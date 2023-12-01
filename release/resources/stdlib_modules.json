@@ -428,7 +428,7 @@
     "extended_modules": [
         {
             "name": "module-ballerinax-copybook",
-            "module_version": "0.1.3-SNAPSHOT",
+            "module_version": "0.2.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibCopybookVersion",
@@ -466,7 +466,7 @@
     "connectors": [
         {
             "name": "module-ballerinax-googleapis.gmail",
-            "module_version": "4.0.0-SNAPSHOT",
+            "module_version": "4.0.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibGoogleapis.gmailVersion",
