@@ -567,7 +567,7 @@
         },
         {
             "name": "copybook-tools",
-            "module_version": "0.1.1-SNAPSHOT",
+            "module_version": "0.1.2-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibCopybook-toolsVersion",
