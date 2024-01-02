@@ -316,7 +316,7 @@
         },
         {
             "name": "module-ballerina-toml",
-            "module_version": "0.5.0-SNAPSHOT",
+            "module_version": "0.5.1-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibTomlVersion",
@@ -325,7 +325,7 @@
         },
         {
             "name": "module-ballerina-yaml",
-            "module_version": "0.5.0-SNAPSHOT",
+            "module_version": "0.5.1-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibYamlVersion",
@@ -408,7 +408,7 @@
         },
         {
             "name": "module-ballerina-soap",
-            "module_version": "0.10.0-SNAPSHOT",
+            "module_version": "0.10.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibSoapVersion",
