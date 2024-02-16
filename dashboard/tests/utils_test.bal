@@ -32,7 +32,7 @@ function getTrivyBadgeTest() {
 
 @test:Config
 function getCodecovBadgeTest() {
-    test:assertEquals(getCodecovBadge(IO_MODULE, "master"), "[![CodeCov](https://codecov.io/gh/ballerina-platform/module-ballerina-io/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-io)");
+    test:assertEquals(getCodecovBadge(IO_MODULE, "master", true), "[![CodeCov](https://codecov.io/gh/ballerina-platform/module-ballerina-io/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-io)");
 }
 
 @test:Config
