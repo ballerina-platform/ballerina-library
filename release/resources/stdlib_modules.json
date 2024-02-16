@@ -334,7 +334,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "module_version": "2.10.7-SNAPSHOT",
+            "module_version": "2.10.8-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibHttpVersion",
@@ -399,7 +399,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "module_version": "1.10.1-SNAPSHOT",
+            "module_version": "1.11.0-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
@@ -465,8 +465,17 @@
     ],
     "connectors": [
         {
+            "name": "module-ballerinax-aws.redshift",
+            "module_version": "1.0.2-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibAws.redshiftVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
             "name": "module-ballerinax-googleapis.gmail",
-            "module_version": "4.0.1-SNAPSHOT",
+            "module_version": "4.0.2-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibGoogleapis.gmailVersion",
@@ -551,6 +560,15 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibRabbitmqVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerinax-twilio",
+            "module_version": "4.0.2-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibTwilioVersion",
             "release": true,
             "dependents": []
         }
