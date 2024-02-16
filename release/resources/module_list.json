@@ -137,6 +137,9 @@
     ],
     "connectors": [
         {
+            "name": "module-ballerinax-aws.redshift"
+        },
+        {
             "name": "module-ballerinax-googleapis.gmail"
         },
         {
@@ -167,9 +170,6 @@
         },
         {
             "name": "module-ballerinax-rabbitmq"
-        },
-        {
-            "name": "module-ballerinax-aws.redshift"
         },
         {
             "name": "module-ballerinax-twilio",
