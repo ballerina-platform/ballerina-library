@@ -6,3 +6,9 @@ version = "1.0.0"
 
 [build-options]
 observabilityIncluded = true
+
+[[dependency]]
+org = "ballerinax"
+name = "github"
+version = "4.6.0"
+
