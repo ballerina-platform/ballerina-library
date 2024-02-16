@@ -75,6 +75,7 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [tcp](https://github.com/ballerina-platform/module-ballerina-tcp) | [@Bhashinee](https://github.com/Bhashinee) | [@MohamedSabthar](https://github.com/MohamedSabthar) |
 | [time](https://github.com/ballerina-platform/module-ballerina-time) | [@sahanHe](https://github.com/sahanHe) | [@daneshk](https://github.com/daneshk) |
 | [toml](https://github.com/ballerina-platform/module-ballerina-toml) | [@RDPerera](https://github.com/RDPerera) | |
+| [twilio](https://github.com/ballerina-platform/module-ballerinax-twilio) | [@RDPerera](https://github.com/RDPerera) | |
 | [udp](https://github.com/ballerina-platform/module-ballerina-udp) | [@Bhashinee](https://github.com/Bhashinee) | [@MohamedSabthar](https://github.com/MohamedSabthar) |
 | [url](https://github.com/ballerina-platform/module-ballerina-url) |[@TharmiganK](https://github.com/TharmiganK) |[@ayeshLK](https://github.com/ayeshLK), [@dilanSachi](https://github.com/dilanSachi)|
 | [uuid](https://github.com/ballerina-platform/module-ballerina-uuid) | [@daneshk](https://github.com/daneshk) | [@Bhashinee](https://github.com/Bhashinee) |
