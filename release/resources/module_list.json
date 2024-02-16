@@ -167,6 +167,10 @@
         },
         {
             "name": "module-ballerinax-rabbitmq"
+        },
+        {
+            "name": "module-ballerinax-twilio",
+            "display_code_cov_badge": false
         }
     ],
     "tools": [
