@@ -167,6 +167,9 @@
         },
         {
             "name": "module-ballerinax-rabbitmq"
+        },
+        {
+            "name": "module-ballerinax-aws.redshift"
         }
     ],
     "tools": [
