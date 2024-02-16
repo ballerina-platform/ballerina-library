@@ -11,7 +11,8 @@
                 "module-ballerina-log",
                 "module-ballerina-os",
                 "module-ballerina-xslt"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-jballerina.java.arrays",
@@ -20,7 +21,8 @@
             "default_branch": "master",
             "version_key": "stdlibJavaArraysVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-math.vector",
@@ -29,7 +31,8 @@
             "default_branch": "main",
             "version_key": "stdlibMathVectorVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-time",
@@ -46,7 +49,8 @@
                 "module-ballerina-protobuf",
                 "module-ballerina-random",
                 "module-ballerina-task"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-url",
@@ -57,7 +61,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-oauth2"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-xmldata",
@@ -66,7 +71,8 @@
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-constraint",
@@ -77,7 +83,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-cache"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-crypto",
@@ -92,7 +99,8 @@
                 "module-ballerina-oauth2",
                 "module-ballerina-tcp",
                 "module-ballerina-uuid"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-log",
@@ -111,7 +119,8 @@
                 "module-ballerina-oauth2",
                 "module-ballerina-tcp",
                 "module-ballerina-udp"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-os",
@@ -122,7 +131,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-file"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-persist",
@@ -131,7 +141,8 @@
             "default_branch": "main",
             "version_key": "stdlibPersistVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-protobuf",
@@ -142,7 +153,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-grpc"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-random",
@@ -157,7 +169,8 @@
                 "module-ballerina-soap",
                 "module-ballerina-websub",
                 "module-ballerina-websubhub"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-task",
@@ -170,7 +183,8 @@
                 "module-ballerina-cache",
                 "module-ballerina-email",
                 "module-ballerina-ftp"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-xslt",
@@ -179,7 +193,8 @@
             "default_branch": "master",
             "version_key": "stdlibXsltVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-cache",
@@ -192,7 +207,8 @@
                 "module-ballerina-auth",
                 "module-ballerina-jwt",
                 "module-ballerina-oauth2"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-file",
@@ -206,7 +222,8 @@
                 "module-ballerina-http",
                 "module-ballerina-toml",
                 "module-ballerina-yaml"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-ftp",
@@ -215,7 +232,8 @@
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-mime",
@@ -227,7 +245,8 @@
             "dependents": [
                 "module-ballerina-email",
                 "module-ballerina-http"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-tcp",
@@ -236,7 +255,8 @@
             "default_branch": "master",
             "version_key": "stdlibTcpVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-udp",
@@ -245,7 +265,8 @@
             "default_branch": "main",
             "version_key": "stdlibUdpVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-uuid",
@@ -261,7 +282,8 @@
                 "module-ballerina-websocket",
                 "module-ballerina-websub",
                 "module-ballerina-websubhub"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-auth",
@@ -272,7 +294,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-http"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-email",
@@ -281,7 +304,8 @@
             "default_branch": "master",
             "version_key": "stdlibEmailVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-jwt",
@@ -292,7 +316,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-http"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-mqtt",
@@ -301,7 +326,8 @@
             "default_branch": "main",
             "version_key": "stdlibMqttVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-oauth2",
@@ -312,7 +338,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-http"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-toml",
@@ -321,7 +348,8 @@
             "default_branch": "main",
             "version_key": "stdlibTomlVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-yaml",
@@ -330,7 +358,8 @@
             "default_branch": "main",
             "version_key": "stdlibYamlVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-http",
@@ -345,7 +374,8 @@
                 "module-ballerina-websocket",
                 "module-ballerina-websub",
                 "module-ballerina-websubhub"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-grpc",
@@ -354,7 +384,8 @@
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinai-transaction",
@@ -366,7 +397,8 @@
             "dependents": [
                 "module-ballerina-soap",
                 "module-ballerina-sql"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-websocket",
@@ -377,7 +409,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-graphql"
-            ]
+            ],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-websub",
@@ -386,7 +419,8 @@
             "default_branch": "master",
             "version_key": "stdlibWebsubVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-websubhub",
@@ -395,7 +429,8 @@
             "default_branch": "main",
             "version_key": "stdlibWebsubhubVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-graphql",
@@ -404,7 +439,8 @@
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-soap",
@@ -413,7 +449,8 @@
             "default_branch": "master",
             "version_key": "stdlibSoapVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-sql",
@@ -422,7 +459,8 @@
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         }
     ],
     "extended_modules": [
@@ -433,7 +471,8 @@
             "default_branch": "main",
             "version_key": "stdlibCopybookVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-persist.googlesheets",
@@ -442,7 +481,8 @@
             "default_branch": "main",
             "version_key": "stdlibPersistGoogleSheetVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-persist.inmemory",
@@ -451,7 +491,8 @@
             "default_branch": "main",
             "version_key": "stdlibPersistInmemoryVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-persist.sql",
@@ -460,7 +501,8 @@
             "default_branch": "main",
             "version_key": "stdlibPersistSqlVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         }
     ],
     "connectors": [
@@ -471,7 +513,8 @@
             "default_branch": "main",
             "version_key": "stdlibAws.redshiftVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-googleapis.gmail",
@@ -480,7 +523,8 @@
             "default_branch": "master",
             "version_key": "stdlibGoogleapis.gmailVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-java.jdbc",
@@ -489,7 +533,8 @@
             "default_branch": "master",
             "version_key": "stdlibJdbcVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-java.jms",
@@ -498,7 +543,8 @@
             "default_branch": "master",
             "version_key": "stdlibJmsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-kafka",
@@ -507,7 +553,8 @@
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-mssql",
@@ -516,7 +563,8 @@
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-mysql",
@@ -525,7 +573,8 @@
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-nats",
@@ -534,7 +583,8 @@
             "default_branch": "master",
             "version_key": "stdlibNatsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-oracledb",
@@ -543,7 +593,8 @@
             "default_branch": "main",
             "version_key": "stdlibOracledbVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-postgresql",
@@ -552,7 +603,8 @@
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-rabbitmq",
@@ -561,7 +613,8 @@
             "default_branch": "master",
             "version_key": "stdlibRabbitmqVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-twilio",
@@ -570,7 +623,8 @@
             "default_branch": "master",
             "version_key": "stdlibTwilioVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": false
         }
     ],
     "tools": [
@@ -581,7 +635,8 @@
             "default_branch": "main",
             "version_key": "stdlibAsyncapi-toolsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "copybook-tools",
@@ -590,7 +645,8 @@
             "default_branch": "main",
             "version_key": "stdlibCopybook-toolsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "graphql-tools",
@@ -599,7 +655,8 @@
             "default_branch": "main",
             "version_key": "stdlibGraphql-toolsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "openapi-tools",
@@ -608,7 +665,8 @@
             "default_branch": "master",
             "version_key": "stdlibOpenapi-toolsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "persist-tools",
@@ -617,7 +675,8 @@
             "default_branch": "main",
             "version_key": "stdlibPersist-toolsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         },
         {
             "name": "protoc-tools",
@@ -626,7 +685,8 @@
             "default_branch": "main",
             "version_key": "stdlibProtoc-toolsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "display_code_cov_badge": true
         }
     ]
 }
