@@ -36,6 +36,7 @@ type Module record {|
     boolean release?;
     string[] dependents?;
     string gradle_properties?;
+    boolean display_code_cov_badge?;
 |};
 
 public function main() returns error? {
@@ -105,7 +106,7 @@ function initializeModuleInfo(Module module) returns Module|error {
 
     string versionKey = getVersionKey(module);
     string moduleVersion = check getVersion(moduleName, gradleProperties);
-
+    boolean displayCodeCovBadge = getDisplayCodeCovBadge(module);
     return {
         name: moduleName,
         module_version: moduleVersion,
@@ -113,11 +114,18 @@ function initializeModuleInfo(Module module) returns Module|error {
         default_branch: defaultBranch,
         version_key: versionKey,
         release: true,
+        display_code_cov_badge: displayCodeCovBadge,
         dependents: [],
         gradle_properties: gradleProperties
     };
 }
-
+function getDisplayCodeCovBadge(Module module) returns boolean {
+    boolean? displayCodeCovBadge = module.display_code_cov_badge;
+    if displayCodeCovBadge is boolean {
+        return displayCodeCovBadge;
+    }
+    return true;
+}
 function getVersionKey(Module module) returns string {
     string? versionKey = module.version_key;
     if versionKey is string {

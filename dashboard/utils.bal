@@ -25,12 +25,13 @@ isolated function getLibraryDashboardRow(Module module, string level) returns st
 isolated function getToolsDashboardRow(Module module) returns string|error {
     string moduleName = module.name;
     string defaultBranch = module.default_branch ?: "";
+    boolean displayCodeCovBadge = module.display_code_cov_badge ?: true;
 
     string repoLink = getRepoLink(moduleName);
     string releaseBadge = getReleaseBadge(moduleName);
     string buildStatusBadge = check getBuildStatusBadge(moduleName, defaultBranch);
     string trivyBadge = check getTrivyBadge(moduleName, defaultBranch);
-    string codecovBadge = getCodecovBadge(moduleName, defaultBranch);
+    string codecovBadge = getCodecovBadge(moduleName, defaultBranch, displayCodeCovBadge);
     string bugsBadge = check getBugsBadge(moduleName);
     string pullRequestsBadge = getPullRequestsBadge(moduleName);
 
@@ -40,11 +41,13 @@ isolated function getToolsDashboardRow(Module module) returns string|error {
 isolated function getDashboardRow(Module module) returns string|error {
     string moduleName = module.name;
     string defaultBranch = module.default_branch ?: "";
+    boolean displayCodeCovBadge = module.display_code_cov_badge ?: true;
+
     string repoLink = getRepoLink(moduleName);
     string releaseBadge = getReleaseBadge(moduleName);
     string buildStatusBadge = check getBuildStatusBadge(moduleName, defaultBranch);
     string trivyBadge = check getTrivyBadge(moduleName, defaultBranch);
-    string codecovBadge = getCodecovBadge(moduleName, defaultBranch);
+    string codecovBadge = getCodecovBadge(moduleName, defaultBranch, displayCodeCovBadge);
     string bugsBadge = check getBugsBadge(moduleName);
     string pullRequestsBadge = getPullRequestsBadge(moduleName);
     string loadTestsBadge;
@@ -94,9 +97,12 @@ isolated function getTrivyBadge(string moduleName, string defaultBranch) returns
     return string `[![Trivy](${badgeUrl})](${repoUrl})`;
 }
 
-isolated function getCodecovBadge(string moduleName, string defaultBranch) returns string {
-    string badgeUrl = string `${CODECOV_BADGE_URL}/${BALLERINA_ORG_NAME}/${moduleName}/branch/${defaultBranch}/graph/badge.svg`;
+isolated function getCodecovBadge(string moduleName, string defaultBranch, boolean displayCodeCov) returns string {
     string repoUrl = string `${CODECOV_BADGE_URL}/${BALLERINA_ORG_NAME}/${moduleName}`;
+    string badgeUrl = string `${CODECOV_BADGE_URL}/${BALLERINA_ORG_NAME}/${moduleName}/branch/${defaultBranch}/graph/badge.svg`;
+    if !displayCodeCov {
+        badgeUrl = NABADGE;
+    }
     return string `[![CodeCov](${badgeUrl})](${repoUrl})`;
 }
 
