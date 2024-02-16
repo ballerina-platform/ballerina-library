@@ -391,6 +391,7 @@ isolated function removePropertiesFile(Module[] modules) returns Module[] {
         level: module.level,
         default_branch: module.default_branch,
         version_key: module.version_key,
+        display_code_cov_badge: module.display_code_cov_badge,
         release: module.release,
         dependents: module.dependents
     };
