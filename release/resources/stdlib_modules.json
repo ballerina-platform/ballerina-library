@@ -363,7 +363,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "module_version": "2.10.8-SNAPSHOT",
+            "module_version": "2.10.9-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibHttpVersion",
@@ -670,7 +670,7 @@
         },
         {
             "name": "persist-tools",
-            "module_version": "1.2.2-SNAPSHOT",
+            "module_version": "1.3.0-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibPersist-toolsVersion",
