@@ -3,7 +3,7 @@
 Authors: @ThisaruGuruge \
 Reviewers: @NipunaRanasinghe \
 Created: 2023/05/09 \
-Updated: 2023/06/23 \
+Updated: 2023/06/23 
 
 This is a step-by-step guide on creating a new Ballerina module. It will guide you through setting up build and workflow scripts, preparing the environment, and adding a new module to the Ballerina daily build and release pipelines.
 
