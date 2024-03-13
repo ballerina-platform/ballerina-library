@@ -133,6 +133,10 @@
         {
             "name": "module-ballerinax-persist.sql",
             "version_key": "stdlibPersistSqlVersion"
+        },
+        {
+            "name": "module-ballerinax-persist.redis",
+            "version_key": "stdlibPersistRedisVersion"
         }
     ],
     "connectors": [
