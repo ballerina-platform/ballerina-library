@@ -503,6 +503,16 @@
             "release": true,
             "dependents": [],
             "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-persist.redis",
+            "module_version": "0.1.0-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibPersistRedisVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
         }
     ],
     "connectors": [
