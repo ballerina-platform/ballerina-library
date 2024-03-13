@@ -166,6 +166,9 @@
             "name": "module-ballerinax-oracledb"
         },
         {
+            "name": "module-ballerinax-redis"
+        },
+        {
             "name": "module-ballerinax-postgresql"
         },
         {
