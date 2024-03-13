@@ -166,13 +166,13 @@
             "name": "module-ballerinax-oracledb"
         },
         {
-            "name": "module-ballerinax-redis"
-        },
-        {
             "name": "module-ballerinax-postgresql"
         },
         {
             "name": "module-ballerinax-rabbitmq"
+        },
+        {
+            "name": "module-ballerinax-redis"
         },
         {
             "name": "module-ballerinax-twilio",
