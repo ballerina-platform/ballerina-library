@@ -363,7 +363,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "module_version": "2.10.10-SNAPSHOT",
+            "module_version": "2.10.11-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibHttpVersion",
@@ -612,6 +612,16 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibRabbitmqVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-redis",
+            "module_version": "3.0.2-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibRedisVersion",
             "release": true,
             "dependents": [],
             "display_code_cov_badge": true
