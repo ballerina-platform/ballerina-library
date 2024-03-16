@@ -518,7 +518,7 @@
     "connectors": [
         {
             "name": "module-ballerinax-aws.redshift",
-            "module_version": "1.0.2-SNAPSHOT",
+            "module_version": "1.0.3-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibAws.redshiftVersion",
