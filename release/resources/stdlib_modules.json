@@ -548,7 +548,7 @@
         },
         {
             "name": "module-ballerinax-java.jms",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.0.2-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibJmsVersion",
@@ -670,7 +670,7 @@
         },
         {
             "name": "graphql-tools",
-            "module_version": "0.9.0-SNAPSHOT",
+            "module_version": "0.9.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibGraphql-toolsVersion",
