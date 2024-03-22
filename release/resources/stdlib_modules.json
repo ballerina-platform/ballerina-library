@@ -670,7 +670,7 @@
         },
         {
             "name": "graphql-tools",
-            "module_version": "0.9.1-SNAPSHOT",
+            "module_version": "0.10.0-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibGraphql-toolsVersion",
