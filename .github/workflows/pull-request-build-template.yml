@@ -48,6 +48,7 @@ jobs:
                 env:
                     packageUser: ${{ github.actor }}
                     packagePAT: ${{ secrets.GITHUB_TOKEN }}
+                    CENTRAL_VERBOSE_ENABLED: true bal build
                 run: |
                   ./gradlew build -x test ${{ inputs.additional-ubuntu-build-flags }}
                   ./gradlew test ${{ inputs.additional-ubuntu-test-flags }}
