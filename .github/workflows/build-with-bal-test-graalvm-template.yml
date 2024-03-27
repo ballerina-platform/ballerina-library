@@ -7,7 +7,7 @@ on:
                 description: Branch/Release Tag of the Ballerina Lang
                 type: string
                 required: false
-                default: master
+                default: 2201.8.x
             lang_version:
                 description: Ballerina Lang Version (If given ballerina lang buid will be skipped)
                 type: string
