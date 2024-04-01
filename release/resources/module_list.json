@@ -158,6 +158,9 @@
             "name": "module-ballerinax-kafka"
         },
         {
+            "name": "module-ballerinax-mongodb"
+        },
+        {
             "name": "module-ballerinax-mssql"
         },
         {
