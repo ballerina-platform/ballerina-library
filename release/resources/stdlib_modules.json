@@ -567,6 +567,16 @@
             "display_code_cov_badge": true
         },
         {
+            "name": "module-ballerinax-mongodb",
+            "module_version": "5.0.0-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibMongodbVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
             "name": "module-ballerinax-mssql",
             "module_version": "1.11.2-SNAPSHOT",
             "level": 1,
