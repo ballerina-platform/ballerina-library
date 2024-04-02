@@ -598,7 +598,7 @@
         },
         {
             "name": "module-ballerinax-mongodb",
-            "module_version": "5.0.0-SNAPSHOT",
+            "module_version": "5.0.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibMongodbVersion",
