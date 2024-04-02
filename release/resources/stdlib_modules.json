@@ -557,6 +557,16 @@
             "display_code_cov_badge": true
         },
         {
+            "name": "module-ballerinax-ibm.ibmmq",
+            "module_version": "0.1.4-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibIbmMqVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
             "name": "module-ballerinax-kafka",
             "module_version": "3.10.3-SNAPSHOT",
             "level": 1,
