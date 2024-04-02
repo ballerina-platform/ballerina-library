@@ -155,6 +155,9 @@
             "version_key": "stdlibJmsVersion"
         },
         {
+            "name": "module-ballerinax-ibm.ibmmq"
+        },
+        {
             "name": "module-ballerinax-kafka"
         },
         {
