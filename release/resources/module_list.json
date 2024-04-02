@@ -144,6 +144,12 @@
             "name": "module-ballerinax-aws.redshift"
         },
         {
+            "name": "module-ballerinax-candid "
+        },
+        {
+            "name": "module-ballerinax-github"
+        },
+        {
             "name": "module-ballerinax-googleapis.gmail"
         },
         {
