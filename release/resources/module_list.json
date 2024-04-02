@@ -153,15 +153,15 @@
             "name": "module-ballerinax-googleapis.gmail"
         },
         {
+            "name": "module-ballerinax-ibm.ibmmq"
+        },
+        {
             "name": "module-ballerinax-java.jdbc",
             "version_key": "stdlibJdbcVersion"
         },
         {
             "name": "module-ballerinax-java.jms",
             "version_key": "stdlibJmsVersion"
-        },
-        {
-            "name": "module-ballerinax-ibm.ibmmq"
         },
         {
             "name": "module-ballerinax-kafka"

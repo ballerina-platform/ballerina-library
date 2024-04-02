@@ -527,11 +527,41 @@
             "display_code_cov_badge": true
         },
         {
+            "name": "module-ballerinax-candid",
+            "module_version": "0.1.2-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibCandidVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-github",
+            "module_version": "5.0.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibGithubVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
             "name": "module-ballerinax-googleapis.gmail",
             "module_version": "4.0.2-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibGoogleapis.gmailVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-ibm.ibmmq",
+            "module_version": "0.1.4-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibIbm.ibmmqVersion",
             "release": true,
             "dependents": [],
             "display_code_cov_badge": true
