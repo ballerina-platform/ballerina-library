@@ -527,6 +527,16 @@
             "display_code_cov_badge": true
         },
         {
+            "name": "module-ballerinax-azure-service-bus",
+            "module_version": "3.7.0",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibModule-ballerinax-azure-service-busVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
             "name": "module-ballerinax-candid",
             "module_version": "0.1.2-SNAPSHOT",
             "level": 1,
@@ -704,6 +714,16 @@
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibCopybook-toolsVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "edi-tools",
+            "module_version": "1.0.1",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibEdi-toolsVersion",
             "release": true,
             "dependents": [],
             "display_code_cov_badge": true
