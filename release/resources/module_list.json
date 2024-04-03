@@ -144,6 +144,9 @@
             "name": "module-ballerinax-aws.redshift"
         },
         {
+            "name": "module-ballerinax-azure-service-bus"
+        },
+        {
             "name": "module-ballerinax-candid"
         },
         {
@@ -201,6 +204,9 @@
         },
         {
             "name": "copybook-tools"
+        },
+        {
+            "name": "edi-tools"
         },
         {
             "name": "graphql-tools"
