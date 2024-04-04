@@ -13,6 +13,10 @@
             "name": "module-ballerina-crypto"
         },
         {
+            "name": "module-ballerina-data.jsondata",
+            "version_key": "stdlibDataJsondataVersion"
+        },
+        {
             "name": "module-ballerina-email"
         },
         {
