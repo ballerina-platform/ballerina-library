@@ -8,6 +8,8 @@
             "version_key": "stdlibIoVersion",
             "release": true,
             "dependents": [
+                "module-ballerina-data.jsondata",
+                "module-ballerina-data.xmldata",
                 "module-ballerina-log",
                 "module-ballerina-os",
                 "module-ballerina-xslt"
@@ -100,6 +102,26 @@
                 "module-ballerina-tcp",
                 "module-ballerina-uuid"
             ],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerina-data.jsondata",
+            "module_version": "0.1.0-SNAPSHOT",
+            "level": 2,
+            "default_branch": "main",
+            "version_key": "stdlibDataJsondataVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerina-data.xmldata",
+            "module_version": "0.1.0-SNAPSHOT",
+            "level": 2,
+            "default_branch": "main",
+            "version_key": "stdlibDataXmldataVersion",
+            "release": true,
+            "dependents": [],
             "display_code_cov_badge": true
         },
         {
