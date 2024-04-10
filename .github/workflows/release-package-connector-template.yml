@@ -62,6 +62,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: "rootfs"
+          scan-ref: "/github/workspace/ballerina/lib"
           format: "table"
           timeout: "10m0s"
           exit-code: "1"
