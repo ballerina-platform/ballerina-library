@@ -8,6 +8,7 @@
             "version_key": "stdlibIoVersion",
             "release": true,
             "dependents": [
+                "module-ballerina-avro",
                 "module-ballerina-data.xmldata",
                 "module-ballerina-log",
                 "module-ballerina-os",
@@ -71,6 +72,16 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerina-avro",
+            "module_version": "0.1.1-SNAPSHOT",
+            "level": 2,
+            "default_branch": "main",
+            "version_key": "stdlibAvroVersion",
             "release": true,
             "dependents": [],
             "display_code_cov_badge": true
@@ -570,11 +581,71 @@
             "display_code_cov_badge": true
         },
         {
+            "name": "module-ballerinax-confluent.cavroserdes",
+            "module_version": "0.1.0-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibConfluent.cavroserdesVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-confluent.cregistry",
+            "module_version": "0.1.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibConfluent.cregistryVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-docusign.dsadmin",
+            "module_version": "2.0.0-SNAPSHOT\r",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibDocusign.dsadminVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-docusign.dsclick",
+            "module_version": "2.0.0-SNAPSHOT\r",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibDocusign.dsclickVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-docusign.dsesign",
+            "module_version": "1.0.1-SNAPSHOT\r",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibDocusign.dsesignVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
             "name": "module-ballerinax-github",
             "module_version": "5.0.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibGithubVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-googleapis.calendar",
+            "module_version": "4.0.2-SNAPSHOT\r",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibGoogleapis.calendarVersion",
             "release": true,
             "dependents": [],
             "display_code_cov_badge": true
