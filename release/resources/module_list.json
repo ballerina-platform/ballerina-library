@@ -179,7 +179,7 @@
             "name": "module-ballerinax-github"
         },
         {
-            "name": "module-ballerinax-googleapis.gcalendar"
+            "name": "module-ballerinax-googleapis.calendar"
         },
         {
             "name": "module-ballerinax-googleapis.gmail"
