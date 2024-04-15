@@ -161,6 +161,12 @@
             "name": "module-ballerinax-candid"
         },
         {
+            "name": "module-ballerinax-confluent.cavroserdes"
+        },
+        {
+            "name": "module-ballerinax-confluent.cregistry"
+        },
+        {
             "name": "module-ballerinax-github"
         },
         {
