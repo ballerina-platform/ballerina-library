@@ -167,6 +167,15 @@
             "name": "module-ballerinax-confluent.cregistry"
         },
         {
+            "name": "module-ballerinax-docusign.dsadmin"
+        },
+        {
+            "name": "module-ballerinax-docusign.dsclick"
+        },
+        {
+            "name": "module-ballerinax-docusign.dsesign"
+        },
+        {
             "name": "module-ballerinax-github"
         },
         {
