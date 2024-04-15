@@ -78,7 +78,7 @@
         },
         {
             "name": "module-ballerina-avro",
-            "module_version": "0.1.1-SNAPSHOT",
+            "module_version": "0.1.2-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibAvroVersion",
@@ -241,6 +241,7 @@
             "release": true,
             "dependents": [
                 "module-ballerina-data.jsondata",
+                "module-ballerina-edi",
                 "module-ballerina-email",
                 "module-ballerina-http",
                 "module-ballerina-toml",
@@ -327,6 +328,16 @@
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibDataJsondataVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerina-edi",
+            "module_version": "1.2.1",
+            "level": 4,
+            "default_branch": "main",
+            "version_key": "stdlibEdiVersion",
             "release": true,
             "dependents": [],
             "display_code_cov_badge": true
