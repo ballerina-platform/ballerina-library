@@ -24,6 +24,9 @@
             "version_key": "stdlibDataXmldataVersion"
         },
         {
+            "name": "module-ballerina-edi"
+        },
+        {
             "name": "module-ballerina-email"
         },
         {
