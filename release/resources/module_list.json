@@ -4,6 +4,9 @@
             "name": "module-ballerina-auth"
         },
         {
+            "name": "module-ballerina-avro"
+        },
+        {
             "name": "module-ballerina-cache"
         },
         {
