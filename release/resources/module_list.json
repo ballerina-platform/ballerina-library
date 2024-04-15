@@ -4,6 +4,9 @@
             "name": "module-ballerina-auth"
         },
         {
+            "name": "module-ballerina-avro"
+        },
+        {
             "name": "module-ballerina-cache"
         },
         {
@@ -158,7 +161,25 @@
             "name": "module-ballerinax-candid"
         },
         {
+            "name": "module-ballerinax-confluent.cavroserdes"
+        },
+        {
+            "name": "module-ballerinax-confluent.cregistry"
+        },
+        {
+            "name": "module-ballerinax-docusign.dsadmin"
+        },
+        {
+            "name": "module-ballerinax-docusign.dsclick"
+        },
+        {
+            "name": "module-ballerinax-docusign.dsesign"
+        },
+        {
             "name": "module-ballerinax-github"
+        },
+        {
+            "name": "module-ballerinax-googleapis.gcalendar"
         },
         {
             "name": "module-ballerinax-googleapis.gmail"
