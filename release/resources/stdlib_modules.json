@@ -593,7 +593,7 @@
         },
         {
             "name": "module-ballerinax-confluent.cavroserdes",
-            "module_version": "0.1.0-SNAPSHOT",
+            "module_version": "0.1.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibConfluent.cavroserdesVersion",
@@ -673,7 +673,7 @@
         },
         {
             "name": "module-ballerinax-ibm.ibmmq",
-            "module_version": "0.1.4-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibIbm.ibmmqVersion",
