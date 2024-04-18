@@ -562,11 +562,41 @@
     ],
     "connectors": [
         {
+            "name": "module-ballerinax-aws.dynamodb",
+            "module_version": "2.3.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibAws.dynamodbVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-aws.dynamodbstreams",
+            "module_version": "1.0.0-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibAws.dynamodbstreamsVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
             "name": "module-ballerinax-aws.redshift",
             "module_version": "1.0.3-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibAws.redshiftVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-aws.sns",
+            "module_version": "3.0.0-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibAws.snsVersion",
             "release": true,
             "dependents": [],
             "display_code_cov_badge": true
