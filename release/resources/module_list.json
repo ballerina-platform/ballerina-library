@@ -155,7 +155,16 @@
     ],
     "connectors": [
         {
+            "name": "module-ballerinax-aws.dynamodb"
+        },
+        {
+            "name": "module-ballerinax-aws.dynamodbstreams"
+        },
+        {
             "name": "module-ballerinax-aws.redshift"
+        },
+        {
+            "name": "module-ballerinax-aws.sns"
         },
         {
             "name": "module-ballerinax-azure-service-bus"
@@ -189,15 +198,6 @@
         },
         {
             "name": "module-ballerinax-ibm.ibmmq"
-        },
-        {
-            "name": "module-ballerinax-aws.dynamodb"
-        },
-        {
-            "name": "module-ballerinax-aws.dynamodbstreams"
-        },
-        {
-            "name": "module-ballerinax-aws.sns"
         },
         {
             "name": "module-ballerinax-java.jdbc",
