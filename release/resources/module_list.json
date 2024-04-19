@@ -197,6 +197,10 @@
             "name": "module-ballerinax-googleapis.gmail"
         },
         {
+            "name": "module-ballerinax-guidewire.insnow",
+            "display_code_cov_badge": false
+        },
+        {
             "name": "module-ballerinax-ibm.ibmmq"
         },
         {
