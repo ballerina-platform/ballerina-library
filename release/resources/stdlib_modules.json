@@ -822,6 +822,16 @@
             "display_code_cov_badge": true
         },
         {
+            "name": "module-ballerinax-snowflake",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibSnowflakeVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": false
+        },
+        {
             "name": "module-ballerinax-twilio",
             "module_version": "4.0.2-SNAPSHOT",
             "level": 1,
