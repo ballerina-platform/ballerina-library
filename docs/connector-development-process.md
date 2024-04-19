@@ -1,8 +1,8 @@
 # Connector Development Process
 
 # Library Development Process 
-_Author_: @shafreenAnfar @ThisaruGuruge @NipunaRanasinghe @niveathika @TharmiganK    
-_Reviewer_: @daneshk @ThisaruGuruge @NipunaRanasinghe  
+_Authors_: @shafreenAnfar @ThisaruGuruge @NipunaRanasinghe @niveathika @TharmiganK    
+_Reviewers_: @daneshk @ThisaruGuruge @NipunaRanasinghe  
 _Created_: 2024/04/17   
 _Created_: 2024/04/17   
 
@@ -14,7 +14,7 @@ This section discusses the connector development process from inception to reali
 
 This section introduces the naming conventions you need to be aware of before starting the development of connectors.
 
-Package:
+### Package
 The connector name should use lowercase letters and be descriptive of the service or API it interacts with.
 
 ### Submodules
@@ -44,17 +44,17 @@ Submodules should primarily be used to organize the code structure within a sing
 
 ### Vendor/Platform Prefixes
 
-Generic SaaS Product Names:
+#### Generic SaaS Product Names
 When dealing with SaaS product names that are more generic and not specific to a particular vendor, it is recommended to add a vendor/platform abbreviation as a prefix to the package name. This helps to distinguish the client usages and avoid ambiguity, especially when multiple vendors offer similar services. For example, Azure provides storage services. In this case, using a vendor/platform abbreviation as a prefix is advisable:
 
 - ballerinax/azure.azstorage
 
-### Vendor-Specific Names
+#### Vendor-Specific Names
 If the SaaS product name is specific to a particular vendor and is unlikely to cause conflicts or confusion with other connector usages in the same program, there may be no need to prefix the package name with a vendor/platform abbreviation. For example, Azure provides CosmosDB. In this case, using the connector as ‘cosmosdb:Client’ is less likely to create conflicts or confusion with other connectors:
 
 - ballerinax/azure.cosmosdb
 
-### Summary
+#### Summary
 In summary, the decision to add a vendor/platform abbreviation as a prefix to the package name should be handled on a case-by-case basis, considering the specificity of the SaaS product name and its potential for conflicts or confusion.
 
 ### Best Practices
@@ -80,7 +80,7 @@ While nesting subpackages can be useful for organization, avoid creating overly 
 
 #### Avoiding Split-Module Conditions
 
-A “split-module condition” can occur when the latest versions of two different packages contain the same module, resulting in a build failure. Therefore, hierarchical structures should be chosen carefully and used with caution to minimize such situations. (Refer to Ballerina's documentation on split-module conditions for more details).
+A “split-module condition” can occur when the latest versions of two different packages contain the same module, resulting in a build failure. Therefore, hierarchical structures should be chosen carefully and used with caution to minimize such situations. (Refer to [Ballerina package references documentation](https://ballerina.io/learn/package-references/#the-split-module-condition) for more details).
 
 ## Development process
 
