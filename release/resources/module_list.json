@@ -155,6 +155,10 @@
     ],
     "connectors": [
         {
+            "name": "module-ballerinax-asana",
+            "display_code_cov_badge": false
+        },
+        {
             "name": "module-ballerinax-aws.dynamodb"
         },
         {
@@ -244,6 +248,10 @@
         },
         {
             "name": "module-ballerinax-twilio",
+            "display_code_cov_badge": false
+        },
+        {
+            "name": "module-ballerinax-zendesk",
             "display_code_cov_badge": false
         }
     ],
