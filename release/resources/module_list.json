@@ -237,6 +237,10 @@
         {
             "name": "module-ballerinax-twilio",
             "display_code_cov_badge": false
+        },
+        {
+            "name": "module-ballerinax-snowflake",
+            "display_code_cov_badge": false
         }
     ],
     "tools": [
