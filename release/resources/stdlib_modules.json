@@ -562,6 +562,16 @@
     ],
     "connectors": [
         {
+            "name": "module-ballerinax-asana",
+            "module_version": "2.0.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibAsanaVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": false
+        },
+        {
             "name": "module-ballerinax-aws.dynamodb",
             "module_version": "2.3.1-SNAPSHOT",
             "level": 1,
@@ -847,6 +857,16 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibTwilioVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": false
+        },
+        {
+            "name": "module-ballerinax-zendesk",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibZendeskVersion",
             "release": true,
             "dependents": [],
             "display_code_cov_badge": false
