@@ -159,11 +159,13 @@ These types of connectors wrap some SDK with Ballerina code, such as the IBM MQ 
 
 ### Write Specification
 
-You must write a specification for your connector. In the case of REST APIs, your specification can be the OAS (OpenAPI Specification). However, if you have made any alterations, or as we call them, sanitations, you must document them in sanitations.md. Additionally, you may include a `spec.md`.
+You must write a specification for your connector. In the case of REST APIs, your specification can be the OAS (OpenAPI Specification). However, if you have made any alterations, or as we call them, sanitations, you must document them in sanitations.md. For a handwritten connector, a `spec.md` should be included describing the connector functionality.
 
 ### Test Consideration
 
-The code we write for connectors differs significantly from the code we write for other modules. Most connectors are generated using the OpenAPI tool, and some are handwritten. Handwritten connectors simply wrap a given SDK to create the Ballerina version of it. The code required for this is very minimal, lacks mutable state, and each operation is independent of the others.
+The code we write for connectors differs significantly from the code we write for other modules. Most connectors are generated using the OpenAPI tool, and some are handwritten. Handwritten connectors usually wrap a given SDK to create the Ballerina version of it. Most of the time, the code required for this is very minimal, lacks a mutable state, and each operation is independent of the others.
+
+>**Note:** Some handwritten connectors may include custom logic. In such scenarios, using tests to cover the custom logic and maintaining 80% coverage is a must.
 
 With the above in mind, the following are the aspects covered by test cases:
 
@@ -171,7 +173,8 @@ With the above in mind, the following are the aspects covered by test cases:
 - Catch any regression issues (not common),
 - Catch any breaking changes introduced by language changes (relatively common),
 - Validate against platforms such as GraalVM, Java11, etc. (not common).
-Need for Tests
+
+#### Need for Tests
 
 Yes, tests are necessary due to the aforementioned reasons, but the main reason is to guard against language changes.
 
