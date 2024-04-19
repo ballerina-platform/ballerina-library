@@ -239,11 +239,11 @@
             "name": "module-ballerinax-redis"
         },
         {
-            "name": "module-ballerinax-twilio",
+            "name": "module-ballerinax-snowflake",
             "display_code_cov_badge": false
         },
         {
-            "name": "module-ballerinax-snowflake",
+            "name": "module-ballerinax-twilio",
             "display_code_cov_badge": false
         }
     ],
