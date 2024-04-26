@@ -163,7 +163,12 @@
             "default_branch": "main",
             "version_key": "stdlibPersistVersion",
             "release": true,
-            "dependents": [],
+            "dependents": [
+                "module-ballerinax-persist.googlesheets",
+                "module-ballerinax-persist.inmemory",
+                "module-ballerinax-persist.redis",
+                "module-ballerinax-persist.sql"
+            ],
             "display_code_cov_badge": true
         },
         {
@@ -273,6 +278,16 @@
             "display_code_cov_badge": true
         },
         {
+            "name": "module-ballerinax-persist.inmemory",
+            "module_version": "1.3.0-SNAPSHOT",
+            "level": 3,
+            "default_branch": "main",
+            "version_key": "stdlibPersistInmemoryVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
             "name": "module-ballerina-tcp",
             "module_version": "1.10.0-SNAPSHOT",
             "level": 3,
@@ -284,7 +299,7 @@
         },
         {
             "name": "module-ballerina-udp",
-            "module_version": "1.9.2-SNAPSHOT",
+            "module_version": "1.10.0-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibUdpVersion",
@@ -302,6 +317,7 @@
             "dependents": [
                 "module-ballerina-grpc",
                 "module-ballerina-mqtt",
+                "module-ballerinax-persist.redis",
                 "module-ballerina-soap",
                 "module-ballerinai-transaction",
                 "module-ballerina-websocket",
@@ -415,6 +431,7 @@
             "release": true,
             "dependents": [
                 "module-ballerina-grpc",
+                "module-ballerinax-persist.redis",
                 "module-ballerina-soap",
                 "module-ballerinai-transaction",
                 "module-ballerina-websocket",
@@ -429,6 +446,16 @@
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-persist.redis",
+            "module_version": "0.1.0-SNAPSHOT",
+            "level": 6,
+            "default_branch": "main",
+            "version_key": "stdlibPersistRedisVersion",
             "release": true,
             "dependents": [],
             "display_code_cov_badge": true
@@ -451,6 +478,7 @@
             "version_key": "stdlibTransactionVersion",
             "release": true,
             "dependents": [
+                "module-ballerinax-persist.googlesheets",
                 "module-ballerina-sql"
             ],
             "display_code_cov_badge": true
@@ -498,11 +526,33 @@
             "display_code_cov_badge": true
         },
         {
+            "name": "module-ballerinax-persist.googlesheets",
+            "module_version": "1.3.0-SNAPSHOT",
+            "level": 7,
+            "default_branch": "main",
+            "version_key": "stdlibPersistGoogleSheetVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
             "name": "module-ballerina-sql",
             "module_version": "1.13.0-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
+            "release": true,
+            "dependents": [
+                "module-ballerinax-persist.sql"
+            ],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-persist.sql",
+            "module_version": "1.3.0-SNAPSHOT",
+            "level": 8,
+            "default_branch": "main",
+            "version_key": "stdlibPersistSqlVersion",
             "release": true,
             "dependents": [],
             "display_code_cov_badge": true
@@ -515,46 +565,6 @@
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibCopybookVersion",
-            "release": true,
-            "dependents": [],
-            "display_code_cov_badge": true
-        },
-        {
-            "name": "module-ballerinax-persist.googlesheets",
-            "module_version": "1.3.0-SNAPSHOT",
-            "level": 1,
-            "default_branch": "main",
-            "version_key": "stdlibPersistGoogleSheetVersion",
-            "release": true,
-            "dependents": [],
-            "display_code_cov_badge": true
-        },
-        {
-            "name": "module-ballerinax-persist.inmemory",
-            "module_version": "1.3.0-SNAPSHOT",
-            "level": 1,
-            "default_branch": "main",
-            "version_key": "stdlibPersistInmemoryVersion",
-            "release": true,
-            "dependents": [],
-            "display_code_cov_badge": true
-        },
-        {
-            "name": "module-ballerinax-persist.redis",
-            "module_version": "0.1.0-SNAPSHOT",
-            "level": 1,
-            "default_branch": "main",
-            "version_key": "stdlibPersistRedisVersion",
-            "release": true,
-            "dependents": [],
-            "display_code_cov_badge": true
-        },
-        {
-            "name": "module-ballerinax-persist.sql",
-            "module_version": "1.3.0-SNAPSHOT",
-            "level": 1,
-            "default_branch": "main",
-            "version_key": "stdlibPersistSqlVersion",
             "release": true,
             "dependents": [],
             "display_code_cov_badge": true
