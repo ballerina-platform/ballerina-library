@@ -130,27 +130,28 @@
         },
         {
             "name": "module-ballerina-yaml"
-        }
-    ],
-    "extended_modules": [
-        {
-            "name": "module-ballerinax-copybook"
         },
         {
-            "name": "module-ballerinax-persist.googlesheets",
-            "version_key": "stdlibPersistGoogleSheetVersion"
+            "name": "module-ballerinax-persist.sql",
+            "version_key": "stdlibPersistSqlVersion"
         },
         {
             "name": "module-ballerinax-persist.inmemory",
             "version_key": "stdlibPersistInmemoryVersion"
         },
         {
-            "name": "module-ballerinax-persist.redis",
-            "version_key": "stdlibPersistRedisVersion"
+            "name": "module-ballerinax-persist.googlesheets",
+            "version_key": "stdlibPersistGoogleSheetVersion"
         },
         {
-            "name": "module-ballerinax-persist.sql",
-            "version_key": "stdlibPersistSqlVersion"
+            "name": "module-ballerinax-persist.redis",
+            "version_key": "stdlibPersistRedisVersion"
+        }
+
+    ],
+    "extended_modules": [
+        {
+            "name": "module-ballerinax-copybook"
         }
     ],
     "connectors": [
