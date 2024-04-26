@@ -1,5 +1,5 @@
-[project]
-org-name= "ballerina_stdlib"
-version= "0.1.0"
-
-[dependencies]
+[package]
+org = "ballerina_library"
+name = "release"
+version = "0.1.0"
+distribution = "2201.8.0"

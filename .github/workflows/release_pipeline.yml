@@ -9,11 +9,11 @@ jobs:
         steps:
             -   uses: actions/checkout@v2
 
-            -   name: Release Pipeline
-                uses: ballerina-platform/ballerina-action@1.2.x
+            -   name: Release Ballerina Libraries
+                uses: ballerina-platform/ballerina-action@2201.8.6
                 with:
                     args:
-                        run release
+                        run
                 env:
                     WORKING_DIR: ./release
-                    GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+                    BALLERINA_BOT_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}

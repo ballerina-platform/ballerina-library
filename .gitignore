@@ -41,3 +41,5 @@ Ballerina.lock
 
 #Ballerina
 dashboard/Dependencies.toml
+release/Dependencies.toml
+Config.toml
