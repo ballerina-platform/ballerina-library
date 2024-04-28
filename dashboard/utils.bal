@@ -53,15 +53,11 @@ isolated function getRepoLink(string moduleName) returns string {
 }
 
 isolated function getModuleShortName(string moduleName) returns string {
-    string[] nameSplit = re `-`.split(moduleName);
-    if nameSplit.length() == 3 {
-        string shortName = nameSplit[2];
-        if shortName == "jballerina.java.arrays" {
-            return "java.arrays";
-        }
-        return shortName;
+    string shortName = re `module-ballerina[x|i]*-`.replace(moduleName, "");
+    if shortName == "jballerina.java.arrays" {
+        return "java.arrays";
     }
-    return moduleName; // Tools
+    return shortName;
 }
 
 // string formating

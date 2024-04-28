@@ -67,18 +67,13 @@ public function main() returns error? {
 
     check getImmediateDependencies(modules);
     check calculateLevels(modules);
+    moduleDetails.forEach(function (Module[] moduleList) {
+        removePropertiesFile(moduleList);
+    });
     moduleDetails.modules = libraryModules.sort(array:ASCENDING, a => a.level);
-    moduleDetails.extended_modules = extendedModules.sort(array:ASCENDING, a => a.level);
-    moduleDetails.tools = tools.sort(array:ASCENDING, a => a.level);
 
-    List filteredList = {
-        modules: removePropertiesFile(moduleDetails.modules),
-        extended_modules: removePropertiesFile(moduleDetails.extended_modules),
-        connectors: removePropertiesFile(moduleDetails.connectors),
-        tools: removePropertiesFile(moduleDetails.tools)
-    };
-    check writeToFile(STDLIB_MODULES_JSON, filteredList);
-    check updateStdlibDashboard(filteredList);
+    check writeToFile(STDLIB_MODULES_JSON, moduleDetails);
+    check updateStdlibDashboard(moduleDetails);
 }
 
 //  Sorts the Ballerina library module list in ascending order
@@ -99,7 +94,7 @@ function getSortedModuleNameList() returns List|error {
 
 function sortModuleArray(Module[] moduleArray, int nameIndex) returns Module[] {
     Module[] sortedModuleArray = from Module module in moduleArray
-        order by re `-`.split(module.name)[nameIndex] ascending
+        order by getModuleShortName(module.name) ascending
         select module;
     return sortedModuleArray;
 }
@@ -407,16 +402,8 @@ isolated function writeToFile(string fileName, json content) returns error? {
     }
 }
 
-isolated function removePropertiesFile(Module[] modules) returns Module[] {
-    return from Module module in modules
-    select {
-        name: module.name,
-        module_version: module.module_version,
-        level: module.level,
-        default_branch: module.default_branch,
-        version_key: module.version_key,
-        display_code_cov_badge: module.display_code_cov_badge,
-        release: module.release,
-        dependents: module.dependents
-    };
+isolated function removePropertiesFile(Module[] modules) {
+    foreach Module module in modules {
+        module.gradle_properties = ();
+    }
 }
