@@ -22,10 +22,7 @@ import ballerinax/github;
 
 const string ACCESS_TOKEN_ENV = "BALLERINA_BOT_TOKEN";
 const string MODULE_LIST_JSON = "./resources/stdlib_modules.json";
-
 const string GITHUB_ORG = "ballerina-platform";
-const string RELEASE_EVENT = "stdlib-release-pipeline";
-
 // IMPORTANT: When testing, do not use `publish-release.yml` as the release workflow.
 const string RELEASE_WORKFLOW = "build-timestamped-master.yml";
 
@@ -121,11 +118,10 @@ isolated function releaseLevel(Module[] modules, int level) returns error? {
 }
 
 isolated function waitForLevelRelease(ProcessingModule[] processingModules, int level) returns error? {
-    printInfo(string `Waiting for level ${level} module releases`);
+    printInfo(string `Waiting for level ${level} module releases to complete`);
     int processedCount = 0;
     int totalModules = processingModules.length();
-    error[] errors = [];
-    Module[] relesedModules = [];
+    (Module|error)[] releasedModules = [];
     while processedCount < totalModules {
         runtime:sleep(WORKFLOW_POLL_INTERVAL);
         // Clonning the array to avoid concurrent modification
@@ -133,28 +129,19 @@ isolated function waitForLevelRelease(ProcessingModule[] processingModules, int 
         foreach ProcessingModule processingModule in newProcessingModules {
             boolean|error result = isModuleReleased(processingModule);
             if result is error {
-                errors.push(result);
+                releasedModules.push(result);
                 processedCount += 1;
                 _ = removeModule(processingModules, processingModule);
                 continue;
             }
             if result {
-                relesedModules.push(processingModule.m);
+                releasedModules.push(processingModule.m);
                 _ = removeModule(processingModules, processingModule);
                 processedCount += 1;
             }
         }
     }
-
-    foreach Module m in relesedModules {
-        printInfo(string `Module ${m.name} released successfully`);
-    }
-
-    if errors.length() > 0 {
-        errors.forEach(e => printError(e));
-        return error(string `Failed to release modules in level ${level}`);
-    }
-    printInfo(string `All modules in level ${level} released successfully`);
+    check logProcessedModules(releasedModules, level);
 }
 
 isolated function triggerModuleRelease(Module m) returns int|error {
@@ -221,6 +208,23 @@ isolated function removeModule(ProcessingModule[] modules, ProcessingModule m) r
         return;
     }
     return modules.remove(index);
+}
+
+isolated function logProcessedModules((Module|error)[] releasedModules, int level) returns error? {
+    boolean hasErrors = false;
+    foreach Module|error m in releasedModules {
+        if m is error {
+            printError(m);
+            hasErrors = true;
+            continue;
+        }
+        printInfo(string `Module ${m.name} released successfully`);
+    }
+
+    if hasErrors {
+        return error(string `Failed to release modules in level ${level}`);
+    }
+    printInfo(string `All modules in level ${level} released successfully`);
 }
 
 isolated function printInfo(string message) {
