@@ -5,7 +5,7 @@ const IO_MODULE = "module-ballerina-io";
 const JAVA_ARRAYS_MODULE = "module-ballerina-jballerina.java.arrays";
 const GMAIL_MODULE = "module-ballerinax-googleapis.gmail";
 
-final readonly & List list = check (check io:fileReadJson("./stdlib_modules.json")).fromJsonWithType();
+final readonly & List list = check (check io:fileReadJson("../release/resources/stdlib_modules.json")).fromJsonWithType();
 final readonly & Module ioModule = check getIoModule();
 final readonly & Module gmailModule = check getGmailModule();
 
