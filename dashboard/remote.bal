@@ -19,6 +19,7 @@ import ballerina/lang.regexp;
 import ballerina/os;
 import ballerina/url;
 import ballerinax/github;
+import ballerina/io;
 
 int issueCount = 0;
 
@@ -111,8 +112,9 @@ isolated function getRepoBadges(Module module) returns RepoBadges|error {
 
 isolated function getBugsBadge(string moduleName) returns WorkflowBadge|error {
     string shortName = getModuleShortName(moduleName);
-    github:Issue[] issues = check github->/repos/[GITHUB_ORG]/[BALLERINA_LIBRARY_REPO]/issues(labels = string `Type/Bug, module/${shortName}`, state = "open");
+    github:Issue[] issues = check github->/repos/[GITHUB_ORG]/[BALLERINA_LIBRARY_REPO]/issues(labels = string `Type/Bug,module/${shortName}`, state = "open");
     int bugCount = issues.length();
+    io:println(string `${moduleName} bug count: ${bugCount}`);
     string labelColour = bugCount == 0 ? BADGE_COLOR_GREEN : BADGE_COLOR_YELLOW;
     string issueFilter = check url:encode(string `is:open label:module/${shortName} label:Type/Bug`, ENCODING);
     string query = string `${issueFilter}&color=${labelColour}&label=`;
