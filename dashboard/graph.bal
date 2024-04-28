@@ -31,21 +31,45 @@ type Module record {|
     string name;
     string module_version?;
     int level?;
-    string default_branch?;
+    string default_branch = "main";
     string version_key?;
     boolean release?;
     string[] dependents?;
     string gradle_properties?;
-    boolean display_code_cov_badge?;
+    boolean display_code_cov_badge = true;
+|};
+
+type WorkflowBadge record {|
+    string name;
+    string badgeUrl = NABADGE;
+    string htmlUrl = "";
+|};
+
+type RepoBadges record {|
+    WorkflowBadge release?;
+    WorkflowBadge buildStatus?;
+    WorkflowBadge trivy?;
+    WorkflowBadge codeCov?;
+    WorkflowBadge bugs?;
+    WorkflowBadge pullRequests?;
+    WorkflowBadge loadTests?;
+    WorkflowBadge graalvmCheck?;
 |};
 
 public function main() returns error? {
     List moduleNameList = check getSortedModuleNameList();
     List moduleDetails = check initializeModuleDetails(moduleNameList);
 
-    check getImmediateDependencies(moduleDetails);
-    check calculateLevels(moduleDetails);
-    moduleDetails.modules = moduleDetails.modules.sort(array:ASCENDING, a => a.level);
+    Module[] libraryModules = moduleDetails.modules;
+    Module[] extendedModules = moduleDetails.extended_modules;
+    Module[] tools = moduleDetails.tools;
+    Module[] modules = [...libraryModules, ...extendedModules, ...tools];
+
+    check getImmediateDependencies(modules);
+    check calculateLevels(modules);
+    moduleDetails.modules = libraryModules.sort(array:ASCENDING, a => a.level);
+    moduleDetails.extended_modules = extendedModules.sort(array:ASCENDING, a => a.level);
+    moduleDetails.tools = tools.sort(array:ASCENDING, a => a.level);
 
     List filteredList = {
         modules: removePropertiesFile(moduleDetails.modules),
@@ -151,12 +175,12 @@ function getVersion(string moduleName, string gradleProperties) returns string|e
 }
 
 // Get the modules list which use the specific module
-function getImmediateDependencies(List moduleDetails) returns error? {
-    foreach Module module in moduleDetails.modules {
-        string[] dependees = check getDependencies(module, moduleDetails);
+function getImmediateDependencies(Module[] modules) returns error? {
+    foreach Module module in modules {
+        string[] dependees = check getDependencies(module, modules);
 
         // Get the dependecies modules which use module in there package
-        foreach Module dependee in moduleDetails.modules {
+        foreach Module dependee in modules {
             string dependeeName = dependee.name;
             string[]? dependeeDependents = dependee.dependents;
             if dependees.indexOf(dependeeName) is int && dependeeDependents is string[] {
@@ -168,7 +192,7 @@ function getImmediateDependencies(List moduleDetails) returns error? {
 }
 
 // Get dependecies of specific module
-function getDependencies(Module module, List moduleDetails) returns string[]|error {
+function getDependencies(Module module, Module[] modules) returns string[]|error {
     string[] propertiesFileArr = [];
     string moduleName = module.name;
     string? propertiesFile = module.gradle_properties;
@@ -178,7 +202,7 @@ function getDependencies(Module module, List moduleDetails) returns string[]|err
     string[] dependencies = [];
 
     foreach string line in propertiesFileArr {
-        foreach Module item in moduleDetails.modules {
+        foreach Module item in modules {
             string dependentName = item.name;
             if dependentName == moduleName {
                 continue;
@@ -193,16 +217,16 @@ function getDependencies(Module module, List moduleDetails) returns string[]|err
     return dependencies;
 }
 
-function calculateLevels(List moduleDetails) returns error? {
-    DiGraph dependencyGraph = new DiGraph();
+function calculateLevels(Module[] modules) returns error? {
+    DiGraph dependencyGraph = new;
 
     // Module names are used to create the nodes and the level attribute of the node is initialized to 1
-    foreach Module module in moduleDetails.modules {
+    foreach Module module in modules {
         dependencyGraph.addNode(module.name);
     }
 
     // Edges are created considering the dependents of each module
-    foreach Module module in moduleDetails.modules {
+    foreach Module module in modules {
         string[]? moduleDependents = module.dependents;
         if moduleDependents is string[] {
             foreach var dependent in moduleDependents {
@@ -228,13 +252,13 @@ function calculateLevels(List moduleDetails) returns error? {
         string[] processing = [];
 
         foreach string n in processedList {
-            processCurrentLevel(dependencyGraph, processing, moduleDetails, currentLevel, n);
+            processCurrentLevel(dependencyGraph, processing, modules, currentLevel, n);
         }
         processedList = processing;
         currentLevel += 1;
     }
 
-    foreach Module module in moduleDetails.modules {
+    foreach Module module in modules {
         int? moduleLevel = dependencyGraph.getCurrentLevel(module.name);
         if moduleLevel is int {
             module.level = moduleLevel;
@@ -242,7 +266,7 @@ function calculateLevels(List moduleDetails) returns error? {
     }
 }
 
-function processCurrentLevel(DiGraph dependencyGraph, string[] processing, List moduleDetails,
+function processCurrentLevel(DiGraph dependencyGraph, string[] processing, Module[] modules,
         int currentLevel, string node) {
     string[]? successorsOfNode = dependencyGraph.successor(node);
     string[] successors = [];
@@ -252,7 +276,7 @@ function processCurrentLevel(DiGraph dependencyGraph, string[] processing, List 
     }
 
     foreach string successor in successors {
-        removeModulesInIntermediatePaths(dependencyGraph, node, successor, successors, moduleDetails);
+        removeModulesInIntermediatePaths(dependencyGraph, node, successor, successors, modules);
         dependencyGraph.setCurrentLevel(successor, currentLevel);
         if !(processing.indexOf(successor) is int) {
             processing.push(successor);
@@ -261,11 +285,11 @@ function processCurrentLevel(DiGraph dependencyGraph, string[] processing, List 
 }
 
 function removeModulesInIntermediatePaths(DiGraph dependencyGraph, string sourceNode,
-        string destinationNode, string[] successors, List moduleDetails) {
+        string destinationNode, string[] successors, Module[] modules) {
     string[] longestPath = dependencyGraph.getLongestPath(sourceNode, destinationNode);
     foreach string n in longestPath.slice(1, longestPath.length() - 1) {
         if (successors.indexOf(n) is int) {
-            foreach Module module in moduleDetails.modules {
+            foreach Module module in modules {
                 string[]? moduleDependents = module.dependents;
                 if module.name == sourceNode && moduleDependents is string[] {
                     int? indexOfDestinationNode = moduleDependents.indexOf(destinationNode);

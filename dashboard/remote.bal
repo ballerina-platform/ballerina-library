@@ -15,14 +15,21 @@
 // under the License.
 
 import ballerina/http;
+import ballerina/lang.regexp;
 import ballerina/os;
+import ballerina/url;
 import ballerinax/github;
 
 int issueCount = 0;
 
+const string GITHUB_ORG = "ballerina-platform";
+const string BALLERINA_LIBRARY_REPO = "ballerina-library";
+
+configurable string token = os:getEnv(BALLERINA_BOT_TOKEN);
+
 http:Client git = check new (GITHUB_RAW_LINK, config = {
     auth: {
-        token: os:getEnv(BALLERINA_BOT_TOKEN)
+        token
     },
     retryConfig: {
         count: HTTP_REQUEST_RETRIES,
@@ -31,59 +38,130 @@ http:Client git = check new (GITHUB_RAW_LINK, config = {
     }
 });
 
-github:ConnectionConfig config = {
-    auth: {
-        token: os:getEnv(BALLERINA_BOT_TOKEN)
-    },
+final github:Client github = check new ({
     retryConfig: {
         count: HTTP_REQUEST_RETRIES,
         interval: HTTP_REQUEST_DELAY_IN_SECONDS,
         backOffFactor: HTTP_REQUEST_DELAY_MULTIPLIER
-    }
-};
-
-github:Client githubClient = check new (config);
+    },
+    auth: {token}
+});
 
 function getDefaultBranch(string moduleName) returns string|error {
-    // record { string default_branch; } response = check git->/repos/[BALLERINA_ORG_NAME]/[moduleName];
-    // return response.default_branch;
+    github:FullRepository repository = check github->/repos/[GITHUB_ORG]/[moduleName];
+    return repository.default_branch;
 
-    stream<github:Branch, github:Error?> branches = check githubClient->getBranches(BALLERINA_ORG_NAME, moduleName);
-    stream<github:Branch, github:Error?> filter = branches.filter(filterBranch);
-
-    record {|github:Branch value;|}? defaultBranch = check filter.next();
-    return defaultBranch == () ? "" : defaultBranch.value.name;
 }
 
-function filterBranch(github:Branch branch) returns boolean {
-    return branch.name == "master" || branch.name == "main";
-}
+isolated function getRepoBadges(Module module) returns RepoBadges|error {
+    string moduleName = module.name;
+    string defaultBranch = module.default_branch;
+    github:WorkflowResponse workflowResponse = check github->/repos/[GITHUB_ORG]/[module.name]/actions/workflows;
+    WorkflowBadge codeCov = module.display_code_cov_badge ? {
+            name: "CodeCov",
+            badgeUrl: string `${CODECOV_BADGE_URL}/${BALLERINA_ORG_NAME}/${moduleName}/branch/${defaultBranch}/graph/badge.svg`,
+            htmlUrl: string `${CODECOV_BADGE_URL}/${BALLERINA_ORG_NAME}/${moduleName}`
+        } : {
+            name: "CodeCov",
+            badgeUrl: NABADGE,
+            htmlUrl: ""
+        };
+    WorkflowBadge release = check getLatestRelease(moduleName);
+    WorkflowBadge pullRequests = check getPullRequestsBadge(module);
+    RepoBadges repoBadges = {
+        release,
+        codeCov,
+        pullRequests,
+        bugs: check getBugsBadge(moduleName)
+    };
 
-function getIssuesCount(string repoName, string shortName) returns int|error? {
-    stream<github:Issue, github:Error?> issues =
-        check githubClient->getIssues(BALLERINA_ORG_NAME, repoName,
-        issueFilters = {labels: ["Type/Bug", string `module/${shortName}`], states: [github:ISSUE_OPEN]});
-    issueCount = 0;
-    _ = check issues.forEach(count);
-    return issueCount;
-}
-
-function count(github:Issue issue) {
-    issueCount += 1;
-}
-
-isolated function openUrl(string page, string url) returns http:Response|error {
-    http:Client httpClient = check new (page, config = {
-        auth: {
-            token: os:getEnv(BALLERINA_BOT_TOKEN)
-        },
-        retryConfig: {
-            count: HTTP_REQUEST_RETRIES,
-            interval: HTTP_REQUEST_DELAY_IN_SECONDS,
-            backOffFactor: HTTP_REQUEST_DELAY_MULTIPLIER
+    foreach github:Workflow workflow in workflowResponse.workflows {
+        string workflowFileName = getWorkflowFileName(workflow.path);
+        if workflowFileName == WORKFLOW_MASTER_BUILD || workflowFileName == WORKFLOW_MASTER_CI_BUILD {
+            repoBadges.buildStatus = {
+                name: "Build",
+                badgeUrl: getBadgeUrl(moduleName, workflowFileName, defaultBranch),
+                htmlUrl: getWorkflowUrl(moduleName, workflowFileName)
+            };
         }
-    });
+        if workflowFileName == WORKFLOW_TRIVY {
+            repoBadges.trivy = {
+                name: "Trivy",
+                badgeUrl: getBadgeUrl(moduleName, workflowFileName, defaultBranch),
+                htmlUrl: getWorkflowUrl(moduleName, workflowFileName)
+            };
+        }
+        if workflowFileName == WORKFLOW_PROCESS_LOAD_TESTS {
+            repoBadges.loadTests = {
+                name: "Load Tests",
+                badgeUrl: getBadgeUrl(moduleName, workflowFileName, defaultBranch),
+                htmlUrl: getWorkflowUrl(moduleName, workflowFileName)
+            };
+        }
+        if workflowFileName == WORKFLOW_BAL_TEST_GRAALVM {
+            repoBadges.graalvmCheck = {
+                name: "GraalVM Check",
+                badgeUrl: getBadgeUrl(moduleName, workflowFileName, defaultBranch),
+                htmlUrl: getWorkflowUrl(moduleName, workflowFileName)
+            };
+        }
+    }
+    return repoBadges;
+}
 
-    http:Response response = check httpClient->get(url);
-    return response;
+isolated function getBugsBadge(string moduleName) returns WorkflowBadge|error {
+    string shortName = getModuleShortName(moduleName);
+    github:Issue[] issues = check github->/repos/[GITHUB_ORG]/[BALLERINA_LIBRARY_REPO]/issues(labels = string `Type/Bug, module/${shortName}`, state = "open");
+    int bugCount = issues.length();
+    string labelColour = bugCount == 0 ? BADGE_COLOR_GREEN : BADGE_COLOR_YELLOW;
+    string issueFilter = check url:encode(string `is:open label:module/${shortName} label:Type/Bug`, ENCODING);
+    string query = string `${issueFilter}&color=${labelColour}&label=`;
+
+    string badgeUrl = string `${GITHUB_BADGE_URL}/issues-search/${BALLERINA_ORG_NAME}/${BALLERINA_STANDARD_LIBRARY}?query=${query}`;
+    string htmlUrl = string `${BALLERINA_ORG_URL}/${BALLERINA_STANDARD_LIBRARY}/issues?q=${issueFilter}`;
+    return {
+        name: "Bugs",
+        badgeUrl,
+        htmlUrl
+    };
+}
+
+isolated function getLatestRelease(string moduleName) returns WorkflowBadge|error {
+    github:Release|error release = github->/repos/[GITHUB_ORG]/[moduleName]/releases/latest;
+    if release is error {
+        return {
+            name: "N/A",
+            badgeUrl: NABADGE,
+            htmlUrl: ""
+        };
+    }
+    string badgeUrl = string `${GITHUB_BADGE_URL}/v/release/${GITHUB_ORG}/${moduleName}?color=${BADGE_COLOR_GREEN}&label=`;
+    return {
+        name: "Latest Release",
+        badgeUrl,
+        htmlUrl: release.url
+    };
+}
+
+isolated function getPullRequestsBadge(Module module) returns WorkflowBadge|error {
+    string badgeUrl = string `${GITHUB_BADGE_URL}/issues-pr-raw/${BALLERINA_ORG_NAME}/${module.name}.svg?label=`;
+    string htmlUrl = string `${BALLERINA_ORG_URL}/${module.name}/pulls`;
+    return {
+        name: "Pull Requests",
+        badgeUrl,
+        htmlUrl
+    };
+}
+
+isolated function getWorkflowFileName(string workflowPath) returns string {
+    string[] pathParts = regexp:split(re `/`, workflowPath);
+    return pathParts[pathParts.length() - 1];
+}
+
+isolated function getBadgeUrl(string moduleName, string workflow, string defaultBranch) returns string {
+    return string `${GITHUB_BADGE_URL}/actions/workflow/status/${BALLERINA_ORG_NAME}/${moduleName}/${workflow}?branch=${defaultBranch}&label=`;
+}
+
+isolated function getWorkflowUrl(string moduleName, string workflow) returns string {
+    return string `${BALLERINA_ORG_URL}/${moduleName}/actions/workflows/${workflow}`;
 }
