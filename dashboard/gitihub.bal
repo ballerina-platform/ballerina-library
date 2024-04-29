@@ -57,16 +57,8 @@ isolated function getRepoBadges(Module module) returns RepoBadges|error {
     string moduleName = module.name;
     string defaultBranch = module.default_branch;
     github:WorkflowResponse workflowResponse = check github->/repos/[GITHUB_ORG]/[module.name]/actions/workflows;
-    WorkflowBadge codeCov = module.display_code_cov_badge ? {
-            name: "CodeCov",
-            badgeUrl: string `${CODECOV_BADGE_URL}/${BALLERINA_ORG_NAME}/${moduleName}/branch/${defaultBranch}/graph/badge.svg`,
-            htmlUrl: string `${CODECOV_BADGE_URL}/${BALLERINA_ORG_NAME}/${moduleName}`
-        } : {
-            name: "CodeCov",
-            badgeUrl: NABADGE,
-            htmlUrl: ""
-        };
-    WorkflowBadge release = check getLatestRelease(moduleName);
+    WorkflowBadge codeCov = getCodeCoverageBadge(module);
+    WorkflowBadge release = check getLatestReleaseBadge(moduleName);
     WorkflowBadge pullRequests = check getPullRequestsBadge(module);
     RepoBadges repoBadges = {
         release,
@@ -126,7 +118,7 @@ isolated function getBugsBadge(string moduleName) returns WorkflowBadge|error {
     };
 }
 
-isolated function getLatestRelease(string moduleName) returns WorkflowBadge|error {
+isolated function getLatestReleaseBadge(string moduleName) returns WorkflowBadge|error {
     github:Release|error release = github->/repos/[GITHUB_ORG]/[moduleName]/releases/latest;
     if release is error {
         return {
@@ -151,6 +143,25 @@ isolated function getPullRequestsBadge(Module module) returns WorkflowBadge|erro
         badgeUrl,
         htmlUrl
     };
+}
+
+isolated function getCodeCoverageBadge(Module module) returns WorkflowBadge {
+    boolean? displayCodeCovBadge = module.display_code_cov_badge;
+    if displayCodeCovBadge is () || !displayCodeCovBadge {
+        return {
+            name: "CodeCov",
+            badgeUrl: NABADGE,
+            htmlUrl: ""
+        };
+    }
+    string moduleName = module.name;
+    string defaultBranch = module.default_branch;
+    return {
+        name: "CodeCov",
+        badgeUrl: string `${CODECOV_BADGE_URL}/${BALLERINA_ORG_NAME}/${moduleName}/branch/${defaultBranch}/graph/badge.svg`,
+        htmlUrl: string `${CODECOV_BADGE_URL}/${BALLERINA_ORG_NAME}/${moduleName}`
+    };
+
 }
 
 isolated function getWorkflowFileName(string workflowPath) returns string {

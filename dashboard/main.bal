@@ -1,6 +1,6 @@
-// Copyright (c) 2022, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2024, WSO2 LLC. (http://www.wso2.org).
 //
-// WSO2 Inc. licenses this file to you under the Apache License,
+// WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
 // in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,54 +20,16 @@ import ballerina/log;
 
 import thisarug/prettify;
 
-type List record {|
-    Module[] modules;
-    Module[] extended_modules;
-    Module[] connectors;
-    Module[] tools;
-|};
-
-type Module record {|
-    string name;
-    string module_version?;
-    int level?;
-    string default_branch = "main";
-    string version_key?;
-    boolean release?;
-    string[] dependents?;
-    string gradle_properties?;
-    boolean display_code_cov_badge = true;
-|};
-
-type WorkflowBadge record {|
-    string name;
-    string badgeUrl = NABADGE;
-    string htmlUrl = "";
-|};
-
-type RepoBadges record {|
-    WorkflowBadge release?;
-    WorkflowBadge buildStatus?;
-    WorkflowBadge trivy?;
-    WorkflowBadge codeCov?;
-    WorkflowBadge bugs?;
-    WorkflowBadge pullRequests?;
-    WorkflowBadge loadTests?;
-    WorkflowBadge graalvmCheck?;
-|};
-
 public function main() returns error? {
     List moduleNameList = check getSortedModuleNameList();
     List moduleDetails = check initializeModuleDetails(moduleNameList);
 
     Module[] libraryModules = moduleDetails.modules;
-    Module[] extendedModules = moduleDetails.extended_modules;
-    Module[] tools = moduleDetails.tools;
-    Module[] modules = [...libraryModules, ...extendedModules, ...tools];
+    Module[] modules = [...libraryModules, ...moduleDetails.extended_modules, ...moduleDetails.tools];
 
     check getImmediateDependencies(modules);
     check calculateLevels(modules);
-    moduleDetails.forEach(function (Module[] moduleList) {
+    moduleDetails.forEach(function(Module[] moduleList) {
         removePropertiesFile(moduleList);
     });
     moduleDetails.modules = libraryModules.sort(array:ASCENDING, a => a.level);
@@ -78,25 +40,23 @@ public function main() returns error? {
 
 //  Sorts the Ballerina library module list in ascending order
 function getSortedModuleNameList() returns List|error {
-    json moduleListJson = check io:fileReadJson(MODULE_LIST_JSON);
-    List moduleList = check moduleListJson.cloneWithType();
+    List moduleList = check (check io:fileReadJson(MODULE_LIST_JSON)).fromJsonWithType();
 
     List sortedList = {
-        modules: sortModuleArray(moduleList.modules, 2),
-        extended_modules: sortModuleArray(moduleList.extended_modules, 2),
-        connectors: sortModuleArray(moduleList.connectors, 2),
-        tools: sortModuleArray(moduleList.tools, 0)
+        modules: sortModuleArray(moduleList.modules),
+        extended_modules: sortModuleArray(moduleList.extended_modules),
+        connectors: sortModuleArray(moduleList.connectors),
+        tools: sortModuleArray(moduleList.tools)
     };
 
     check writeToFile(MODULE_LIST_JSON, sortedList);
     return sortedList;
 }
 
-function sortModuleArray(Module[] moduleArray, int nameIndex) returns Module[] {
-    Module[] sortedModuleArray = from Module module in moduleArray
+function sortModuleArray(Module[] moduleArray) returns Module[] {
+    return from Module module in moduleArray
         order by getModuleShortName(module.name) ascending
         select module;
-    return sortedModuleArray;
 }
 
 function initializeModuleDetails(List moduleNameList) returns List|error {
@@ -122,7 +82,6 @@ function initializeModuleInfo(Module module) returns Module|error {
     string defaultBranch = check getDefaultBranch(moduleName);
     string gradleProperties =
         check git->get(string `/${BALLERINA_ORG_NAME}/${moduleName}/${defaultBranch}/${GRADLE_PROPERTIES}`);
-
     string versionKey = getVersionKey(module);
     string moduleVersion = check getVersion(moduleName, gradleProperties);
     boolean displayCodeCovBadge = getDisplayCodeCovBadge(module);
@@ -138,6 +97,7 @@ function initializeModuleInfo(Module module) returns Module|error {
         gradle_properties: gradleProperties
     };
 }
+
 function getDisplayCodeCovBadge(Module module) returns boolean {
     boolean? displayCodeCovBadge = module.display_code_cov_badge;
     if displayCodeCovBadge is boolean {
@@ -145,6 +105,7 @@ function getDisplayCodeCovBadge(Module module) returns boolean {
     }
     return true;
 }
+
 function getVersionKey(Module module) returns string {
     string? versionKey = module.version_key;
     if versionKey is string {
