@@ -1,9 +1,9 @@
 # Ballerina Library Build and Release Guide
 
-_Authors_: @niveathika @ThisaruGuruge  
-_Reviewers_: @shafreenAnfar @daneshk  
-_Created_: 2022/07/05  
-_Updated_: 2023/06/23  
+_Authors_: @niveathika @ThisaruGuruge
+_Reviewers_: @shafreenAnfar @daneshk @NipunaRanasinghe
+_Created_: 2022/07/05
+_Updated_: 2024/04/29
 
 ## Table of Contents
 
@@ -30,6 +30,7 @@ Ballerina distribution depends on multiple components.
 Standard Libraries are built on top of the base Ballerina Language distribution.
 
 The build includes the following tasks,
+
 1. Create an intermediate Ballerina Distribution consisting of Language and any dependent Ballerina library package.
 2. Build and Run unit tests.
 3. Create an intermediate distribution, including the module.
@@ -40,14 +41,14 @@ The [Gradle Plugin](https://github.com/ballerina-platform/plugin-gradle) execute
 
 ## Branching Strategy
 
-The Ballerina library branches are intended to maintain a releasable state all the time. The default branch of the repository *should* be the latest release branch. Patch branches are used to do patches on top of a given distribution version.
+The Ballerina library branches are intended to maintain a releasable state all the time. The default branch of the repository _should_ be the latest release branch. Patch branches are used to do patches on top of a given distribution version.
 
 ### Branch Naming
 
 The Branch naming convention is as follows.
 
 1. There is a default branch for each repository, named either `master` or `main`.
-2. For each distribution release, there *should* be a patch branch names `<distribution-major-version>.<distribution-minor-version>.x`
+2. For each distribution release, there _should_ be a patch branch names `<distribution-major-version>.<distribution-minor-version>.x`
 
     E.g.:
     - 2201.1.x
@@ -57,13 +58,14 @@ The Branch naming convention is as follows.
 
 ## Version Strategy
 
-All the Ballerina Standard Libraries *must* follow [semver versioning](https://semver.org/).
+All the Ballerina Standard Libraries _must_ follow [semver versioning](https://semver.org/).
 
 Excerpt from semver:
 
 > Given a version number MAJOR.MINOR.PATCH, increment the:
-> - MAJOR version when you make incompatible API changes 
-> - MINOR version when you add functionality in a backward compatible manner 
+>
+> - MAJOR version when you make incompatible API changes
+> - MINOR version when you add functionality in a backward compatible manner
 > - PATCH version when you make backward compatible bug fixes
 
 ### Release Scenarios
@@ -74,7 +76,7 @@ A Ballerina library module can be released in the following scenarios.
 - A bug fix is added to the module.
 - A dependent module is released with a new feature.
 
->**Note:** When a dependent Ballerina library package is having a minor version bump, all the dependents *must* bump to the next minor version with the updated dependency versions.
+>**Note:** When a dependent Ballerina library package is having a minor version bump, all the dependents _must_ bump to the next minor version with the updated dependency versions.
 
 For example, consider the following scenario:
 
@@ -82,13 +84,13 @@ For example, consider the following scenario:
 - The `ballerina/log` is depending on `ballerina/io` and also released `1.0.0` version
 - The `ballerina/http` is depending on `ballerina/log` and also released `1.0.0` version
 
-### Case 1: Dependent Module Released a Patch Version:
+### Case 1: Dependent Module Released a Patch Version
 
-If the `ballerina/io` is released the `1.0.1` version, the `ballerina/log` or the `ballerina/http` module does not need to update the dependencies. (Although it is *recommended* to update to the patch version, there's no issue even if it is not updated since the Ballerina package resolution will automatically resolve the latest patch version).
+If the `ballerina/io` is released the `1.0.1` version, the `ballerina/log` or the `ballerina/http` module does not need to update the dependencies. (Although it is _recommended_ to update to the patch version, there's no issue even if it is not updated since the Ballerina package resolution will automatically resolve the latest patch version).
 
-### Case 2: Dependent Module Released a Minor Version:
+### Case 2: Dependent Module Released a Minor Version
 
-If the `ballerina/io` is released the `1.1.0` version, the `ballerina/log` module should update the `io` version in the default branch to `1.1.0` and release the `1.1.0` (the next minor version) of the `ballerina/log` module. Then the `ballerina/http` *must* release the `1.1.0` version with the updated `ballerina/io` and `ballerina/log` dependencies. This is to ensure that there are no version conflicts occurring in the `ballerina-distribution` and the next Ballerina release.  
+If the `ballerina/io` is released the `1.1.0` version, the `ballerina/log` module should update the `io` version in the default branch to `1.1.0` and release the `1.1.0` (the next minor version) of the `ballerina/log` module. Then the `ballerina/http` _must_ release the `1.1.0` version with the updated `ballerina/io` and `ballerina/log` dependencies. This is to ensure that there are no version conflicts occurring in the `ballerina-distribution` and the next Ballerina release.
 
 ## Handling Essential Breaking Changes
 
@@ -112,11 +114,11 @@ Compiler Team will handle all Essential Changes proactively. We have added a Pul
 5. Update the `ballerina-distribution` with the timestamp versions of the impacted modules.
 6. Developer opens a `ballerina-lang` PR and merges the change.
    - If the ballerina-lang changes are needed for the module build to pass:
-     - The ballerina-lang developer should provide the Language timestamped version to module owners after publishing the lang 
+     - The ballerina-lang developer should provide the Language timestamped version to module owners after publishing the lang
      - Then the Ballerina library developers should update the lang version to the timestamped version and do the fixes on top
-   - If the ballerina-lang changes are *not needed* for the module build to pass:
+   - If the ballerina-lang changes are _not needed_ for the module build to pass:
      - The module developer can do the fix and merge it to the default branch
-     - The ballerina-lang developer can check the build workflow to check whether there are more failures in the Ballerina library. If there are no more breaking modules, they can merge their fixes  
+     - The ballerina-lang developer can check the build workflow to check whether there are more failures in the Ballerina library. If there are no more breaking modules, they can merge their fixes
 
 ## Release Process
 
@@ -127,6 +129,7 @@ With the current design of Central, any stand library can be released at any tim
 [Publish GitHub Workflow](https://github.com/ballerina-platform/module-ballerina-http/actions/workflows/publish-release.yml) is used to release the module .
 
 Checklist for the release,
+
 1. All unit and integration tests are passing.
 2. The module does not include any components with an identified Security Vulnerability.
 3. Publish artifact to the [Central Staging Environment](https://github.com/ballerina-platform/module-ballerina-http/actions/workflows/central-publish.yml). Select the `STAGE CENTRAL` option in the workflow.
@@ -148,19 +151,19 @@ The Ballerina Library Release Manager will use [Stdlib Release Workflow](https:/
     - Need Lang Latest
     - Timestamped Version or Latest Released Version (Refer [Release Scenarios](#release-scenarios) section for information)
     - Distribution Version
-   
+
     Along with these columns, the latest lang timestamped version and the latest distribution version should be added. Optionally, the `observe` and `observei` versions should be added for reference.
-2. Communicate with the module owners to update the sheet incrementally from level 1 onwards. 
+2. Communicate with the module owners to update the sheet incrementally from level 1 onwards.
     - If the module is releasing with the distribution:
-      * The module owner should update
-        * The module version, dependency version, and the lang version in the `gradle.properties` file
-        * The distribution version in the `Ballerina.toml` file 
-        
+      - The module owner should update
+        - The module version, dependency version, and the lang version in the `gradle.properties` file
+        - The distribution version in the `Ballerina.toml` file
+
         and send a PR to the respective repo.
-      * Once the PR is merged and the build is passed, the module owner should update the sheet with the timestamped version
-      * The dependent modules should use the timestamp versions of the dependencies
-   - If the module is not releasing with the distribution:
-     * The module owner should update the sheet with the latest released version
+      - Once the PR is merged and the build is passed, the module owner should update the sheet with the timestamped version
+      - The dependent modules should use the timestamp versions of the dependencies
+    - If the module is not releasing with the distribution:
+      - The module owner should update the sheet with the latest released version
 
 3. The Ballerina library release manager uses the [Extensions - Update Ballerina Version Workflow](https://github.com/ballerina-platform/ballerina-release/actions/workflows/update_dependency_version.yml) to update dependency versions to the latest for consecutive version updates if any (lang RC releases).
     - If the RM is releasing only a subset of modules, which have the latest Language version, they should update the [extensions.json](https://github.com/ballerina-platform/ballerina-release/blob/master/dependabot/resources/extensions.json) by removing unnecessary modules in a separate branch. They can run the workflow run on said branch
@@ -170,13 +173,14 @@ The Ballerina Library Release Manager will use [Stdlib Release Workflow](https:/
 6. Once the final RC pack is passed the voting phase, update the [module list](https://github.com/ballerina-platform/ballerina-standard-library/blob/main/release/resources/stdlib_modules.json) to reflect the modules to be released.
    >**Note:** If a module is not releasing with the given distribution release, change the `release` property to `false` in the module list. (This can be done on a separate branch and that branch can be used to trigger the release workflow.)
 7. Once the module list is updated, notify the team to refrain from merging any PRs to the default branches, including the post-release PRs.
-8. Then the release manager can trigger the [Stdlib Release Workflow](https://github.com/ballerina-platform/ballerina-library/actions/workflows/release_pipeline.yml) to trigger the release.
+8. Then the release manager can trigger the [Library Release Workflow](https://github.com/ballerina-platform/ballerina-library/actions/workflows/release_pipeline.yml) to trigger the release.
+    > **Note:** The release manager should update the `release` property in the module list (stdlib_modules.json) to `false` for the modules that are not releasing with the distribution release before triggering the workflow.
 9. The workflow logs will show the current status of the release. The release manager should monitor the workflow and take necessary actions if any failures occur.
-   * If a particular module release is failed, the Ballerina library release manager should check the logs and take necessary actions to fix the issue. 
-     * If the issue is related to the module, inform the module owner to fix the issue and inform the release manager. 
-     * If the issue is an intermittent issue (GitHub issue, network issue, etc.), the release manager can manually trigger the release workflow for the failed module.
-     * If the module is already released to the Ballerina central, and the GitHub release is failed after creating the tag, the release manager can manually create the GitHub release.
-   * Once the failed module is released, the Ballerina library release manager can re-trigger the Stdlib Release Workflow to continue the release. There's no need to update the module list.
-      
-       >**Note:** If a post-release sync PR is merged before the release is completed, re-triggering the workflow may result in a re-release of the module.
 
+    - If a particular module release is failed, the Ballerina library release manager should check the logs and take necessary actions to fix the issue.
+      - If the issue is related to the module, inform the module owner to fix the issue and inform the release manager.
+      - If the issue is an intermittent issue (GitHub issue, network issue, etc.), the release manager can manually trigger the release workflow for the failed module.
+      - If the module is already released to the Ballerina central, and the GitHub release is failed after creating the tag, the release manager can manually create the GitHub release.
+    - Once the failed module is released, the Ballerina library release manager can re-trigger the Library Release Workflow to continue the release. There's no need to update the module list.
+
+       >**Note:** If a post-release sync PR is merged before the release is completed, re-triggering the workflow may result in a re-release of the module.

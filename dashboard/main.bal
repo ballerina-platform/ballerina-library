@@ -80,8 +80,7 @@ function initializeModuleList(Module[] modules) returns Module[]|error {
 function initializeModuleInfo(Module module) returns Module|error {
     string moduleName = module.name;
     string defaultBranch = check getDefaultBranch(moduleName);
-    string gradleProperties =
-        check git->get(string `/${BALLERINA_ORG_NAME}/${moduleName}/${defaultBranch}/${GRADLE_PROPERTIES}`);
+    string gradleProperties = check getGradlePropertiesFile(moduleName);
     string versionKey = getVersionKey(module);
     string moduleVersion = check getVersion(moduleName, gradleProperties);
     boolean displayCodeCovBadge = getDisplayCodeCovBadge(module);

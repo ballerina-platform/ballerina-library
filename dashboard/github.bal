@@ -14,8 +14,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/http;
+import ballerina/io;
 import ballerina/lang.regexp;
+import ballerina/mime;
 import ballerina/os;
 import ballerina/url;
 import ballerinax/github;
@@ -26,17 +27,6 @@ const string GITHUB_ORG = "ballerina-platform";
 const string BALLERINA_LIBRARY_REPO = "ballerina-library";
 
 configurable string token = os:getEnv(BALLERINA_BOT_TOKEN);
-
-http:Client git = check new (GITHUB_RAW_LINK, config = {
-    auth: {
-        token
-    },
-    retryConfig: {
-        count: HTTP_REQUEST_RETRIES,
-        interval: HTTP_REQUEST_DELAY_IN_SECONDS,
-        backOffFactor: HTTP_REQUEST_DELAY_MULTIPLIER
-    }
-});
 
 final github:Client github = check new ({
     retryConfig: {
@@ -162,6 +152,22 @@ isolated function getCodeCoverageBadge(Module module) returns WorkflowBadge {
         htmlUrl: string `${CODECOV_BADGE_URL}/${BALLERINA_ORG_NAME}/${moduleName}`
     };
 
+}
+
+isolated function getGradlePropertiesFile(string moduleName) returns string|error {
+    github:ContentTree[]? propsFileContent =
+        check github->/repos/[BALLERINA_ORG_NAME]/[moduleName]/contents/[GRADLE_PROPERTIES];
+    if propsFileContent is () || propsFileContent.length() != 1 {
+        return error("Invalid gradle.properties file found for the module: " + moduleName);
+    }
+    anydata fileContent = propsFileContent[0]["content"];
+    if fileContent !is string {
+        return error("Invalid gradle.properties file content found for the module: " + moduleName);
+    }
+    string|byte[]|io:ReadableByteChannel gradleProperties = check mime:base64Decode(fileContent);
+    if gradleProperties !is string {
+        return error("Error occurred while decoding the gradle.properties file content for the module: " + moduleName);
+    }
 }
 
 isolated function getWorkflowFileName(string workflowPath) returns string {
