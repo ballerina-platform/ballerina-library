@@ -168,6 +168,7 @@ isolated function getGradlePropertiesFile(string moduleName) returns string|erro
     if gradleProperties !is string {
         return error("Error occurred while decoding the gradle.properties file content for the module: " + moduleName);
     }
+    return gradleProperties;
 }
 
 isolated function getWorkflowFileName(string workflowPath) returns string {
