@@ -1,6 +1,6 @@
-// Copyright (c) 2022, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2024, WSO2 Inc. (http://www.wso2.org).
 //
-// WSO2 Inc. licenses this file to you under the Apache License,
+// WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
 // in compliance with the License.
 // You may obtain a copy of the License at
@@ -21,32 +21,27 @@ import ballerina/os;
 import ballerina/url;
 import ballerinax/github;
 
-int issueCount = 0;
-
-const string GITHUB_ORG = "ballerina-platform";
-const string BALLERINA_LIBRARY_REPO = "ballerina-library";
-
 configurable string token = os:getEnv(BALLERINA_BOT_TOKEN);
 
 final github:Client github = check new ({
     retryConfig: {
-        count: HTTP_REQUEST_RETRIES,
-        interval: HTTP_REQUEST_DELAY_IN_SECONDS,
-        backOffFactor: HTTP_REQUEST_DELAY_MULTIPLIER
+        count: 3,
+        interval: 2,
+        backOffFactor: 2,
+        maxWaitInterval: 10
     },
     auth: {token}
 });
 
 function getDefaultBranch(string moduleName) returns string|error {
-    github:FullRepository repository = check github->/repos/[GITHUB_ORG]/[moduleName];
+    github:FullRepository repository = check github->/repos/[BALLERINA_ORG_NAME]/[moduleName];
     return repository.default_branch;
-
 }
 
 isolated function getRepoBadges(Module module) returns RepoBadges|error {
     string moduleName = module.name;
     string defaultBranch = module.default_branch;
-    github:WorkflowResponse workflowResponse = check github->/repos/[GITHUB_ORG]/[module.name]/actions/workflows;
+    github:WorkflowResponse workflowResponse = check github->/repos/[BALLERINA_ORG_NAME]/[module.name]/actions/workflows;
     WorkflowBadge codeCov = getCodeCoverageBadge(module);
     WorkflowBadge release = check getLatestReleaseBadge(moduleName);
     WorkflowBadge pullRequests = check getPullRequestsBadge(module);
@@ -93,14 +88,16 @@ isolated function getRepoBadges(Module module) returns RepoBadges|error {
 
 isolated function getBugsBadge(string moduleName) returns WorkflowBadge|error {
     string shortName = getModuleShortName(moduleName);
-    github:Issue[] issues = check github->/repos/[GITHUB_ORG]/[BALLERINA_LIBRARY_REPO]/issues(labels = string `Type/Bug,module/${shortName}`, state = "open");
+    github:Issue[] issues = check github->/repos/[BALLERINA_ORG_NAME]/[LIBRARY_REPO]/issues(
+        labels = string `Type/Bug,module/${shortName}`, state = "open"
+    );
     int bugCount = issues.length();
     string labelColour = bugCount == 0 ? BADGE_COLOR_GREEN : BADGE_COLOR_YELLOW;
     string issueFilter = check url:encode(string `is:open label:module/${shortName} label:Type/Bug`, ENCODING);
     string query = string `${issueFilter}&color=${labelColour}&label=`;
 
-    string badgeUrl = string `${GITHUB_BADGE_URL}/issues-search/${BALLERINA_ORG_NAME}/${BALLERINA_STANDARD_LIBRARY}?query=${query}`;
-    string htmlUrl = string `${BALLERINA_ORG_URL}/${BALLERINA_STANDARD_LIBRARY}/issues?q=${issueFilter}`;
+    string badgeUrl = string `${GITHUB_BADGE_URL}/issues-search/${BALLERINA_ORG_NAME}/${LIBRARY_REPO}?query=${query}`;
+    string htmlUrl = string `${BALLERINA_ORG_URL}/${LIBRARY_REPO}/issues?q=${issueFilter}`;
     return {
         name: "Bugs",
         badgeUrl,
@@ -109,7 +106,7 @@ isolated function getBugsBadge(string moduleName) returns WorkflowBadge|error {
 }
 
 isolated function getLatestReleaseBadge(string moduleName) returns WorkflowBadge|error {
-    github:Release|error release = github->/repos/[GITHUB_ORG]/[moduleName]/releases/latest;
+    github:Release|error release = github->/repos/[BALLERINA_ORG_NAME]/[moduleName]/releases/latest;
     if release is error {
         return {
             name: "N/A",
@@ -117,7 +114,7 @@ isolated function getLatestReleaseBadge(string moduleName) returns WorkflowBadge
             htmlUrl: ""
         };
     }
-    string badgeUrl = string `${GITHUB_BADGE_URL}/v/release/${GITHUB_ORG}/${moduleName}?color=${BADGE_COLOR_GREEN}&label=`;
+    string badgeUrl = string `${GITHUB_BADGE_URL}/v/release/${BALLERINA_ORG_NAME}/${moduleName}?color=${BADGE_COLOR_GREEN}&label=`;
     return {
         name: "Latest Release",
         badgeUrl,
@@ -151,7 +148,6 @@ isolated function getCodeCoverageBadge(Module module) returns WorkflowBadge {
         badgeUrl: string `${CODECOV_BADGE_URL}/${BALLERINA_ORG_NAME}/${moduleName}/branch/${defaultBranch}/graph/badge.svg`,
         htmlUrl: string `${CODECOV_BADGE_URL}/${BALLERINA_ORG_NAME}/${moduleName}`
     };
-
 }
 
 isolated function getGradlePropertiesFile(string moduleName) returns string|error {
