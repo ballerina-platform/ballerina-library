@@ -1,8 +1,8 @@
 import ballerina/http;
-import ballerina/os;
+import ballerina/io;
 import ballerina/lang.runtime;
 import ballerina/log;
-import ballerina/io;
+import ballerina/os;
 
 string GITHUB_TOKEN = os:getEnv("GITHUB_TOKEN");
 string LANG_TAG = os:getEnv("LANG_TAG");
@@ -84,9 +84,10 @@ type Module record {
     string default_branch;
 };
 
-type Data record {|
+type Data record {
     Module[] modules;
-|};
+    Module[] extended_modules;
+};
 
 enum STATUS {
     PENDING = "pending",
@@ -131,36 +132,45 @@ function triggerGraalVMChecks(Data data) returns map<LevelStatus> {
     map<LevelStatus> result = {};
 
     foreach Module module in data.modules {
-        do {
-            check triggerWorkflow(module.name, module.default_branch,
-                lang_tag = LANG_TAG, lang_version = LANG_VERSION, native_image_options = NATIVE_IMAGE_OPTIONS);
-            runtime:sleep(10);
-            [int, string] [id, link] = check getWorkflow(module.name);
-            log:printInfo("Successfully triggered the GraalVM check", module = module.name, link = link);
-
-            ModuleStatus moduleStatus = {
-                status: IN_PROGRESS,
-                link: link,
-                workflow_id: id,
-                conclusion: NOT_APPLICABLE,
-                jobs: {}
-            };
-
-            if !result.hasKey(module.level.toString()) {
-                LevelStatus levelStatus = {
-                    status: IN_PROGRESS,
-                    modules: [{[module.name] : moduleStatus}]
-                };
-                result[module.level.toString()] = levelStatus;
-            } else {
-                LevelStatus levelStatus = result.get(module.level.toString());
-                levelStatus.modules.push({[module.name] : moduleStatus});
-            }
-        } on fail error err {
-            log:printError("Failed to trigger the GraalVM check", module = module.name, 'error = err);
-        }
+        result = triggerGraalVMCheck(module, result);
     }
 
+    foreach Module module in data.extended_modules {
+        result = triggerGraalVMCheck(module, result);
+    }
+
+    return result;
+}
+
+function triggerGraalVMCheck(Module module, map<LevelStatus> result) returns map<LevelStatus> {
+    do {
+        check triggerWorkflow(module.name, module.default_branch,
+                lang_tag = LANG_TAG, lang_version = LANG_VERSION, native_image_options = NATIVE_IMAGE_OPTIONS);
+        runtime:sleep(10);
+        [int, string] [id, link] = check getWorkflow(module.name);
+        log:printInfo("Successfully triggered the GraalVM check", module = module.name, link = link);
+
+        ModuleStatus moduleStatus = {
+            status: IN_PROGRESS,
+            link: link,
+            workflow_id: id,
+            conclusion: NOT_APPLICABLE,
+            jobs: {}
+        };
+
+        if !result.hasKey(module.level.toString()) {
+            LevelStatus levelStatus = {
+                status: IN_PROGRESS,
+                modules: [{[module.name]: moduleStatus}]
+            };
+            result[module.level.toString()] = levelStatus;
+        } else {
+            LevelStatus levelStatus = result.get(module.level.toString());
+            levelStatus.modules.push({[module.name]: moduleStatus});
+        }
+    } on fail error err {
+        log:printError("Failed to trigger the GraalVM check", module = module.name, 'error = err);
+    }
     return result;
 }
 
