@@ -24,7 +24,7 @@ const string ACCESS_TOKEN_ENV = "BALLERINA_BOT_TOKEN";
 const string MODULE_LIST_JSON = "./resources/stdlib_modules.json";
 const string GITHUB_ORG = "ballerina-platform";
 // IMPORTANT: When testing, do not use `publish-release.yml` as the release workflow.
-const string RELEASE_WORKFLOW = "build-timestamped-master.yml";
+const string RELEASE_WORKFLOW = "publish-release.yml";
 
 const decimal WORKFLOW_START_WAIT_TIME = 2;
 const decimal WORKFLOW_POLL_INTERVAL = 5;
