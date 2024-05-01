@@ -3,7 +3,7 @@
 Authors: @ThisaruGuruge \
 Reviewers: @NipunaRanasinghe \
 Created: 2023/05/09 \
-Updated: 2023/06/23 
+Updated: 2024/05/01
 
 This is a step-by-step guide on creating a new Ballerina module. It will guide you through setting up build and workflow scripts, preparing the environment, and adding a new module to the Ballerina daily build and release pipelines.
 
@@ -18,21 +18,21 @@ This is a step-by-step guide on creating a new Ballerina module. It will guide y
 6. [Directory structure](#directory-structure)
     * 6.1 [The `.github` directory](#the-github-directory-required)
         * 6.1.1 [The `workflows` directory](#the-workflows-directory-required)
-    * 6.2 [The `ballerina` directory](#the-ballerina-directory-gradle-submodulerequired)
+    * 6.2 [The `ballerina` directory](#the-ballerina-directory-gradle-submodule-required)
     * 6.3 [The `build-config` directory](#the-build-config-directory-required)
         * 6.3.1 [The `checkstyle` directory](#the-checkstyle-directory-optional)
         * 6.3.2 [The `resources` directory](#the-resources-directory-required)
-    * 6.4 [The `ballerina-tests` directory](#the-ballerina-tests-directory-gradle-submoduleoptional)
-    * 6.5 [The `compiler-plugin` directory](#the-compiler-plugin-directory-gradle-submoduleoptional)
-    * 6.6 [The `compiler-plugin-tests` directory](#the-compiler-plugin-tests-directory-gradle-submoduleoptional)
+    * 6.4 [The `ballerina-tests` directory](#the-ballerina-tests-directory-gradle-submodule-optional)
+    * 6.5 [The `compiler-plugin` directory](#the-compiler-plugin-directory-gradle-submodule-optional)
+    * 6.6 [The `compiler-plugin-tests` directory](#the-compiler-plugin-tests-directory-gradle-submodule-optional)
     * 6.7 [The `docs` directory](#the-docs-directory-optional)
-    * 6.8 [The `examples` directory](#the-examples-directory-gradle-submoduleoptional)
+    * 6.8 [The `examples` directory](#the-examples-directory-gradle-submodule-optional)
     * 6.9 [The `load-tests` directory](#the-load-tests-directory-optional)
         * 6.9.1 [The `deployment` directory](#the-deployment-directory-required)
         * 6.9.2 [The `results` directory](#the-results-directory-required)
         * 6.9.3 [The `scripts` directory](#the-scripts-directory-required)
         * 6.9.4 [The `src` directory](#the-src-directory-required)
-    * 6.10 [The `native` directory](#the-native-directory-gradle-submoduleoptional)
+    * 6.10 [The `native` directory](#the-native-directory-gradle-submodule-optional)
     * 6.11 [Other build files](#other-build-files)
         * 6.11.1 [The `LICENSE` file](#the-license-file-required)
         * 6.11.2 [The `README.md` file](#the-readmemd-file-required)
@@ -58,13 +58,14 @@ The [Ballerina `graphql` Module](https://github.com/ballerina-platform/module-ba
 
 ## Prerequisites
 
-- [Ballerina](https://ballerina.io/downloads)
-- [Gradle](https://gradle.org/releases/) - Version 7.1 preferred in Ballerina Standard Libraries
-- [A GitHub access token](https://docs.github.com/en/enterprise-server@3.4/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+* [Ballerina](https://ballerina.io/downloads)
+* [Gradle](https://gradle.org/releases/) - Version 7.1 preferred in Ballerina Standard Libraries
+* [A GitHub access token](https://docs.github.com/en/enterprise-server@3.4/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 
 ## Repository creation
-- The new repository should be created under the [Ballerina Platform Organization](https://github.com/balerina-platform).
-- The repository request can be created by filling out the **GitHub Repo Creation Request Form** in WSO2 internal apps.
+
+* The new repository should be created under the [Ballerina Platform Organization](https://github.com/balerina-platform).
+* The repository request can be created by filling out the **GitHub Repo Creation Request Form** in WSO2 internal apps.
 
 ### Repository naming convention
 
@@ -74,23 +75,24 @@ The repository name should start with the `module-` prefix, followed by the org 
 
 Example Names:
 
-- module-ballerina-http
-- module-ballerinax-kafka
-- module-ballerina-jballerina.java.arrays
+* module-ballerina-http
+* module-ballerinax-kafka
+* module-ballerina-jballerina.java.arrays
 
 ## Set up the environment
 
 Download and install the [prerequisites](#prerequisites) . Then, set up the following environment variables.
 
-- `packageUser` - Your GitHub username
-- `packagePAT` - Your GitHub access token
+* `packageUser` - Your GitHub username
+* `packagePAT` - Your GitHub access token
 
 ## Initialize the repository
 
 1. Clone the repository.
 2. Navigate to the repository directory.
 3. Run the following command to initialize the Gradle build.
-   ```shell
+
+   ```bash
    gradle init
    ```
 
@@ -98,7 +100,7 @@ Download and install the [prerequisites](#prerequisites) . Then, set up the foll
 
    Example output of the `gradle init` command:
 
-   ```
+   ```none
    Select type of project to generate:
      1: basic
      2: application
@@ -170,8 +172,8 @@ This directory contains the GitHub workflow scripts and other configurations req
     └── update-spec.yml
 ```
 
-- `CODEOWNERS`: This file contains the GitHub usernames of the module owners. This is used to notify the module owners on pull requests.
-- `pull_request_template.md`: This file contains the template for the pull request description.
+* `CODEOWNERS`: This file contains the GitHub usernames of the module owners. This is used to notify the module owners on pull requests.
+* `pull_request_template.md`: This file contains the template for the pull request description.
 
 #### The `workflows` directory [Required]
 
@@ -225,7 +227,7 @@ This workflow script is used to scan the module for vulnerabilities using Trivy.
 
 This workflow script is used to update the module specification in the Ballerina website. It is needed only if the module has a specification listed in the Ballerina website. This workflow script is triggered automatically when the `docs/spec` directory is updated.
 
-### The `ballerina` directory [Gradle Submodule][Required]
+### The `ballerina` directory [Gradle Submodule] [Required]
 
 This directory contains the Ballerina module source code including the `Ballerina.toml`, `Module.md`, and `Package.md` files and the tests.
 
@@ -253,17 +255,17 @@ Each of these files have placeholders to replace the values during the build. Th
 
 >**Note:** The `CompilerPlugin.toml` file is required only if the module has a compiler plugin. The `BallerinaTest.toml` file is required only if the repository has the `ballerina-tests` Gradle submodule.
 
-### The `ballerina-tests` directory [Gradle Submodule][Optional]
+### The `ballerina-tests` directory [Gradle Submodule] [Optional]
 
 This directory contains the Ballerina tests that cannot be included in the `ballerina` directory. This includes the tests that are required to be run with the compiler plugin. It also includes a `build.gradle` file, which is used to build and run the `ballerina-tests` submodule.
 
 `ballerina/http` and `ballerina/graphql` are example modules that have tests in the `ballerina-tests` directory.
 
-### The `compiler-plugin` directory [Gradle Submodule][Optional]
+### The `compiler-plugin` directory [Gradle Submodule] [Optional]
 
 This directory contains the compiler plugin source code. It also includes a `build.gradle` file, which is used to build the `compiler-plugin` submodule.
 
-### The `compiler-plugin-tests` directory [Gradle Submodule][Optional]
+### The `compiler-plugin-tests` directory [Gradle Submodule] [Optional]
 
 This directory contains the compiler plugin tests written using [TestNG](https://testng.org/doc/). It also includes a `build.gradle` file, which is used to build and run the compiler-plugin-tests submodule. This is required only if the module has a compiler plugin.
 
@@ -271,7 +273,7 @@ This directory contains the compiler plugin tests written using [TestNG](https:/
 
 This directory contains the module specifications. It includes a `proposals` directory to add the implemented proposals and the `spec` directory, that defines the module specification.
 
-### The `examples` directory [Gradle Submodule][Optional]
+### The `examples` directory [Gradle Submodule] [Optional]
 
 This directory contains the examples for the module. It includes a `build.gradle` file, which is used to build the `examples` submodule.
 
@@ -281,7 +283,7 @@ This directory is used to add load tests for the module. The `trigger-load-tests
 
 Each load test should be added as a separate directory. The following structure should be maintained in each load test directory.
 
-```
+```shell
 ├── deployment
 ├── results
 ├── scripts
@@ -304,7 +306,7 @@ This directory contains the scripts required for the load test. This includes th
 
 This directory contains the Ballerina source code of the load test.
 
-### The `native` directory [Gradle Submodule][Optional]
+### The `native` directory [Gradle Submodule] [Optional]
 
 This directory contains the Java native code of the module. This is required only if the module has native code. It also includes a `build.gradle` file, which is used to build the `native` submodule.
 
@@ -314,7 +316,7 @@ Apart from the above-mentioned directories, there are other files that are requi
 
 Following are the files that are required for the build.
 
-```
+```shell
 .
 ├── LICENSE
 ├── README.md
@@ -362,7 +364,7 @@ These files are auto-generated using the `gradle wrapper` command. These files a
 
 This file contains the Gradle settings of the module. It includes the Gradle submodules of the module. The above-mentioned directories related to `Gradle Submodule` should be added to this file using the following convention.
 
-```
+```none
 ballerina -> <module_name>-ballerina
 ballerina-tests -> <module_name>-ballerina-tests
 compiler-plugin -> <module_name>-compiler-plugin
@@ -420,62 +422,35 @@ Once updated this file, the module is ready to be released with the Ballerina li
 
 To add a module to the Ballerina daily build process, add an entry in the [`module_list.json`](https://github.com/ballerina-platform/ballerina-release/blob/master/dependabot/resources/module_list.json) in the [`ballerina-release`](https://github.com/ballerina-platform/ballerina-release) repository.
 
-This JSON file has two main fields.
+This JSON file has an array field `standard_library`, to which the newly added module should be added.
 
-- `standard_library` - This field contains an array of modules that are part of the Ballerina distribution. Add the module to this list if the module is released along with the Ballerina distribution.
-- `extended_library` - This field contains an array of modules that are not part of the Ballerina distribution. Add the module to this list if the module is an extended Ballerina module, which is not released along with the Ballerina distribution.
+Each entry in the above-mentioned array has the following fields.
 
-Each entry in the above-mentioned arrays has the following fields.
-
-#### The `name` field
+#### The `name` JSON field
 
 This field defines the name of the module. This should be the name of the repository (e.g., module-ballerina-io).
 
-#### The `version_key` field
+#### The `version_key` JSON field
 
 The version key of the module. This is related to the version prefix mentioned in the [`gradle.properties`](#the-gradleproperties-file-required) file. (e.g., `ballerinaStdlibIo`). It is used to add the module as a dependency to another repository including the [`ballerina-distribution`](https://github.com/ballerina-platform/ballerina-distribution) repository.
 
-Refer the [`version_key`](#the-versionkey-field) section under [Add the module to the Ballerina library](#add-the-module-to-the-ballerina-library-optional).
+Refer the [`version_key`](#the-version_key-field) section under [Add the module to the Ballerina library](#add-the-module-to-the-ballerina-library-optional).
 
-#### The `level` field
-
-This field denotes the level of the module in the dependency graph. This will be updated automatically. Do not update this field manually.
-
-#### The `group_id` field
+#### The `group_id` JSON field
 
 This field defines the Maven artifact group ID of the module. The default value is `io.ballerina.stdlib`. If the group ID of the module is different, it should be updated in this field.
 
-#### The `artifact_id` field
+#### The `artifact_id` JSON field
 
 This field defines the Maven artifact ID of the module. The default value is `<module_name>-ballerina`. If the artifact ID of the module is different, it should be updated in this field.
 
-#### The `default_branch` field
-
-This field defines the default branch of the module. This field will be updated automatically. Do not update this field manually.
-
-#### The `auto_merge` field
-
-This field defines whether to auto-merge the dependency update pull requests or not. The default value is `true`. Set this to `false` to stop auto merging dependency update PRs (not recommended).
-
-#### The `push_to_central` field
+#### The `push_to_central` JSON field
 
 This field is used to define whether the module is being pushed to the Ballerina Central or not. The default value is `true`. Set this to `false` for non-central repositories such as Ballerina tools repositories (e.g., `ballerina-openapi-tools`, `ballerina-graphql-tools`, etc.).
 
-#### The `is_extended_library` field
+#### The `is_extended_library` JSON field
 
 This field is used to define whether the module is an extended library package or not. The default value is `true`. Set this to `false` for repositories that are released along with the [`ballerina-distribution`](https://github.com/ballerina-platform/ballerina-distribution).
-
-#### The `build_action_file` field
-
-This field is to define the default build action file of the module. This field will be updated automatically. Do not update this field manually.
-
-#### The `send_notification` field
-
-This field is used to define whether to send a notification to the chat on build failures. The default value is `true`. Set this to `false` to stop sending notifications on build failures (not recommended).
-
-#### The `dependents` field
-
-This field is used to add the dependents of the module. This field will be updated automatically. Do not update this field manually.
 
 Once the `module_list.json` is updated, the [Update Dependency Graph](https://github.com/ballerina-platform/ballerina-release/actions/workflows/update_dependency_graph.yml) workflow will run automatically to update the dependency graph.
 
@@ -489,7 +464,7 @@ To add the module to the Ballerina distribution, follow the below steps.
 
 The module version should be added to the [`gradle.properties`](https://github.com/ballerina-platform/ballerina-distribution/blob/master/gradle.properties) file in the [`ballerina-distribution`](https://github.com/ballerina-platform/ballerina-distribution).
 
-When adding the version, the `version_key` mentioned in the above sections should be used. If the module is not yet released, use a timestamp version of the module as the version.
+When adding the version, the [`version_key`](#the-version_key-field) mentioned in the above sections should be used. If the module is not yet released, use a timestamp version of the module as the version.
 
 >**Note:** The timestamp version can be found in the module repository under the `packages` section.
 
@@ -497,6 +472,6 @@ When adding the version, the `version_key` mentioned in the above sections shoul
 
 The module should be added as a configuration in the [`build.gradle`](https://github.com/ballerina-platform/ballerina-distribution/blob/master/build.gradle) file in the [ballerina-distribution](https://github.com/ballerina-platform/ballerina-distribution).
 
->**Note:** The module should be added under the `ballerinaStdlibs` configuration.
+>**Note:** The module should be added under the `ballerinaStdlibs` configuration. Please make sure to maintain the alphabetical order when adding the configuration.
 
 The module is now added to the Ballerina daily builds and release processes.
