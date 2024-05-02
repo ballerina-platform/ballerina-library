@@ -73,7 +73,10 @@
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
             "release": true,
-            "dependents": [],
+            "dependents": [
+                "asyncapi-tools",
+                "openapi-tools"
+            ],
             "display_code_cov_badge": true
         },
         {
@@ -250,7 +253,8 @@
                 "module-ballerina-email",
                 "module-ballerina-http",
                 "module-ballerina-toml",
-                "module-ballerina-yaml"
+                "module-ballerina-yaml",
+                "edi-tools"
             ],
             "display_code_cov_badge": true
         },
@@ -275,16 +279,6 @@
                 "module-ballerina-email",
                 "module-ballerina-http"
             ],
-            "display_code_cov_badge": true
-        },
-        {
-            "name": "module-ballerinax-persist.inmemory",
-            "module_version": "1.3.0-SNAPSHOT",
-            "level": 3,
-            "default_branch": "main",
-            "version_key": "stdlibPersistInmemoryVersion",
-            "release": true,
-            "dependents": [],
             "display_code_cov_badge": true
         },
         {
@@ -317,12 +311,13 @@
             "dependents": [
                 "module-ballerina-grpc",
                 "module-ballerina-mqtt",
-                "module-ballerinax-persist.redis",
                 "module-ballerina-soap",
                 "module-ballerinai-transaction",
                 "module-ballerina-websocket",
                 "module-ballerina-websub",
-                "module-ballerina-websubhub"
+                "module-ballerina-websubhub",
+                "module-ballerinax-persist.redis",
+                "asyncapi-tools"
             ],
             "display_code_cov_badge": true
         },
@@ -431,12 +426,13 @@
             "release": true,
             "dependents": [
                 "module-ballerina-grpc",
-                "module-ballerinax-persist.redis",
                 "module-ballerina-soap",
                 "module-ballerinai-transaction",
                 "module-ballerina-websocket",
                 "module-ballerina-websub",
-                "module-ballerina-websubhub"
+                "module-ballerina-websubhub",
+                "module-ballerinax-persist.redis",
+                "asyncapi-tools"
             ],
             "display_code_cov_badge": true
         },
@@ -447,17 +443,10 @@
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
             "release": true,
-            "dependents": [],
-            "display_code_cov_badge": true
-        },
-        {
-            "name": "module-ballerinax-persist.redis",
-            "module_version": "0.1.0-SNAPSHOT",
-            "level": 6,
-            "default_branch": "main",
-            "version_key": "stdlibPersistRedisVersion",
-            "release": true,
-            "dependents": [],
+            "dependents": [
+                "openapi-tools",
+                "protoc-tools"
+            ],
             "display_code_cov_badge": true
         },
         {
@@ -478,8 +467,8 @@
             "version_key": "stdlibTransactionVersion",
             "release": true,
             "dependents": [
-                "module-ballerinax-persist.googlesheets",
-                "module-ballerina-sql"
+                "module-ballerina-sql",
+                "module-ballerinax-persist.googlesheets"
             ],
             "display_code_cov_badge": true
         },
@@ -502,7 +491,9 @@
             "default_branch": "master",
             "version_key": "stdlibWebsubVersion",
             "release": true,
-            "dependents": [],
+            "dependents": [
+                "openapi-tools"
+            ],
             "display_code_cov_badge": true
         },
         {
@@ -522,17 +513,10 @@
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
             "release": true,
-            "dependents": [],
-            "display_code_cov_badge": true
-        },
-        {
-            "name": "module-ballerinax-persist.googlesheets",
-            "module_version": "1.3.0-SNAPSHOT",
-            "level": 7,
-            "default_branch": "main",
-            "version_key": "stdlibPersistGoogleSheetVersion",
-            "release": true,
-            "dependents": [],
+            "dependents": [
+                "graphql-tools",
+                "openapi-tools"
+            ],
             "display_code_cov_badge": true
         },
         {
@@ -546,16 +530,6 @@
                 "module-ballerinax-persist.sql"
             ],
             "display_code_cov_badge": true
-        },
-        {
-            "name": "module-ballerinax-persist.sql",
-            "module_version": "1.3.0-SNAPSHOT",
-            "level": 8,
-            "default_branch": "main",
-            "version_key": "stdlibPersistSqlVersion",
-            "release": true,
-            "dependents": [],
-            "display_code_cov_badge": true
         }
     ],
     "extended_modules": [
@@ -567,6 +541,54 @@
             "version_key": "stdlibCopybookVersion",
             "release": true,
             "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-persist.googlesheets",
+            "module_version": "1.3.0-SNAPSHOT",
+            "level": 7,
+            "default_branch": "main",
+            "version_key": "stdlibPersistGoogleSheetVersion",
+            "release": true,
+            "dependents": [
+                "persist-tools"
+            ],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-persist.inmemory",
+            "module_version": "1.3.0-SNAPSHOT",
+            "level": 3,
+            "default_branch": "main",
+            "version_key": "stdlibPersistInmemoryVersion",
+            "release": true,
+            "dependents": [
+                "persist-tools"
+            ],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-persist.redis",
+            "module_version": "0.1.0-SNAPSHOT",
+            "level": 6,
+            "default_branch": "main",
+            "version_key": "stdlibPersistRedisVersion",
+            "release": true,
+            "dependents": [
+                "persist-tools"
+            ],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-persist.sql",
+            "module_version": "1.3.0-SNAPSHOT",
+            "level": 8,
+            "default_branch": "main",
+            "version_key": "stdlibPersistSqlVersion",
+            "release": true,
+            "dependents": [
+                "persist-tools"
+            ],
             "display_code_cov_badge": true
         }
     ],
@@ -626,7 +648,7 @@
             "module_version": "3.7.0",
             "level": 1,
             "default_branch": "main",
-            "version_key": "stdlibModule-ballerinax-azure-service-busVersion",
+            "version_key": "stdlibAzure-service-busVersion",
             "release": true,
             "dependents": [],
             "display_code_cov_badge": true
@@ -886,7 +908,7 @@
         {
             "name": "asyncapi-tools",
             "module_version": "0.8.0-SNAPSHOT",
-            "level": 1,
+            "level": 6,
             "default_branch": "main",
             "version_key": "stdlibAsyncapi-toolsVersion",
             "release": true,
@@ -906,7 +928,7 @@
         {
             "name": "edi-tools",
             "module_version": "1.0.1",
-            "level": 1,
+            "level": 4,
             "default_branch": "main",
             "version_key": "stdlibEdi-toolsVersion",
             "release": true,
@@ -916,7 +938,7 @@
         {
             "name": "graphql-tools",
             "module_version": "0.10.0-SNAPSHOT",
-            "level": 1,
+            "level": 8,
             "default_branch": "main",
             "version_key": "stdlibGraphql-toolsVersion",
             "release": true,
@@ -926,7 +948,7 @@
         {
             "name": "openapi-tools",
             "module_version": "1.9.0-SNAPSHOT",
-            "level": 1,
+            "level": 8,
             "default_branch": "master",
             "version_key": "stdlibOpenapi-toolsVersion",
             "release": true,
@@ -936,7 +958,7 @@
         {
             "name": "persist-tools",
             "module_version": "1.3.0-SNAPSHOT",
-            "level": 1,
+            "level": 9,
             "default_branch": "main",
             "version_key": "stdlibPersist-toolsVersion",
             "release": true,
@@ -946,7 +968,7 @@
         {
             "name": "protoc-tools",
             "module_version": "0.2.1-SNAPSHOT",
-            "level": 1,
+            "level": 7,
             "default_branch": "main",
             "version_key": "stdlibProtoc-toolsVersion",
             "release": true,

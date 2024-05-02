@@ -16,14 +16,12 @@
 
 // Names
 const BALLERINA_ORG_NAME = "ballerina-platform";
-const BALLERINA_STANDARD_LIBRARY = "ballerina-library";
+const LIBRARY_REPO = "ballerina-library";
 
 // Links
 const BALLERINA_ORG_URL = "https://github.com/ballerina-platform";
 const GITHUB_BADGE_URL = "https://img.shields.io/github";
 const CODECOV_BADGE_URL = "https://codecov.io/gh";
-const GITHUB_API_LINK = "https://api.github.com/repos";
-const GITHUB_RAW_LINK = "https://raw.githubusercontent.com";
 
 // Colors
 const BADGE_COLOR_GREEN = "30c955";
@@ -34,11 +32,6 @@ const MODULE_LIST_JSON = "../release/resources/module_list.json";
 const STDLIB_MODULES_JSON = "../release/resources/stdlib_modules.json";
 const README_FILE = "../README.md";
 const GRADLE_PROPERTIES = "gradle.properties";
-
-// Retry Configs
-const HTTP_REQUEST_RETRIES = 3;
-const decimal HTTP_REQUEST_DELAY_IN_SECONDS = 2;
-const float HTTP_REQUEST_DELAY_MULTIPLIER = 2;
 
 // Env variable Names
 const BALLERINA_BOT_TOKEN = "BALLERINA_BOT_TOKEN";
@@ -68,4 +61,4 @@ const WORKFLOW_MASTER_BUILD = "build-timestamped-master.yml";
 const WORKFLOW_TRIVY = "trivy-scan.yml";
 const WORKFLOW_MASTER_CI_BUILD = "daily-build.yml";
 const WORKFLOW_PROCESS_LOAD_TESTS = "process-load-test-result.yml";
-const WORKFLOW_BAL_TEST_NATIVE = "build-with-bal-test-graalvm.yml";
+const WORKFLOW_BAL_TEST_GRAALVM = "build-with-bal-test-graalvm.yml";

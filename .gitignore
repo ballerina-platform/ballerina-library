@@ -40,4 +40,4 @@ Ballerina.lock
 *.DS_Store
 
 #Ballerina
-dashboard/Dependencies.toml
+Config.toml

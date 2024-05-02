@@ -1,6 +1,6 @@
-// Copyright (c) 2022, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2024, WSO2 LLC. (http://www.wso2.org).
 //
-// WSO2 Inc. licenses this file to you under the Apache License,
+// WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
 // in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,64 +20,43 @@ import ballerina/log;
 
 import thisarug/prettify;
 
-type List record {|
-    Module[] modules;
-    Module[] extended_modules;
-    Module[] connectors;
-    Module[] tools;
-|};
-
-type Module record {|
-    string name;
-    string module_version?;
-    int level?;
-    string default_branch?;
-    string version_key?;
-    boolean release?;
-    string[] dependents?;
-    string gradle_properties?;
-    boolean display_code_cov_badge?;
-|};
-
 public function main() returns error? {
     List moduleNameList = check getSortedModuleNameList();
     List moduleDetails = check initializeModuleDetails(moduleNameList);
 
-    check getImmediateDependencies(moduleDetails);
-    check calculateLevels(moduleDetails);
-    moduleDetails.modules = moduleDetails.modules.sort(array:ASCENDING, a => a.level);
+    Module[] libraryModules = moduleDetails.modules;
+    Module[] modules = [...libraryModules, ...moduleDetails.extended_modules, ...moduleDetails.tools];
 
-    List filteredList = {
-        modules: removePropertiesFile(moduleDetails.modules),
-        extended_modules: removePropertiesFile(moduleDetails.extended_modules),
-        connectors: removePropertiesFile(moduleDetails.connectors),
-        tools: removePropertiesFile(moduleDetails.tools)
-    };
-    check writeToFile(STDLIB_MODULES_JSON, filteredList);
-    check updateStdlibDashboard(filteredList);
+    check getImmediateDependencies(modules);
+    check calculateLevels(modules);
+    moduleDetails.forEach(function(Module[] moduleList) {
+        removePropertiesFile(moduleList);
+    });
+    moduleDetails.modules = libraryModules.sort(array:ASCENDING, a => a.level);
+
+    check writeToFile(STDLIB_MODULES_JSON, moduleDetails);
+    check updateStdlibDashboard(moduleDetails);
 }
 
 //  Sorts the Ballerina library module list in ascending order
 function getSortedModuleNameList() returns List|error {
-    json moduleListJson = check io:fileReadJson(MODULE_LIST_JSON);
-    List moduleList = check moduleListJson.cloneWithType();
+    List moduleList = check (check io:fileReadJson(MODULE_LIST_JSON)).fromJsonWithType();
 
     List sortedList = {
-        modules: sortModuleArray(moduleList.modules, 2),
-        extended_modules: sortModuleArray(moduleList.extended_modules, 2),
-        connectors: sortModuleArray(moduleList.connectors, 2),
-        tools: sortModuleArray(moduleList.tools, 0)
+        modules: sortModuleArray(moduleList.modules),
+        extended_modules: sortModuleArray(moduleList.extended_modules),
+        connectors: sortModuleArray(moduleList.connectors),
+        tools: sortModuleArray(moduleList.tools)
     };
 
     check writeToFile(MODULE_LIST_JSON, sortedList);
     return sortedList;
 }
 
-function sortModuleArray(Module[] moduleArray, int nameIndex) returns Module[] {
-    Module[] sortedModuleArray = from Module module in moduleArray
-        order by re `-`.split(module.name)[nameIndex] ascending
+function sortModuleArray(Module[] moduleArray) returns Module[] {
+    return from Module module in moduleArray
+        order by getModuleShortName(module.name) ascending
         select module;
-    return sortedModuleArray;
 }
 
 function initializeModuleDetails(List moduleNameList) returns List|error {
@@ -101,9 +80,7 @@ function initializeModuleList(Module[] modules) returns Module[]|error {
 function initializeModuleInfo(Module module) returns Module|error {
     string moduleName = module.name;
     string defaultBranch = check getDefaultBranch(moduleName);
-    string gradleProperties =
-        check git->get(string `/${BALLERINA_ORG_NAME}/${moduleName}/${defaultBranch}/${GRADLE_PROPERTIES}`);
-
+    string gradleProperties = check getGradlePropertiesFile(moduleName);
     string versionKey = getVersionKey(module);
     string moduleVersion = check getVersion(moduleName, gradleProperties);
     boolean displayCodeCovBadge = getDisplayCodeCovBadge(module);
@@ -119,6 +96,7 @@ function initializeModuleInfo(Module module) returns Module|error {
         gradle_properties: gradleProperties
     };
 }
+
 function getDisplayCodeCovBadge(Module module) returns boolean {
     boolean? displayCodeCovBadge = module.display_code_cov_badge;
     if displayCodeCovBadge is boolean {
@@ -126,6 +104,7 @@ function getDisplayCodeCovBadge(Module module) returns boolean {
     }
     return true;
 }
+
 function getVersionKey(Module module) returns string {
     string? versionKey = module.version_key;
     if versionKey is string {
@@ -151,12 +130,12 @@ function getVersion(string moduleName, string gradleProperties) returns string|e
 }
 
 // Get the modules list which use the specific module
-function getImmediateDependencies(List moduleDetails) returns error? {
-    foreach Module module in moduleDetails.modules {
-        string[] dependees = check getDependencies(module, moduleDetails);
+function getImmediateDependencies(Module[] modules) returns error? {
+    foreach Module module in modules {
+        string[] dependees = check getDependencies(module, modules);
 
         // Get the dependecies modules which use module in there package
-        foreach Module dependee in moduleDetails.modules {
+        foreach Module dependee in modules {
             string dependeeName = dependee.name;
             string[]? dependeeDependents = dependee.dependents;
             if dependees.indexOf(dependeeName) is int && dependeeDependents is string[] {
@@ -168,7 +147,7 @@ function getImmediateDependencies(List moduleDetails) returns error? {
 }
 
 // Get dependecies of specific module
-function getDependencies(Module module, List moduleDetails) returns string[]|error {
+function getDependencies(Module module, Module[] modules) returns string[]|error {
     string[] propertiesFileArr = [];
     string moduleName = module.name;
     string? propertiesFile = module.gradle_properties;
@@ -178,7 +157,7 @@ function getDependencies(Module module, List moduleDetails) returns string[]|err
     string[] dependencies = [];
 
     foreach string line in propertiesFileArr {
-        foreach Module item in moduleDetails.modules {
+        foreach Module item in modules {
             string dependentName = item.name;
             if dependentName == moduleName {
                 continue;
@@ -193,16 +172,16 @@ function getDependencies(Module module, List moduleDetails) returns string[]|err
     return dependencies;
 }
 
-function calculateLevels(List moduleDetails) returns error? {
-    DiGraph dependencyGraph = new DiGraph();
+function calculateLevels(Module[] modules) returns error? {
+    DiGraph dependencyGraph = new;
 
     // Module names are used to create the nodes and the level attribute of the node is initialized to 1
-    foreach Module module in moduleDetails.modules {
+    foreach Module module in modules {
         dependencyGraph.addNode(module.name);
     }
 
     // Edges are created considering the dependents of each module
-    foreach Module module in moduleDetails.modules {
+    foreach Module module in modules {
         string[]? moduleDependents = module.dependents;
         if moduleDependents is string[] {
             foreach var dependent in moduleDependents {
@@ -228,13 +207,13 @@ function calculateLevels(List moduleDetails) returns error? {
         string[] processing = [];
 
         foreach string n in processedList {
-            processCurrentLevel(dependencyGraph, processing, moduleDetails, currentLevel, n);
+            processCurrentLevel(dependencyGraph, processing, modules, currentLevel, n);
         }
         processedList = processing;
         currentLevel += 1;
     }
 
-    foreach Module module in moduleDetails.modules {
+    foreach Module module in modules {
         int? moduleLevel = dependencyGraph.getCurrentLevel(module.name);
         if moduleLevel is int {
             module.level = moduleLevel;
@@ -242,7 +221,7 @@ function calculateLevels(List moduleDetails) returns error? {
     }
 }
 
-function processCurrentLevel(DiGraph dependencyGraph, string[] processing, List moduleDetails,
+function processCurrentLevel(DiGraph dependencyGraph, string[] processing, Module[] modules,
         int currentLevel, string node) {
     string[]? successorsOfNode = dependencyGraph.successor(node);
     string[] successors = [];
@@ -252,7 +231,7 @@ function processCurrentLevel(DiGraph dependencyGraph, string[] processing, List 
     }
 
     foreach string successor in successors {
-        removeModulesInIntermediatePaths(dependencyGraph, node, successor, successors, moduleDetails);
+        removeModulesInIntermediatePaths(dependencyGraph, node, successor, successors, modules);
         dependencyGraph.setCurrentLevel(successor, currentLevel);
         if !(processing.indexOf(successor) is int) {
             processing.push(successor);
@@ -261,11 +240,11 @@ function processCurrentLevel(DiGraph dependencyGraph, string[] processing, List 
 }
 
 function removeModulesInIntermediatePaths(DiGraph dependencyGraph, string sourceNode,
-        string destinationNode, string[] successors, List moduleDetails) {
+        string destinationNode, string[] successors, Module[] modules) {
     string[] longestPath = dependencyGraph.getLongestPath(sourceNode, destinationNode);
     foreach string n in longestPath.slice(1, longestPath.length() - 1) {
         if (successors.indexOf(n) is int) {
-            foreach Module module in moduleDetails.modules {
+            foreach Module module in modules {
                 string[]? moduleDependents = module.dependents;
                 if module.name == sourceNode && moduleDependents is string[] {
                     int? indexOfDestinationNode = moduleDependents.indexOf(destinationNode);
@@ -383,16 +362,8 @@ isolated function writeToFile(string fileName, json content) returns error? {
     }
 }
 
-isolated function removePropertiesFile(Module[] modules) returns Module[] {
-    return from Module module in modules
-    select {
-        name: module.name,
-        module_version: module.module_version,
-        level: module.level,
-        default_branch: module.default_branch,
-        version_key: module.version_key,
-        display_code_cov_badge: module.display_code_cov_badge,
-        release: module.release,
-        dependents: module.dependents
-    };
+isolated function removePropertiesFile(Module[] modules) {
+    foreach Module module in modules {
+        module.gradle_properties = ();
+    }
 }
