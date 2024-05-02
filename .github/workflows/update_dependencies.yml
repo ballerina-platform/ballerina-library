@@ -39,7 +39,6 @@ jobs:
                 id: commitFiles
                 run: |
                     git add -u
-                    git reset -- dashboard/Dependencies.toml
                     if git diff-index --quiet HEAD --;
                     then
                         printf "::set-output name=hasChanged::false"
