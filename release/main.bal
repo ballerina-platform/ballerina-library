@@ -61,8 +61,8 @@ public function main() returns error? {
 }
 
 public function getModuleList() returns Module[]|error {
-    map<json> jsonValue = check io:fileReadJson(MODULE_LIST_JSON).ensureType();
-    return jsonValue?.modules.fromJsonWithType();
+    List moduleList = check (check io:fileReadJson(MODULE_LIST_JSON)).fromJsonWithType();
+    return [...moduleList.modules, ...moduleList.extended_modules, ...moduleList.tools]
 }
 
 isolated function filterModules(Module[] modules) returns [Module[], int]|error {
