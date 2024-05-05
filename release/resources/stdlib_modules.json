@@ -508,7 +508,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "module_version": "1.12.0-SNAPSHOT",
+            "module_version": "1.12.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
@@ -785,7 +785,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "module_version": "4.0.0-SNAPSHOT",
+            "module_version": "4.0.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
