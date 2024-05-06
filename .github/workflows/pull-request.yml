@@ -17,4 +17,4 @@ jobs:
                         test
                 env:
                     WORKING_DIR: ./dashboard
-                    BALLERINA_BOT_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+                    BALLERINA_BOT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
