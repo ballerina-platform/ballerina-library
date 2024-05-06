@@ -21,6 +21,11 @@ import ballerina/os;
 import ballerinax/github;
 
 const string ACCESS_TOKEN_ENV = "BALLERINA_BOT_TOKEN";
+const string RELEASE_LIBS = "RELEASE_LIBS";
+const string RELASE_EXTENSIONS = "RELEASE_EXTENSIONS";
+const string RELEASE_TOOLS = "RELEASE_TOOLS";
+const string RELEASE_CONNECTORS = "RELEASE_CONNECTORS";
+
 const string MODULE_LIST_JSON = "./resources/stdlib_modules.json";
 const string GITHUB_ORG = "ballerina-platform";
 // IMPORTANT: When testing, do not use `publish-release.yml` as the release workflow.
@@ -30,6 +35,11 @@ const decimal WORKFLOW_START_WAIT_TIME = 2;
 const decimal WORKFLOW_POLL_INTERVAL = 5;
 
 configurable string token = os:getEnv(ACCESS_TOKEN_ENV);
+
+configurable boolean releaseLibs = check os:getEnv(RELEASE_LIBS).ensureType();
+configurable boolean releaseExtensions = check os:getEnv(RELASE_EXTENSIONS).ensureType();
+configurable boolean releaseTools = check os:getEnv(RELEASE_TOOLS).ensureType();
+configurable boolean releaseConnectors = check os:getEnv(RELEASE_CONNECTORS).ensureType();
 
 final github:Client github = check new ({
     retryConfig: {
@@ -50,6 +60,7 @@ public function main() returns error? {
         printError(modules);
         return modules;
     }
+    modules.forEach((m) => io:println(m.name));
     [Module[], int]|error filterResult = filterModules(modules);
     if filterResult is error {
         printError(filterResult);
@@ -62,7 +73,20 @@ public function main() returns error? {
 
 public function getModuleList() returns Module[]|error {
     List moduleList = check (check io:fileReadJson(MODULE_LIST_JSON)).fromJsonWithType();
-    return [...moduleList.modules, ...moduleList.extended_modules, ...moduleList.tools]
+    Module[] result = [];
+    if releaseLibs {
+        result.push(...moduleList.modules);
+    }
+    if releaseExtensions {
+        result.push(...moduleList.extended_modules);
+    }
+    if releaseTools {
+        result.push(...moduleList.tools);
+    }
+    if releaseConnectors {
+        result.push(...moduleList.connectors);
+    }
+    return result;
 }
 
 isolated function filterModules(Module[] modules) returns [Module[], int]|error {

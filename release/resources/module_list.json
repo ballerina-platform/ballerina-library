@@ -220,6 +220,7 @@
         {
             "name": "module-ballerinax-copybook",
             "default_branch": "main",
+            "release": false,
             "display_code_cov_badge": true
         },
         {
@@ -415,11 +416,13 @@
         {
             "name": "copybook-tools",
             "default_branch": "main",
+            "release": false,
             "display_code_cov_badge": true
         },
         {
             "name": "edi-tools",
             "default_branch": "main",
+            "release": false,
             "display_code_cov_badge": true
         },
         {
