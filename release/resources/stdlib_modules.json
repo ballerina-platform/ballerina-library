@@ -119,7 +119,7 @@
         },
         {
             "name": "module-ballerina-data.xmldata",
-            "module_version": "0.1.0-SNAPSHOT",
+            "module_version": "0.1.1-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibDataXmldataVersion",
