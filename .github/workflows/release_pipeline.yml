@@ -23,8 +23,6 @@ on:
                 required: true
                 default: false
                 type: boolean
-
-
 jobs:
     build:
         name: Release Ballerina Stdlibs
