@@ -173,7 +173,7 @@ The Ballerina Library Release Manager will use [Stdlib Release Workflow](https:/
 6. Once the final RC pack is passed the voting phase, update the [module list](https://github.com/ballerina-platform/ballerina-standard-library/blob/main/release/resources/stdlib_modules.json) to reflect the modules to be released.
    >**Note:** If a module is not releasing with the given distribution release, change the `release` property to `false` in the module list. (This can be done on a separate branch and that branch can be used to trigger the release workflow.)
 7. Once the module list is updated, notify the team to refrain from merging any PRs to the default branches, including the post-release PRs.
-8. Create a separate branch in the `ballerina-library` repo related to the release and update the `stdlib_modules.json` file with the modules that needs to be released by either setting the `release` property to `false` for the non-releasing modules or completely removing the modules that does not need to be released.
+8. Create a separate branch in the `ballerina-library` repo related to the release and, update the `stdlib_modules.json` file by either setting the `release` property to `false` or completely removing the entries for the modules that don't need to be released.
 9. Then the release manager can trigger the [Library Release Workflow](https://github.com/ballerina-platform/ballerina-library/actions/workflows/release_pipeline.yml) to trigger the release.
     This workflow expects the following inputs:
     - `release_libs`: To release the library (`module-ballerina-*` modules that are packed with the distribution) modules. These modules are listed under the `modules` field in the `module_list.json` file. The default value is `true`.
