@@ -1,9 +1,9 @@
 # Ballerina Library Build and Release Guide
 
-_Authors_: @niveathika @ThisaruGuruge
-_Reviewers_: @shafreenAnfar @daneshk @NipunaRanasinghe
-_Created_: 2022/07/05
-_Updated_: 2024/04/29
+_Authors_: @niveathika @ThisaruGuruge \
+_Reviewers_: @shafreenAnfar @daneshk @NipunaRanasinghe \
+_Created_: 2022/07/05 \
+_Updated_: 2024/05/07
 
 ## Table of Contents
 
