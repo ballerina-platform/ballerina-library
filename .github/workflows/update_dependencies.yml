@@ -27,7 +27,7 @@ jobs:
                     git checkout -b update-dependency-graph
 
             -   name: Update the Dependencies and Generate the Dashboard
-                uses: ballerina-platform/ballerina-action@2201.8.0
+                uses: ballerina-platform/ballerina-action@2201.9.0
                 with:
                     args:
                         run

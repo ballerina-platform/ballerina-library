@@ -11,10 +11,10 @@ jobs:
                 uses: actions/checkout@v2
 
             -   name: Testing the Dashboard Generation
-                uses: ballerina-platform/ballerina-action@2201.8.0
+                uses: ballerina-platform/ballerina-action@2201.9.0
                 with:
                     args:
                         test
                 env:
                     WORKING_DIR: ./dashboard
-                    BALLERINA_BOT_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+                    BALLERINA_BOT_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -173,9 +173,17 @@ The Ballerina Library Release Manager will use [Stdlib Release Workflow](https:/
 6. Once the final RC pack is passed the voting phase, update the [module list](https://github.com/ballerina-platform/ballerina-standard-library/blob/main/release/resources/stdlib_modules.json) to reflect the modules to be released.
    >**Note:** If a module is not releasing with the given distribution release, change the `release` property to `false` in the module list. (This can be done on a separate branch and that branch can be used to trigger the release workflow.)
 7. Once the module list is updated, notify the team to refrain from merging any PRs to the default branches, including the post-release PRs.
-8. Then the release manager can trigger the [Library Release Workflow](https://github.com/ballerina-platform/ballerina-library/actions/workflows/release_pipeline.yml) to trigger the release.
+8. Create a separate branch in the `ballerina-library` repo related to the release and, update the `stdlib_modules.json` file by either setting the `release` property to `false` or completely removing the entries for the modules that don't need to be released.
+9. Then the release manager can trigger the [Library Release Workflow](https://github.com/ballerina-platform/ballerina-library/actions/workflows/release_pipeline.yml) to trigger the release.
+    This workflow expects the following inputs:
+    - `release_libs`: To release the library (`module-ballerina-*` modules that are packed with the distribution) modules. These modules are listed under the `modules` field in the `module_list.json` file. The default value is `true`.
+    - `release_extensions`: To release the ballerina extended (`module-ballerinax-persist.*`, and `copybook`) modules. These modules are listed under the `extended_modules` field in the `module_list.json` file. The default value is `false`.
+    - `release_tools`: To release the ballerina tools (`*-tool`) modules. These modules are listed under the `tools` field in the `module_list.json` file. The default value is `false`.
+    - `release_connectors`: To release the ballerina connectors (`module-ballerinax-*`) modules. These modules are listed under the `connectors` field in the `module_list.json` file. The default value is `false`.
+
     > **Note:** The release manager should update the `release` property in the module list (stdlib_modules.json) to `false` for the modules that are not releasing with the distribution release before triggering the workflow.
-9. The workflow logs will show the current status of the release. The release manager should monitor the workflow and take necessary actions if any failures occur.
+
+10. The workflow logs will show the current status of the release. The release manager should monitor the workflow and take necessary actions if any failures occur.
 
     - If a particular module release is failed, the Ballerina library release manager should check the logs and take necessary actions to fix the issue.
       - If the issue is related to the module, inform the module owner to fix the issue and inform the release manager.
@@ -184,3 +192,5 @@ The Ballerina Library Release Manager will use [Stdlib Release Workflow](https:/
     - Once the failed module is released, the Ballerina library release manager can re-trigger the Library Release Workflow to continue the release. There's no need to update the module list.
 
        >**Note:** If a post-release sync PR is merged before the release is completed, re-triggering the workflow may result in a re-release of the module.
+11. Once the release workflow is complete, update the corresponding branch in the `ballerina-distribution` repo with the released module versions. Then inform the release manager to continue the distribution release process.
+12. Once the distribution release process is completed, notify the team to update the changelogs and merge the post-release PRs to the default branches.

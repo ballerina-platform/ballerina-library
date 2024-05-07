@@ -14,6 +14,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
+type List record {|
+    Module[] modules;
+    Module[] extended_modules;
+    Module[] connectors;
+    Module[] tools;
+|};
+
 type Module record {
     string name;
     string module_version;

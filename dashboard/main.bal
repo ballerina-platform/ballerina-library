@@ -17,8 +17,7 @@
 import ballerina/io;
 import ballerina/lang.array;
 import ballerina/log;
-
-import thisarug/prettify;
+import ballerina/data.jsondata;
 
 public function main() returns error? {
     List moduleNameList = check getSortedModuleNameList();
@@ -63,12 +62,12 @@ function initializeModuleDetails(List moduleNameList) returns List|error {
     return {
         modules: check initializeModuleList(moduleNameList.modules),
         extended_modules: check initializeModuleList(moduleNameList.extended_modules),
-        connectors: check initializeModuleList(moduleNameList.connectors),
+        connectors: check initializeModuleList(moduleNameList.connectors, 10),
         tools: check initializeModuleList(moduleNameList.tools)
     };
 }
 
-function initializeModuleList(Module[] modules) returns Module[]|error {
+function initializeModuleList(Module[] modules, int defaultModuleLevel = 1) returns Module[]|error {
     Module[] moduleList = [];
     foreach Module module in modules {
         Module initialModule = check initializeModuleInfo(module);
@@ -77,7 +76,7 @@ function initializeModuleList(Module[] modules) returns Module[]|error {
     return moduleList;
 }
 
-function initializeModuleInfo(Module module) returns Module|error {
+function initializeModuleInfo(Module module, int defaultModuleLevel = 1) returns Module|error {
     string moduleName = module.name;
     string defaultBranch = check getDefaultBranch(moduleName);
     string gradleProperties = check getGradlePropertiesFile(moduleName);
@@ -87,7 +86,7 @@ function initializeModuleInfo(Module module) returns Module|error {
     return {
         name: moduleName,
         module_version: moduleVersion,
-        level: 1,
+        level: defaultModuleLevel,
         default_branch: defaultBranch,
         version_key: versionKey,
         release: true,
@@ -353,7 +352,7 @@ ${TOOLS_HEADER_SEPARATOR}`;
 }
 
 isolated function writeToFile(string fileName, json content) returns error? {
-    string prettifiedContent = prettify:prettify(content);
+    string prettifiedContent = jsondata:prettify(content);
 
     error? result = io:fileWriteString(fileName, prettifiedContent);
     if result is error {

@@ -1,6 +1,28 @@
 name: Stdlib Release
 
-on: [ workflow_dispatch ]
+on:
+    workflow_dispatch:
+        inputs:
+            release_libs:
+                description: 'Release Ballerina Libraries (ballerina/*)'
+                required: true
+                default: true
+                type: boolean
+            release_extensions:
+                description: 'Release Ballerina Extensions (persist.*)'
+                required: true
+                default: false
+                type: boolean
+            release_tools:
+                description: 'Release Ballerina Tools (OpenAPI, GraphQL, AsyncAPI, etc.)'
+                required: true
+                default: false
+                type: boolean
+            release_connectors:
+                description: 'Release Ballerina Connectors (ballerinax/*)'
+                required: true
+                default: false
+                type: boolean
 jobs:
     build:
         name: Release Ballerina Stdlibs
@@ -10,10 +32,14 @@ jobs:
             -   uses: actions/checkout@v2
 
             -   name: Release Ballerina Libraries
-                uses: ballerina-platform/ballerina-action@2201.8.6
+                uses: ballerina-platform/ballerina-action@2201.9.0
                 with:
                     args:
                         run
                 env:
                     WORKING_DIR: ./release
                     BALLERINA_BOT_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+                    RELEASE_LIBS: ${{ github.event.inputs.release_libs }}
+                    RELEASE_EXTENSIONS: ${{ github.event.inputs.release_extensions }}
+                    RELEASE_TOOLS: ${{ github.event.inputs.release_tools }}
+                    RELEASE_CONNECTORS: ${{ github.event.inputs.release_extensions }}
