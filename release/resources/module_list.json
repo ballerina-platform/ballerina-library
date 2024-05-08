@@ -392,6 +392,16 @@
             "display_code_cov_badge": true
         },
         {
+            "name": "module-ballerinax-salesforce",
+            "default_branch": "main",
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-salesforce.types",
+            "default_branch": "main",
+            "display_code_cov_badge": false
+        },
+        {
             "name": "module-ballerinax-snowflake",
             "default_branch": "main",
             "display_code_cov_badge": false
@@ -403,16 +413,6 @@
         },
         {
             "name": "module-ballerinax-zendesk",
-            "default_branch": "main",
-            "display_code_cov_badge": false
-        },
-        {
-            "name": "module-ballerinax-salesforce",
-            "default_branch": "main",
-            "display_code_cov_badge": true
-        },
-        {
-            "name": "module-ballerinax-salesforce.types",
             "default_branch": "main",
             "display_code_cov_badge": false
         }
