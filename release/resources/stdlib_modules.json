@@ -874,6 +874,26 @@
             "display_code_cov_badge": true
         },
         {
+            "name": "module-ballerinax-salesforce",
+            "module_version": "8.0.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibSalesforceVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-salesforce.types",
+            "module_version": "1.0.0-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibSalesforce.typesVersion",
+            "release": true,
+            "dependents": [],
+            "display_code_cov_badge": false
+        },
+        {
             "name": "module-ballerinax-snowflake",
             "module_version": "2.0.0-SNAPSHOT",
             "level": 1,
