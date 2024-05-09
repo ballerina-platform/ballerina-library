@@ -103,7 +103,7 @@
         },
         {
             "name": "module-ballerina-crypto",
-            "module_version": "2.7.0-SNAPSHOT",
+            "module_version": "2.7.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibCryptoVersion",
