@@ -438,7 +438,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "module_version": "1.11.0-SNAPSHOT",
+            "module_version": "1.11.1-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
