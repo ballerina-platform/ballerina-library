@@ -250,7 +250,7 @@
         {
             "name": "module-ballerinax-wso2.controlplane",
             "default_branch": "main",
-            "release": false,
+            "version_key": "stdlibWso2ControlplaneVersion",
             "display_code_cov_badge": true
         }
     ],
