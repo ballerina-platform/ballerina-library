@@ -246,6 +246,12 @@
             "default_branch": "main",
             "version_key": "stdlibPersistSqlVersion",
             "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-wso2.controlplane",
+            "default_branch": "main",
+            "version_key": "stdlibWso2ControlplaneVersion",
+            "display_code_cov_badge": true
         }
     ],
     "connectors": [
