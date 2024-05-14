@@ -317,6 +317,7 @@
                 "module-ballerina-websub",
                 "module-ballerina-websubhub",
                 "module-ballerinax-persist.redis",
+                "module-ballerinax-wso2.controlplane",
                 "asyncapi-tools"
             ],
             "display_code_cov_badge": true
@@ -432,6 +433,7 @@
                 "module-ballerina-websub",
                 "module-ballerina-websubhub",
                 "module-ballerinax-persist.redis",
+                "module-ballerinax-wso2.controlplane",
                 "asyncapi-tools"
             ],
             "display_code_cov_badge": true
@@ -486,7 +488,7 @@
         },
         {
             "name": "module-ballerina-websub",
-            "module_version": "2.11.0-SNAPSHOT",
+            "module_version": "2.11.1-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibWebsubVersion",
@@ -498,7 +500,7 @@
         },
         {
             "name": "module-ballerina-websubhub",
-            "module_version": "1.11.0-SNAPSHOT",
+            "module_version": "1.11.1-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsubhubVersion",
@@ -589,6 +591,16 @@
             "dependents": [
                 "persist-tools"
             ],
+            "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-wso2.controlplane",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 6,
+            "default_branch": "main",
+            "version_key": "stdlibWso2ControlplaneVersion",
+            "release": true,
+            "dependents": [],
             "display_code_cov_badge": true
         }
     ],
