@@ -415,6 +415,11 @@
             "name": "module-ballerinax-zendesk",
             "default_branch": "main",
             "display_code_cov_badge": false
+        },
+        {
+            "name": "module-ballerinax-wso2.controlplane",
+            "default_branch": "main",
+            "display_code_cov_badge": true
         }
     ],
     "tools": [
