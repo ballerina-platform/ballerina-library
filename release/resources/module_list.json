@@ -246,6 +246,12 @@
             "default_branch": "main",
             "version_key": "stdlibPersistSqlVersion",
             "display_code_cov_badge": true
+        },
+        {
+            "name": "module-ballerinax-wso2.controlplane",
+            "default_branch": "main",
+            "release": false,
+            "display_code_cov_badge": true
         }
     ],
     "connectors": [
@@ -415,11 +421,6 @@
             "name": "module-ballerinax-zendesk",
             "default_branch": "main",
             "display_code_cov_badge": false
-        },
-        {
-            "name": "module-ballerinax-wso2.controlplane",
-            "default_branch": "main",
-            "display_code_cov_badge": true
         }
     ],
     "tools": [
