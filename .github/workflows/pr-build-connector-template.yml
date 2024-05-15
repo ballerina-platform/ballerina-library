@@ -30,7 +30,8 @@ jobs:
                 if [ -z "$BAL_VERSION" ]; then
                   BAL_VERSION="latest"
                 fi
-                echo $BAL_VERSION >> $GITHUB_ENV
+                echo "BAL_VERSION=$BAL_VERSION" >> $GITHUB_ENV
+                echo "Ballerina Version: $BAL_VERSION"
 
             - name: Set Up Ballerina
               uses: ballerina-platform/setup-ballerina@v1.1.0
