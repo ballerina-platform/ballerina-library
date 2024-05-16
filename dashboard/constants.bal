@@ -18,6 +18,9 @@
 const BALLERINA_ORG_NAME = "ballerina-platform";
 const LIBRARY_REPO = "ballerina-library";
 
+// Branches
+const BRANCH_MAIN = "main";
+
 // Links
 const BALLERINA_ORG_URL = "https://github.com/ballerina-platform";
 const GITHUB_BADGE_URL = "https://img.shields.io/github";

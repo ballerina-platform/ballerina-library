@@ -25,7 +25,7 @@ type Module record {|
     string name;
     string module_version?;
     int level?;
-    string default_branch = "main";
+    string default_branch?;
     string version_key?;
     boolean release?;
     string[] dependents?;
