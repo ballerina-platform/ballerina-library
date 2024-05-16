@@ -2,254 +2,206 @@
     "modules": [
         {
             "name": "module-ballerina-auth",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-avro",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-cache",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-constraint",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-crypto",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-data.jsondata",
-            "default_branch": "main",
             "version_key": "stdlibDataJsondataVersion",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-data.xmldata",
-            "default_branch": "main",
             "version_key": "stdlibDataXmldataVersion",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-edi",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-email",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-file",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-ftp",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-graphql",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-grpc",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-http",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-io",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-jballerina.java.arrays",
-            "default_branch": "main",
             "version_key": "stdlibJavaArraysVersion",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-jwt",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-log",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-math.vector",
-            "default_branch": "main",
             "version_key": "stdlibMathVectorVersion",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-mime",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-mqtt",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-oauth2",
-            "default_branch": "main",
             "version_key": "stdlibOAuth2Version",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-os",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-persist",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-protobuf",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-random",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-soap",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-sql",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-task",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-tcp",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-time",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-toml",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinai-transaction",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-udp",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-url",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-uuid",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-websocket",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-websub",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-websubhub",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-xmldata",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-xslt",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerina-yaml",
-            "default_branch": "main",
             "display_code_cov_badge": true
         }
     ],
     "extended_modules": [
         {
             "name": "module-ballerinax-copybook",
-            "default_branch": "main",
             "release": false,
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-persist.googlesheets",
-            "default_branch": "main",
             "version_key": "stdlibPersistGoogleSheetVersion",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-persist.inmemory",
-            "default_branch": "main",
             "version_key": "stdlibPersistInmemoryVersion",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-persist.redis",
-            "default_branch": "main",
             "version_key": "stdlibPersistRedisVersion",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-persist.sql",
-            "default_branch": "main",
             "version_key": "stdlibPersistSqlVersion",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-wso2.controlplane",
-            "default_branch": "main",
             "version_key": "stdlibWso2ControlplaneVersion",
             "display_code_cov_badge": true
         }
@@ -257,208 +209,168 @@
     "connectors": [
         {
             "name": "module-ballerinax-asana",
-            "default_branch": "main",
             "display_code_cov_badge": false
         },
         {
             "name": "module-ballerinax-aws.dynamodb",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-aws.dynamodbstreams",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-aws.redshift",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-aws.sns",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-azure-service-bus",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-candid",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-confluent.cavroserdes",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-confluent.cregistry",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-docusign.dsadmin",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-docusign.dsclick",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-docusign.dsesign",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-github",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-googleapis.calendar",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-googleapis.gmail",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-guidewire.insnow",
-            "default_branch": "main",
             "display_code_cov_badge": false
         },
         {
             "name": "module-ballerinax-ibm.ibmmq",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-java.jdbc",
-            "default_branch": "main",
             "version_key": "stdlibJdbcVersion",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-java.jms",
-            "default_branch": "main",
             "version_key": "stdlibJmsVersion",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-kafka",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-mongodb",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-mssql",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-mysql",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-nats",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-oracledb",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-postgresql",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-redis",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-salesforce",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "module-ballerinax-salesforce.types",
-            "default_branch": "main",
             "display_code_cov_badge": false
         },
         {
             "name": "module-ballerinax-snowflake",
-            "default_branch": "main",
             "display_code_cov_badge": false
         },
         {
             "name": "module-ballerinax-twilio",
-            "default_branch": "main",
             "display_code_cov_badge": false
         },
         {
             "name": "module-ballerinax-zendesk",
-            "default_branch": "main",
             "display_code_cov_badge": false
         }
     ],
     "tools": [
         {
             "name": "asyncapi-tools",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "copybook-tools",
-            "default_branch": "main",
             "release": false,
             "display_code_cov_badge": true
         },
         {
             "name": "edi-tools",
-            "default_branch": "main",
             "release": false,
             "display_code_cov_badge": true
         },
         {
             "name": "graphql-tools",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "openapi-tools",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "persist-tools",
-            "default_branch": "main",
             "display_code_cov_badge": true
         },
         {
             "name": "protoc-tools",
-            "default_branch": "main",
             "display_code_cov_badge": true
         }
     ]

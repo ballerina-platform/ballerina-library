@@ -40,7 +40,7 @@ function getDefaultBranch(string moduleName) returns string|error {
 
 isolated function getRepoBadges(Module module) returns RepoBadges|error {
     string moduleName = module.name;
-    string defaultBranch = module.default_branch;
+    string defaultBranch = module.default_branch ?: BRANCH_MAIN;
     github:WorkflowResponse workflowResponse = check github->/repos/[BALLERINA_ORG_NAME]/[module.name]/actions/workflows;
     WorkflowBadge codeCov = getCodeCoverageBadge(module);
     WorkflowBadge release = check getLatestReleaseBadge(moduleName);
@@ -142,7 +142,7 @@ isolated function getCodeCoverageBadge(Module module) returns WorkflowBadge {
         };
     }
     string moduleName = module.name;
-    string defaultBranch = module.default_branch;
+    string defaultBranch = module.default_branch ?: BRANCH_MAIN;
     return {
         name: "CodeCov",
         badgeUrl: string `${CODECOV_BADGE_URL}/${BALLERINA_ORG_NAME}/${moduleName}/branch/${defaultBranch}/graph/badge.svg`,
