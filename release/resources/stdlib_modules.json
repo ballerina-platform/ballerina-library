@@ -81,7 +81,7 @@
         },
         {
             "name": "module-ballerina-avro",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibAvroVersion",
@@ -336,7 +336,7 @@
         },
         {
             "name": "module-ballerina-data.jsondata",
-            "module_version": "0.1.0-SNAPSHOT",
+            "module_version": "0.1.1-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibDataJsondataVersion",
@@ -453,7 +453,7 @@
         },
         {
             "name": "module-ballerina-soap",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibSoapVersion",
@@ -463,7 +463,7 @@
         },
         {
             "name": "module-ballerinai-transaction",
-            "module_version": "1.9.0-SNAPSHOT",
+            "module_version": "1.9.1-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibTransactionVersion",
