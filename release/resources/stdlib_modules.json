@@ -388,7 +388,7 @@
         },
         {
             "name": "module-ballerina-oauth2",
-            "module_version": "2.11.0-SNAPSHOT",
+            "module_version": "2.11.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibOAuth2Version",
@@ -627,7 +627,7 @@
         },
         {
             "name": "module-ballerinax-aws.dynamodbstreams",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibAws.dynamodbstreamsVersion",
