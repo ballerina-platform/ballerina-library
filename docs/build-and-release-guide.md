@@ -182,7 +182,7 @@ The Ballerina Library Release Manager will use [Library Release](https://github.
     - `release_handwritten_connectors`: To release the ballerina handwritten connector modules. These modules are listed under the `handwritten_connectors` field in the `module_list.json` file. The default value is `false`.
     - `release_generated_connectors`: To release the ballerina generated connector modules. These modules are listed under the `generated_connectors` field in the `module_list.json` file. The default value is `false`.
 
-    > **Note:** The release manager should update the `release` property in the module list (stdlib_modules.json) to `false` for the modules that are not releasing with the distribution release before triggering the workflow.
+    > **Note:** When the connectors needed to be released at once, it is advised to release them separately, after releasing the library modules. This is because most probably the connectors has to be released once the Ballerina distribution is released.
 
 10. The workflow logs will show the current status of the release. The release manager should monitor the workflow and take necessary actions if any failures occur.
 
