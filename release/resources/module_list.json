@@ -1,377 +1,288 @@
 {
-    "modules": [
+    "library_modules": [
         {
-            "name": "module-ballerina-auth",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-auth"
         },
         {
-            "name": "module-ballerina-avro",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-avro"
         },
         {
-            "name": "module-ballerina-cache",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-cache"
         },
         {
-            "name": "module-ballerina-constraint",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-constraint"
         },
         {
-            "name": "module-ballerina-crypto",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-crypto"
         },
         {
             "name": "module-ballerina-data.jsondata",
-            "version_key": "stdlibDataJsondataVersion",
-            "display_code_cov_badge": true
+            "version_key": "stdlibDataJsondataVersion"
         },
         {
             "name": "module-ballerina-data.xmldata",
-            "version_key": "stdlibDataXmldataVersion",
-            "display_code_cov_badge": true
+            "version_key": "stdlibDataXmldataVersion"
         },
         {
-            "name": "module-ballerina-edi",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-edi"
         },
         {
-            "name": "module-ballerina-email",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-email"
         },
         {
-            "name": "module-ballerina-file",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-file"
         },
         {
-            "name": "module-ballerina-ftp",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-ftp"
         },
         {
-            "name": "module-ballerina-graphql",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-graphql"
         },
         {
-            "name": "module-ballerina-grpc",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-grpc"
         },
         {
-            "name": "module-ballerina-http",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-http"
         },
         {
-            "name": "module-ballerina-io",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-io"
         },
         {
             "name": "module-ballerina-jballerina.java.arrays",
-            "version_key": "stdlibJavaArraysVersion",
-            "display_code_cov_badge": true
+            "version_key": "stdlibJavaArraysVersion"
         },
         {
-            "name": "module-ballerina-jwt",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-jwt"
         },
         {
-            "name": "module-ballerina-log",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-log"
         },
         {
             "name": "module-ballerina-math.vector",
-            "version_key": "stdlibMathVectorVersion",
-            "display_code_cov_badge": true
+            "version_key": "stdlibMathVectorVersion"
         },
         {
-            "name": "module-ballerina-mime",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-mime"
         },
         {
-            "name": "module-ballerina-mqtt",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-mqtt"
         },
         {
             "name": "module-ballerina-oauth2",
-            "version_key": "stdlibOAuth2Version",
-            "display_code_cov_badge": true
+            "version_key": "stdlibOAuth2Version"
         },
         {
-            "name": "module-ballerina-os",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-os"
         },
         {
-            "name": "module-ballerina-persist",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-persist"
         },
         {
-            "name": "module-ballerina-protobuf",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-protobuf"
         },
         {
-            "name": "module-ballerina-random",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-random"
         },
         {
-            "name": "module-ballerina-soap",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-soap"
         },
         {
-            "name": "module-ballerina-sql",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-sql"
         },
         {
-            "name": "module-ballerina-task",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-task"
         },
         {
-            "name": "module-ballerina-tcp",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-tcp"
         },
         {
-            "name": "module-ballerina-time",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-time"
         },
         {
-            "name": "module-ballerina-toml",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-toml"
         },
         {
-            "name": "module-ballerinai-transaction",
-            "display_code_cov_badge": true
+            "name": "module-ballerinai-transaction"
         },
         {
-            "name": "module-ballerina-udp",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-udp"
         },
         {
-            "name": "module-ballerina-url",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-url"
         },
         {
-            "name": "module-ballerina-uuid",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-uuid"
         },
         {
-            "name": "module-ballerina-websocket",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-websocket"
         },
         {
-            "name": "module-ballerina-websub",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-websub"
         },
         {
-            "name": "module-ballerina-websubhub",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-websubhub"
         },
         {
-            "name": "module-ballerina-xmldata",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-xmldata"
         },
         {
-            "name": "module-ballerina-xslt",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-xslt"
         },
         {
-            "name": "module-ballerina-yaml",
-            "display_code_cov_badge": true
+            "name": "module-ballerina-yaml"
         }
     ],
     "extended_modules": [
         {
-            "name": "module-ballerinax-copybook",
-            "release": false,
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-copybook"
         },
         {
             "name": "module-ballerinax-persist.googlesheets",
-            "version_key": "stdlibPersistGoogleSheetVersion",
-            "display_code_cov_badge": true
+            "version_key": "stdlibPersistGoogleSheetVersion"
         },
         {
             "name": "module-ballerinax-persist.inmemory",
-            "version_key": "stdlibPersistInmemoryVersion",
-            "display_code_cov_badge": true
+            "version_key": "stdlibPersistInmemoryVersion"
         },
         {
             "name": "module-ballerinax-persist.redis",
-            "version_key": "stdlibPersistRedisVersion",
-            "display_code_cov_badge": true
+            "version_key": "stdlibPersistRedisVersion"
         },
         {
             "name": "module-ballerinax-persist.sql",
-            "version_key": "stdlibPersistSqlVersion",
-            "display_code_cov_badge": true
+            "version_key": "stdlibPersistSqlVersion"
         },
         {
             "name": "module-ballerinax-wso2.controlplane",
-            "version_key": "stdlibWso2ControlplaneVersion",
-            "display_code_cov_badge": true
+            "version_key": "stdlibWso2ControlplaneVersion"
         }
     ],
-    "connectors": [
+    "handwritten_connectors": [
         {
-            "name": "module-ballerinax-asana",
-            "display_code_cov_badge": false
+            "name": "module-ballerinax-asana"
         },
         {
-            "name": "module-ballerinax-aws.dynamodb",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-aws.dynamodb"
         },
         {
-            "name": "module-ballerinax-aws.dynamodbstreams",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-aws.dynamodbstreams"
         },
         {
-            "name": "module-ballerinax-aws.redshift",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-aws.redshift"
         },
         {
-            "name": "module-ballerinax-aws.sns",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-aws.sns"
         },
         {
-            "name": "module-ballerinax-azure-service-bus",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-azure-service-bus"
         },
         {
-            "name": "module-ballerinax-candid",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-candid"
         },
         {
-            "name": "module-ballerinax-confluent.cavroserdes",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-confluent.cavroserdes"
         },
         {
-            "name": "module-ballerinax-confluent.cregistry",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-confluent.cregistry"
         },
         {
-            "name": "module-ballerinax-docusign.dsadmin",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-guidewire.insnow"
         },
         {
-            "name": "module-ballerinax-docusign.dsclick",
-            "display_code_cov_badge": true
-        },
-        {
-            "name": "module-ballerinax-docusign.dsesign",
-            "display_code_cov_badge": true
-        },
-        {
-            "name": "module-ballerinax-github",
-            "display_code_cov_badge": true
-        },
-        {
-            "name": "module-ballerinax-googleapis.calendar",
-            "display_code_cov_badge": true
-        },
-        {
-            "name": "module-ballerinax-googleapis.gmail",
-            "display_code_cov_badge": true
-        },
-        {
-            "name": "module-ballerinax-guidewire.insnow",
-            "display_code_cov_badge": false
-        },
-        {
-            "name": "module-ballerinax-ibm.ibmmq",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-ibm.ibmmq"
         },
         {
             "name": "module-ballerinax-java.jdbc",
-            "version_key": "stdlibJdbcVersion",
-            "display_code_cov_badge": true
+            "version_key": "stdlibJdbcVersion"
         },
         {
             "name": "module-ballerinax-java.jms",
-            "version_key": "stdlibJmsVersion",
-            "display_code_cov_badge": true
+            "version_key": "stdlibJmsVersion"
         },
         {
-            "name": "module-ballerinax-kafka",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-kafka"
         },
         {
-            "name": "module-ballerinax-mongodb",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-mongodb"
         },
         {
-            "name": "module-ballerinax-mssql",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-mssql"
         },
         {
-            "name": "module-ballerinax-mysql",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-mysql"
         },
         {
-            "name": "module-ballerinax-nats",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-nats"
         },
         {
-            "name": "module-ballerinax-oracledb",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-oracledb"
         },
         {
-            "name": "module-ballerinax-postgresql",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-postgresql"
         },
         {
-            "name": "module-ballerinax-rabbitmq",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-rabbitmq"
         },
         {
-            "name": "module-ballerinax-redis",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-redis"
         },
         {
-            "name": "module-ballerinax-salesforce",
-            "display_code_cov_badge": true
+            "name": "module-ballerinax-salesforce"
         },
         {
-            "name": "module-ballerinax-salesforce.types",
-            "display_code_cov_badge": false
+            "name": "module-ballerinax-salesforce.types"
         },
         {
-            "name": "module-ballerinax-snowflake",
-            "display_code_cov_badge": false
+            "name": "module-ballerinax-snowflake"
         },
         {
-            "name": "module-ballerinax-twilio",
-            "display_code_cov_badge": false
+            "name": "module-ballerinax-zendesk"
+        }
+    ],
+    "generated_connectors": [
+        {
+            "name": "module-ballerinax-docusign.dsadmin"
         },
         {
-            "name": "module-ballerinax-zendesk",
-            "display_code_cov_badge": false
+            "name": "module-ballerinax-docusign.dsclick"
+        },
+        {
+            "name": "module-ballerinax-docusign.dsesign"
+        },
+        {
+            "name": "module-ballerinax-github"
+        },
+        {
+            "name": "module-ballerinax-googleapis.calendar"
+        },
+        {
+            "name": "module-ballerinax-googleapis.gmail"
+        },
+        {
+            "name": "module-ballerinax-twilio"
         }
     ],
     "tools": [
         {
-            "name": "asyncapi-tools",
-            "display_code_cov_badge": true
+            "name": "asyncapi-tools"
         },
         {
-            "name": "copybook-tools",
-            "release": false,
-            "display_code_cov_badge": true
+            "name": "copybook-tools"
         },
         {
-            "name": "edi-tools",
-            "release": false,
-            "display_code_cov_badge": true
+            "name": "edi-tools"
         },
         {
-            "name": "graphql-tools",
-            "display_code_cov_badge": true
+            "name": "graphql-tools"
         },
         {
-            "name": "openapi-tools",
-            "display_code_cov_badge": true
+            "name": "openapi-tools"
         },
         {
-            "name": "persist-tools",
-            "display_code_cov_badge": true
+            "name": "persist-tools"
         },
         {
-            "name": "protoc-tools",
-            "display_code_cov_badge": true
+            "name": "protoc-tools"
         }
     ]
 }

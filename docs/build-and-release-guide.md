@@ -141,7 +141,7 @@ Checklist for the release,
 
 ### Multiple Module Release
 
-The Ballerina Library Release Manager will use [Stdlib Release Workflow](https://github.com/ballerina-platform/ballerina-library/actions/workflows/release_pipeline.yml) to release multiple modules(Usually during Ballerina Update releases). It will publish all modules in the [list](https://github.com/ballerina-platform/ballerina-library/blob/main/release/resources/stdlib_modules.json). The Release Manager can override it by using the `release` property.
+The Ballerina Library Release Manager will use [Library Release](https://github.com/ballerina-platform/ballerina-library/actions/workflows/release_pipeline.yml) workflow to release multiple modules (Usually during Ballerina Update releases). It will publish all modules in the [list](https://github.com/ballerina-platform/ballerina-library/blob/main/release/resources/stdlib_modules.json). The Release Manager can override it by using the `release` property.
 
 #### Release Checklist
 
@@ -179,7 +179,8 @@ The Ballerina Library Release Manager will use [Stdlib Release Workflow](https:/
     - `release_libs`: To release the library (`module-ballerina-*` modules that are packed with the distribution) modules. These modules are listed under the `modules` field in the `module_list.json` file. The default value is `true`.
     - `release_extensions`: To release the ballerina extended (`module-ballerinax-persist.*`, and `copybook`) modules. These modules are listed under the `extended_modules` field in the `module_list.json` file. The default value is `false`.
     - `release_tools`: To release the ballerina tools (`*-tool`) modules. These modules are listed under the `tools` field in the `module_list.json` file. The default value is `false`.
-    - `release_connectors`: To release the ballerina connectors (`module-ballerinax-*`) modules. These modules are listed under the `connectors` field in the `module_list.json` file. The default value is `false`.
+    - `release_handwritten_connectors`: To release the ballerina handwritten connector modules. These modules are listed under the `handwritten_connectors` field in the `module_list.json` file. The default value is `false`.
+    - `release_generated_connectors`: To release the ballerina generated connector modules. These modules are listed under the `generated_connectors` field in the `module_list.json` file. The default value is `false`.
 
     > **Note:** The release manager should update the `release` property in the module list (stdlib_modules.json) to `false` for the modules that are not releasing with the distribution release before triggering the workflow.
 

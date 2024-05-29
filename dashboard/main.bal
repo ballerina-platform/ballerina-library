@@ -14,27 +14,39 @@
 // specific language governing permissions and limitations
 // under the License.
 
+import ballerina/data.jsondata;
 import ballerina/io;
 import ballerina/lang.array;
 import ballerina/log;
-import ballerina/data.jsondata;
 
 public function main() returns error? {
     List moduleNameList = check getSortedModuleNameList();
     List moduleDetails = check initializeModuleDetails(moduleNameList);
 
-    Module[] libraryModules = moduleDetails.modules;
-    Module[] modules = [...libraryModules, ...moduleDetails.extended_modules, ...moduleDetails.tools];
+    Module[] libraryModules = moduleDetails.library_modules;
+    Module[] extendedModules = moduleDetails.extended_modules;
+    Module[] handwrittenConnectors = moduleDetails.handwritten_connectors;
+    Module[] generatedConnectors = moduleDetails.generated_connectors;
+    Module[] tools = moduleDetails.tools;
+
+    Module[] modules = [
+        ...libraryModules,
+        ...extendedModules,
+        ...handwrittenConnectors,
+        ...generatedConnectors,
+        ...tools
+    ];
 
     check getImmediateDependencies(modules);
     check calculateLevels(modules);
     moduleDetails.forEach(function(Module[] moduleList) {
         removePropertiesFile(moduleList);
     });
-    moduleDetails.modules = libraryModules.sort(array:ASCENDING, a => a.level);
+
+    moduleDetails.library_modules = libraryModules.sort(array:ASCENDING, a => a.level);
 
     check writeToFile(STDLIB_MODULES_JSON, moduleDetails);
-    check updateStdlibDashboard(moduleDetails);
+    check updateDashboard(moduleDetails);
 }
 
 //  Sorts the Ballerina library module list in ascending order
@@ -42,9 +54,10 @@ function getSortedModuleNameList() returns List|error {
     List moduleList = check (check io:fileReadJson(MODULE_LIST_JSON)).fromJsonWithType();
 
     List sortedList = {
-        modules: sortModuleArray(moduleList.modules),
+        library_modules: sortModuleArray(moduleList.library_modules),
         extended_modules: sortModuleArray(moduleList.extended_modules),
-        connectors: sortModuleArray(moduleList.connectors),
+        handwritten_connectors: sortModuleArray(moduleList.handwritten_connectors),
+        generated_connectors: sortModuleArray(moduleList.generated_connectors),
         tools: sortModuleArray(moduleList.tools)
     };
 
@@ -60,9 +73,10 @@ function sortModuleArray(Module[] moduleArray) returns Module[] {
 
 function initializeModuleDetails(List moduleNameList) returns List|error {
     return {
-        modules: check initializeModuleList(moduleNameList.modules),
+        library_modules: check initializeModuleList(moduleNameList.library_modules),
         extended_modules: check initializeModuleList(moduleNameList.extended_modules),
-        connectors: check initializeModuleList(moduleNameList.connectors, 10),
+        handwritten_connectors: check initializeModuleList(moduleNameList.handwritten_connectors, MAX_LEVEL),
+        generated_connectors: check initializeModuleList(moduleNameList.generated_connectors, MAX_LEVEL),
         tools: check initializeModuleList(moduleNameList.tools)
     };
 }
@@ -70,7 +84,7 @@ function initializeModuleDetails(List moduleNameList) returns List|error {
 function initializeModuleList(Module[] modules, int defaultModuleLevel = 1) returns Module[]|error {
     Module[] moduleList = [];
     foreach Module module in modules {
-        Module initialModule = check initializeModuleInfo(module);
+        Module initialModule = check initializeModuleInfo(module, defaultModuleLevel);
         moduleList.push(initialModule);
     }
     return moduleList;
@@ -80,28 +94,17 @@ function initializeModuleInfo(Module module, int defaultModuleLevel = 1) returns
     string moduleName = module.name;
     string defaultBranch = check getDefaultBranch(moduleName);
     string gradleProperties = check getGradlePropertiesFile(moduleName);
-    string versionKey = getVersionKey(module);
     string moduleVersion = check getVersion(moduleName, gradleProperties);
-    boolean displayCodeCovBadge = getDisplayCodeCovBadge(module);
     return {
         name: moduleName,
         module_version: moduleVersion,
         level: defaultModuleLevel,
         default_branch: defaultBranch,
-        version_key: versionKey,
+        version_key: getVersionKey(module),
         release: true,
-        display_code_cov_badge: displayCodeCovBadge,
         dependents: [],
         gradle_properties: gradleProperties
     };
-}
-
-function getDisplayCodeCovBadge(Module module) returns boolean {
-    boolean? displayCodeCovBadge = module.display_code_cov_badge;
-    if displayCodeCovBadge is boolean {
-        return displayCodeCovBadge;
-    }
-    return true;
 }
 
 function getVersionKey(Module module) returns string {
@@ -213,6 +216,9 @@ function calculateLevels(Module[] modules) returns error? {
     }
 
     foreach Module module in modules {
+        if module.level == MAX_LEVEL {
+            continue;
+        }
         int? moduleLevel = dependencyGraph.getCurrentLevel(module.name);
         if moduleLevel is int {
             module.level = moduleLevel;
@@ -242,7 +248,7 @@ function removeModulesInIntermediatePaths(DiGraph dependencyGraph, string source
         string destinationNode, string[] successors, Module[] modules) {
     string[] longestPath = dependencyGraph.getLongestPath(sourceNode, destinationNode);
     foreach string n in longestPath.slice(1, longestPath.length() - 1) {
-        if (successors.indexOf(n) is int) {
+        if successors.indexOf(n) is int {
             foreach Module module in modules {
                 string[]? moduleDependents = module.dependents;
                 if module.name == sourceNode && moduleDependents is string[] {
@@ -259,7 +265,7 @@ function removeModulesInIntermediatePaths(DiGraph dependencyGraph, string source
 }
 
 // Updates the stdlib dashboard in README.md
-function updateStdlibDashboard(List moduleDetails) returns error? {
+function updateDashboard(List moduleDetails) returns error? {
     string readmeFile = check io:fileReadString(README_FILE);
     string[] readmeFileLines = re `\n`.split(readmeFile);
     string updatedReadmeFile = "";
@@ -271,12 +277,10 @@ function updateStdlibDashboard(List moduleDetails) returns error? {
         }
     }
 
-    updatedReadmeFile += check getBallerinaDashboard(moduleDetails.modules);
-    updatedReadmeFile += "\n";
-    updatedReadmeFile += check getBallerinaExtendedDashboard(moduleDetails.extended_modules);
-    updatedReadmeFile += "\n";
-    updatedReadmeFile += check getBallerinaConnectorDashboard(moduleDetails.connectors);
-    updatedReadmeFile += "\n";
+    updatedReadmeFile += check getLibraryModulesDashboard(moduleDetails.library_modules);
+    updatedReadmeFile += check getExtendedModulesDashboard(moduleDetails.extended_modules);
+    updatedReadmeFile += check getHandwrittenConnectorDashboard(moduleDetails.handwritten_connectors);
+    updatedReadmeFile += check getGeneratedConnectorDashboard(moduleDetails.generated_connectors);
     updatedReadmeFile += check getBallerinaToolsDashboard(moduleDetails.tools);
 
     io:Error? fileWriteString = io:fileWriteString(README_FILE, updatedReadmeFile);
@@ -286,69 +290,70 @@ function updateStdlibDashboard(List moduleDetails) returns error? {
     log:printInfo("Dashboard Updated");
 }
 
-isolated function getBallerinaDashboard(Module[] modules) returns string|error {
-    string dashboard = string `
-${BAL_TITLE}
-
-${LIBRARY_DASHBOARD_HEDER}
-${LIBRARY_HEADER_SEPARATOR}`;
+isolated function getLibraryModulesDashboard(Module[] modules) returns string|error {
+    string data = "";
     string levelColumn = "1";
     int currentLevel = 1;
-
     foreach Module module in modules {
         int? moduleLevel = module.level;
         if moduleLevel is int && moduleLevel > currentLevel {
             currentLevel = moduleLevel;
             levelColumn = currentLevel.toString();
         }
-        string row = check getLibraryDashboardRow(module, levelColumn);
-        dashboard += row;
-        dashboard += "\n";
+        data += check getLibraryDashboardRow(module, levelColumn) + "\n";
         levelColumn = "";
     }
-    return dashboard;
+    return getDashboard(TITLE_LIBRARY_MODULES, DESCRIPTION_LIBRARY_MODULES, HEADER_LIBRARY_MODULES_DASHBOARD,
+            HEADER_SEPARATOR_LIBRARY_MODULES, data);
 }
 
-isolated function getBallerinaExtendedDashboard(Module[] modules) returns string|error {
-    string dashboard = string `
-${BALX_TITLE}
-
-${EXTENDED_DASHBOARD_HEDER}
-${HEADER_SEPARATOR}`;
-
+isolated function getExtendedModulesDashboard(Module[] modules) returns string|error {
+    string data = "";
     foreach Module module in modules {
-        string row = check getDashboardRow(module);
-        dashboard += row + "\n";
+        data += check getDashboardRow(module) + "\n";
     }
-    return dashboard;
+    return getDashboard(TITLE_EXTENDED_MODULES, DESCRIPTION_EXTENDED_MODULES, HEADER_EXTENDED_MODULES_DASHBOARD,
+            HEADER_SEPARATOR_EXTENDED_MODULES, data);
 }
 
-isolated function getBallerinaConnectorDashboard(Module[] modules) returns string|error {
-    string dashboard = string `
-${CONNECTOR_TITLE}
-
-${CONNECTOR_DASHBOARD_HEDER}
-${HEADER_SEPARATOR}`;
+isolated function getHandwrittenConnectorDashboard(Module[] modules) returns string|error {
+    string data = "";
 
     foreach Module module in modules {
-        string row = check getDashboardRow(module);
-        dashboard += row + "\n";
+        data += check getDashboardRow(module) + "\n";
     }
-    return dashboard;
+    return getDashboard(TITLE_HANDWRITTEN_CONNECTORS, DESCRIPTION_HANDWRITTEN_CONNECTORS,
+            HEADER_HANDWRITTEN_CONNECTOR_DASHBOARD, HEADER_SEPARATOR_HANDWRITTEN_CONNECTORS, data);
+}
+
+isolated function getGeneratedConnectorDashboard(Module[] modules) returns string|error {
+    string data = "";
+
+    foreach Module module in modules {
+        data += check getGeneratedConnectorDashboardRow(module) + "\n";
+    }
+    return getDashboard(TITLE_GENERATED_CONNECTORS, DESCRIPTION_GENERATED_CONNECTORS,
+            HEADER_GENERATED_CONNECTOR_DASHBOARD, HEADER_SEPARATOR_GENERATED_CONNECTORS, data);
 }
 
 isolated function getBallerinaToolsDashboard(Module[] modules) returns string|error {
-    string dashboard = string `
-${TOOLS_TITLE}
-
-${TOOLS_DASHBOARD_HEDER}
-${TOOLS_HEADER_SEPARATOR}`;
+    string data = "";
 
     foreach Module module in modules {
-        string row = check getToolsDashboardRow(module);
-        dashboard += row + "\n";
+        data += check getToolsDashboardRow(module) + "\n";
     }
-    return dashboard;
+    return getDashboard(TITLE_TOOLS, DESCRIPTION_TOOLS, HEADER_TOOLS_DASHBOARD, HEADER_SEPARATOR_TOOLS, data);
+}
+
+isolated function getDashboard(string title, string description, string header, string separator, string data) returns string {
+    return string `
+${title}
+
+${description}
+
+${header}
+${separator}
+${data}`;
 }
 
 isolated function writeToFile(string fileName, json content) returns error? {

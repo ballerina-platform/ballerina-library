@@ -46,6 +46,17 @@ isolated function getDashboardRow(Module module) returns string|error {
     return string `|${repoLink}|${releaseBadge}|${buildStatusBadge}|${trivyBadge}|${codecovBadge}|${bugsBadge}|${pullRequestsBadge}|${loadTestsBadge}|${graalvmCheck}|`;
 }
 
+isolated function getGeneratedConnectorDashboardRow(Module module) returns string|error {
+    RepoBadges repoBadges = check getRepoBadges(module);
+    string repoLink = getRepoLink(module.name);
+    string releaseBadge = getBadge(repoBadges.release);
+    string buildStatusBadge = getBadge(repoBadges.buildStatus);
+    string trivyBadge = getBadge(repoBadges.trivy);
+    string bugsBadge = getBadge(repoBadges.bugs);
+    string pullRequestsBadge = getBadge(repoBadges.pullRequests);
+    string graalvmCheck = getBadge(repoBadges.graalvmCheck);
+    return string `|${repoLink}|${releaseBadge}|${buildStatusBadge}|${trivyBadge}|${bugsBadge}|${pullRequestsBadge}|${graalvmCheck}|`;
+}
 
 isolated function getRepoLink(string moduleName) returns string {
     string shortName = getModuleShortName(moduleName);

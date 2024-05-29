@@ -15,9 +15,10 @@
 // under the License.
 
 type List record {|
-    Module[] modules;
+    Module[] library_modules;
     Module[] extended_modules;
-    Module[] connectors;
+    Module[] handwritten_connectors;
+    Module[] generated_connectors;
     Module[] tools;
 |};
 
@@ -30,7 +31,6 @@ type Module record {|
     boolean release?;
     string[] dependents?;
     string gradle_properties?;
-    boolean display_code_cov_badge?;
 |};
 
 type WorkflowBadge record {|

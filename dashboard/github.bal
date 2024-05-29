@@ -133,14 +133,6 @@ isolated function getPullRequestsBadge(Module module) returns WorkflowBadge|erro
 }
 
 isolated function getCodeCoverageBadge(Module module) returns WorkflowBadge {
-    boolean? displayCodeCovBadge = module.display_code_cov_badge;
-    if displayCodeCovBadge is () || !displayCodeCovBadge {
-        return {
-            name: "CodeCov",
-            badgeUrl: NABADGE,
-            htmlUrl: ""
-        };
-    }
     string moduleName = module.name;
     string defaultBranch = module.default_branch ?: BRANCH_MAIN;
     return {

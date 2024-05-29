@@ -10,7 +10,7 @@ final readonly & Module ioModule = check getIoModule();
 final readonly & Module twilioModule = check getTwilioModule();
 
 isolated function getTwilioModule() returns readonly & Module|error {
-    foreach Module module in list.connectors {
+    foreach Module module in list.generated_connectors {
         if module.name == "module-ballerinax-twilio" {
             return module;
         }
@@ -19,7 +19,7 @@ isolated function getTwilioModule() returns readonly & Module|error {
 }
 
 isolated function getIoModule() returns readonly & Module|error {
-    foreach Module module in list.modules {
+    foreach Module module in list.library_modules {
         if module.name == "module-ballerina-io" {
             return module;
         }
