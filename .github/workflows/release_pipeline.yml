@@ -1,4 +1,4 @@
-name: Stdlib Release
+name: Library Release
 
 on:
     workflow_dispatch:
@@ -9,7 +9,7 @@ on:
                 default: true
                 type: boolean
             release_extensions:
-                description: 'Release Ballerina Extensions (persist.*)'
+                description: 'Release Ballerina Extensions (copybook, persist.*)'
                 required: true
                 default: false
                 type: boolean
@@ -18,8 +18,13 @@ on:
                 required: true
                 default: false
                 type: boolean
-            release_connectors:
-                description: 'Release Ballerina Connectors (ballerinax/*)'
+            release_handwritten_connectors:
+                description: 'Release Ballerina Handwritten Connectors (ballerinax/mongodb, ballerinax/mysql, etc.)'
+                required: true
+                default: false
+                type: boolean
+            release_generated_connectors:
+                description: 'Release Ballerina Generated Connectors (ballerinax/twillio, ballerinax/docusign, etc.)'
                 required: true
                 default: false
                 type: boolean
@@ -42,4 +47,7 @@ jobs:
                     RELEASE_LIBS: ${{ github.event.inputs.release_libs }}
                     RELEASE_EXTENSIONS: ${{ github.event.inputs.release_extensions }}
                     RELEASE_TOOLS: ${{ github.event.inputs.release_tools }}
-                    RELEASE_CONNECTORS: ${{ github.event.inputs.release_extensions }}
+                    RELEASE_HANDWRITTEN_CONNECTORS: ${{ github.event.inputs.release_handwritten_connectors }}
+                    RELEASE_GENERATED_CONNECTORS: ${{ github.event.inputs.release_generated_connectors }}
+                    BAL_CONFIG_VAR_WORKFLOW: "publish-release.yml"
+

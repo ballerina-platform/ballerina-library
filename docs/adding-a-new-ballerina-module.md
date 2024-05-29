@@ -389,9 +389,10 @@ This step is required only if the module is a part of the Ballerina library and 
 
 To add a module to the Ballerina library, add an entry in the [`module_list.json`](https://github.com/ballerina-platform/ballerina-library/blob/main/release/resources/module_list.json) file in the [`ballerina-library`](https://github.com/ballerina-platform/ballerina-library) repository. This JSON file has 4 main fields.
 
-* `modules` - The `ballerina` modules that are packed with the Ballerina distribution
-* `extended_modules` - The `ballerinax` modules that are not packed with the Ballerina distribution
-* `connectors` - The `ballerinax` connector modules that are published to the central
+* `library_modules` - The modules published under the `ballerina` organization that are packed with the Ballerina distribution
+* `extended_modules` - The protocol modules that are not packed with the Ballerina distribution
+* `handwritten_connectors` - The connector modules that are handwritten and published to the Ballerina central
+* `generated_connectors` - The connector modules that are generated using the Ballerina OpenAPI tool and published to the Ballerina central
 * `tools` - The `ballerina` CLI tools
 
 Add the module to the relevant array based on the type of the module.

@@ -24,12 +24,11 @@ const string ACCESS_TOKEN_ENV = "BALLERINA_BOT_TOKEN";
 const string RELEASE_LIBS = "RELEASE_LIBS";
 const string RELASE_EXTENSIONS = "RELEASE_EXTENSIONS";
 const string RELEASE_TOOLS = "RELEASE_TOOLS";
-const string RELEASE_CONNECTORS = "RELEASE_CONNECTORS";
+const string RELEASE_HANDWRITTEN_CONNECTORS = "RELEASE_HANDWRITTEN_CONNECTORS";
+const string RELEASE_GENERATED_CONNECTORS = "RELEASE_GENERATED_CONNECTORS";
 
 const string MODULE_LIST_JSON = "./resources/stdlib_modules.json";
 const string GITHUB_ORG = "ballerina-platform";
-// IMPORTANT: When testing, do not use `publish-release.yml` as the release workflow.
-const string RELEASE_WORKFLOW = "publish-release.yml";
 
 const decimal WORKFLOW_START_WAIT_TIME = 2;
 const decimal WORKFLOW_POLL_INTERVAL = 5;
@@ -39,7 +38,11 @@ configurable string token = os:getEnv(ACCESS_TOKEN_ENV);
 configurable boolean releaseLibs = check os:getEnv(RELEASE_LIBS).ensureType();
 configurable boolean releaseExtensions = check os:getEnv(RELASE_EXTENSIONS).ensureType();
 configurable boolean releaseTools = check os:getEnv(RELEASE_TOOLS).ensureType();
-configurable boolean releaseConnectors = check os:getEnv(RELEASE_CONNECTORS).ensureType();
+configurable boolean releaseHandwrittenConnectors = check os:getEnv(RELEASE_HANDWRITTEN_CONNECTORS).ensureType();
+configurable boolean releaseGeneratedConnectors = check os:getEnv(RELEASE_GENERATED_CONNECTORS).ensureType();
+
+// Provide the correct workflow as a configurable variable.
+configurable string workflow = ?;
 
 final github:Client github = check new ({
     retryConfig: {
@@ -75,7 +78,7 @@ public function getModuleList() returns Module[]|error {
     List moduleList = check (check io:fileReadJson(MODULE_LIST_JSON)).fromJsonWithType();
     Module[] result = [];
     if releaseLibs {
-        result.push(...moduleList.modules);
+        result.push(...moduleList.library_modules);
     }
     if releaseExtensions {
         result.push(...moduleList.extended_modules);
@@ -83,8 +86,11 @@ public function getModuleList() returns Module[]|error {
     if releaseTools {
         result.push(...moduleList.tools);
     }
-    if releaseConnectors {
-        result.push(...moduleList.connectors);
+    if releaseHandwrittenConnectors {
+        result.push(...moduleList.handwritten_connectors);
+    }
+    if releaseGeneratedConnectors {
+        result.push(...moduleList.generated_connectors);
     }
     return result;
 }
@@ -180,7 +186,7 @@ isolated function triggerModuleRelease(Module m) returns int|error {
         ref: m.default_branch
     };
 
-    error? dispatchResult = github->/repos/[GITHUB_ORG]/[m.name]/actions/workflows/[RELEASE_WORKFLOW]/dispatches.post(payload);
+    error? dispatchResult = github->/repos/[GITHUB_ORG]/[m.name]/actions/workflows/[workflow]/dispatches.post(payload);
     if dispatchResult is error {
         printError(dispatchResult);
         return dispatchResult;
@@ -190,7 +196,7 @@ isolated function triggerModuleRelease(Module m) returns int|error {
     runtime:sleep(WORKFLOW_START_WAIT_TIME);
 
     // Retrieve the workflow run ID
-    github:WorkflowRunResponse|error result = github->/repos/[GITHUB_ORG]/[m.name]/actions/workflows/[RELEASE_WORKFLOW]/runs(per_page = 1);
+    github:WorkflowRunResponse|error result = github->/repos/[GITHUB_ORG]/[m.name]/actions/workflows/[workflow]/runs(per_page = 1);
     if result is error {
         printError(result);
         return result;

@@ -10,7 +10,7 @@ final readonly & Module ioModule = check getIoModule();
 final readonly & Module twilioModule = check getTwilioModule();
 
 isolated function getTwilioModule() returns readonly & Module|error {
-    foreach Module module in list.connectors {
+    foreach Module module in list.generated_connectors {
         if module.name == "module-ballerinax-twilio" {
             return module;
         }
@@ -19,7 +19,7 @@ isolated function getTwilioModule() returns readonly & Module|error {
 }
 
 isolated function getIoModule() returns readonly & Module|error {
-    foreach Module module in list.modules {
+    foreach Module module in list.library_modules {
         if module.name == "module-ballerina-io" {
             return module;
         }
@@ -55,9 +55,7 @@ function getTrivyBadgeTest() returns error? {
 @test:Config
 function getCodecovBadgeTest() returns error? {
     RepoBadges repoBadgesIo = check getRepoBadges(ioModule);
-    RepoBadges repoBadgesTwilio = check getRepoBadges(twilioModule);
     test:assertEquals(getBadge(repoBadgesIo.codeCov), "[![CodeCov](https://codecov.io/gh/ballerina-platform/module-ballerina-io/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-io)");
-    test:assertEquals(getBadge(repoBadgesTwilio.codeCov), "[![CodeCov](https://img.shields.io/badge/-N%2FA-yellow)]()");
 }
 
 @test:Config
