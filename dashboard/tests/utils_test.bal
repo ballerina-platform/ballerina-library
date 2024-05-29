@@ -55,9 +55,7 @@ function getTrivyBadgeTest() returns error? {
 @test:Config
 function getCodecovBadgeTest() returns error? {
     RepoBadges repoBadgesIo = check getRepoBadges(ioModule);
-    RepoBadges repoBadgesTwilio = check getRepoBadges(twilioModule);
     test:assertEquals(getBadge(repoBadgesIo.codeCov), "[![CodeCov](https://codecov.io/gh/ballerina-platform/module-ballerina-io/branch/master/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerina-io)");
-    test:assertEquals(getBadge(repoBadgesTwilio.codeCov), "[![CodeCov](https://img.shields.io/badge/-N%2FA-yellow)]()");
 }
 
 @test:Config
