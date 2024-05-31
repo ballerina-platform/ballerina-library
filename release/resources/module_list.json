@@ -186,9 +186,6 @@
             "name": "module-ballerinax-confluent.cregistry"
         },
         {
-            "name": "module-ballerinax-guidewire.insnow"
-        },
-        {
             "name": "module-ballerinax-ibm.ibmmq"
         },
         {
@@ -257,6 +254,9 @@
         },
         {
             "name": "module-ballerinax-googleapis.gmail"
+        },
+        {
+            "name": "module-ballerinax-guidewire.insnow"
         },
         {
             "name": "module-ballerinax-twilio"
