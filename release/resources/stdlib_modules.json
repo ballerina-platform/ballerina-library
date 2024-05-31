@@ -576,15 +576,6 @@
     ],
     "handwritten_connectors": [
         {
-            "name": "module-ballerinax-asana",
-            "module_version": "2.0.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibAsanaVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
             "name": "module-ballerinax-aws.dynamodb",
             "module_version": "2.3.1-SNAPSHOT",
             "level": 100,
@@ -626,15 +617,6 @@
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAzure-service-busVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerinax-candid",
-            "module_version": "0.1.2-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibCandidVersion",
             "release": true,
             "dependents": []
         },
@@ -798,18 +780,27 @@
             "version_key": "stdlibSnowflakeVersion",
             "release": true,
             "dependents": []
-        },
-        {
-            "name": "module-ballerinax-zendesk",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibZendeskVersion",
-            "release": true,
-            "dependents": []
         }
     ],
     "generated_connectors": [
+        {
+            "name": "module-ballerinax-asana",
+            "module_version": "2.0.1-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibAsanaVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerinax-candid",
+            "module_version": "0.1.2-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibCandidVersion",
+            "release": true,
+            "dependents": []
+        },
         {
             "name": "module-ballerinax-docusign.dsadmin",
             "module_version": "2.0.1-SNAPSHOT\r",
@@ -879,6 +870,15 @@
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibTwilioVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
+            "name": "module-ballerinax-zendesk",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibZendeskVersion",
             "release": true,
             "dependents": []
         }
