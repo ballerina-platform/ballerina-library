@@ -348,7 +348,7 @@
         },
         {
             "name": "module-ballerina-jwt",
-            "module_version": "2.11.1-SNAPSHOT",
+            "module_version": "2.12.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibJwtVersion",
@@ -622,7 +622,7 @@
         },
         {
             "name": "module-ballerinax-azure-service-bus",
-            "module_version": "3.7.0",
+            "module_version": "3.8.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAzure-service-busVersion",
@@ -653,15 +653,6 @@
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibConfluent.cregistryVersion",
-            "release": true,
-            "dependents": []
-        },
-        {
-            "name": "module-ballerinax-guidewire.insnow",
-            "module_version": "0.1.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibGuidewire.insnowVersion",
             "release": true,
             "dependents": []
         },
@@ -874,6 +865,15 @@
             "dependents": []
         },
         {
+            "name": "module-ballerinax-guidewire.insnow",
+            "module_version": "0.1.1-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibGuidewire.insnowVersion",
+            "release": true,
+            "dependents": []
+        },
+        {
             "name": "module-ballerinax-twilio",
             "module_version": "4.0.2-SNAPSHOT",
             "level": 100,
@@ -913,7 +913,7 @@
         },
         {
             "name": "graphql-tools",
-            "module_version": "0.10.0-SNAPSHOT",
+            "module_version": "0.10.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibGraphql-toolsVersion",
