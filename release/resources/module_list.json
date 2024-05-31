@@ -159,9 +159,6 @@
     ],
     "handwritten_connectors": [
         {
-            "name": "module-ballerinax-asana"
-        },
-        {
             "name": "module-ballerinax-aws.dynamodb"
         },
         {
@@ -175,9 +172,6 @@
         },
         {
             "name": "module-ballerinax-azure-service-bus"
-        },
-        {
-            "name": "module-ballerinax-candid"
         },
         {
             "name": "module-ballerinax-confluent.cavroserdes"
@@ -231,12 +225,15 @@
         },
         {
             "name": "module-ballerinax-snowflake"
-        },
-        {
-            "name": "module-ballerinax-zendesk"
         }
     ],
     "generated_connectors": [
+        {
+            "name": "module-ballerinax-asana"
+        },
+        {
+            "name": "module-ballerinax-candid"
+        },
         {
             "name": "module-ballerinax-docusign.dsadmin"
         },
@@ -260,6 +257,9 @@
         },
         {
             "name": "module-ballerinax-twilio"
+        },
+        {
+            "name": "module-ballerinax-zendesk"
         }
     ],
     "tools": [
