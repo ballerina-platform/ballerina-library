@@ -118,7 +118,7 @@ isolated function getLatestReleaseBadge(string moduleName) returns WorkflowBadge
     return {
         name: "Latest Release",
         badgeUrl,
-        htmlUrl: release.url
+        htmlUrl: release.html_url
     };
 }
 
