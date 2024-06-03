@@ -70,6 +70,7 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [protobuf](https://github.com/ballerina-platform/module-ballerina-protobuf) | [@daneshk](https://github.com/daneshk) | [@dilanSachi](https://github.com/dilanSachi)  |
 | [rabbitmq](https://github.com/ballerina-platform/module-ballerinax-rabbitmq) | [@aashikam](https://github.com/aashikam) | [@dilanSachi](https://github.com/dilanSachi)|
 | [random](https://github.com/ballerina-platform/module-ballerina-random) | [@daneshk](https://github.com/daneshk) | [@sahanHe](https://github.com/sahanHe) |
+| [sap](https://github.com/ballerina-platform/module-ballerinax-sap) | [@niveathika](https://github.com/niveathika) |  |
 | [soap](https://github.com/ballerina-platform/module-ballerina-soap) | [@Nuvindu](https://github.com/Nuvindu) |  |
 | [sql](https://github.com/ballerina-platform/module-ballerina-sql) | [@niveathika](https://github.com/niveathika) | [@kaneeldias](https://github.com/kaneeldias) |
 | [task](https://github.com/ballerina-platform/module-ballerina-task) |[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@Bhashinee](https://github.com/Bhashinee)|
