@@ -774,7 +774,7 @@
         },
         {
             "name": "module-ballerinax-sap",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibSapVersion",
