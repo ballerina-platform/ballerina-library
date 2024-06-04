@@ -1,6 +1,5 @@
 # Connector Development Process
 
-# Library Development Process 
 _Authors_: @shafreenAnfar @ThisaruGuruge @NipunaRanasinghe @niveathika @TharmiganK    
 _Reviewers_: @daneshk @ThisaruGuruge @NipunaRanasinghe  
 _Created_: 2024/04/17   
