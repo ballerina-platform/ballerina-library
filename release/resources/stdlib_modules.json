@@ -113,7 +113,7 @@
         },
         {
             "name": "module-ballerina-data.xmldata",
-            "module_version": "0.1.1-SNAPSHOT",
+            "module_version": "0.1.2-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibDataXmldataVersion",
@@ -494,7 +494,7 @@
         },
         {
             "name": "module-ballerina-sql",
-            "module_version": "1.13.1-SNAPSHOT",
+            "module_version": "1.13.2-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
