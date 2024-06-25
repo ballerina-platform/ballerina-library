@@ -131,7 +131,7 @@ public function main() returns error? {
 function triggerGraalVMChecks(Data data) returns map<LevelStatus> {
     map<LevelStatus> result = {};
 
-    foreach Module module in data.modules {
+    foreach Module module in data.library_modules {
         result = triggerGraalVMCheck(module, result);
     }
 
