@@ -85,7 +85,7 @@ type Module record {
 };
 
 type Data record {
-    Module[] modules;
+    Module[] library_modules;
     Module[] extended_modules;
 };
 
