@@ -150,7 +150,7 @@ jobs:
               if: ${{ inputs.lang_version == '' }}
               run: |
                   perl -pi -e "s/^\s*version=.*/version=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
-                  ./gradlew.bat build -x test publishToMavenLocal --continue -x createJavadoc --stacktrace -scan --console=plain --no-daemon --no-parallel
+                  ./gradlew.bat build -x test publishToMavenLocal --continue -x javadoc --stacktrace -scan --console=plain --no-daemon --no-parallel
 
             - name: Set up GraalVM
               uses: graalvm/setup-graalvm@v1
