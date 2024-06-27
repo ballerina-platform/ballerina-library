@@ -416,7 +416,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "module_version": "1.11.1-SNAPSHOT",
+            "module_version": "1.11.2-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
@@ -949,7 +949,7 @@
         },
         {
             "name": "protoc-tools",
-            "module_version": "0.2.1-SNAPSHOT",
+            "module_version": "0.3.1-SNAPSHOT",
             "level": 7,
             "default_branch": "main",
             "version_key": "stdlibProtoc-toolsVersion",
