@@ -595,7 +595,7 @@
         },
         {
             "name": "module-ballerinax-aws.redshift",
-            "module_version": "1.0.3-SNAPSHOT",
+            "module_version": "1.0.4-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAws.redshiftVersion",
