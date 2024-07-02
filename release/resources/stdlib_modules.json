@@ -304,8 +304,7 @@
                 "module-ballerinax-persist.redis",
                 "module-ballerinax-wso2.controlplane",
                 "module-ballerinax-ibm.ibmmq",
-                "module-ballerinax-java.jms",
-                "asyncapi-tools"
+                "module-ballerinax-java.jms"
             ]
         },
         {
@@ -410,8 +409,7 @@
                 "module-ballerina-websub",
                 "module-ballerina-websubhub",
                 "module-ballerinax-persist.redis",
-                "module-ballerinax-wso2.controlplane",
-                "asyncapi-tools"
+                "module-ballerinax-wso2.controlplane"
             ]
         },
         {
@@ -457,7 +455,8 @@
             "version_key": "stdlibWebsocketVersion",
             "release": true,
             "dependents": [
-                "module-ballerina-graphql"
+                "module-ballerina-graphql",
+                "asyncapi-tools"
             ]
         },
         {
@@ -482,7 +481,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "module_version": "1.13.1-SNAPSHOT",
+            "module_version": "1.13.2-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
@@ -672,7 +671,9 @@
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
             "release": true,
-            "dependents": []
+            "dependents": [
+                "asyncapi-tools"
+            ]
         },
         {
             "name": "module-ballerinax-mongodb",
@@ -896,7 +897,7 @@
         {
             "name": "asyncapi-tools",
             "module_version": "0.8.0-SNAPSHOT",
-            "level": 6,
+            "level": 8,
             "default_branch": "main",
             "version_key": "stdlibAsyncapi-toolsVersion",
             "release": true,
