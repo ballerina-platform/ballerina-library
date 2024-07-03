@@ -92,6 +92,7 @@
             "release": true,
             "dependents": [
                 "module-ballerina-cache",
+                "module-ballerina-data.jsondata",
                 "module-ballerinax-nats"
             ]
         },
