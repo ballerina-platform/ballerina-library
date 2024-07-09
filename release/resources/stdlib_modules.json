@@ -114,7 +114,7 @@
         },
         {
             "name": "module-ballerina-data.xmldata",
-            "module_version": "0.1.3-SNAPSHOT",
+            "module_version": "0.1.4-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibDataXmldataVersion",
@@ -156,7 +156,7 @@
         },
         {
             "name": "module-ballerina-persist",
-            "module_version": "1.3.1-SNAPSHOT",
+            "module_version": "1.4.0-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibPersistVersion",
@@ -649,7 +649,7 @@
         },
         {
             "name": "module-ballerinax-java.jdbc",
-            "module_version": "1.12.0-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibJdbcVersion",
