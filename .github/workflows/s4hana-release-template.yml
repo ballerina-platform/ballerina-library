@@ -1,0 +1,98 @@
+name: Publish Release (S/4 HANA Connector)
+
+on:
+  workflow_call:
+    inputs:
+      hana-connector-group:
+        required: true
+        type: string
+      hana-connector-name:
+        required: true
+        type: string
+
+jobs:
+  call_workflow:
+    name: Release Package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Get Ballerina Version
+        run: |
+          BAL_VERSION=$(grep -w 'ballerinaLangVersion' gradle.properties | cut -d= -f2 | rev | cut --complement -d- -f1 | rev) 
+          if [ -z "$BAL_VERSION" ]; then
+            BAL_VERSION="latest"
+          fi
+          echo "BAL_VERSION=$BAL_VERSION" >> $GITHUB_ENV
+          echo "Ballerina Version: $BAL_VERSION"
+
+      - name: Set Up Ballerina
+        uses: ballerina-platform/setup-ballerina@v1.1.0
+        with:
+          version: ${{ env.BAL_VERSION }}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17.0.7
+
+        # This step is because this repoistory is a collection of packages
+      - name: Change version in gradle.properties
+        run: |
+          git config --global user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
+          git config --global user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
+          CONNECTOR_VERSION=$((grep -w '${{ inputs.hana-connector-name }}Version' | cut -d= -f2) < gradle.properties)
+          VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties)
+          if [[ "$VERSION" == "$CONNECTOR_VERSION" ]]; then
+            echo "Version is already up to date"
+            exit 0
+          fi
+          sed -i "s/version=\(.*\)/version=$CONNECTOR_VERSION/g" gradle.properties
+          git commit -m "[Automated] Update verion to match connector version" gradle.properties
+
+      - name: Build without Tests
+        env:
+          packageUser: ${{ github.actor }}
+          packagePAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./gradlew build -x test 
+
+      - name: Run Trivy Vulnerability Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "rootfs"
+          scan-ref: "/github/workspace/ballerina"
+          format: "table"
+          timeout: "10m0s"
+          exit-code: "1"
+          skip-dirs: "examples"
+
+      - name: Get Release Version
+        run: echo "VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties | rev | cut -d- -f2 | rev)" >> $GITHUB_ENV
+
+      - name: Checkout to Release Branch
+        run: |
+          echo "Version: ${VERSION}"
+          git checkout -b release-${{ inputs.hana-connector-name }}-${VERSION}
+
+      - name: Publish Package
+        env:
+          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ secrets.BALLERINA_CENTRAL_ACCESS_TOKEN }}
+          packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+          packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          publishUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+          publishPAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
+        run: |
+          ./gradlew clean :${{ inputs.hana-connector-group }}-ballerina:${{ inputs.hana-connector-name }}:release -x :${{ inputs.hana-connector-group }}-examples:test -Prelease.useAutomaticVersion=true 
+          ./gradlew -Pversion=${VERSION} -P${{ inputs.hana-connector-name }}Version=${VERSION} :${{ inputs.hana-connector-group }}-ballerina:${{ inputs.hana-connector-name }}:publish -x test -PpublishToCentral=true 
+
+      - name: GitHub Release and Release Sync PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+        run: |
+          git push origin release-${{ inputs.hana-connector-name }}-${VERSION}
+          gh release create ${{ inputs.hana-connector-name }}-v$VERSION --title "${{ inputs.hana-connector-name }}-v$VERSION"
+          gh pr create --base ${GITHUB_REF##*/} --title "[Automated] Sync ${GITHUB_REF##*/} after ${{ inputs.hana-connector-name }}-$VERSION release" --body "Sync ${GITHUB_REF##*/} after ${{ inputs.hana-connector-name }}-$VERSION release"
