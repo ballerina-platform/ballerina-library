@@ -23,7 +23,7 @@ jobs:
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew build -x test -x :${{ inputs.hana-connector-group }}-examples:build -x:${{ inputs.hana-connector-group }}-sanitations:build 
+        run: ./gradlew build -x test -x :${{ inputs.hana-connector-group }}-examples:build -x:${{ inputs.hana-connector-group }}-sanitation:build 
 
       - name: Create lib Directory if not Exists
         run: |
