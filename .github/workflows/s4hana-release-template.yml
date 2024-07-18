@@ -59,14 +59,11 @@ jobs:
         run: |
           ./gradlew build -x test 
 
-      - name: Create lib Directory if not Exists
-        run: mkdir -p ballerina/lib
-
       - name: Run Trivy Vulnerability Scanner
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: "rootfs"
-          scan-ref: "/github/workspace/ballerina/lib"
+          scan-ref: "/github/workspace/ballerina"
           format: "table"
           timeout: "10m0s"
           exit-code: "1"
@@ -79,10 +76,6 @@ jobs:
         run: |
           echo "Version: ${VERSION}"
           git checkout -b release-${{ inputs.hana-connector-name }}-${VERSION}
-
-      - name: Remove Lib Directory
-        run: |
-          sudo rm -rf ballerina/lib
 
       - name: Publish Package
         env:

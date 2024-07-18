@@ -25,21 +25,11 @@ jobs:
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew build -x test -x :${{ inputs.hana-connector-group }}-examples:build -x:${{ inputs.hana-connector-group }}-sanitation:build 
 
-      - name: Create lib Directory if not Exists
-        run: |
-          cd ballerina
-          for dir in $(find . -type d -maxdepth 1  -mindepth 1); do
-            if [[ "$dir" == *resources ]]; then
-              continue
-            fi
-            (cd "$dir" && mkdir -p lib && cd ..); 
-          done
-
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: "rootfs"
-          scan-ref: "/github/workspace/ballerina/**/lib"
+          scan-ref: "/github/workspace/ballerina"
           format: "table"
           timeout: "10m0s"
           exit-code: "1"
