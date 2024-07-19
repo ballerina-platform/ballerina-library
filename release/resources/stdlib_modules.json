@@ -14,7 +14,8 @@
                 "module-ballerina-os",
                 "module-ballerina-xslt",
                 "module-ballerinax-confluent.cavroserdes"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-jballerina.java.arrays",
@@ -23,7 +24,8 @@
             "default_branch": "master",
             "version_key": "stdlibJavaArraysVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-math.vector",
@@ -32,7 +34,8 @@
             "default_branch": "main",
             "version_key": "stdlibMathVectorVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-time",
@@ -49,7 +52,8 @@
                 "module-ballerina-protobuf",
                 "module-ballerina-random",
                 "module-ballerina-task"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-url",
@@ -60,7 +64,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-oauth2"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-xmldata",
@@ -72,7 +77,8 @@
             "dependents": [
                 "asyncapi-tools",
                 "openapi-tools"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-avro",
@@ -81,7 +87,8 @@
             "default_branch": "main",
             "version_key": "stdlibAvroVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-constraint",
@@ -94,7 +101,8 @@
                 "module-ballerina-cache",
                 "module-ballerina-data.jsondata",
                 "module-ballerinax-nats"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-crypto",
@@ -110,7 +118,8 @@
                 "module-ballerina-tcp",
                 "module-ballerina-uuid",
                 "module-ballerinax-nats"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-data.xmldata",
@@ -119,7 +128,8 @@
             "default_branch": "main",
             "version_key": "stdlibDataXmldataVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-log",
@@ -141,7 +151,8 @@
                 "module-ballerinax-ibm.ibmmq",
                 "module-ballerinax-java.jms",
                 "module-ballerinax-nats"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-os",
@@ -152,7 +163,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-file"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-persist",
@@ -166,7 +178,8 @@
                 "module-ballerinax-persist.inmemory",
                 "module-ballerinax-persist.redis",
                 "module-ballerinax-persist.sql"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-protobuf",
@@ -177,7 +190,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-grpc"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-random",
@@ -194,7 +208,8 @@
                 "module-ballerina-websubhub",
                 "module-ballerinax-kafka",
                 "module-ballerinax-rabbitmq"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-task",
@@ -207,7 +222,8 @@
                 "module-ballerina-cache",
                 "module-ballerina-email",
                 "module-ballerina-ftp"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-xslt",
@@ -216,7 +232,8 @@
             "default_branch": "master",
             "version_key": "stdlibXsltVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-cache",
@@ -229,7 +246,8 @@
                 "module-ballerina-auth",
                 "module-ballerina-jwt",
                 "module-ballerina-oauth2"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-file",
@@ -246,7 +264,8 @@
                 "module-ballerina-toml",
                 "module-ballerina-yaml",
                 "edi-tools"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-ftp",
@@ -255,7 +274,8 @@
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-mime",
@@ -267,7 +287,8 @@
             "dependents": [
                 "module-ballerina-email",
                 "module-ballerina-http"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-tcp",
@@ -276,7 +297,8 @@
             "default_branch": "master",
             "version_key": "stdlibTcpVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-udp",
@@ -285,7 +307,8 @@
             "default_branch": "main",
             "version_key": "stdlibUdpVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-uuid",
@@ -306,7 +329,8 @@
                 "module-ballerinax-wso2.controlplane",
                 "module-ballerinax-ibm.ibmmq",
                 "module-ballerinax-java.jms"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-auth",
@@ -317,7 +341,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-http"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-data.jsondata",
@@ -326,7 +351,8 @@
             "default_branch": "main",
             "version_key": "stdlibDataJsondataVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-edi",
@@ -335,7 +361,8 @@
             "default_branch": "main",
             "version_key": "stdlibEdiVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-email",
@@ -344,7 +371,8 @@
             "default_branch": "master",
             "version_key": "stdlibEmailVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-jwt",
@@ -355,7 +383,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-http"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-mqtt",
@@ -364,7 +393,8 @@
             "default_branch": "main",
             "version_key": "stdlibMqttVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-oauth2",
@@ -375,7 +405,8 @@
             "release": true,
             "dependents": [
                 "module-ballerina-http"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-toml",
@@ -384,7 +415,8 @@
             "default_branch": "main",
             "version_key": "stdlibTomlVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-yaml",
@@ -393,7 +425,8 @@
             "default_branch": "main",
             "version_key": "stdlibYamlVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-http",
@@ -411,7 +444,8 @@
                 "module-ballerina-websubhub",
                 "module-ballerinax-persist.redis",
                 "module-ballerinax-wso2.controlplane"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-grpc",
@@ -423,7 +457,8 @@
             "dependents": [
                 "openapi-tools",
                 "protoc-tools"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-soap",
@@ -432,7 +467,8 @@
             "default_branch": "master",
             "version_key": "stdlibSoapVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinai-transaction",
@@ -446,7 +482,8 @@
                 "module-ballerinax-persist.googlesheets",
                 "module-ballerinax-kafka",
                 "module-ballerinax-rabbitmq"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-websocket",
@@ -458,7 +495,8 @@
             "dependents": [
                 "module-ballerina-graphql",
                 "asyncapi-tools"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-websub",
@@ -469,7 +507,8 @@
             "release": true,
             "dependents": [
                 "openapi-tools"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-websubhub",
@@ -478,7 +517,8 @@
             "default_branch": "main",
             "version_key": "stdlibWebsubhubVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-graphql",
@@ -490,7 +530,8 @@
             "dependents": [
                 "graphql-tools",
                 "openapi-tools"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-sql",
@@ -507,7 +548,8 @@
                 "module-ballerinax-oracledb",
                 "module-ballerinax-postgresql",
                 "module-ballerinax-snowflake"
-            ]
+            ],
+            "is_multiple_connectors": false
         }
     ],
     "extended_modules": [
@@ -518,7 +560,8 @@
             "default_branch": "main",
             "version_key": "stdlibCopybookVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-persist.googlesheets",
@@ -529,7 +572,8 @@
             "release": true,
             "dependents": [
                 "persist-tools"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-persist.inmemory",
@@ -540,7 +584,8 @@
             "release": true,
             "dependents": [
                 "persist-tools"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-persist.redis",
@@ -551,7 +596,8 @@
             "release": true,
             "dependents": [
                 "persist-tools"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-persist.sql",
@@ -562,7 +608,8 @@
             "release": true,
             "dependents": [
                 "persist-tools"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-wso2.controlplane",
@@ -571,7 +618,8 @@
             "default_branch": "main",
             "version_key": "stdlibWso2ControlplaneVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         }
     ],
     "handwritten_connectors": [
@@ -582,7 +630,8 @@
             "default_branch": "main",
             "version_key": "stdlibAws.dynamodbVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-aws.dynamodbstreams",
@@ -591,7 +640,8 @@
             "default_branch": "main",
             "version_key": "stdlibAws.dynamodbstreamsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-aws.redshift",
@@ -600,7 +650,8 @@
             "default_branch": "main",
             "version_key": "stdlibAws.redshiftVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-aws.sns",
@@ -609,7 +660,8 @@
             "default_branch": "main",
             "version_key": "stdlibAws.snsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-azure-service-bus",
@@ -618,7 +670,8 @@
             "default_branch": "main",
             "version_key": "stdlibAzure-service-busVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-confluent.cavroserdes",
@@ -627,7 +680,8 @@
             "default_branch": "main",
             "version_key": "stdlibConfluent.cavroserdesVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-confluent.cregistry",
@@ -636,7 +690,8 @@
             "default_branch": "main",
             "version_key": "stdlibConfluent.cregistryVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-ibm.ibmmq",
@@ -645,7 +700,8 @@
             "default_branch": "main",
             "version_key": "stdlibIbm.ibmmqVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-java.jdbc",
@@ -656,7 +712,8 @@
             "release": true,
             "dependents": [
                 "module-ballerinax-persist.sql"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-java.jms",
@@ -665,7 +722,8 @@
             "default_branch": "master",
             "version_key": "stdlibJmsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-kafka",
@@ -676,7 +734,8 @@
             "release": true,
             "dependents": [
                 "asyncapi-tools"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-mongodb",
@@ -685,7 +744,8 @@
             "default_branch": "master",
             "version_key": "stdlibMongodbVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-mssql",
@@ -696,7 +756,8 @@
             "release": true,
             "dependents": [
                 "module-ballerinax-persist.sql"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-mysql",
@@ -707,7 +768,8 @@
             "release": true,
             "dependents": [
                 "module-ballerinax-persist.sql"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-nats",
@@ -716,7 +778,8 @@
             "default_branch": "master",
             "version_key": "stdlibNatsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-oracledb",
@@ -725,7 +788,8 @@
             "default_branch": "main",
             "version_key": "stdlibOracledbVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-postgresql",
@@ -736,7 +800,8 @@
             "release": true,
             "dependents": [
                 "module-ballerinax-persist.sql"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-rabbitmq",
@@ -745,7 +810,8 @@
             "default_branch": "master",
             "version_key": "stdlibRabbitmqVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-redis",
@@ -756,7 +822,8 @@
             "release": true,
             "dependents": [
                 "module-ballerinax-persist.redis"
-            ]
+            ],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-salesforce",
@@ -765,7 +832,8 @@
             "default_branch": "master",
             "version_key": "stdlibSalesforceVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-salesforce.types",
@@ -774,7 +842,8 @@
             "default_branch": "main",
             "version_key": "stdlibSalesforce.typesVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-sap",
@@ -783,7 +852,8 @@
             "default_branch": "main",
             "version_key": "stdlibSapVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-snowflake",
@@ -792,7 +862,8 @@
             "default_branch": "main",
             "version_key": "stdlibSnowflakeVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         }
     ],
     "generated_connectors": [
@@ -803,7 +874,8 @@
             "default_branch": "main",
             "version_key": "stdlibAsanaVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-candid",
@@ -812,7 +884,8 @@
             "default_branch": "main",
             "version_key": "stdlibCandidVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-docusign.dsadmin",
@@ -821,7 +894,8 @@
             "default_branch": "main",
             "version_key": "stdlibDocusign.dsadminVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-docusign.dsclick",
@@ -830,7 +904,8 @@
             "default_branch": "main",
             "version_key": "stdlibDocusign.dsclickVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-docusign.dsesign",
@@ -839,7 +914,8 @@
             "default_branch": "main",
             "version_key": "stdlibDocusign.dsesignVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-github",
@@ -848,7 +924,8 @@
             "default_branch": "master",
             "version_key": "stdlibGithubVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-googleapis.calendar",
@@ -857,7 +934,8 @@
             "default_branch": "main",
             "version_key": "stdlibGoogleapis.calendarVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-googleapis.gmail",
@@ -866,7 +944,8 @@
             "default_branch": "master",
             "version_key": "stdlibGoogleapis.gmailVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-guidewire.insnow",
@@ -875,7 +954,18 @@
             "default_branch": "main",
             "version_key": "stdlibGuidewire.insnowVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-sap.s4hana.sales",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibSap.s4hana.salesVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": true
         },
         {
             "name": "module-ballerinax-twilio",
@@ -884,7 +974,8 @@
             "default_branch": "master",
             "version_key": "stdlibTwilioVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinax-zendesk",
@@ -893,7 +984,8 @@
             "default_branch": "main",
             "version_key": "stdlibZendeskVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         }
     ],
     "tools": [
@@ -904,7 +996,8 @@
             "default_branch": "main",
             "version_key": "stdlibAsyncapi-toolsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "copybook-tools",
@@ -913,7 +1006,8 @@
             "default_branch": "main",
             "version_key": "stdlibCopybook-toolsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "edi-tools",
@@ -922,7 +1016,8 @@
             "default_branch": "main",
             "version_key": "stdlibEdi-toolsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "graphql-tools",
@@ -931,7 +1026,8 @@
             "default_branch": "main",
             "version_key": "stdlibGraphql-toolsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "openapi-tools",
@@ -940,7 +1036,8 @@
             "default_branch": "master",
             "version_key": "stdlibOpenapi-toolsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "persist-tools",
@@ -949,7 +1046,8 @@
             "default_branch": "main",
             "version_key": "stdlibPersist-toolsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         },
         {
             "name": "protoc-tools",
@@ -958,7 +1056,8 @@
             "default_branch": "main",
             "version_key": "stdlibProtoc-toolsVersion",
             "release": true,
-            "dependents": []
+            "dependents": [],
+            "is_multiple_connectors": false
         }
     ]
 }
