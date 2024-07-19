@@ -259,6 +259,10 @@
             "name": "module-ballerinax-guidewire.insnow"
         },
         {
+            "name": "module-ballerinax-sap.s4hana.sales",
+            "is_multiple_connectors": true
+        },
+        {
             "name": "module-ballerinax-twilio"
         },
         {
