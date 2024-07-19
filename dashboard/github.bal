@@ -43,7 +43,7 @@ isolated function getRepoBadges(Module module) returns RepoBadges|error {
     string defaultBranch = module.default_branch ?: BRANCH_MAIN;
     github:WorkflowResponse workflowResponse = check github->/repos/[BALLERINA_ORG_NAME]/[module.name]/actions/workflows;
     WorkflowBadge codeCov = getCodeCoverageBadge(module);
-    WorkflowBadge release = check getLatestReleaseBadge(moduleName);
+    WorkflowBadge release = check getLatestReleaseBadge(module);
     WorkflowBadge pullRequests = check getPullRequestsBadge(module);
     RepoBadges repoBadges = {
         release,
@@ -105,8 +105,16 @@ isolated function getBugsBadge(string moduleName) returns WorkflowBadge|error {
     };
 }
 
-isolated function getLatestReleaseBadge(string moduleName) returns WorkflowBadge|error {
-    github:Release|error release = github->/repos/[BALLERINA_ORG_NAME]/[moduleName]/releases/latest;
+isolated function getLatestReleaseBadge(Module module) returns WorkflowBadge|error {
+    boolean isMultipleConnectors = module.is_multiple_connectors ?: false;
+    if isMultipleConnectors {
+        return {
+            name: "N/A",
+            badgeUrl: NABADGE,
+            htmlUrl: string `https://github.com/ballerina-platform/${module.name}/releases`
+        };
+    }
+    github:Release|error release = github->/repos/[BALLERINA_ORG_NAME]/[module.name]/releases/latest;
     if release is error {
         return {
             name: "N/A",
@@ -114,7 +122,7 @@ isolated function getLatestReleaseBadge(string moduleName) returns WorkflowBadge
             htmlUrl: ""
         };
     }
-    string badgeUrl = string `${GITHUB_BADGE_URL}/v/release/${BALLERINA_ORG_NAME}/${moduleName}?color=${BADGE_COLOR_GREEN}&label=`;
+    string badgeUrl = string `${GITHUB_BADGE_URL}/v/release/${BALLERINA_ORG_NAME}/${module.name}?color=${BADGE_COLOR_GREEN}&label=`;
     return {
         name: "Latest Release",
         badgeUrl,

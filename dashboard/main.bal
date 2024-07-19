@@ -103,7 +103,8 @@ function initializeModuleInfo(Module module, int defaultModuleLevel = 1) returns
         version_key: getVersionKey(module),
         release: true,
         dependents: [],
-        gradle_properties: gradleProperties
+        gradle_properties: gradleProperties,
+        is_multiple_connectors: module.is_multiple_connectors ?: false
     };
 }
 

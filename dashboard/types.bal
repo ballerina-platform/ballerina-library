@@ -31,6 +31,7 @@ type Module record {|
     boolean release?;
     string[] dependents?;
     string gradle_properties?;
+    boolean is_multiple_connectors?; 
 |};
 
 type WorkflowBadge record {|
