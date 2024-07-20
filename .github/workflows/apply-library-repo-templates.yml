@@ -1,0 +1,78 @@
+name: Apply Library Repo Templates and Create PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      template_type:
+        description: 'Template type'
+        default: 'Generated Connector Template (Standard)'
+        type: choice
+        options:
+          - Generated Connector Template (Standard)
+      target_repo:
+        description: 'Target repository to apply the template'
+        required: true
+        example: 'ballerina-platform/module-ballerinax-github'
+      module_name:
+        description: 'Module name of the connector'
+        required: true
+        example: 'github'
+      ballerina_version:
+        description: `Compatible Ballerina version to be used for the connector`
+        required: true
+        example: '2201.9.0'
+      module_version:
+        description: 'Connector version'
+        required: true
+        default: '0.1.0'
+        example: '1.0.0'
+      target_branch:
+        description: 'Target branch'
+        required: false
+        default: 'main'
+
+jobs:
+  apply_templates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout template repository
+        uses: actions/checkout@v3
+        with:
+          path: template-repo
+
+      - name: Checkout target repository
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ github.event.inputs.target_repo }}
+          path: target-repo
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Ballerina
+        uses: ballerina-platform/setup-ballerina@v1.1.0
+        with:
+          version: latest
+
+      - name: Apply templates and replace placeholders
+        if: ${{ github.event.inputs.template_type }} == 'Generated Connector Template (Standard)'
+        run: |
+          cp -r template-repo/generated-connector-template/files/* target-repo/
+          cd template-repo/generated-connector-template/scripts/
+          bal run replace_placeholders.bal -- ../../../target-repo/ ${{ github.event.inputs.module_name }} ${{ github.event.inputs.target_repo }} ${{ github.event.inputs.module_version }} ${{ github.event.inputs.ballerina_version }}
+          cd ../../../target-repo
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git checkout -b apply-templates-${{ github.run_number }}
+          git add .
+          git commit -m "Apply library repo template"
+          git push origin apply-templates-${{ github.run_number }}
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --repo ${{ github.event.inputs.target_repo }} \
+            --base ${{ github.event.inputs.target_branch }} \
+            --head apply-templates-${{ github.run_number }} \
+            --title "Add ${{ github.event.inputs.template_type }}" \
+            --body "This PR applies ${{ github.event.inputs.template_type }} template to this repository."
