@@ -5,7 +5,7 @@
 *.log
 
 generated
-#Config file
+# Ballerina Config file
 Config.toml
 
 # BlueJ files
@@ -17,7 +17,7 @@ Config.toml
 # .DS_Store files
 *.DS_Store
 
-# Package Files #
+# Package Files
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
 *.war
