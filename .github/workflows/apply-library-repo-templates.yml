@@ -55,10 +55,10 @@ jobs:
       - name: Apply templates and replace placeholders
         if: ${{ github.event.inputs.template_type }} == 'Generated Connector Template (Standard)'
         run: |
-          cp -r template-repo/generated-connector-template/files/* target-repo/
-          cd template-repo/generated-connector-template/scripts/
-          bal run replace_placeholders.bal -- ../../../target-repo/ ${{ github.event.inputs.module_name }} ${{ github.event.inputs.target_repo }} ${{ github.event.inputs.module_version }} ${{ github.event.inputs.ballerina_version }}
-          cd ../../../target-repo
+          cp -r template-repo/library-templates/generated-connector-template/files/* target-repo/
+          cd template-repo/library-templates/generated-connector-template/scripts/
+          bal run replace_placeholders.bal -- ../../../../target-repo/ ${{ github.event.inputs.module_name }} ${{ github.event.inputs.target_repo }} ${{ github.event.inputs.module_version }} ${{ github.event.inputs.ballerina_version }}
+          cd ../../../../target-repo
           git config user.name github-actions
           git config user.email github-actions@github.com
           git checkout -b apply-templates-${{ github.run_number }}
