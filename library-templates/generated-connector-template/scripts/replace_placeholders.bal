@@ -18,6 +18,7 @@ import ballerina/file;
 import ballerina/io;
 import ballerina/lang.regexp;
 import ballerina/log;
+import ballerina/time;
 
 // Define the file extensions that are considered as template files
 public type TemplateFileExt "bal"|"md"|"json"|"yaml"|"yml"|"toml"|"gradle"|"properties";
@@ -34,7 +35,8 @@ public function main(string path, string moduleName, string repoName, string mod
         "MODULE_NAME_CC": moduleName[0].toLowerAscii() + moduleName.substring(1),
         "REPO_NAME": regexp:split(re `/`, repoName)[1],
         "MODULE_VERSION": moduleVersion,
-        "BAL_VERSION": balVersion
+        "BAL_VERSION": balVersion,
+        "LICENSE_YEAR": time:utcToCivil(time:utcNow()).year.toString()
     };
 
     // Recursively process all files in the target directory
