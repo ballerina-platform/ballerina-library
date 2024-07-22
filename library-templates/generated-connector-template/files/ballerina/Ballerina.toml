@@ -5,8 +5,8 @@ name = "{{MODULE_NAME_CC}}"
 version = "{{MODULE_VERSION}}"
 license = ["Apache-2.0"]
 authors = ["Ballerina"]
-keywords = ["Finance/Payment", "Cost/Freemium"]
-icon = "icon.png"
+keywords = [] // TODO: Add keywords
+icon = "icon.png" // TODO: Add icon path
 repository = "https://github.com/ballerina-platform/{{REPO_NAME}}"
 
 [build-options]
