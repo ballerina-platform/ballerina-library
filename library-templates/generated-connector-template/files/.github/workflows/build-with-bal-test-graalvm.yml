@@ -1,0 +1,17 @@
+name: GraalVM Check
+
+on:
+  schedule:
+    - cron: "30 18 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  call_stdlib_workflow:
+    name: Run StdLib Workflow
+    if: ${{ github.event_name != 'schedule' || (github.event_name == 'schedule' && github.repository_owner == 'ballerina-platform') }}
+    uses: ballerina-platform/ballerina-library/.github/workflows/build-with-bal-test-graalvm-connector-template.yml@main
+    secrets: inherit

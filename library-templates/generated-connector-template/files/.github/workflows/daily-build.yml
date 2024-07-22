@@ -1,0 +1,14 @@
+name: Daily build
+
+on:
+  schedule:
+    - cron: "30 2 * * *"
+
+jobs:
+  call_workflow:
+    name: Run Daily Build Workflow
+    if: ${{ github.repository_owner == 'ballerina-platform' }}
+    uses: ballerina-platform/ballerina-library/.github/workflows/daily-build-connector-template.yml@main
+    secrets: inherit
+    with:
+      repo-name: {{REPO_NAME}}

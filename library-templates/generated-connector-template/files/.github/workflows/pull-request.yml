@@ -1,0 +1,16 @@
+name: PR Build
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+on: pull_request
+
+jobs:
+  call_workflow:
+    name: Run PR Build Workflow
+    if: ${{ github.repository_owner == 'ballerina-platform' }}
+    uses: ballerina-platform/ballerina-library/.github/workflows/pr-build-connector-template.yml@main
+    secrets: inherit
+    with:
+      additional-test-flags: ${{ github.event.pull_request.head.repo.full_name != github.repository && '-x test' || ''}}

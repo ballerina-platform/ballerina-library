@@ -1,0 +1,16 @@
+name: Publish Release
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [ stdlib-release-pipeline ]
+
+jobs:
+  call_workflow:
+    name: Run Release Workflow
+    if: ${{ github.repository_owner == 'ballerina-platform' }}
+    uses: ballerina-platform/ballerina-library/.github/workflows/release-package-connector-template.yml@main
+    secrets: inherit
+    with:
+      package-name: {{MODULE_NAME_CC}}
+      package-org: ballerinax
