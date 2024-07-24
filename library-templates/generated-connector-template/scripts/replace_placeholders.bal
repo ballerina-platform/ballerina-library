@@ -33,7 +33,7 @@ public function main(string path, string moduleName, string repoName, string mod
     map<string> placeholders = {
         "MODULE_NAME_PC": moduleName[0].toUpperAscii() + moduleName.substring(1),
         "MODULE_NAME_CC": moduleName[0].toLowerAscii() + moduleName.substring(1),
-        "REPO_NAME": regexp:split(re `/`, repoName)[1],
+        "REPO_NAME": repoName,
         "MODULE_VERSION": moduleVersion,
         "BAL_VERSION": balVersion,
         "LICENSE_YEAR": time:utcToCivil(time:utcNow()).year.toString()

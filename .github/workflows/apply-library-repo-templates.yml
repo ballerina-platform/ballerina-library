@@ -12,7 +12,7 @@ on:
       target_repo:
         description: 'Target repository to apply the template'
         required: true
-        example: 'ballerina-platform/module-ballerinax-github'
+        example: 'module-ballerinax-github'
       module_name:
         description: 'Module name of the connector'
         required: true
@@ -58,8 +58,8 @@ jobs:
           cd template-repo/library-templates/generated-connector-template/scripts/
           bal run replace_placeholders.bal -- ../../../../target-repo/ ${{ github.event.inputs.module_name }} ${{ github.event.inputs.target_repo }} ${{ github.event.inputs.module_version }} ${{ github.event.inputs.ballerina_version }}
           cd ../../../../target-repo
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config user.name "ballerina-bot"
+          git config user.email "ballerina-bot@ballerina.org"
           git checkout -b apply-templates-${{ github.run_number }}
           git add .
           git commit -m "Apply library repo template"
@@ -67,7 +67,7 @@ jobs:
 
       - name: Create Pull Request
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
         run: |
           gh pr create \
             --repo ${{ github.event.inputs.target_repo }} \

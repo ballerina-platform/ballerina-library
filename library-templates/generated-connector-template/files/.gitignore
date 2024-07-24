@@ -4,10 +4,6 @@
 # Log file
 *.log
 
-generated
-# Ballerina Config file
-Config.toml
-
 # BlueJ files
 *.ctxt
 
@@ -41,13 +37,16 @@ target
 .idea
 .m2
 .vscode/
+
 # Ignore ballerina files
 accessToken.bal
 temp.bal.ballerina/
 target/
+generated/
 .DS_Store
 *Ballerina.lock
 .ballerina
+**/Config.toml
 
 # Ignore Gradle project-specific cache directory
 .gradle
