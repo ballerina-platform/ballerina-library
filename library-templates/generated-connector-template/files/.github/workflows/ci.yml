@@ -1,0 +1,18 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+      - 2201.[0-9]+.x
+  repository_dispatch:
+    types: check_connector_for_breaking_changes
+
+jobs:
+  call_workflow:
+    name: Run Connector Build Workflow
+    if: ${{ github.repository_owner == 'ballerina-platform' }}
+    uses: ballerina-platform/ballerina-library/.github/workflows/build-connector-template.yml@main
+    secrets: inherit
+    with:
+      repo-name: {{REPO_NAME}}

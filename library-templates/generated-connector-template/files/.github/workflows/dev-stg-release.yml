@@ -1,0 +1,21 @@
+name: Publish to the Ballerina Dev\Stage Central
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: Select Environment
+        required: true
+        options:
+          - DEV CENTRAL
+          - STAGE CENTRAL
+
+jobs:
+  call_workflow:
+    name: Run Dev\Stage Central Publish Workflow
+    if: ${{ github.repository_owner == 'ballerina-platform' }}
+    uses: ballerina-platform/ballerina-library/.github/workflows/dev-stage-central-publish-connector-template.yml@main
+    secrets: inherit
+    with:
+      environment: ${{ github.event.inputs.environment }}
