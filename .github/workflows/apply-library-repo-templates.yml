@@ -67,7 +67,7 @@ jobs:
 
       - name: Create Pull Request
         env:
-          GH_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
         run: |
           gh pr create \
             --repo ${{ github.event.inputs.target_repo }} \
