@@ -522,7 +522,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "module_version": "1.13.2-SNAPSHOT",
+            "module_version": "1.14.0-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
