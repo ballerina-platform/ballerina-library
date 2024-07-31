@@ -100,6 +100,7 @@
             "dependents": [
                 "module-ballerina-cache",
                 "module-ballerina-data.jsondata",
+                "module-ballerina-data.xmldata",
                 "module-ballerinax-nats"
             ],
             "is_multiple_connectors": false
@@ -119,16 +120,6 @@
                 "module-ballerina-uuid",
                 "module-ballerinax-nats"
             ],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerina-data.xmldata",
-            "module_version": "1.0.0-SNAPSHOT",
-            "level": 2,
-            "default_branch": "main",
-            "version_key": "stdlibDataXmldataVersion",
-            "release": true,
-            "dependents": [],
             "is_multiple_connectors": false
         },
         {
@@ -247,6 +238,16 @@
                 "module-ballerina-jwt",
                 "module-ballerina-oauth2"
             ],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerina-data.xmldata",
+            "module_version": "1.0.0-SNAPSHOT",
+            "level": 3,
+            "default_branch": "main",
+            "version_key": "stdlibDataXmldataVersion",
+            "release": true,
+            "dependents": [],
             "is_multiple_connectors": false
         },
         {
@@ -430,7 +431,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "module_version": "2.11.3-SNAPSHOT",
+            "module_version": "2.12.0-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibHttpVersion",
