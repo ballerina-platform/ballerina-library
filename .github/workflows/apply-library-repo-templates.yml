@@ -43,7 +43,7 @@ jobs:
       - name: Checkout target repository
         uses: actions/checkout@v3
         with:
-          repository: ${{ github.event.inputs.target_repo }}
+          repository: ballerina-platform/${{ github.event.inputs.target_repo }}
           path: target-repo
 
       - name: Setup Ballerina
@@ -70,7 +70,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
         run: |
           gh pr create \
-            --repo ${{ github.event.inputs.target_repo }} \
+            --repo ballerina-platform/${{ github.event.inputs.target_repo }} \
             --base ${{ github.event.inputs.target_branch }} \
             --head apply-templates-${{ github.run_number }} \
             --title "Add ${{ github.event.inputs.template_type }}" \
