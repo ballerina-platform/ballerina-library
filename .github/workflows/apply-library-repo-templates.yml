@@ -18,7 +18,7 @@ on:
         required: true
         example: 'github'
       ballerina_version:
-        description: `Compatible Ballerina version to be used for the connector`
+        description: 'Compatible Ballerina version to be used for the connector'
         required: true
         example: '2201.9.0'
       module_version:
