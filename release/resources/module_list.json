@@ -16,6 +16,10 @@
             "name": "module-ballerina-crypto"
         },
         {
+            "name": "module-ballerina-data.csv",
+            "version_key": "stdlibDataCsvVersion"
+        },
+        {
             "name": "module-ballerina-data.jsondata",
             "version_key": "stdlibDataJsondataVersion"
         },
