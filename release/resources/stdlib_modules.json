@@ -10,6 +10,7 @@
             "dependents": [
                 "module-ballerina-avro",
                 "module-ballerina-data.xmldata",
+                "module-ballerina-data.yaml",
                 "module-ballerina-log",
                 "module-ballerina-os",
                 "module-ballerina-xslt",
@@ -101,6 +102,7 @@
                 "module-ballerina-cache",
                 "module-ballerina-data.jsondata",
                 "module-ballerina-data.xmldata",
+                "module-ballerina-data.yaml",
                 "module-ballerinax-nats"
             ],
             "is_multiple_connectors": false
@@ -251,6 +253,16 @@
             "is_multiple_connectors": false
         },
         {
+            "name": "module-ballerina-data.yaml",
+            "module_version": "0.1.0-SNAPSHOT",
+            "level": 3,
+            "default_branch": "main",
+            "version_key": "stdlibDataYamlVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
             "name": "module-ballerina-file",
             "module_version": "1.9.1-SNAPSHOT",
             "level": 3,
@@ -347,7 +359,7 @@
         },
         {
             "name": "module-ballerina-data.jsondata",
-            "module_version": "0.1.1-SNAPSHOT",
+            "module_version": "0.2.0-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibDataJsondataVersion",
@@ -377,7 +389,7 @@
         },
         {
             "name": "module-ballerina-jwt",
-            "module_version": "2.12.2-SNAPSHOT",
+            "module_version": "3.0.0-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibJwtVersion",
@@ -1012,7 +1024,7 @@
         },
         {
             "name": "edi-tools",
-            "module_version": "2.0.3",
+            "module_version": "2.0.4",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibEdi-toolsVersion",
