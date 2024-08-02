@@ -24,6 +24,10 @@
             "version_key": "stdlibDataXmldataVersion"
         },
         {
+            "name": "module-ballerina-data.yaml",
+            "version_key": "stdlibDataYamlVersion"
+        },
+        {
             "name": "module-ballerina-edi"
         },
         {
