@@ -1,6 +1,6 @@
 ## Overview
 
-//TODO: Add overview mentioning the purpose of the module, supported REST API versions, and other high-level details.
+[//]: # (TODO: Add overview mentioning the purpose of the module, supported REST API versions, and other high-level details.)
 
 ## Setup guide
 
