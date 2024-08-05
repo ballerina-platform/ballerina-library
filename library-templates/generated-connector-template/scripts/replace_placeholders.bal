@@ -21,17 +21,18 @@ import ballerina/log;
 import ballerina/time;
 
 // Define the file extensions that are considered as template files
-public type TemplateFileExt "bal"|"md"|"json"|"yaml"|"yml"|"toml"|"gradle"|"properties";
+public type TemplateFileExt "bal"|"md"|"json"|"yaml"|"yml"|"toml"|"gradle"|"properties"|"gitignore";
 
-public function main(string path, string moduleName, string repoName, string moduleVersion, string balVersion) returns error? {
+public function main(string path, string moduleName, string repoName, string moduleVersion, string balVersion, string connectorName) returns error? {
     log:printInfo("Generating connector template with the following metadata:");
     log:printInfo("Module Name: " + moduleName);
     log:printInfo("Repository Name: " + repoName);
     log:printInfo("Module Version: " + moduleVersion);
     log:printInfo("Ballerina Version: " + balVersion);
+    log:printInfo("Connector Name: " + connectorName);
 
     map<string> placeholders = {
-        "MODULE_NAME_PC": moduleName[0].toUpperAscii() + moduleName.substring(1),
+        "MODULE_NAME_PC": connectorName == "" ? moduleName[0].toUpperAscii() + moduleName.substring(1) : connectorName,
         "MODULE_NAME_CC": moduleName[0].toLowerAscii() + moduleName.substring(1),
         "REPO_NAME": repoName,
         "MODULE_VERSION": moduleVersion,
@@ -72,6 +73,7 @@ function processFile(string filePath, map<string> placeholders) returns error? {
     }
 
     check io:fileWriteString(filePath, content);
+    log:printInfo("Added file: " + filePath);
 }
 
 function getExtension(string filePath) returns string {

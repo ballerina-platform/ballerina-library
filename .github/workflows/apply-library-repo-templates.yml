@@ -12,17 +12,17 @@ on:
       target_repo:
         description: 'Target repository to apply the template'
         required: true
-        example: 'module-ballerinax-github'
+        example: 'module-ballerinax-openai.chat'
       module_name:
-        description: 'Module name of the connector'
+        description: 'Module name of the library used in Ballerina.toml'
         required: true
-        example: 'github'
+        example: 'openai.chat'
       ballerina_version:
-        description: 'Compatible Ballerina version to be used for the connector'
+        description: 'Compatible Ballerina version to be used for the library'
         required: true
         example: '2201.9.0'
       module_version:
-        description: 'Connector version'
+        description: 'Library module version'
         required: true
         default: '0.1.0'
         example: '1.0.0'
@@ -30,11 +30,25 @@ on:
         description: 'Target branch'
         required: false
         default: 'main'
+      library_name:
+        description: 'Descriptive name of the library to be used in the documentation (If not provided, module name will be used)'
+        required: false
+        example: 'OpenAI Chat'
+        default: ''
 
 jobs:
   apply_templates:
     runs-on: ubuntu-latest
     steps:
+      - name: Print Inputs
+        run: |
+          echo "Template Type: ${{ github.event.inputs.template_type }}"
+          echo "Target Repository: ${{ github.event.inputs.target_repo }}"
+          echo "Module Name: ${{ github.event.inputs.module_name }}"
+          echo "Ballerina Version: ${{ github.event.inputs.ballerina_version }}"
+          echo "Module Version: ${{ github.event.inputs.module_version }}"
+          echo "Target Branch: ${{ github.event.inputs.target_branch }}"
+          echo "Library Name: ${{ github.event.inputs.library_name }}"
       - name: Checkout template repository
         uses: actions/checkout@v3
         with:
@@ -57,7 +71,7 @@ jobs:
         run: |
           cp -r template-repo/library-templates/generated-connector-template/files/* target-repo/
           cd template-repo/library-templates/generated-connector-template/scripts/
-          bal run replace_placeholders.bal -- ../../../../target-repo/ ${{ github.event.inputs.module_name }} ${{ github.event.inputs.target_repo }} ${{ github.event.inputs.module_version }} ${{ github.event.inputs.ballerina_version }}
+          bal run replace_placeholders.bal -- ../../../../target-repo/ ${{ github.event.inputs.module_name }} ${{ github.event.inputs.target_repo }} ${{ github.event.inputs.module_version }} ${{ github.event.inputs.ballerina_version }} "${{ github.event.inputs.library_name }}"
           cd ../../../../target-repo
           git config user.name "ballerina-bot"
           git config user.email "ballerina-bot@ballerina.org"
