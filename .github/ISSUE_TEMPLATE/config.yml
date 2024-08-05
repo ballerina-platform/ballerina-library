@@ -3,6 +3,6 @@ contact_links:
   - name: General Question
     url: https://stackoverflow.com/questions/tagged/ballerina
     about: "If you have a question then please ask on Stack Overflow using the #ballerina tag."
-  - name: Chat on help-micro-integrator Discord Channel
+  - name: Chat on Ballerina Discord
     url: https://discord.gg/ballerinalang
     about: "Chat about anything else with the community."
