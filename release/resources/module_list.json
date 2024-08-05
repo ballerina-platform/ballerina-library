@@ -59,6 +59,9 @@
             "name": "module-ballerina-jwt"
         },
         {
+            "name": "module-ballerina-ldap"
+        },
+        {
             "name": "module-ballerina-log"
         },
         {
