@@ -1,0 +1,78 @@
+/*
+ * Copyright (c) {{LICENSE_YEAR}}, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+import org.apache.tools.ant.taskdefs.condition.Os
+
+apply plugin: 'java'
+
+def graalvmFlag = ""
+
+task testExamples {
+    if (project.hasProperty("balGraalVMTest")) {
+        graalvmFlag = "--graalvm"
+    }
+    doLast {
+        try {
+            exec {
+                workingDir project.projectDir
+                println("Working dir: ${workingDir}")
+                if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                    commandLine 'cmd', "/c", "chmod +x ./build.sh && ./build.sh run && exit %%ERRORLEVEL%%"
+                } else {
+                    commandLine 'sh', "-c", "chmod +x ./build.sh && ./build.sh run"
+                }
+            }
+        } catch (Exception e) {
+            println("Example Build failed: " + e.message)
+            throw e
+        }
+    }
+}
+
+task buildExamples {
+    gradle.taskGraph.whenReady { graph ->
+        if (graph.hasTask(":{{MODULE_NAME_CC}}-examples:test")) {
+            buildExamples.enabled = false
+        } else {
+            testExamples.enabled = false
+        }
+    }
+    doLast {
+        try {
+            exec {
+                workingDir project.projectDir
+                println("Working dir: ${workingDir}")
+                if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                    commandLine 'cmd', "/c", "chmod +x ./build.sh && ./build.sh build && exit %%ERRORLEVEL%%"
+                } else {
+                    commandLine 'sh', "-c", "chmod +x ./build.sh && ./build.sh build"
+                }
+            }
+        } catch (Exception e) {
+            println("Example Build failed: " + e.message)
+            throw e
+        }
+    }
+}
+
+buildExamples.dependsOn ":{{MODULE_NAME_CC}}-ballerina:build"
+testExamples.dependsOn ":{{MODULE_NAME_CC}}-ballerina:build"
+
+// TODO: Enable the examples build once https://github.com/ballerina-platform/ballerina-library/issues/6135 is fixed
+// test.dependsOn testExamples
+// build.dependsOn buildExamples
