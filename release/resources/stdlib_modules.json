@@ -29,6 +29,16 @@
             "is_multiple_connectors": false
         },
         {
+            "name": "module-ballerina-ldap",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "master",
+            "version_key": "stdlibLdapVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
             "name": "module-ballerina-math.vector",
             "module_version": "1.0.3-SNAPSHOT",
             "level": 1,
