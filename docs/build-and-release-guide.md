@@ -137,7 +137,9 @@ Checklist for the release,
 5. Run the release workflow.
 6. Publish artifact to the [Central Dev Environment](https://github.com/ballerina-platform/module-ballerina-http/actions/workflows/central-publish.yml). Select the `DEV CENTRAL` option in the workflow.
 7. Update module version in Ballerina Distribution in the corresponding patch branch.
-8. Merge the automated post-release pull request in the respective module repo to the corresponding patch branch (E.g.: If the release is done on top of the 2201.3.x branch, change the pull request base to 2201.3.x branch and then merge the PR).
+   
+   > **Note:** If the module is released while updating one or more ballerina library dependencies, then make sure those versions are also updated in the Ballerina distribution repository.
+9. Merge the automated post-release pull request in the respective module repo to the corresponding patch branch (E.g.: If the release is done on top of the 2201.3.x branch, change the pull request base to 2201.3.x branch and then merge the PR).
 
 ### Multiple Module Release
 
