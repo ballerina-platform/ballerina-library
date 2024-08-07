@@ -136,7 +136,7 @@
         },
         {
             "name": "module-ballerina-log",
-            "module_version": "2.9.1-SNAPSHOT",
+            "module_version": "2.10.0-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibLogVersion",
@@ -357,7 +357,7 @@
         },
         {
             "name": "module-ballerina-auth",
-            "module_version": "2.11.2-SNAPSHOT",
+            "module_version": "2.12.0-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibAuthVersion",
@@ -389,7 +389,7 @@
         },
         {
             "name": "module-ballerina-email",
-            "module_version": "2.9.1-SNAPSHOT",
+            "module_version": "2.10.0-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibEmailVersion",
