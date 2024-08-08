@@ -2,7 +2,7 @@
     "library_modules": [
         {
             "name": "module-ballerina-io",
-            "module_version": "1.6.1-SNAPSHOT",
+            "module_version": "1.6.2-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibIoVersion",
@@ -379,7 +379,7 @@
         },
         {
             "name": "module-ballerina-edi",
-            "module_version": "1.2.1",
+            "module_version": "1.3.0-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibEdiVersion",
@@ -433,7 +433,7 @@
         },
         {
             "name": "module-ballerina-toml",
-            "module_version": "0.5.2-SNAPSHOT",
+            "module_version": "0.6.0-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibTomlVersion",
@@ -443,7 +443,7 @@
         },
         {
             "name": "module-ballerina-yaml",
-            "module_version": "0.5.4-SNAPSHOT",
+            "module_version": "0.6.0-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibYamlVersion",
@@ -472,7 +472,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "module_version": "1.11.2-SNAPSHOT",
+            "module_version": "1.12.0-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
@@ -485,7 +485,7 @@
         },
         {
             "name": "module-ballerina-soap",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.1.0-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibSoapVersion",
@@ -495,7 +495,7 @@
         },
         {
             "name": "module-ballerinai-transaction",
-            "module_version": "1.9.1-SNAPSHOT",
+            "module_version": "1.10.0-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibTransactionVersion",
@@ -510,7 +510,7 @@
         },
         {
             "name": "module-ballerina-websocket",
-            "module_version": "2.11.1-SNAPSHOT",
+            "module_version": "2.12.0-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsocketVersion",
@@ -523,7 +523,7 @@
         },
         {
             "name": "module-ballerina-websub",
-            "module_version": "2.11.1-SNAPSHOT",
+            "module_version": "2.12.0-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibWebsubVersion",
@@ -535,7 +535,7 @@
         },
         {
             "name": "module-ballerina-websubhub",
-            "module_version": "1.11.1-SNAPSHOT",
+            "module_version": "1.12.0-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsubhubVersion",
@@ -558,7 +558,7 @@
         },
         {
             "name": "module-ballerina-sql",
-            "module_version": "1.13.3-SNAPSHOT",
+            "module_version": "1.14.0-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
