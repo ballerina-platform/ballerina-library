@@ -235,6 +235,9 @@
         },
         {
             "name": "module-ballerinax-snowflake"
+        },
+        {
+            "name": "module-ballerinax-stripe"
         }
     ],
     "generated_connectors": [
