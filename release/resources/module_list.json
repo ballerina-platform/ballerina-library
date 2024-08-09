@@ -235,9 +235,6 @@
         },
         {
             "name": "module-ballerinax-snowflake"
-        },
-        {
-            "name": "module-ballerinax-stripe"
         }
     ],
     "generated_connectors": [
@@ -271,6 +268,9 @@
         {
             "name": "module-ballerinax-sap.s4hana.sales",
             "is_multiple_connectors": true
+        },
+        {
+            "name": "module-ballerinax-stripe"
         },
         {
             "name": "module-ballerinax-twilio"
