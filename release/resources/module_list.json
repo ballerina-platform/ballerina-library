@@ -270,6 +270,9 @@
             "is_multiple_connectors": true
         },
         {
+            "name": "module-ballerinax-stripe"
+        },
+        {
             "name": "module-ballerinax-twilio"
         },
         {
