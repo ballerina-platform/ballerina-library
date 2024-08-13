@@ -30,7 +30,7 @@
         },
         {
             "name": "module-ballerina-ldap",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.0.2-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibLdapVersion",
@@ -230,7 +230,7 @@
         },
         {
             "name": "module-ballerina-xslt",
-            "module_version": "2.6.1-SNAPSHOT",
+            "module_version": "2.7.0-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibXsltVersion",
