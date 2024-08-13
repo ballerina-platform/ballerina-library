@@ -11,3 +11,6 @@ repository = "https://github.com/ballerina-platform/{{REPO_NAME}}"
 
 [build-options]
 observabilityIncluded = true
+
+[platform.java17]
+graalvmCompatible = true
