@@ -60,7 +60,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.ballerina_bot_token }}
       - name: Push results
         if: ${{ steps.processResults.outputs.hasPassed }}
-        run: git push origin load-test-results
+        run: git push origin "load-test-results"
         env:
           GITHUB_TOKEN: ${{ secrets.ballerina_bot_token }}
       - name: Create pull request for new summary
