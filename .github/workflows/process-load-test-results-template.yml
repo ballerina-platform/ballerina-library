@@ -95,22 +95,8 @@ jobs:
       - name: Merge PR
         if: ${{ steps.processResults.outputs.hasPassed }}
         run: |
-          if [[ ${{ steps.processResults.outputs.branch }} == "null" ]]
-          then
-            checkCount="0"
-            while [ "$checkCount" != "3" ]
-            do
-              sleep 20
-              checkCount=$(gh pr status --jq '[.currentBranch .statusCheckRollup[] | select((.conclusion=="SUCCESS") and ((.name=="Run PR Build Workflow / Build on Ubuntu") or (.name=="Run PR Build Workflow / Build on Windows") or (.name=="codecov/project")))] | length' --json statusCheckRollup)
-              failedCount=$(gh pr status --jq '[.currentBranch .statusCheckRollup[] | select((.conclusion=="FAILURE") and ((.name=="Run PR Build Workflow / Build on Ubuntu") or (.name=="Run PR Build Workflow / Build on Windows") or (.name=="codecov/project")))]|length' --json statusCheckRollup)
-              if [[ "$failedCount" != "0" ]]
-              then
-                echo "PR Build has failed"
-                exit 1
-              fi
-            done
-            sleep 20
-          fi
+          gh pr checks ${{ steps.createPR.outputs.prUrl }} --required --watch --interval 20
+          sleep 5
           gh pr merge ${{ steps.createPR.outputs.prUrl }} --merge --delete-branch
         env:
           GITHUB_TOKEN: ${{ secrets.ballerina_bot_token }}
