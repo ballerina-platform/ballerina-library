@@ -58,7 +58,7 @@ jobs:
           done
         env:
           GITHUB_TOKEN: ${{ secrets.ballerina_bot_token }}
-      - name: Check if the load-test-results branch exists
+      - name: Check the existence of load-test-results branch
         if: ${{ steps.processResults.outputs.hasPassed }}
         id: check_branch
         run: |
@@ -67,7 +67,7 @@ jobs:
           else
             echo "branch_exists=false" >> $GITHUB_ENV
           fi
-      - name: Delete existing load-test-results branch
+      - name: Delete the existing load-test-results branch
         if: ${{ steps.check_branch.outputs.branch_exists }}
         run: git push origin --delete load-test-results
       - name: Push results
