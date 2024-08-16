@@ -73,6 +73,7 @@ jobs:
           sed -i 's/stdlib\(.*\)=\(.*\)-[0-9]\{8\}-[0-9]\{6\}-.*$/stdlib\1=\2/g' gradle.properties
           sed -i 's/observe\(.*\)=\(.*\)-SNAPSHOT/observe\1=\2/g' gradle.properties
           sed -i 's/observe\(.*\)=\(.*\)-[0-9]\{8\}-[0-9]\{6\}-.*$/observe\1=\2/g' gradle.properties
+          sed -i 's/ballerinaToOpenApiVersion=\(.*\)-[0-9]\{8\}-[0-9]\{6\}-.*$/ballerinaToOpenApiVersion=\1/g' gradle.properties
           git add gradle.properties
           git commit -m "Move dependencies to stable versions" || echo "No changes to commit"
 
