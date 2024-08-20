@@ -35,11 +35,11 @@ const decimal WORKFLOW_POLL_INTERVAL = 5;
 
 configurable string token = os:getEnv(ACCESS_TOKEN_ENV);
 
-configurable boolean releaseLibs = check os:getEnv(RELEASE_LIBS).ensureType();
-configurable boolean releaseExtensions = check os:getEnv(RELASE_EXTENSIONS).ensureType();
-configurable boolean releaseTools = check os:getEnv(RELEASE_TOOLS).ensureType();
-configurable boolean releaseHandwrittenConnectors = check os:getEnv(RELEASE_HANDWRITTEN_CONNECTORS).ensureType();
-configurable boolean releaseGeneratedConnectors = check os:getEnv(RELEASE_GENERATED_CONNECTORS).ensureType();
+configurable boolean releaseLibs = check boolean:fromString(os:getEnv(RELEASE_LIBS));
+configurable boolean releaseExtensions = check boolean:fromString(os:getEnv(RELASE_EXTENSIONS));
+configurable boolean releaseTools = check boolean:fromString(os:getEnv(RELEASE_TOOLS));
+configurable boolean releaseHandwrittenConnectors = check boolean:fromString(os:getEnv(RELEASE_HANDWRITTEN_CONNECTORS));
+configurable boolean releaseGeneratedConnectors = check boolean:fromString(os:getEnv(RELEASE_GENERATED_CONNECTORS)); 
 
 // Provide the correct workflow as a configurable variable.
 configurable string workflow = ?;
