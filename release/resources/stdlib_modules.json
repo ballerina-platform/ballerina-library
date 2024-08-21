@@ -485,7 +485,7 @@
         },
         {
             "name": "module-ballerina-soap",
-            "module_version": "1.1.0-SNAPSHOT",
+            "module_version": "1.1.1-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibSoapVersion",
@@ -600,7 +600,7 @@
         },
         {
             "name": "module-ballerinax-persist.inmemory",
-            "module_version": "1.4.0-SNAPSHOT",
+            "module_version": "1.4.1-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibPersistInmemoryVersion",
@@ -612,7 +612,7 @@
         },
         {
             "name": "module-ballerinax-persist.redis",
-            "module_version": "0.2.0-SNAPSHOT",
+            "module_version": "0.2.1-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibPersistRedisVersion",
@@ -828,7 +828,7 @@
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "module_version": "3.1.0-SNAPSHOT",
+            "module_version": "3.1.1-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibRabbitmqVersion",
@@ -1064,7 +1064,7 @@
         },
         {
             "name": "openapi-tools",
-            "module_version": "2.1.0-SNAPSHOT",
+            "module_version": "2.1.1-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibOpenapi-toolsVersion",
