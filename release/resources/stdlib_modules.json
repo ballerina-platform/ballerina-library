@@ -136,7 +136,7 @@
         },
         {
             "name": "module-ballerina-log",
-            "module_version": "2.10.0-SNAPSHOT",
+            "module_version": "2.10.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibLogVersion",
@@ -302,7 +302,7 @@
         },
         {
             "name": "module-ballerina-mime",
-            "module_version": "2.10.0-SNAPSHOT",
+            "module_version": "2.10.1-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibMimeVersion",
@@ -545,7 +545,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "module_version": "1.14.0-SNAPSHOT",
+            "module_version": "1.14.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
