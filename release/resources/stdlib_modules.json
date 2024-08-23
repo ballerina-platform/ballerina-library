@@ -453,7 +453,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "module_version": "2.12.0-SNAPSHOT",
+            "module_version": "2.12.1-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibHttpVersion",
@@ -796,7 +796,7 @@
         },
         {
             "name": "module-ballerinax-nats",
-            "module_version": "3.1.0-SNAPSHOT",
+            "module_version": "3.1.1-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibNatsVersion",
@@ -870,7 +870,7 @@
         },
         {
             "name": "module-ballerinax-sap",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.1.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibSapVersion",
