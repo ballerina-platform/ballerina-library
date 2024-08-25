@@ -850,7 +850,7 @@
         },
         {
             "name": "module-ballerinax-salesforce",
-            "module_version": "8.1.0-SNAPSHOT",
+            "module_version": "8.1.1-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibSalesforceVersion",
