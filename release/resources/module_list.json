@@ -245,6 +245,12 @@
             "name": "module-ballerinax-candid"
         },
         {
+            "name": "module-ballerinax-dayforce"
+        },
+        {
+            "name": "module-ballerinax-discord"
+        },
+        {
             "name": "module-ballerinax-docusign.dsadmin"
         },
         {
@@ -266,14 +272,35 @@
             "name": "module-ballerinax-guidewire.insnow"
         },
         {
+            "name": "module-ballerinax-openai.assistants"
+        },
+        {
+            "name": "module-ballerinax-openai.audio"
+        },
+        {
+            "name": "module-ballerinax-openai.chat"
+        },
+        {
+            "name": "module-ballerinax-openai.finetunes"
+        },
+        {
+            "name": "module-ballerinax-openai.images"
+        },
+        {
             "name": "module-ballerinax-sap.s4hana.sales",
             "is_multiple_connectors": true
+        },
+        {
+            "name": "module-ballerinax-slack"
         },
         {
             "name": "module-ballerinax-stripe"
         },
         {
             "name": "module-ballerinax-twilio"
+        },
+        {
+            "name": "module-ballerinax-twitter"
         },
         {
             "name": "module-ballerinax-zendesk"
