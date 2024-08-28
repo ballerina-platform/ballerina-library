@@ -718,7 +718,7 @@
         },
         {
             "name": "module-ballerinax-ibm.ibmmq",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.1.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibIbm.ibmmqVersion",
