@@ -172,6 +172,12 @@
             "name": "module-ballerinax-aws.dynamodbstreams"
         },
         {
+            "name": "module-ballerinax-aws.marketplace.mpe"
+        },
+        {
+            "name": "module-ballerinax-aws.marketplace.mpm"
+        },
+        {
             "name": "module-ballerinax-aws.redshift"
         },
         {
