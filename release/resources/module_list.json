@@ -234,9 +234,6 @@
             "name": "module-ballerinax-salesforce"
         },
         {
-            "name": "module-ballerinax-salesforce.types"
-        },
-        {
             "name": "module-ballerinax-sap"
         },
         {
