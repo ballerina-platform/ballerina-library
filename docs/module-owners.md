@@ -87,7 +87,6 @@ In the event of a change in ownership, the new owner is accountable for updating
 | [xmldata](https://github.com/ballerina-platform/module-ballerina-xmldata)|[@kalaiyarasiganeshalingam](https://github.com/kalaiyarasiganeshalingam)|[@sahanHe](https://github.com/sahanHe)|
 | [redshift](https://github.com/ballerina-platform/module-ballerinax-aws.redshift)|[@aashikam](https://github.com/aashikam)|  |
 | [salesforce](https://github.com/ballerina-platform/module-ballerinax-salesforce)          |[@aashikam](https://github.com/aashikam)|  |
-| [salesforce.types](https://github.com/ballerina-platform/module-ballerinax-salesforce.types)       |[@aashikam](https://github.com/aashikam)|  |
 | [xslt](https://github.com/ballerina-platform/module-ballerina-xslt) | [@sahanHe](https://github.com/sahanHe) | [@daneshk](https://github.com/daneshk) |
 | [yaml](https://github.com/ballerina-platform/module-ballerina-yaml) | [@RDPerera](https://github.com/RDPerera) |  |
 

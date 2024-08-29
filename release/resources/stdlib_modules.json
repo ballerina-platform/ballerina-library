@@ -881,16 +881,6 @@
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-salesforce.types",
-            "module_version": "1.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibSalesforce.typesVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
             "name": "module-ballerinax-sap",
             "module_version": "1.1.1-SNAPSHOT",
             "level": 100,
