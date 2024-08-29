@@ -435,7 +435,7 @@
         },
         {
             "name": "module-ballerina-toml",
-            "module_version": "0.6.0-SNAPSHOT",
+            "module_version": "0.6.1-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibTomlVersion",
@@ -445,7 +445,7 @@
         },
         {
             "name": "module-ballerina-yaml",
-            "module_version": "0.6.0-SNAPSHOT",
+            "module_version": "0.6.1-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibYamlVersion",
@@ -560,7 +560,7 @@
         },
         {
             "name": "module-ballerina-sql",
-            "module_version": "1.14.0-SNAPSHOT",
+            "module_version": "1.14.2-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
@@ -750,7 +750,7 @@
         },
         {
             "name": "module-ballerinax-java.jdbc",
-            "module_version": "1.12.0-SNAPSHOT",
+            "module_version": "1.12.1-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibJdbcVersion",
@@ -794,7 +794,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "module_version": "1.13.0-SNAPSHOT",
+            "module_version": "1.13.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
@@ -838,7 +838,7 @@
         },
         {
             "name": "module-ballerinax-postgresql",
-            "module_version": "1.13.0-SNAPSHOT",
+            "module_version": "1.13.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
