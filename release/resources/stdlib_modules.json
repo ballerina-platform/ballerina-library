@@ -750,7 +750,7 @@
         },
         {
             "name": "module-ballerinax-java.jdbc",
-            "module_version": "1.12.1-SNAPSHOT",
+            "module_version": "1.12.2-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibJdbcVersion",
@@ -794,7 +794,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "module_version": "1.13.1-SNAPSHOT",
+            "module_version": "1.13.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
@@ -806,7 +806,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "module_version": "1.13.0-SNAPSHOT",
+            "module_version": "1.13.2-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
@@ -838,7 +838,7 @@
         },
         {
             "name": "module-ballerinax-postgresql",
-            "module_version": "1.13.1-SNAPSHOT",
+            "module_version": "1.13.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
