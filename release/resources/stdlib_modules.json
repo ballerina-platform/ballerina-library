@@ -294,7 +294,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "module_version": "2.11.0-SNAPSHOT",
+            "module_version": "2.11.1-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
@@ -423,7 +423,7 @@
         },
         {
             "name": "module-ballerina-oauth2",
-            "module_version": "2.12.0-SNAPSHOT",
+            "module_version": "2.12.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibOAuth2Version",
@@ -512,7 +512,7 @@
         },
         {
             "name": "module-ballerina-websocket",
-            "module_version": "2.12.0-SNAPSHOT",
+            "module_version": "2.12.1-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsocketVersion",
@@ -580,7 +580,7 @@
     "extended_modules": [
         {
             "name": "module-ballerinax-copybook",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibCopybookVersion",
@@ -1156,7 +1156,7 @@
         },
         {
             "name": "graphql-tools",
-            "module_version": "0.11.0-SNAPSHOT",
+            "module_version": "0.11.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibGraphql-toolsVersion",
