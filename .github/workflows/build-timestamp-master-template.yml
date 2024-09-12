@@ -49,7 +49,7 @@ jobs:
       - name: Generate CodeCov Report
         uses: codecov/codecov-action@v3
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ballerina-runtime
           path: target/ballerina-runtime/
