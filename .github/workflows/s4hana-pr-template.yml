@@ -57,6 +57,7 @@ jobs:
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
         with:
+          name: ${{ matrix.directory }}
           path: ballerina/**/coverage-report.xml
 
   upload-codcov:
