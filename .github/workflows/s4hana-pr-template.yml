@@ -57,6 +57,7 @@ jobs:
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
         with:
+          name: ${{ matrix.directory }}
           path: ballerina/**/coverage-report.xml
 
   upload-codcov:
@@ -65,7 +66,7 @@ jobs:
     needs: build-connectors
     steps:
       - name: Download coverage reports
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - name: Generate Codecov Report
         uses: codecov/codecov-action@v3
