@@ -42,6 +42,7 @@ const BALLERINA_BOT_TOKEN = "BALLERINA_BOT_TOKEN";
 // Misc
 const ENCODING = "UTF-8";
 const NABADGE = "https://img.shields.io/badge/-N%2FA-yellow";
+const DISABLED_BADGE = "https://img.shields.io/badge/-disabled-red";
 const MAX_LEVEL = 100;
 
 // README Contents
