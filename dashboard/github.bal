@@ -62,11 +62,20 @@ isolated function getRepoBadges(Module module) returns RepoBadges|error {
             };
         }
         if workflowFileName == WORKFLOW_TRIVY {
-            repoBadges.trivy = {
-                name: "Trivy",
-                badgeUrl: getBadgeUrl(moduleName, workflowFileName, defaultBranch),
-                htmlUrl: getWorkflowUrl(moduleName, workflowFileName)
-            };
+            string workflowUrl = getWorkflowUrl(moduleName, workflowFileName);
+            if workflow.state == "disabled_inactivity" {
+                repoBadges.trivy = {
+                    name: "Trivy",
+                    badgeUrl: DISABLED_BADGE,
+                    htmlUrl: workflowUrl
+                };
+            } else {
+                repoBadges.trivy = {
+                    name: "Trivy",
+                    badgeUrl: getBadgeUrl(moduleName, workflowFileName, defaultBranch),
+                    htmlUrl: workflowUrl
+                };
+            }
         }
         if workflowFileName == WORKFLOW_PROCESS_LOAD_TESTS {
             repoBadges.loadTests = {
