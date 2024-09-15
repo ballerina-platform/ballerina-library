@@ -19,6 +19,7 @@ type List record {|
     Module[] extended_modules;
     Module[] handwritten_connectors;
     Module[] generated_connectors;
+    Module[] driver_connectors;
     Module[] tools;
 |};
 

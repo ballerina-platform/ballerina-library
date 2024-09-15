@@ -27,6 +27,7 @@ public function main() returns error? {
     Module[] extendedModules = moduleDetails.extended_modules;
     Module[] handwrittenConnectors = moduleDetails.handwritten_connectors;
     Module[] generatedConnectors = moduleDetails.generated_connectors;
+    Module[] driver_connectors = moduleDetails.driver_connectors;
     Module[] tools = moduleDetails.tools;
 
     Module[] modules = [
@@ -34,6 +35,7 @@ public function main() returns error? {
         ...extendedModules,
         ...handwrittenConnectors,
         ...generatedConnectors,
+        ...driver_connectors,
         ...tools
     ];
 
@@ -58,6 +60,7 @@ function getSortedModuleNameList() returns List|error {
         extended_modules: sortModuleArray(moduleList.extended_modules),
         handwritten_connectors: sortModuleArray(moduleList.handwritten_connectors),
         generated_connectors: sortModuleArray(moduleList.generated_connectors),
+        driver_connectors: sortModuleArray(moduleList.driver_connectors),
         tools: sortModuleArray(moduleList.tools)
     };
 
@@ -77,6 +80,7 @@ function initializeModuleDetails(List moduleNameList) returns List|error {
         extended_modules: check initializeModuleList(moduleNameList.extended_modules),
         handwritten_connectors: check initializeModuleList(moduleNameList.handwritten_connectors, MAX_LEVEL),
         generated_connectors: check initializeModuleList(moduleNameList.generated_connectors, MAX_LEVEL),
+        driver_connectors: check initializeModuleList(moduleNameList.driver_connectors),
         tools: check initializeModuleList(moduleNameList.tools)
     };
 }
@@ -282,6 +286,7 @@ function updateDashboard(List moduleDetails) returns error? {
     updatedReadmeFile += check getExtendedModulesDashboard(moduleDetails.extended_modules);
     updatedReadmeFile += check getHandwrittenConnectorDashboard(moduleDetails.handwritten_connectors);
     updatedReadmeFile += check getGeneratedConnectorDashboard(moduleDetails.generated_connectors);
+    updatedReadmeFile += check getDriverModulesDashboard(moduleDetails.driver_connectors);
     updatedReadmeFile += check getBallerinaToolsDashboard(moduleDetails.tools);
 
     io:Error? fileWriteString = io:fileWriteString(README_FILE, updatedReadmeFile);
@@ -335,6 +340,16 @@ isolated function getGeneratedConnectorDashboard(Module[] modules) returns strin
     }
     return getDashboard(TITLE_GENERATED_CONNECTORS, DESCRIPTION_GENERATED_CONNECTORS,
             HEADER_GENERATED_CONNECTOR_DASHBOARD, HEADER_SEPARATOR_GENERATED_CONNECTORS, data);
+}
+
+function getDriverModulesDashboard(Module[] modules) returns string|error {
+    string data = "";
+
+    foreach Module module in modules {
+        data += check getDriverConnectorsDashboardRow(module) + "\n";
+    }
+    return getDashboard(TITLE_DRIVER_CONNECTORS, DESCRIPTION_DRIVER_CONNECTORS,
+            HEADER_DRIVER_CONNECTOR_DASHBOARD, HEADER_SEPARATOR_DRIVER_CONNECTORS, data);
 }
 
 isolated function getBallerinaToolsDashboard(Module[] modules) returns string|error {

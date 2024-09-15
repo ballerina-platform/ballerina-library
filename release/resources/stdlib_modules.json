@@ -1123,6 +1123,102 @@
             "is_multiple_connectors": false
         }
     ],
+    "driver_connectors": [
+        {
+            "name": "module-ballerinax-activemq.driver",
+            "module_version": "1.0.2-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "activeMQDriverVersion",
+            "release": true,
+            "dependents": [
+                "module-ballerinax-java.jms"
+            ],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-aws.redshift.driver",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibAws.redshift.driverVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-h2.driver",
+            "module_version": "1.1.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibH2DriverVersion",
+            "release": true,
+            "dependents": [
+                "module-ballerinax-java.jdbc"
+            ],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-mssql.driver",
+            "module_version": "1.6.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibMssqlDriverVersion",
+            "release": true,
+            "dependents": [
+                "module-ballerinax-mssql"
+            ],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-mysql.driver",
+            "module_version": "1.7.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibMysqlDriverVersion",
+            "release": true,
+            "dependents": [
+                "module-ballerinax-mysql"
+            ],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-oracledb.driver",
+            "module_version": "1.4.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibOracledbDriverVersion",
+            "release": true,
+            "dependents": [
+                "module-ballerinax-oracledb"
+            ],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-postgresql.driver",
+            "module_version": "1.5.2-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibPostgresqlDriverVersion",
+            "release": true,
+            "dependents": [
+                "module-ballerinax-postgresql"
+            ],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-snowflake.driver",
+            "module_version": "2.7.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "snowflakeDriverVersion",
+            "release": true,
+            "dependents": [
+                "module-ballerinax-snowflake"
+            ],
+            "is_multiple_connectors": false
+        }
+    ],
     "tools": [
         {
             "name": "asyncapi-tools",
