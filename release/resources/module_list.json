@@ -309,7 +309,7 @@
             "name": "module-ballerinax-zendesk"
         }
     ],
-    "driver_connectors": [
+    "driver_modules": [
         {
             "name": "module-ballerinax-activemq.driver",
             "version_key": "activeMQDriverVersion"
