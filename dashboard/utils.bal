@@ -58,6 +58,15 @@ isolated function getGeneratedConnectorDashboardRow(Module module) returns strin
     return string `|${repoLink}|${releaseBadge}|${buildStatusBadge}|${trivyBadge}|${bugsBadge}|${pullRequestsBadge}|${graalvmCheck}|`;
 }
 
+function getDriverConnectorsDashboardRow(Module module) returns string|error {
+    RepoBadges repoBadges = check getRepoBadges(module);
+    string repoLink = getRepoLink(module.name);
+    string releaseBadge = getBadge(repoBadges.release);
+    string buildStatusBadge = getBadge(repoBadges.buildStatus);
+    string trivyBadge = getBadge(repoBadges.trivy);
+    return string `|${repoLink}|${releaseBadge}|${buildStatusBadge}|${trivyBadge}|`;
+}
+
 isolated function getRepoLink(string moduleName) returns string {
     string shortName = getModuleShortName(moduleName);
     return string `[${shortName}](${BALLERINA_ORG_URL}/${moduleName})`;

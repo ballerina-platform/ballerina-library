@@ -309,6 +309,39 @@
             "name": "module-ballerinax-zendesk"
         }
     ],
+    "driver_modules": [
+        {
+            "name": "module-ballerinax-activemq.driver",
+            "version_key": "activeMQDriverVersion"
+        },
+        {
+            "name": "module-ballerinax-aws.redshift.driver"
+        },
+        {
+            "name": "module-ballerinax-h2.driver",
+            "version_key": "stdlibH2DriverVersion"
+        },
+        {
+            "name": "module-ballerinax-mssql.driver",
+            "version_key": "stdlibMssqlDriverVersion"
+        },
+        {
+            "name": "module-ballerinax-mysql.driver",
+            "version_key": "stdlibMysqlDriverVersion"
+        },
+        {
+            "name": "module-ballerinax-oracledb.driver",
+            "version_key": "stdlibOracledbDriverVersion"
+        },
+        {
+            "name": "module-ballerinax-postgresql.driver",
+            "version_key": "stdlibPostgresqlDriverVersion"
+        },
+        {
+            "name": "module-ballerinax-snowflake.driver",
+            "version_key": "snowflakeDriverVersion"
+        }
+    ],
     "tools": [
         {
             "name": "asyncapi-tools"
