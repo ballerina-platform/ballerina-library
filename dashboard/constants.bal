@@ -42,6 +42,7 @@ const BALLERINA_BOT_TOKEN = "BALLERINA_BOT_TOKEN";
 // Misc
 const ENCODING = "UTF-8";
 const NABADGE = "https://img.shields.io/badge/-N%2FA-yellow";
+const DISABLED_BADGE = "https://img.shields.io/badge/-disabled-red";
 const MAX_LEVEL = 100;
 
 // README Contents
@@ -71,7 +72,7 @@ const DESCRIPTION_LIBRARY_MODULES = "These modules are published under the `ball
 const DESCRIPTION_EXTENDED_MODULES = "These modules are protocol modules that are not packed with the Ballerina distribution.";
 const DESCRIPTION_HANDWRITTEN_CONNECTORS = "These are the handwritten Ballerina connector modules that are used to connect to third-party services. They are published under the `ballerinax` organization ";
 const DESCRIPTION_GENERATED_CONNECTORS = "These are the generated Ballerina connector modules that are used to connect to third-party services. They are published under the `ballerinax` organization. The modules are generated using the Ballerina OpenAPI tool using the third-party service's OpenAPI definition. Since these are auto-generated, they only contain a smoke test suite rather than a comprehensive test suite. Due to this nature, the code coverage and load test results are not applicable for these modules. Some repositories such as `sap.s4hana.sales` contain multiple connectors which are highly co-related. These have multiple releases and thus not indicated here.";
-const DESCRIPTION_DRIVER_MODULES = "These Ballerina modules bundle database drivers, making it easier to use Ballerina database connectors. They are published under the `ballerinax` organization. These modules only bundle drivers, so only build, latest release, and security checks are applicable to these modules.";
+const DESCRIPTION_DRIVER_MODULES = "These Ballerina modules bundle database drivers, making it easier to use Ballerina database connectors. They are published under the `ballerinax` organization. Only daily build, latest release, and security checks are applicable to these modules.";
 const DESCRIPTION_TOOLS = "These are the Ballerina CLI tools maintained by the Ballerina Library team.";
 
 // Workflow files
