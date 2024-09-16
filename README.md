@@ -160,7 +160,7 @@ These are the generated Ballerina connector modules that are used to connect to 
 
 ### Ballerina Driver Modules
 
-These Ballerina modules bundle database drivers, making it easier to use Ballerina database connectors. They are published under the `ballerinax` organization. These modules only bundle drivers, so only build, latest release, and security checks are applicable to these modules.
+These Ballerina modules bundle database drivers, making it easier to use Ballerina database connectors. They are published under the `ballerinax` organization. Only daily build, latest release, and security checks are applicable to these modules.
 
 | Name | Latest Version | Build | Security Check |
 |:---:|:---:|:---:|:---:|
