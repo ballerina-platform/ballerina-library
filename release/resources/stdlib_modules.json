@@ -371,7 +371,7 @@
         },
         {
             "name": "module-ballerina-data.jsondata",
-            "module_version": "0.2.1-SNAPSHOT",
+            "module_version": "0.3.0-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibDataJsondataVersion",
@@ -580,7 +580,7 @@
     "extended_modules": [
         {
             "name": "module-ballerinax-copybook",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.0.2-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibCopybookVersion",
