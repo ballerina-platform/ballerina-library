@@ -188,7 +188,7 @@
         },
         {
             "name": "module-ballerina-protobuf",
-            "module_version": "1.6.1-SNAPSHOT",
+            "module_version": "1.6.2-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibProtobufVersion",
@@ -317,7 +317,7 @@
         },
         {
             "name": "module-ballerina-tcp",
-            "module_version": "1.11.1-SNAPSHOT",
+            "module_version": "1.11.2-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibTcpVersion",
