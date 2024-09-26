@@ -27,7 +27,7 @@ As depicted in the image, AOT compilation with GraalVM provides the following ad
 - Can be packaged into lightweight container images for faster and more efficient deployments.
 - Reduced attack surface.
 
-One downside is that the GraalVM native image build is a highly complicated process, which may consume a lot of memory and CPU resulting in an extended build time. However, the GraalVM community is continuously working on improving its performance. In addition, the GraalVM native image assumes a closed-world assumption, where it should know all the classes and resources at compile time. Due to this limitation, Java dynamic features such as reflection are not directly supported. But we can configure the properties related to these dynamic features at compile time to make them work. For more information, see [Native Image Compatibility Guide](https://www.graalvm.org/jdk17/reference-manual/native-image/metadata/Compatibility/).
+One downside is that the GraalVM native image build is a highly complicated process, which may consume a lot of memory and CPU resulting in an extended build time. However, the GraalVM community is continuously working on improving its performance. In addition, the GraalVM native image assumes a closed-world assumption, where it should know all the classes and resources at compile time. Due to this limitation, Java dynamic features such as reflection are not directly supported. But we can configure the properties related to these dynamic features at compile time to make them work. For more information, see [Native Image Compatibility Guide](https://www.graalvm.org/jdk21/reference-manual/native-image/metadata/Compatibility/).
 
 ### Ballerina GraalVM executable
 
@@ -53,15 +53,15 @@ file under the section '[platform.<java*>]' with the attribute
 
 ### Analyzing the code base for Java dynamic features
 
-Since the native-image tool assumes the closed-world assumption, the following [dynamic features](https://www.graalvm.org/jdk17/reference-manual/native-image/dynamic-features/) of Java should be handled explicitly through configuration files.
+Since the native-image tool assumes the closed-world assumption, the following [dynamic features](https://www.graalvm.org/jdk21/reference-manual/native-image/dynamic-features/) of Java should be handled explicitly through configuration files.
 
-- [Accessing Resources](https://www.graalvm.org/jdk17/reference-manual/native-image/dynamic-features/Resources/)
-- [Certificate Management](https://www.graalvm.org/jdk17/reference-manual/native-image/dynamic-features/CertificateManagement/)
-- [Dynamic Proxy](https://www.graalvm.org/jdk17/reference-manual/native-image/dynamic-features/DynamicProxy/)
-- [Java Native Interface (JNI)](https://www.graalvm.org/jdk17/reference-manual/native-image/dynamic-features/JNI/)
-- [JCA Security Services](https://www.graalvm.org/jdk17/reference-manual/native-image/dynamic-features/JCASecurityServices/)
-- [Reflection](https://www.graalvm.org/jdk17/reference-manual/native-image/dynamic-features/Reflection/)
-- [URL Protocols](https://www.graalvm.org/jdk17/reference-manual/native-image/dynamic-features/URLProtocols/)
+- [Accessing Resources](https://www.graalvm.org/jdk21/reference-manual/native-image/dynamic-features/Resources/)
+- [Certificate Management](https://www.graalvm.org/jdk21/reference-manual/native-image/dynamic-features/CertificateManagement/)
+- [Dynamic Proxy](https://www.graalvm.org/jdk21/reference-manual/native-image/dynamic-features/DynamicProxy/)
+- [Java Native Interface (JNI)](https://www.graalvm.org/jdk21/reference-manual/native-image/dynamic-features/JNI/)
+- [JCA Security Services](https://www.graalvm.org/jdk21/reference-manual/native-image/dynamic-features/JCASecurityServices/)
+- [Reflection](https://www.graalvm.org/jdk21/reference-manual/native-image/dynamic-features/Reflection/)
+- [URL Protocols](https://www.graalvm.org/jdk21/reference-manual/native-image/dynamic-features/URLProtocols/)
 
 The analysis should be also done on the third-party libraries used in the module. Some third-party libraries might be already GraalVM compatible, this should be verified with the third-party library owners. You can also refer to the configurations for some commonly used libraries in [graalvm-reachability-metadata repository](https://github.com/oracle/graalvm-reachability-metadata/tree/master/metadata).
 
@@ -83,10 +83,10 @@ The analysis should be also done on the third-party libraries used in the module
    >**Tip:** Use [SDKMAN!](https://sdkman.io/) to install GraalVM.
    >
    >   ```console
-   >   $ sdk install java 17.0.7-graalce
+   >   $ sdk install java 21.0.4-graalce
    >   ```
    >
-   For additional download options, see [Get Started with GraalVM](https://www.graalvm.org/jdk17/docs/getting-started/).
+   For additional download options, see [Get Started with GraalVM](https://www.graalvm.org/jdk21/docs/getting-started/).
    > **Note:** If you have installed Ballerina Swan Lake Update 7(2201.7.x) or lower, you have to install GraalVM JDK 11. For download options, see [Get Started with GraalVM](https://www.graalvm.org/22.3/docs/getting-started/macos/).
 
 2. Set the `GRAALVM_HOME` environment variable to the GraalVM installation directory. If you have installed using SDKMAN! you can set it to `JAVA_HOME`.
@@ -122,9 +122,9 @@ The analysis should be also done on the third-party libraries used in the module
 
 #### Handle errors
 
-There may be errors when building the native image due to [class initialization](https://www.graalvm.org/jdk17/reference-manual/native-image/optimizations-and-performance/ClassInitialization/). Fix these errors using the error logs and tracing the class initialization. For more information, see [Updates on Class Initialization in GraalVM Native Image Generation](https://medium.com/graalvm/updates-on-class-initialization-in-graalvm-native-image-generation-c61faca461f7).
+There may be errors when building the native image due to [class initialization](https://www.graalvm.org/jdk21/reference-manual/native-image/optimizations-and-performance/ClassInitialization/). Fix these errors using the error logs and tracing the class initialization. For more information, see [Updates on Class Initialization in GraalVM Native Image Generation](https://medium.com/graalvm/updates-on-class-initialization-in-graalvm-native-image-generation-c61faca461f7).
 
-Even though the build passes, running the executable may end up in unexpected errors. This could happen if you have not added all the necessary configurations related to the Java dynamic features. The necessary configurations needed for this particular sample application can be automatically found by engaging the [tracing agent](https://www.graalvm.org/jdk17/reference-manual/native-image/metadata/AutomaticMetadataCollection/) when running the jar file.
+Even though the build passes, running the executable may end up in unexpected errors. This could happen if you have not added all the necessary configurations related to the Java dynamic features. The necessary configurations needed for this particular sample application can be automatically found by engaging the [tracing agent](https://www.graalvm.org/jdk21/reference-manual/native-image/metadata/AutomaticMetadataCollection/) when running the jar file.
 
 #### The GraalVM Tracing agent
 
@@ -215,6 +215,6 @@ If the library requires any additional configurations that are generated by the 
 If you get GraalVM compatibility warnings when building or packing the library, then that means the library has to be marked as GraalVM compatible after making it GraalVM compatible. This can be achieved by adding the following to the `Ballerina.toml`
 
 ```toml
-[platform.java17]
+[platform.java21]
 graalvmCompatible = true
 ```

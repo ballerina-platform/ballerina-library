@@ -47,7 +47,7 @@ jobs:
       - name: Set up GraalVM
         uses: graalvm/setup-graalvm@v1
         with:
-          java-version: "17"
+          java-version: "21"
           distribution: "graalvm-community"
           set-java-home: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
