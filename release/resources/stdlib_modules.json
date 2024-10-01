@@ -712,7 +712,7 @@
         },
         {
             "name": "module-ballerinax-azure-service-bus",
-            "module_version": "3.8.2-SNAPSHOT",
+            "module_version": "3.8.3-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAzure-service-busVersion",
