@@ -20,8 +20,11 @@ import ballerina/lang.regexp;
 import ballerina/log;
 import ballerina/time;
 
-// Define the file extensions that are considered as template files
+// Define file extensions to be accepted as template files
 public type TemplateFileExt "bal"|"md"|"json"|"yaml"|"yml"|"toml"|"gradle"|"properties"|"gitignore"|"txt";
+
+// Define file name patterns to be accepted as template files
+
 
 # This function generates a connector template with the given metadata.
 #
