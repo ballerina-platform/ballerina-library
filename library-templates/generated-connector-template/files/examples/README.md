@@ -1,6 +1,6 @@
 # Examples
 
-The `ballerinax/{{MODULE_NAME_CC}}` connector provides practical examples illustrating usage in various scenarios. Explore these [examples](https://github.com/ballerina-platform/module-ballerinax-{{MODULE_NAME_CC}}/tree/main/examples), covering use cases like cache management, session management, and rate limiting.
+The `ballerinax/{{MODULE_NAME_CC}}` connector provides practical examples illustrating usage in various scenarios.
 
 [//]: # (TODO: Add examples)
 1. 
