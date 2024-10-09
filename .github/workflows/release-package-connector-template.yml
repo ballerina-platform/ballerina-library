@@ -68,7 +68,7 @@ jobs:
         run: mkdir -p ballerina/lib
 
       - name: Run Trivy Vulnerability Scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.23.0
         with:
           scan-type: "rootfs"
           scan-ref: "/github/workspace/ballerina/lib"
