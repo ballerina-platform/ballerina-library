@@ -66,7 +66,7 @@ function processDirectory(string dir, map<string> placeholders) returns error? {
 
 function processFile(string filePath, map<string> placeholders) returns error? {
     string ext = getExtension(filePath);
-    if ext !is TemplateFileType || ext != "jar" {
+    if ext !is TemplateFileType || ext == "jar" {
         log:printInfo("Skipping file: " + filePath);
         return;
     }
