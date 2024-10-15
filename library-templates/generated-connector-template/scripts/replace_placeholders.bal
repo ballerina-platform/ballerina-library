@@ -66,7 +66,7 @@ function processDirectory(string dir, map<string> placeholders) returns error? {
 
 function processFile(string filePath, map<string> placeholders) returns error? {
     string ext = getExtension(filePath);
-    if ext !is TemplateFileType {
+    if ext !is TemplateFileType || ext != "jar" {
         log:printInfo("Skipping file: " + filePath);
         return;
     }
@@ -81,7 +81,7 @@ function processFile(string filePath, map<string> placeholders) returns error? {
         content = re `\{\{${placeholder}\}\}`.replaceAll(content, value);
     }
 
-    check io:fileWriteString(filePath, content);
+    check io:fileWriteString(filePath, content + "\n");
     log:printInfo("Added file: " + filePath);
 }
 
