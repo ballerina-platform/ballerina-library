@@ -21,7 +21,7 @@ import ballerina/log;
 import ballerina/time;
 
 // Define file extensions to be accepted as template files
-public type TemplateFileType "bal"|"md"|"json"|"yaml"|"yml"|"toml"|"gradle"|"properties"|"gitignore"|"txt"|"jar"|"sh"|"bat"|"LICENSE"|"CODEOWNERS";
+public type TemplateFileType "bal"|"md"|"json"|"yaml"|"yml"|"toml"|"gradle"|"properties"|"gitignore"|"txt"|"sh"|"bat"|"LICENSE"|"CODEOWNERS";
 
 # This function generates a connector template with the given metadata.
 #
@@ -66,7 +66,7 @@ function processDirectory(string dir, map<string> placeholders) returns error? {
 
 function processFile(string filePath, map<string> placeholders) returns error? {
     string ext = getExtension(filePath);
-    if ext !is TemplateFileType || ext != "jar" {
+    if ext !is TemplateFileType {
         log:printInfo("Skipping file: " + filePath);
         return;
     }
