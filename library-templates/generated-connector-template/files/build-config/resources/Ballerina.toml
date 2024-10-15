@@ -6,7 +6,7 @@ version = "@toml.version@"
 license = ["Apache-2.0"]
 authors = ["Ballerina"]
 keywords = [] # TODO: Add keywords
-icon = "icon.png" # TODO: Add icon
+# icon = "icon.png" # TODO: Add icon
 repository = "https://github.com/ballerina-platform/{{REPO_NAME}}"
 
 [build-options]
