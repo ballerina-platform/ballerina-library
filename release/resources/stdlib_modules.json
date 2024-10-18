@@ -489,7 +489,7 @@
         },
         {
             "name": "module-ballerina-soap",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibSoapVersion",
@@ -582,7 +582,7 @@
     "extended_modules": [
         {
             "name": "module-ballerinax-copybook",
-            "module_version": "1.0.2-SNAPSHOT",
+            "module_version": "1.0.3-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibCopybookVersion",
