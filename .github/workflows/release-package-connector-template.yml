@@ -57,8 +57,8 @@ jobs:
 
       - name: Build without Tests
         env:
-          packageUser: ${{ github.actor }}
-          packagePAT: ${{ secrets.GITHUB_TOKEN }}
+          packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+          packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
         run: |
           git config --global user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
           git config --global user.email ${{ secrets.BALLERINA_BOT_EMAIL }}

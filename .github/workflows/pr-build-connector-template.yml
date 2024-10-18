@@ -50,8 +50,8 @@ jobs:
 
             -   name: Build the Package
                 env:
-                    packageUser: ${{ github.actor }}
-                    packagePAT: ${{ secrets.GITHUB_TOKEN }}
+                    packageUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
+                    packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
                 run: |
                   ./gradlew build -x test ${{ inputs.additional-build-flags }}
                   ./gradlew test ${{ inputs.additional-test-flags }}
