@@ -489,7 +489,7 @@
         },
         {
             "name": "module-ballerina-soap",
-            "module_version": "2.0.1-SNAPSHOT",
+            "module_version": "2.0.2-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibSoapVersion",
@@ -722,7 +722,7 @@
         },
         {
             "name": "module-ballerinax-confluent.cavroserdes",
-            "module_version": "0.2.1-SNAPSHOT",
+            "module_version": "0.2.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibConfluent.cavroserdesVersion",
@@ -1234,7 +1234,7 @@
         },
         {
             "name": "copybook-tools",
-            "module_version": "0.1.2-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibCopybook-toolsVersion",
