@@ -28,16 +28,6 @@
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerina-ldap",
-            "module_version": "1.0.2-SNAPSHOT",
-            "level": 1,
-            "default_branch": "master",
-            "version_key": "stdlibLdapVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
             "name": "module-ballerina-math.vector",
             "module_version": "1.0.3-SNAPSHOT",
             "level": 1,
@@ -130,6 +120,7 @@
             "dependents": [
                 "module-ballerina-auth",
                 "module-ballerina-jwt",
+                "module-ballerina-ldap",
                 "module-ballerina-oauth2",
                 "module-ballerina-tcp",
                 "module-ballerina-uuid",
@@ -299,6 +290,16 @@
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerina-ldap",
+            "module_version": "1.1.0-SNAPSHOT",
+            "level": 3,
+            "default_branch": "master",
+            "version_key": "stdlibLdapVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
