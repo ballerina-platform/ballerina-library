@@ -60,14 +60,15 @@ jobs:
           ./gradlew build -x test 
 
       - name: Run Trivy Vulnerability Scanner
-        uses: aquasecurity/trivy-action@0.23.0
+        uses: aquasecurity/trivy-action@master
         with:
           scan-type: "rootfs"
-          scan-ref: "/github/workspace/ballerina"
+          scan-ref: "${{ github.workspace }}/ballerina"
           format: "table"
           timeout: "10m0s"
           exit-code: "1"
           skip-dirs: "resources"
+          scanners: "vuln"
 
       - name: Get Release Version
         run: echo "VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties | rev | cut -d- -f2 | rev)" >> $GITHUB_ENV
