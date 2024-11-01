@@ -26,11 +26,12 @@ jobs:
         run: ./gradlew build -x test -x :${{ inputs.hana-connector-group }}-examples:build -x:${{ inputs.hana-connector-group }}-sanitation:build
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.23.0
+        uses: aquasecurity/trivy-action@master
         with:
           scan-type: "rootfs"
-          scan-ref: "/github/workspace/ballerina"
+          scan-ref: "${{ github.workspace }}/ballerina"
           format: "table"
           timeout: "10m0s"
           exit-code: "1"
           skip-dirs: "resources"
+          scanners: "vuln"
