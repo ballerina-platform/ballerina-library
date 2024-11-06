@@ -39,7 +39,7 @@
         },
         {
             "name": "module-ballerina-time",
-            "module_version": "2.5.1-SNAPSHOT",
+            "module_version": "2.6.0-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibTimeVersion",
@@ -96,7 +96,7 @@
         },
         {
             "name": "module-ballerina-constraint",
-            "module_version": "1.5.1-SNAPSHOT",
+            "module_version": "1.6.0-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibConstraintVersion",
