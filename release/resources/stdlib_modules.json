@@ -1097,7 +1097,7 @@
         },
         {
             "name": "module-ballerinax-twilio",
-            "module_version": "4.0.2-SNAPSHOT",
+            "module_version": "5.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibTwilioVersion",
