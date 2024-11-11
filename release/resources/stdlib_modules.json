@@ -841,7 +841,7 @@
         },
         {
             "name": "module-ballerinax-postgresql",
-            "module_version": "1.13.2-SNAPSHOT",
+            "module_version": "1.13.3-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
