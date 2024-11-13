@@ -2,7 +2,7 @@
     "library_modules": [
         {
             "name": "module-ballerina-io",
-            "module_version": "1.6.2-SNAPSHOT",
+            "module_version": "1.7.0-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibIoVersion",
