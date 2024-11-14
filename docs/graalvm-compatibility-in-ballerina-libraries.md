@@ -182,6 +182,12 @@ This is not straightforward since Ballerina tests are not executed by a single U
 
 3. Run the following command to run Ballerina tests with the tracing agent
 
+   For **Ballerina SwanLake Update 10(2201.10.x)** or **higher**:
+   ```console
+   $ $GRAALVM_HOME/bin/java -agentlib:native-image-agent=config-output-dir=config-dir -cp @class-path.txt "org.ballerinalang.test.runtime.BTestMain" false "target/cache/tests_cache/test_suit.json" "target" "" true false "" "" "" false false false false
+   ```
+
+   For other versions:
    ```console
    $ $GRAALVM_HOME/bin/java -agentlib:native-image-agent=config-output-dir=config-dir -cp @class-path.txt "org.ballerinalang.test.runtime.BTestMain" "target" "" true false "" "" "" false false
    ```
