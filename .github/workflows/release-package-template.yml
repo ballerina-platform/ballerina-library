@@ -51,12 +51,16 @@ jobs:
 
       - name: Run Trivy Vulnerability Scanner
         uses: aquasecurity/trivy-action@master
+        env:
+          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+          TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
         with:
           scan-type: "rootfs"
-          scan-ref: "/github/workspace/ballerina/lib"
+          scan-ref: "${{ github.workspace }}/ballerina/lib"
           format: "table"
           timeout: "10m0s"
           exit-code: "1"
+          scanners: "vuln"
 
       - name: Get Release Version
         run: echo "VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties | rev | cut --complement -d- -f1 | rev)" >> $GITHUB_ENV

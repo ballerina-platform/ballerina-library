@@ -4,34 +4,34 @@ on:
   workflow_dispatch:
     inputs:
       template_type:
-        description: 'Template type'
+        description: 'Select the type of template to apply to the target repository.'
         default: 'Generated Connector Template (Standard)'
         type: choice
         options:
           - Generated Connector Template (Standard)
       target_repo:
-        description: 'Target repository to apply the template'
+        description: 'The repository where the selected template will be applied.'
         required: true
         example: 'module-ballerinax-openai.chat'
       module_name:
-        description: 'Module name of the library used in Ballerina.toml'
+        description: 'The module name as defined in the Ballerina.toml file.'
         required: true
         example: 'openai.chat'
       ballerina_version:
-        description: 'Compatible Ballerina version to be used for the library'
+        description: 'The Ballerina version that the library should be compatible with.'
         required: true
         example: '2201.9.0'
       module_version:
-        description: 'Library module version'
+        description: 'The version number of the library module.'
         required: true
         default: '0.1.0'
         example: '1.0.0'
       target_branch:
-        description: 'Target branch'
+        description: 'The branch in the target repository where changes will be applied.'
         required: false
         default: 'main'
       library_name:
-        description: 'Descriptive name of the library to be used in the documentation (If not provided, module name will be used)'
+        description: 'A descriptive name for the library, used in the documentation. If not provided, the module name will be used instead.'
         required: false
         example: 'OpenAI Chat'
         default: ''
@@ -69,7 +69,7 @@ jobs:
       - name: Apply templates and replace placeholders
         if: ${{ github.event.inputs.template_type }} == 'Generated Connector Template (Standard)'
         run: |
-          cp -r template-repo/library-templates/generated-connector-template/files/* target-repo/
+          cp -r template-repo/library-templates/generated-connector-template/files/. target-repo/
           cd template-repo/library-templates/generated-connector-template/scripts/
           bal run replace_placeholders.bal -- ../../../../target-repo/ ${{ github.event.inputs.module_name }} ${{ github.event.inputs.target_repo }} ${{ github.event.inputs.module_version }} ${{ github.event.inputs.ballerina_version }} "${{ github.event.inputs.library_name }}"
           cd ../../../../target-repo

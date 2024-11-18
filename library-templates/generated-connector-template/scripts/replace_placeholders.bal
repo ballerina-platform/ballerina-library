@@ -20,9 +20,18 @@ import ballerina/lang.regexp;
 import ballerina/log;
 import ballerina/time;
 
-// Define the file extensions that are considered as template files
-public type TemplateFileExt "bal"|"md"|"json"|"yaml"|"yml"|"toml"|"gradle"|"properties"|"gitignore"|"txt";
+// Define file extensions to be accepted as template files
+public type TemplateFileType "bal"|"md"|"json"|"yaml"|"yml"|"toml"|"gradle"|"properties"|"gitignore"|"txt"|"sh"|"bat"|"LICENSE"|"CODEOWNERS";
 
+# This function generates a connector template with the given metadata.
+#
+# + path - The relative path to the directory where the connector template is located
+# + moduleName - The name of the module to be used the `Ballerina.toml` file and the Ballerina central
+# + repoName - The name of the repository to be used in the `Ballerina.toml` file
+# + moduleVersion - The version of the module to be used in the `Ballerina.toml` file
+# + balVersion - The Ballerina version to be used
+# + connectorName - The descriptive name of the connector to be used in the generated files
+# + return - An error if an error occurs while generating the connector template
 public function main(string path, string moduleName, string repoName, string moduleVersion, string balVersion, string connectorName) returns error? {
     log:printInfo("Generating connector template with the following metadata:");
     log:printInfo("Module Name: " + moduleName);
@@ -57,7 +66,7 @@ function processDirectory(string dir, map<string> placeholders) returns error? {
 
 function processFile(string filePath, map<string> placeholders) returns error? {
     string ext = getExtension(filePath);
-    if ext !is TemplateFileExt {
+    if ext !is TemplateFileType {
         log:printInfo("Skipping file: " + filePath);
         return;
     }
@@ -72,7 +81,7 @@ function processFile(string filePath, map<string> placeholders) returns error? {
         content = re `\{\{${placeholder}\}\}`.replaceAll(content, value);
     }
 
-    check io:fileWriteString(filePath, content);
+    check io:fileWriteString(filePath, content + "\n");
     log:printInfo("Added file: " + filePath);
 }
 

@@ -6,7 +6,7 @@ version = "{{MODULE_VERSION}}"
 license = ["Apache-2.0"]
 authors = ["Ballerina"]
 keywords = []
-icon = "icon.png"
+# icon = "icon.png" # TODO: update icon.png
 repository = "https://github.com/ballerina-platform/{{REPO_NAME}}"
 
 [build-options]
