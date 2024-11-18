@@ -7,7 +7,7 @@ on:
                 description: Branch/Release Tag of the Ballerina Lang
                 type: string
                 required: false
-                default: master
+                default: java21
             lang_version:
                 description: Ballerina Lang Version (If given ballerina lang buid will be skipped)
                 type: string
@@ -38,18 +38,18 @@ jobs:
         if: github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'Skip GraalVM Check')
 
         steps:
-            - name: Set up JDK 17
+            - name: Set up JDK 21
               uses: actions/setup-java@v3
               with:
                   distribution: 'temurin'
-                  java-version: '17'
+                  java-version: '21'
 
             - name: Checkout Ballerina Lang Repository
               if: ${{ inputs.lang_version == '' }}
               uses: actions/checkout@v3
               with:
                   repository: 'ballerina-platform/ballerina-lang'
-                  ref: ${{ inputs.lang_tag || 'master' }}
+                  ref: ${{ inputs.lang_tag || 'java21' }}
 
             - name: Set Ballerina Lang version
               run: |
@@ -71,7 +71,7 @@ jobs:
             - name: Set up GraalVM
               uses: graalvm/setup-graalvm@v1
               with:
-                  java-version: '17'
+                  java-version: '21'
                   distribution: 'graalvm-community'
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   set-java-home: 'false'
@@ -110,11 +110,11 @@ jobs:
         if: github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'Skip GraalVM Check')
 
         steps:
-            - name: Set up JDK 17
+            - name: Set up JDK 21
               uses: actions/setup-java@v3
               with:
                   distribution: 'temurin'
-                  java-version: '17'
+                  java-version: '21'
 
             - name: Git configure long path
               run: git config --global core.longpaths true
@@ -124,7 +124,7 @@ jobs:
               uses: actions/checkout@v3
               with:
                   repository: 'ballerina-platform/ballerina-lang'
-                  ref: ${{ inputs.lang_tag || 'master' }}
+                  ref: ${{ inputs.lang_tag || 'java21' }}
 
             - name: Set Ballerina Lang version
               run: |
@@ -155,7 +155,7 @@ jobs:
             - name: Set up GraalVM
               uses: graalvm/setup-graalvm@v1
               with:
-                  java-version: '17'
+                  java-version: '21'
                   distribution: 'graalvm-community'
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   set-java-home: 'false'

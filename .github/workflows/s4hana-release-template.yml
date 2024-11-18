@@ -32,11 +32,11 @@ jobs:
         with:
           version: ${{ env.BAL_VERSION }}
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: 17.0.7
+          java-version: 21
 
         # This step is because this repoistory is a collection of packages
       - name: Change version in gradle.properties
