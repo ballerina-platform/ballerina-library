@@ -36,7 +36,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: 21
+          java-version: 21.0.3
 
         # This step is because this repoistory is a collection of packages
       - name: Change version in gradle.properties

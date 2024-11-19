@@ -33,7 +33,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
-          java-version: 21
+          java-version: 21.0.3
 
       - name: Build the Package
         env:
@@ -78,7 +78,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
-          java-version: 21
+          java-version: 21.0.3
 
       - name: Build the Package
         env:
