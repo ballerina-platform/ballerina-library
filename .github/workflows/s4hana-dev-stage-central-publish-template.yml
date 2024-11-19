@@ -46,7 +46,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
-          java-version: 21
+          java-version: 21.0.3
 
       - name: Ballerina Central Dev Push
         if: ${{ inputs.environment == 'DEV CENTRAL' }}
