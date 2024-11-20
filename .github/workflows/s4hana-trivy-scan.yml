@@ -38,3 +38,4 @@ jobs:
           exit-code: "1"
           skip-dirs: "resources"
           scanners: "vuln"
+          cache-dir: "/tmp/trivy-cache"
