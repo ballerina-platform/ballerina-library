@@ -61,6 +61,7 @@ jobs:
           timeout: "10m0s"
           exit-code: "1"
           scanners: "vuln"
+          cache-dir: "/tmp/trivy-cache"
 
       - name: Get Release Version
         run: echo "VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties | rev | cut --complement -d- -f1 | rev)" >> $GITHUB_ENV
