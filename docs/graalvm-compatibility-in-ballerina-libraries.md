@@ -87,7 +87,9 @@ The analysis should be also done on the third-party libraries used in the module
    >   ```
    >
    For additional download options, see [Get Started with GraalVM](https://www.graalvm.org/jdk21/docs/getting-started/).
-   > **Note:** If you have installed Ballerina Swan Lake Update 7(2201.7.x) or lower, you have to install GraalVM JDK 11. For download options, see [Get Started with GraalVM](https://www.graalvm.org/22.3/docs/getting-started/macos/).
+   > **Note:**
+   > - If you have installed **Ballerina Swan Lake Update 10(2201.10.x) or Update 9(2201.9.x) or Update 8(2201.8.x)**, you have to install GraalVM JDK 17. For download options, see [Get Started with GraalVM](https://www.graalvm.org/jdk17/docs/getting-started/)
+   > - If you have installed **Ballerina Swan Lake Update 7(2201.7.x) or lower**, you have to install GraalVM JDK 11. For download options, see [Get Started with GraalVM](https://www.graalvm.org/22.3/docs/getting-started/).
 
 2. Set the `GRAALVM_HOME` environment variable to the GraalVM installation directory. If you have installed using SDKMAN! you can set it to `JAVA_HOME`.
 
