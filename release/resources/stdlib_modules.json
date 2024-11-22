@@ -155,7 +155,7 @@
         },
         {
             "name": "module-ballerina-os",
-            "module_version": "1.8.1-SNAPSHOT",
+            "module_version": "1.9.0-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibOsVersion",
@@ -194,7 +194,7 @@
         },
         {
             "name": "module-ballerina-random",
-            "module_version": "1.5.1-SNAPSHOT",
+            "module_version": "1.6.0-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibRandomVersion",
@@ -212,7 +212,7 @@
         },
         {
             "name": "module-ballerina-task",
-            "module_version": "2.5.1-SNAPSHOT",
+            "module_version": "2.6.0-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibTaskVersion",
