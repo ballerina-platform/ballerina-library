@@ -78,8 +78,7 @@
             "version_key": "stdlibXmldataVersion",
             "release": true,
             "dependents": [
-                "asyncapi-tools",
-                "openapi-tools"
+                "asyncapi-tools"
             ],
             "is_multiple_connectors": false
         },
@@ -255,7 +254,9 @@
             "default_branch": "main",
             "version_key": "stdlibDataXmldataVersion",
             "release": true,
-            "dependents": [],
+            "dependents": [
+                "openapi-tools"
+            ],
             "is_multiple_connectors": false
         },
         {
@@ -289,7 +290,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "module_version": "2.11.1-SNAPSHOT",
+            "module_version": "2.12.0-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
