@@ -181,7 +181,7 @@
         },
         {
             "name": "module-ballerina-protobuf",
-            "module_version": "1.6.2-SNAPSHOT",
+            "module_version": "1.7.0-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibProtobufVersion",
@@ -261,7 +261,7 @@
         },
         {
             "name": "module-ballerina-data.yaml",
-            "module_version": "0.1.1-SNAPSHOT",
+            "module_version": "0.2.0-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibDataYamlVersion",
@@ -310,7 +310,7 @@
         },
         {
             "name": "module-ballerina-mime",
-            "module_version": "2.10.2-SNAPSHOT",
+            "module_version": "2.11.0-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibMimeVersion",
@@ -343,7 +343,7 @@
         },
         {
             "name": "module-ballerina-uuid",
-            "module_version": "1.8.1-SNAPSHOT",
+            "module_version": "1.9.0-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibUuidVersion",
@@ -365,7 +365,7 @@
         },
         {
             "name": "module-ballerina-auth",
-            "module_version": "2.12.1-SNAPSHOT",
+            "module_version": "2.13.0-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibAuthVersion",
@@ -377,7 +377,7 @@
         },
         {
             "name": "module-ballerina-data.csv",
-            "module_version": "0.1.1-SNAPSHOT",
+            "module_version": "0.4.0-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibDataCsvVersion",
@@ -397,7 +397,7 @@
         },
         {
             "name": "module-ballerina-edi",
-            "module_version": "1.3.1-SNAPSHOT",
+            "module_version": "1.4.0-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibEdiVersion",
@@ -407,7 +407,7 @@
         },
         {
             "name": "module-ballerina-email",
-            "module_version": "2.10.1-SNAPSHOT",
+            "module_version": "2.11.0-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibEmailVersion",
@@ -417,7 +417,7 @@
         },
         {
             "name": "module-ballerina-jwt",
-            "module_version": "2.13.1-SNAPSHOT",
+            "module_version": "2.14.0-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibJwtVersion",
@@ -429,7 +429,7 @@
         },
         {
             "name": "module-ballerina-mqtt",
-            "module_version": "1.2.1-SNAPSHOT",
+            "module_version": "1.3.0-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibMqttVersion",
@@ -451,7 +451,7 @@
         },
         {
             "name": "module-ballerina-toml",
-            "module_version": "0.6.1-SNAPSHOT",
+            "module_version": "0.7.0-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibTomlVersion",
@@ -461,7 +461,7 @@
         },
         {
             "name": "module-ballerina-yaml",
-            "module_version": "0.6.1-SNAPSHOT",
+            "module_version": "0.7.0-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibYamlVersion",
@@ -619,7 +619,7 @@
         },
         {
             "name": "module-ballerinax-persist.inmemory",
-            "module_version": "1.4.1-SNAPSHOT",
+            "module_version": "1.5.0-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibPersistInmemoryVersion",
