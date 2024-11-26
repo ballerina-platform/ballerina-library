@@ -1165,7 +1165,7 @@
         },
         {
             "name": "module-ballerinax-h2.driver",
-            "module_version": "1.1.1-SNAPSHOT",
+            "module_version": "1.2.0-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibH2DriverVersion",
@@ -1177,7 +1177,7 @@
         },
         {
             "name": "module-ballerinax-mssql.driver",
-            "module_version": "1.6.1-SNAPSHOT",
+            "module_version": "1.7.0-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibMssqlDriverVersion",
@@ -1189,7 +1189,7 @@
         },
         {
             "name": "module-ballerinax-mysql.driver",
-            "module_version": "1.7.1-SNAPSHOT",
+            "module_version": "1.8.0-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibMysqlDriverVersion",
@@ -1213,7 +1213,7 @@
         },
         {
             "name": "module-ballerinax-postgresql.driver",
-            "module_version": "1.5.2-SNAPSHOT",
+            "module_version": "1.6.0-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlDriverVersion",
