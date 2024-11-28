@@ -123,6 +123,7 @@ Compiler Team will handle all Essential Changes proactively. We have added a Pul
 ## Release Process
 
 ### Release Manager
+
 The Ballerina library release manager should maintain a time log from the moment they start the release process, to track all actions executed during the release.
 
 ### Single Module Release
