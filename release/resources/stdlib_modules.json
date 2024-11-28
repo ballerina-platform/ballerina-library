@@ -77,9 +77,7 @@
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
             "release": true,
-            "dependents": [
-                "asyncapi-tools"
-            ],
+            "dependents": [],
             "is_multiple_connectors": false
         },
         {
@@ -255,6 +253,7 @@
             "version_key": "stdlibDataXmldataVersion",
             "release": true,
             "dependents": [
+                "asyncapi-tools",
                 "openapi-tools"
             ],
             "is_multiple_connectors": false
@@ -1269,7 +1268,7 @@
         },
         {
             "name": "graphql-tools",
-            "module_version": "0.11.1-SNAPSHOT",
+            "module_version": "0.12.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibGraphql-toolsVersion",
@@ -1289,7 +1288,7 @@
         },
         {
             "name": "persist-tools",
-            "module_version": "1.4.1-SNAPSHOT",
+            "module_version": "1.5.0-SNAPSHOT",
             "level": 10,
             "default_branch": "main",
             "version_key": "stdlibPersist-toolsVersion",
@@ -1299,7 +1298,7 @@
         },
         {
             "name": "protoc-tools",
-            "module_version": "0.3.2-SNAPSHOT",
+            "module_version": "0.4.0-SNAPSHOT",
             "level": 7,
             "default_branch": "main",
             "version_key": "stdlibProtoc-toolsVersion",
