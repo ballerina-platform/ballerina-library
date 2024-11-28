@@ -122,6 +122,9 @@ Compiler Team will handle all Essential Changes proactively. We have added a Pul
 
 ## Release Process
 
+### Release Manager
+The Ballerina library release manager should maintain a time log from the moment they start the release process, to track all actions executed during the release.
+
 ### Single Module Release
 
 With the current design of Central, any stand library can be released at any time if the module owner and the lead deem it necessary. Module owners need not wait and synchronize with distribution release dates.
