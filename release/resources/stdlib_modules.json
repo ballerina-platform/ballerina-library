@@ -990,7 +990,7 @@
         },
         {
             "name": "module-ballerinax-github",
-            "module_version": "5.1.0-SNAPSHOT",
+            "module_version": "5.1.1-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibGithubVersion",
