@@ -41,7 +41,7 @@ jobs:
                 echo "Ballerina Version: $BAL_VERSION"
 
             - name: Set Up Ballerina
-              uses: ballerina-platform/setup-ballerina@v1.1.0
+              uses: ballerina-platform/setup-ballerina@v1.1.3
               with:
                 version: ${{ env.BAL_VERSION }}
 
