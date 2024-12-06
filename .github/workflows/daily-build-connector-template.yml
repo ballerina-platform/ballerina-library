@@ -46,14 +46,14 @@ jobs:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ./gradlew build -x test ${{ inputs.additional-build-flags }} -PbuildUsingDocker=nightly
+          ./gradlew build -x test ${{ inputs.additional-build-flags }} -PignoreVersionMismatch
 
       - name: Test the Package
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ./gradlew test ${{ inputs.additional-test-flags }} -PbuildUsingDocker=nightly
+          ./gradlew test ${{ inputs.additional-test-flags }} -PignoreVersionMismatch
 
       # Send notification when build fails
       - name: Notify failure
