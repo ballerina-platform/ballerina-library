@@ -54,10 +54,13 @@ jobs:
         with:
           path: template-repo
 
+      - name: Fork the target repository
+        run: gh repo fork ballerina-platform/${{ github.event.inputs.target_repo }} --remote
+
       - name: Checkout target repository
         uses: actions/checkout@v3
         with:
-          repository: ballerina-platform/${{ github.event.inputs.target_repo }}
+          repository: ballerina-bot/${{ github.event.inputs.target_repo }}
           path: target-repo
           token: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
