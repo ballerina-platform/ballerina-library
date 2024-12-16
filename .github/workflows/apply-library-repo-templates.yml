@@ -54,10 +54,15 @@ jobs:
         with:
           path: template-repo
 
+      - name: Fork the target repository
+        run: gh repo fork ballerina-platform/${{ github.event.inputs.target_repo }} --remote
+        env:
+          GH_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+
       - name: Checkout target repository
         uses: actions/checkout@v3
         with:
-          repository: ballerina-platform/${{ github.event.inputs.target_repo }}
+          repository: ballerina-bot/${{ github.event.inputs.target_repo }}
           path: target-repo
           token: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
@@ -83,10 +88,10 @@ jobs:
       - name: Create Pull Request
         env:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+        working-directory: ./target-repo
         run: |
           gh pr create \
             --repo ballerina-platform/${{ github.event.inputs.target_repo }} \
             --base ${{ github.event.inputs.target_branch }} \
-            --head apply-templates-${{ github.run_number }} \
             --title "Add ${{ github.event.inputs.template_type }}" \
             --body "This PR applies ${{ github.event.inputs.template_type }} template to this repository."
