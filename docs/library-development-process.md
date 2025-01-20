@@ -2,7 +2,7 @@
 _Author_: @shafreenAnfar @ldclakmal  
 _Reviewer_: @daneshk   
 _Created_: 2021/08/26   
-_Updated_: 2022/02/23  
+_Updated_: 2025/01/20  
 
 This section basically discusses the library development process from the inception to materializing it. The goal is to make sure we deliver the best possible library experience we could. The order of each step could be changed a bit but the overall process stays the same. Once a library goes to each step and reaches the end, we can sign it off as a general availability ready library. Each library owner is responsible for making sure their libraries go through these steps before signing off. 
 
@@ -14,9 +14,11 @@ The below section discusses each step of this process.
 
 Library specification is a structured document which states what needs to be implemented. For an example specification refer to [this](https://github.com/ballerina-platform/module-ballerina-auth/blob/master/docs/spec/spec.md). Once written the specification needs to be committed into the relevant repo under `docs/spec` folder.
 
-In order to update the specification first there should be a proposal. A proposal could be in `draft`, `active`, `rejected`, `accepted` or `implemented` state. Only area leads could reject or accept a given proposal. If accepted, the proposal must be implemented in a branch. Once implemented, the PR must be sent to the main-branch which includes the code changes, the proposal and the specification update. The main idea is since the main-branch is always production ready, the code and the specification must always be in sync with each other.
+In order to update the specification first there should be a proposal. The proposal should be in a separate `.md` file under the `stdlib/proposals/<library>` folder in the [`ballerina-platform/ballerina-spec`](https://github.com/ballerina-platform/ballerina-spec) repo. The file should be named such that it is unique and reflects the proposed feature. The filename should be in the format `feature_name.md`. For example, if the proposal is to add contextual logging to the Ballerina log library, the filename could be `contextual_logging.md` and the file should be placed in the `stdlib/proposals/log` folder.
 
-Proposal should clearly state the motivation, description of the solution, goals and none-goals and future work, etc. For an example proposal refer to [this](https://github.com/ballerina-platform/module-ballerina-http/blob/master/docs/proposals/interceptors.md) and the template can be found [here](https://openjdk.java.net/jeps/2). Basically, the JEP format is followed. Once accepted, as mentioned earlier the proposal needs to be committed to the relevant repo under `docs/proposals` folder.
+The proposal should clearly state the summary, goals and non-goals, motivation, design description, future work, etc. For an example proposal, refer to [this](https://github.com/ballerina-platform/ballerina-spec/blob/master/stdlib/proposals/log/contextual_logging.md). The template can be found [here](https://openjdk.java.net/jeps/2). Basically, the JEP format is followed. Once submitted, a GitHub issue should be created in the `ballerina-platform/ballerina-spec` repo. The issue should be tagged with the `Area/StdLib` label and `Type/Improvement` or `Type/NewFeatue` label as appropriate. This issue should be used to discuss the proposal and get feedback from the community.
+
+A proposal could be in `submitted`, `rejected`, `accepted` or `implemented` state. The state is maintained in the proposal file itself. If accepted, the proposal must be implemented in a branch. Once implemented, the PR must be sent to the main-branch which includes the code changes, and the specification update. The main idea is since the main-branch is always production ready, the code and the specification must always be in sync with each other.
 
 
 ## Implementation
