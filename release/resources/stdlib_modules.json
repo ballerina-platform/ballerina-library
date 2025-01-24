@@ -1032,7 +1032,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.automation.actions",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.automation.actionsVersion",
@@ -1042,7 +1042,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.commerce.carts",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.commerce.cartsVersion",
@@ -1052,7 +1052,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.commerce.discounts",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.commerce.discountsVersion",
@@ -1062,7 +1062,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.commerce.orders",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.commerce.ordersVersion",
@@ -1072,7 +1072,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.commerce.quotes",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.commerce.quotesVersion",
@@ -1082,7 +1082,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.commerce.taxes",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.commerce.taxesVersion",
@@ -1092,7 +1092,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.engagement.meeting",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.engagement.meetingVersion",
@@ -1102,7 +1102,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.engagement.notes",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.engagement.notesVersion",
@@ -1112,7 +1112,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.import",
-            "module_version": "3.0.0-SNAPSHOT",
+            "module_version": "3.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.importVersion",
@@ -1122,7 +1122,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.lists",
-            "module_version": "0.1.0-SNAPSHOT",
+            "module_version": "0.1.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.listsVersion",
@@ -1222,7 +1222,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.pipelines",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.pipelinesVersion",
@@ -1232,7 +1232,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.properties",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.propertiesVersion",
@@ -1242,7 +1242,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.campaigns",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.campaignsVersion",
@@ -1252,7 +1252,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.emails",
-            "module_version": "0.1.0-SNAPSHOT",
+            "module_version": "0.1.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.emailsVersion",
@@ -1262,7 +1262,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.events",
-            "module_version": "0.1.0-SNAPSHOT",
+            "module_version": "0.1.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.eventsVersion",
@@ -1272,7 +1272,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.forms",
-            "module_version": "0.1.0-SNAPSHOT",
+            "module_version": "0.1.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.formsVersion",
@@ -1282,7 +1282,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.subscriptions",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.subscriptionsVersion",
@@ -1292,7 +1292,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.transactional",
-            "module_version": "0.1.0-SNAPSHOT",
+            "module_version": "0.1.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.transactionalVersion",
