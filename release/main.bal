@@ -211,6 +211,7 @@ isolated function getRunId(Module m) returns int|error {
         }
         i += 1;
     }
+    return error(string `Unable to trigger the release workflow of module ${m.name}`);
 }
 
 isolated function isModuleReleased(ProcessingModule processingModule) returns boolean|error {
