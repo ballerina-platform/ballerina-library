@@ -33,6 +33,7 @@ const string GITHUB_ORG = "ballerina-platform";
 
 const decimal WORKFLOW_START_WAIT_TIME = 5;
 const decimal WORKFLOW_POLL_INTERVAL = 5;
+const int WORKFLOW_RUN_RETRY_COUNT = 3;
 
 configurable string token = os:getEnv(ACCESS_TOKEN_ENV);
 
@@ -191,16 +192,25 @@ isolated function triggerModuleRelease(Module m) returns int|error {
         return dispatchResult;
     }
 
-    // Wait for the workflow to start
-    runtime:sleep(WORKFLOW_START_WAIT_TIME);
-
     // Retrieve the workflow run ID
-    github:WorkflowRunResponse|error result = github->/repos/[GITHUB_ORG]/[m.name]/actions/workflows/[workflow]/runs(per_page = 1);
-    if result is error {
-        printError(result);
-        return result;
+    return getRunId(m);
+}
+
+isolated function getRunId(Module m) returns int|error {
+    int i = 0;
+    while i < WORKFLOW_RUN_RETRY_COUNT {
+        // Wait for the workflow to start
+        runtime:sleep(WORKFLOW_START_WAIT_TIME);
+        github:WorkflowRunResponse|error result = github->/repos/[GITHUB_ORG]/[m.name]/actions/workflows/[workflow]/runs(per_page = 1);
+        if result is error {
+            printError(result);
+            return result;
+        }
+        if result.length() > 0 {
+            return result.workflow_runs[0].id;
+        }
+        i += 1;
     }
-    return result.workflow_runs[0].id;
 }
 
 isolated function isModuleReleased(ProcessingModule processingModule) returns boolean|error {
