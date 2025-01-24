@@ -22,10 +22,11 @@ import ballerinax/github;
 
 const string ACCESS_TOKEN_ENV = "BALLERINA_BOT_TOKEN";
 const string RELEASE_LIBS = "RELEASE_LIBS";
-const string RELASE_EXTENSIONS = "RELEASE_EXTENSIONS";
+const string RELEASE_EXTENSIONS = "RELEASE_EXTENSIONS";
 const string RELEASE_TOOLS = "RELEASE_TOOLS";
 const string RELEASE_HANDWRITTEN_CONNECTORS = "RELEASE_HANDWRITTEN_CONNECTORS";
 const string RELEASE_GENERATED_CONNECTORS = "RELEASE_GENERATED_CONNECTORS";
+const string WORKFLOW_FILE = "WORKFLOW_FILE";
 
 const string MODULE_LIST_JSON = "./resources/stdlib_modules.json";
 const string GITHUB_ORG = "ballerina-platform";
@@ -36,13 +37,11 @@ const decimal WORKFLOW_POLL_INTERVAL = 5;
 configurable string token = os:getEnv(ACCESS_TOKEN_ENV);
 
 configurable boolean releaseLibs = check boolean:fromString(os:getEnv(RELEASE_LIBS));
-configurable boolean releaseExtensions = check boolean:fromString(os:getEnv(RELASE_EXTENSIONS));
+configurable boolean releaseExtensions = check boolean:fromString(os:getEnv(RELEASE_EXTENSIONS));
 configurable boolean releaseTools = check boolean:fromString(os:getEnv(RELEASE_TOOLS));
 configurable boolean releaseHandwrittenConnectors = check boolean:fromString(os:getEnv(RELEASE_HANDWRITTEN_CONNECTORS));
-configurable boolean releaseGeneratedConnectors = check boolean:fromString(os:getEnv(RELEASE_GENERATED_CONNECTORS)); 
-
-// Provide the correct workflow as a configurable variable.
-configurable string workflow = ?;
+configurable boolean releaseGeneratedConnectors = check boolean:fromString(os:getEnv(RELEASE_GENERATED_CONNECTORS));
+configurable string workflow = os:getEnv(WORKFLOW_FILE);
 
 final github:Client github = check new ({
     retryConfig: {

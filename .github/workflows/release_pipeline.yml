@@ -28,6 +28,11 @@ on:
                 required: true
                 default: false
                 type: boolean
+            workflow_file:
+                description: 'Workflow file to be used for the release'
+                required: true
+                default: 'publish-release.yml'
+                type: string
 jobs:
     build:
         name: Release Ballerina Stdlibs
@@ -49,5 +54,5 @@ jobs:
                     RELEASE_TOOLS: ${{ github.event.inputs.release_tools }}
                     RELEASE_HANDWRITTEN_CONNECTORS: ${{ github.event.inputs.release_handwritten_connectors }}
                     RELEASE_GENERATED_CONNECTORS: ${{ github.event.inputs.release_generated_connectors }}
-                    BAL_CONFIG_VAR_WORKFLOW: "publish-release.yml"
+                    WORKFLOW_FILE: ${{ github.event.inputs.workflow_file }}
 

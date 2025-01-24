@@ -37,7 +37,11 @@ Ballerina.lock
 # Python
 *.pyc
 
+# macOS
 *.DS_Store
+
+# Java
+*.hprof
 
 #Ballerina
 Config.toml
