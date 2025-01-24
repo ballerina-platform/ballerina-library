@@ -31,7 +31,7 @@ const string WORKFLOW_FILE = "WORKFLOW_FILE";
 const string MODULE_LIST_JSON = "./resources/stdlib_modules.json";
 const string GITHUB_ORG = "ballerina-platform";
 
-const decimal WORKFLOW_START_WAIT_TIME = 2;
+const decimal WORKFLOW_START_WAIT_TIME = 5;
 const decimal WORKFLOW_POLL_INTERVAL = 5;
 
 configurable string token = os:getEnv(ACCESS_TOKEN_ENV);
