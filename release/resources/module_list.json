@@ -311,6 +311,87 @@
         },
         {
             "name": "module-ballerinax-zendesk"
+        },
+        {
+            "name": "module-ballerinax-hubspot.marketing.emails"
+        },
+        {
+            "name": "module-ballerinax-hubspot.marketing.transactional"
+        },
+        {
+            "name": "module-ballerinax-hubspot.marketing.campaigns"
+        },
+        {
+            "name": "module-ballerinax-hubspot.marketing.forms"
+        },
+        {
+            "name": "module-ballerinax-hubspot.marketing.events"
+        },
+        {
+            "name": "module-ballerinax-hubspot.marketing.subscriptions"
+        },
+        {
+            "name": "module-ballerinax-hubspot.automation.actions"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.object.companies"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.object.contacts"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.object.deals"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.object.feedback"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.object.leads"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.object.lineitems"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.object.schemas"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.object.products"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.object.tickets"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.commerce.carts"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.commerce.orders"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.commerce.quotes"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.commerce.taxes"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.commerce.discounts"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.engagement.meeting"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.engagement.notes"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.import"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.pipelines"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.properties"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.lists"
         }
     ],
     "driver_modules": [
