@@ -21,7 +21,7 @@
         },
         {
             "name": "module-ballerina-data.jsondata",
-            "version_key": "stdlibDataJsondataVersion"
+            "version_key": "stdlibDataJsonDataVersion"
         },
         {
             "name": "module-ballerina-data.xmldata",
