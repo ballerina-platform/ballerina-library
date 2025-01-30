@@ -707,7 +707,7 @@
         },
         {
             "name": "module-ballerinax-aws.redshift",
-            "module_version": "1.1.1-SNAPSHOT",
+            "module_version": "1.2.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAws.redshiftVersion",
@@ -835,7 +835,7 @@
         },
         {
             "name": "module-ballerinax-nats",
-            "module_version": "3.1.1-SNAPSHOT",
+            "module_version": "3.2.0-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibNatsVersion",
@@ -877,7 +877,7 @@
         },
         {
             "name": "module-ballerinax-redis",
-            "module_version": "3.0.3-SNAPSHOT",
+            "module_version": "3.1.0-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibRedisVersion",
@@ -889,7 +889,7 @@
         },
         {
             "name": "module-ballerinax-salesforce",
-            "module_version": "8.1.1-SNAPSHOT",
+            "module_version": "8.2.0-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibSalesforceVersion",
