@@ -677,7 +677,7 @@
         },
         {
             "name": "module-ballerinax-aws.dynamodbstreams",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.1.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAws.dynamodbstreamsVersion",
@@ -717,7 +717,7 @@
         },
         {
             "name": "module-ballerinax-aws.sns",
-            "module_version": "3.0.1-SNAPSHOT",
+            "module_version": "3.1.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAws.snsVersion",
@@ -727,7 +727,7 @@
         },
         {
             "name": "module-ballerinax-azure-service-bus",
-            "module_version": "3.8.3-SNAPSHOT",
+            "module_version": "3.9.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAzure-service-busVersion",
@@ -845,7 +845,7 @@
         },
         {
             "name": "module-ballerinax-oracledb",
-            "module_version": "1.12.0-SNAPSHOT",
+            "module_version": "1.13.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibOracledbVersion",
