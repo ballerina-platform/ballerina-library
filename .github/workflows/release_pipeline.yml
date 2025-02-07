@@ -18,6 +18,11 @@ on:
                 required: true
                 default: false
                 type: boolean
+            release_driver_modules:
+                description: 'Release Ballerina Driver Modules (ballerinax/mysql.driver, ballerinax/mssql.driver, etc.)'
+                required: true
+                default: false
+                type: boolean
             release_handwritten_connectors:
                 description: 'Release Ballerina Handwritten Connectors (ballerinax/mongodb, ballerinax/mysql, etc.)'
                 required: true
@@ -47,6 +52,7 @@ jobs:
                     RELEASE_LIBS: ${{ github.event.inputs.release_libs }}
                     RELEASE_EXTENSIONS: ${{ github.event.inputs.release_extensions }}
                     RELEASE_TOOLS: ${{ github.event.inputs.release_tools }}
+                    RELEASE_DRIVER_MODULES: ${{ github.event.inputs.release_driver_modules }}
                     RELEASE_HANDWRITTEN_CONNECTORS: ${{ github.event.inputs.release_handwritten_connectors }}
                     RELEASE_GENERATED_CONNECTORS: ${{ github.event.inputs.release_generated_connectors }}
                     BAL_CONFIG_VAR_WORKFLOW: "publish-release.yml"
