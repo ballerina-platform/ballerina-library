@@ -1509,7 +1509,7 @@
     "tools": [
         {
             "name": "asyncapi-tools",
-            "module_version": "0.10.0-SNAPSHOT",
+            "module_version": "0.10.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibAsyncapi-toolsVersion",
