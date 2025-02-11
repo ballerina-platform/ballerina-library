@@ -25,7 +25,7 @@ jobs:
             if [[ "$dir" == resources ]]; then
               continue
             fi
-            folders+=("$dir"); 
+            folders+=("$dir");
           done
           echo "directories=$(jq -nc --args '$ARGS.positional' ${folders[@]})" >> $GITHUB_OUTPUT
 
@@ -68,8 +68,11 @@ jobs:
       - name: Download coverage reports
         uses: actions/download-artifact@v4
 
-      - name: Generate Codecov Report
-        uses: codecov/codecov-action@v3
+      - name: Generate CodeCov Report
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: ballerina-platform/${{ github.event.inputs.repo }}
 
   build-examples:
     name: Build Examples
@@ -81,7 +84,7 @@ jobs:
 
       - name: Get Ballerina Version
         run: |
-          BAL_VERSION=$(grep -w 'ballerinaLangVersion' gradle.properties | cut -d= -f2 | rev | cut --complement -d- -f1 | rev) 
+          BAL_VERSION=$(grep -w 'ballerinaLangVersion' gradle.properties | cut -d= -f2 | rev | cut --complement -d- -f1 | rev)
           if [ -z "$BAL_VERSION" ]; then
             BAL_VERSION="latest"
           fi

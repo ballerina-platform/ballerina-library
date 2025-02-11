@@ -42,7 +42,7 @@ jobs:
 
             - name: Set ENV Variables
               run: |
-                echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV 
+                echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
 
             -   name: Build the Package
                 env:
@@ -52,10 +52,11 @@ jobs:
                   ./gradlew build -x test ${{ inputs.additional-ubuntu-build-flags }}
                   ./gradlew test ${{ inputs.additional-ubuntu-test-flags }}
 
-            -   name: Generate Codecov Report
-                uses: codecov/codecov-action@v3
-                with:
-                    token: ${{ secrets.CODECOV_TOKEN }}
+            - name: Generate CodeCov Report
+              uses: codecov/codecov-action@v5
+              with:
+                token: ${{ secrets.CODECOV_TOKEN }}
+                slug: ballerina-platform/${{ github.event.inputs.repo }}
 
     windows-build:
         name: Build on Windows
@@ -75,7 +76,7 @@ jobs:
 
             - name: Set ENV Variables
               run: |
-                echo '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' | Out-File -FilePath $env:GITHUB_ENV -Append 
+                echo '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' | Out-File -FilePath $env:GITHUB_ENV -Append
 
             -   name: Build the Project
                 env:

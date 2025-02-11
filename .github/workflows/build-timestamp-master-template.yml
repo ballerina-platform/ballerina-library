@@ -36,7 +36,7 @@ jobs:
 
       - name: Set ENV Variables
         run: |
-          echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV 
+          echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
 
       - name: Build with Gradle
         env:
@@ -47,7 +47,10 @@ jobs:
         run: ./gradlew publish --no-daemon --scan ${{ inputs.additional-build-flags }}
 
       - name: Generate CodeCov Report
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: ballerina-platform/${{ github.event.inputs.repo }}
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
