@@ -35,6 +35,11 @@ on:
         required: false
         example: 'OpenAI Chat'
         default: ''
+      code_owners:
+        description: 'The CODEOWNERS of the repository'
+        required: true
+        example: '@user1 @user2'
+        default: ''
 
 jobs:
   apply_templates:
@@ -49,6 +54,7 @@ jobs:
           echo "Module Version: ${{ github.event.inputs.module_version }}"
           echo "Target Branch: ${{ github.event.inputs.target_branch }}"
           echo "Library Name: ${{ github.event.inputs.library_name }}"
+          echo "Code Owners: ${{ github.event.inputs.code_owners }}"
       - name: Checkout template repository
         uses: actions/checkout@v3
         with:
@@ -62,7 +68,7 @@ jobs:
           token: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
       - name: Setup Ballerina
-        uses: ballerina-platform/setup-ballerina@v1.1.0
+        uses: ballerina-platform/setup-ballerina@v1.1.3
         with:
           version: latest
 
@@ -71,7 +77,7 @@ jobs:
         run: |
           cp -r template-repo/library-templates/generated-connector-template/files/. target-repo/
           cd template-repo/library-templates/generated-connector-template/scripts/
-          bal run replace_placeholders.bal -- ../../../../target-repo/ ${{ github.event.inputs.module_name }} ${{ github.event.inputs.target_repo }} ${{ github.event.inputs.module_version }} ${{ github.event.inputs.ballerina_version }} "${{ github.event.inputs.library_name }}"
+          bal run replace_placeholders.bal -- ../../../../target-repo/ ${{ github.event.inputs.module_name }} ${{ github.event.inputs.target_repo }} ${{ github.event.inputs.module_version }} ${{ github.event.inputs.ballerina_version }} "${{ github.event.inputs.library_name }}" "${{ github.event.inputs.code_owners }}"
           cd ../../../../target-repo
           git config user.name "ballerina-bot"
           git config user.email "ballerina-bot@ballerina.org"
