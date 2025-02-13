@@ -70,8 +70,8 @@ jobs:
                     packageUser: ${{ github.actor }}
                     packagePAT: ${{ secrets.GITHUB_TOKEN }}
                 run: |
-                  ./gradlew build -x -PbuildUsingDocker="2201.11.0-pre-rc1" test ${{ inputs.additional-build-flags }}
-                  ./gradlew test -PbuildUsingDocker="2201.11.0-pre-rc1" ${{ inputs.additional-test-flags }}
+                  ./gradlew build -x test ${{ inputs.additional-build-flags }}
+                  ./gradlew test ${{ inputs.additional-test-flags }}
 
             -   name: Generate Codecov Report
                 uses: codecov/codecov-action@v3
@@ -83,7 +83,7 @@ jobs:
                   packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
                   publishUser: ${{ secrets.BALLERINA_BOT_USERNAME }}
                   publishPAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
-                run: ./gradlew publish --no-daemon --scan -PbuildUsingDocker="2201.11.0-pre-rc1" ${{ inputs.additional-build-flags }}
+                run: ./gradlew publish --no-daemon --scan ${{ inputs.additional-build-flags }}
 
             # Send notification when build fails
             - name: Alert notifier on failure
