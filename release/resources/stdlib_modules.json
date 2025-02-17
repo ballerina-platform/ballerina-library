@@ -2,7 +2,7 @@
     "library_modules": [
         {
             "name": "module-ballerina-io",
-            "module_version": "1.7.0-SNAPSHOT",
+            "module_version": "1.7.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibIoVersion",
@@ -20,7 +20,7 @@
         },
         {
             "name": "module-ballerina-jballerina.java.arrays",
-            "module_version": "1.5.0-SNAPSHOT",
+            "module_version": "1.5.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibJavaArraysVersion",
@@ -30,7 +30,7 @@
         },
         {
             "name": "module-ballerina-math.vector",
-            "module_version": "1.1.0-SNAPSHOT",
+            "module_version": "1.1.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibMathVectorVersion",
@@ -40,7 +40,7 @@
         },
         {
             "name": "module-ballerina-time",
-            "module_version": "2.6.0-SNAPSHOT",
+            "module_version": "2.6.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibTimeVersion",
@@ -60,7 +60,7 @@
         },
         {
             "name": "module-ballerina-url",
-            "module_version": "2.5.0-SNAPSHOT",
+            "module_version": "2.5.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibUrlVersion",
@@ -72,7 +72,7 @@
         },
         {
             "name": "module-ballerina-xmldata",
-            "module_version": "2.9.0-SNAPSHOT",
+            "module_version": "2.9.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
@@ -82,7 +82,7 @@
         },
         {
             "name": "module-ballerina-avro",
-            "module_version": "1.1.0-SNAPSHOT",
+            "module_version": "1.1.1-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibAvroVersion",
@@ -94,7 +94,7 @@
         },
         {
             "name": "module-ballerina-constraint",
-            "module_version": "1.6.0-SNAPSHOT",
+            "module_version": "1.6.1-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibConstraintVersion",
@@ -111,7 +111,7 @@
         },
         {
             "name": "module-ballerina-crypto",
-            "module_version": "2.8.0-SNAPSHOT",
+            "module_version": "2.8.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibCryptoVersion",
@@ -129,7 +129,7 @@
         },
         {
             "name": "module-ballerina-log",
-            "module_version": "2.11.0-SNAPSHOT",
+            "module_version": "2.11.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibLogVersion",
@@ -152,7 +152,7 @@
         },
         {
             "name": "module-ballerina-os",
-            "module_version": "1.9.0-SNAPSHOT",
+            "module_version": "1.9.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibOsVersion",
@@ -164,7 +164,7 @@
         },
         {
             "name": "module-ballerina-persist",
-            "module_version": "1.5.0-SNAPSHOT",
+            "module_version": "1.5.1-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibPersistVersion",
@@ -179,7 +179,7 @@
         },
         {
             "name": "module-ballerina-protobuf",
-            "module_version": "1.7.0-SNAPSHOT",
+            "module_version": "1.7.1-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibProtobufVersion",
@@ -288,7 +288,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "module_version": "2.12.0-SNAPSHOT",
+            "module_version": "2.12.1-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
@@ -298,7 +298,7 @@
         },
         {
             "name": "module-ballerina-ldap",
-            "module_version": "1.2.0-SNAPSHOT",
+            "module_version": "1.2.1-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibLdapVersion",
@@ -308,7 +308,7 @@
         },
         {
             "name": "module-ballerina-mime",
-            "module_version": "2.11.0-SNAPSHOT",
+            "module_version": "2.11.1-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibMimeVersion",
@@ -321,7 +321,7 @@
         },
         {
             "name": "module-ballerina-tcp",
-            "module_version": "1.12.0-SNAPSHOT",
+            "module_version": "1.12.2-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibTcpVersion",
@@ -331,7 +331,7 @@
         },
         {
             "name": "module-ballerina-udp",
-            "module_version": "1.12.0-SNAPSHOT",
+            "module_version": "1.12.2-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibUdpVersion",
@@ -407,7 +407,7 @@
         },
         {
             "name": "module-ballerina-email",
-            "module_version": "2.11.0-SNAPSHOT",
+            "module_version": "2.11.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibEmailVersion",
@@ -417,7 +417,7 @@
         },
         {
             "name": "module-ballerina-jwt",
-            "module_version": "2.14.0-SNAPSHOT",
+            "module_version": "2.14.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibJwtVersion",
@@ -429,7 +429,7 @@
         },
         {
             "name": "module-ballerina-mqtt",
-            "module_version": "1.3.0-SNAPSHOT",
+            "module_version": "1.3.1-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibMqttVersion",
@@ -439,7 +439,7 @@
         },
         {
             "name": "module-ballerina-oauth2",
-            "module_version": "2.13.0-SNAPSHOT",
+            "module_version": "2.13.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibOAuth2Version",
@@ -471,7 +471,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "module_version": "2.13.0-SNAPSHOT",
+            "module_version": "2.13.3-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibHttpVersion",
@@ -491,7 +491,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "module_version": "1.13.0-SNAPSHOT",
+            "module_version": "1.13.3-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
@@ -529,7 +529,7 @@
         },
         {
             "name": "module-ballerina-websocket",
-            "module_version": "2.13.0-SNAPSHOT",
+            "module_version": "2.13.2-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsocketVersion",
@@ -542,7 +542,7 @@
         },
         {
             "name": "module-ballerina-websub",
-            "module_version": "2.13.0-SNAPSHOT",
+            "module_version": "2.13.1-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibWebsubVersion",
@@ -554,7 +554,7 @@
         },
         {
             "name": "module-ballerina-websubhub",
-            "module_version": "1.13.0-SNAPSHOT",
+            "module_version": "1.13.1-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWebsubhubVersion",
@@ -564,7 +564,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "module_version": "1.15.0-SNAPSHOT",
+            "module_version": "1.15.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
@@ -597,7 +597,7 @@
     "extended_modules": [
         {
             "name": "module-ballerinax-copybook",
-            "module_version": "1.0.3-SNAPSHOT",
+            "module_version": "1.1.0-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibCopybookVersion",
@@ -607,7 +607,7 @@
         },
         {
             "name": "module-ballerinax-persist.googlesheets",
-            "module_version": "1.5.0-SNAPSHOT",
+            "module_version": "1.5.1-SNAPSHOT",
             "level": 7,
             "default_branch": "main",
             "version_key": "stdlibPersistGoogleSheetVersion",
@@ -619,7 +619,7 @@
         },
         {
             "name": "module-ballerinax-persist.inmemory",
-            "module_version": "1.5.0-SNAPSHOT",
+            "module_version": "1.5.1-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibPersistInmemoryVersion",
@@ -801,7 +801,7 @@
         },
         {
             "name": "module-ballerinax-mongodb",
-            "module_version": "5.1.0-SNAPSHOT",
+            "module_version": "5.1.1-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibMongodbVersion",
@@ -909,7 +909,7 @@
         },
         {
             "name": "module-ballerinax-snowflake",
-            "module_version": "2.0.1-SNAPSHOT",
+            "module_version": "2.1.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibSnowflakeVersion",
@@ -1425,7 +1425,7 @@
         },
         {
             "name": "module-ballerinax-aws.redshift.driver",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.1.0-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibAws.redshift.driverVersion",
@@ -1435,7 +1435,7 @@
         },
         {
             "name": "module-ballerinax-h2.driver",
-            "module_version": "1.2.0-SNAPSHOT",
+            "module_version": "1.2.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibH2DriverVersion",
@@ -1447,7 +1447,7 @@
         },
         {
             "name": "module-ballerinax-mssql.driver",
-            "module_version": "1.7.0-SNAPSHOT",
+            "module_version": "1.7.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibMssqlDriverVersion",
@@ -1459,7 +1459,7 @@
         },
         {
             "name": "module-ballerinax-mysql.driver",
-            "module_version": "1.8.0-SNAPSHOT",
+            "module_version": "1.8.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibMysqlDriverVersion",
@@ -1471,7 +1471,7 @@
         },
         {
             "name": "module-ballerinax-oracledb.driver",
-            "module_version": "1.4.1-SNAPSHOT",
+            "module_version": "1.5.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibOracledbDriverVersion",
@@ -1483,7 +1483,7 @@
         },
         {
             "name": "module-ballerinax-postgresql.driver",
-            "module_version": "1.6.0-SNAPSHOT",
+            "module_version": "1.6.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlDriverVersion",
@@ -1495,7 +1495,7 @@
         },
         {
             "name": "module-ballerinax-snowflake.driver",
-            "module_version": "2.8.0-SNAPSHOT",
+            "module_version": "2.8.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "snowflakeDriverVersion",
@@ -1509,7 +1509,7 @@
     "tools": [
         {
             "name": "asyncapi-tools",
-            "module_version": "0.10.0-SNAPSHOT",
+            "module_version": "0.10.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibAsyncapi-toolsVersion",
@@ -1519,7 +1519,7 @@
         },
         {
             "name": "copybook-tools",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.1.0-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibCopybook-toolsVersion",
@@ -1539,7 +1539,7 @@
         },
         {
             "name": "graphql-tools",
-            "module_version": "0.12.0-SNAPSHOT",
+            "module_version": "0.12.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibGraphql-toolsVersion",
