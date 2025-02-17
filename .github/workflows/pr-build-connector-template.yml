@@ -11,8 +11,7 @@ on:
         required: false
         type: string
         default: ""
-
-
+        
 jobs:
     ubuntu-build:
         name: Build
@@ -21,12 +20,12 @@ jobs:
           group: ${{ github.head_ref }}-ubuntu-build
           cancel-in-progress: true
         steps:
-            -   name: Checkout Repository
-                uses: actions/checkout@v3
+            - name: Checkout Repository
+              uses: actions/checkout@v3
 
             - name: Get Ballerina Version
               run: |
-                BAL_VERSION=$(grep -w 'ballerinaLangVersion' gradle.properties | cut -d= -f2 | rev | cut --complement -d- -f1 | rev) 
+                BAL_VERSION=$(grep -w 'ballerinaLangVersion' gradle.properties | cut -d= -f2 | rev | cut --complement -d- -f1 | rev)
                 if [ -z "$BAL_VERSION" ]; then
                   BAL_VERSION="latest"
                 fi
@@ -38,23 +37,26 @@ jobs:
               with:
                 version: ${{ env.BAL_VERSION }}
 
-            -   name: Set up JDK 21
-                uses: actions/setup-java@v3
-                with:
-                    distribution: 'temurin'
-                    java-version: 21.0.3
-            
-            -   name: Set ENV Variables
-                run: |
-                  echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV 
+            - name: Set up JDK 21
+              uses: actions/setup-java@v3
+              with:
+                distribution: 'temurin'
+                java-version: 21.0.3
 
-            -   name: Build the Package
-                env:
-                    packageUser: ${{ github.actor }}
-                    packagePAT: ${{ secrets.GITHUB_TOKEN }}
-                run: |
-                  ./gradlew build -x test ${{ inputs.additional-build-flags }}
-                  ./gradlew test ${{ inputs.additional-test-flags }}
+            - name: Set ENV Variables
+              run: |
+                echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
 
-            -   name: Generate Codecov Report
-                uses: codecov/codecov-action@v3
+            - name: Build the Package
+              env:
+                packageUser: ${{ github.actor }}
+                packagePAT: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                ./gradlew build -x test ${{ inputs.additional-build-flags }}
+                ./gradlew test ${{ inputs.additional-test-flags }}
+
+            - name: Generate CodeCov Report
+              uses: codecov/codecov-action@v5
+              with:
+                token: ${{ secrets.CODECOV_TOKEN }}
+                slug: ballerina-platform/${{ github.event.inputs.repo }}
