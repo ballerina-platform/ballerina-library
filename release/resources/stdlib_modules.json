@@ -727,7 +727,7 @@
         },
         {
             "name": "module-ballerinax-azure-service-bus",
-            "module_version": "3.9.0-SNAPSHOT",
+            "module_version": "3.9.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAzure-service-busVersion",
@@ -779,7 +779,7 @@
         },
         {
             "name": "module-ballerinax-java.jms",
-            "module_version": "1.1.0-SNAPSHOT",
+            "module_version": "1.1.1-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibJmsVersion",
@@ -789,7 +789,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "module_version": "4.3.0-SNAPSHOT",
+            "module_version": "4.3.1-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
@@ -835,7 +835,7 @@
         },
         {
             "name": "module-ballerinax-nats",
-            "module_version": "3.2.0-SNAPSHOT",
+            "module_version": "3.2.1-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibNatsVersion",
@@ -1413,7 +1413,7 @@
     "driver_modules": [
         {
             "name": "module-ballerinax-activemq.driver",
-            "module_version": "1.0.3-SNAPSHOT",
+            "module_version": "1.1.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "activeMQDriverVersion",
@@ -1425,7 +1425,7 @@
         },
         {
             "name": "module-ballerinax-aws.redshift.driver",
-            "module_version": "1.1.0-SNAPSHOT",
+            "module_version": "1.1.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibAws.redshift.driverVersion",
