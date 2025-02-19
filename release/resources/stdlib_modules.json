@@ -737,7 +737,7 @@
         },
         {
             "name": "module-ballerinax-confluent.cavroserdes",
-            "module_version": "0.3.0-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibConfluent.cavroserdesVersion",
@@ -747,7 +747,7 @@
         },
         {
             "name": "module-ballerinax-confluent.cregistry",
-            "module_version": "0.3.0-SNAPSHOT",
+            "module_version": "0.3.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibConfluent.cregistryVersion",
@@ -1529,7 +1529,7 @@
         },
         {
             "name": "edi-tools",
-            "module_version": "2.1.0",
+            "module_version": "2.2.0",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibEdi-toolsVersion",
