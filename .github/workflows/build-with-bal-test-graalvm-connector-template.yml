@@ -24,7 +24,7 @@ jobs:
       - name: Set Up Ballerina
         uses: ballerina-platform/setup-ballerina@v1.1.3
         with:
-          version: latest
+          version: 2201.10.4
 
       - name: Set up GraalVM
         uses: graalvm/setup-graalvm@v1
