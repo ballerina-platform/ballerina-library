@@ -11,7 +11,7 @@ on:
         required: false
         type: string
         default: ""
-        
+
 jobs:
     ubuntu-build:
         name: Build
@@ -59,4 +59,4 @@ jobs:
               uses: codecov/codecov-action@v5
               with:
                 token: ${{ secrets.CODECOV_TOKEN }}
-                slug: ballerina-platform/${{ github.event.inputs.repo }}
+                slug: ballerina-platform/${{ github.event.repository.name }}
