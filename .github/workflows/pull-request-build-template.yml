@@ -56,7 +56,7 @@ jobs:
               uses: codecov/codecov-action@v5
               with:
                 token: ${{ secrets.CODECOV_TOKEN }}
-                slug: ballerina-platform/${{ github.event.inputs.repo }}
+                slug: ballerina-platform/${{ github.event.repository.name }}
 
     windows-build:
         name: Build on Windows
