@@ -687,7 +687,7 @@
         },
         {
             "name": "module-ballerinax-aws.marketplace.mpe",
-            "module_version": "0.2.0-SNAPSHOT",
+            "module_version": "0.2.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAws.marketplace.mpeVersion",
@@ -697,7 +697,7 @@
         },
         {
             "name": "module-ballerinax-aws.marketplace.mpm",
-            "module_version": "0.2.0-SNAPSHOT",
+            "module_version": "0.2.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAws.marketplace.mpmVersion",
