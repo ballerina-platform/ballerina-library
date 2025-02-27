@@ -737,7 +737,7 @@
         },
         {
             "name": "module-ballerinax-confluent.cavroserdes",
-            "module_version": "1.0.2-SNAPSHOT",
+            "module_version": "1.0.3-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibConfluent.cavroserdesVersion",
@@ -747,7 +747,7 @@
         },
         {
             "name": "module-ballerinax-confluent.cregistry",
-            "module_version": "0.3.1-SNAPSHOT",
+            "module_version": "0.4.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibConfluent.cregistryVersion",
