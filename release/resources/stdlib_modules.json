@@ -2,7 +2,7 @@
     "library_modules": [
         {
             "name": "module-ballerina-io",
-            "module_version": "1.7.1-SNAPSHOT",
+            "module_version": "1.8.0-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibIoVersion",
@@ -20,7 +20,7 @@
         },
         {
             "name": "module-ballerina-jballerina.java.arrays",
-            "module_version": "1.5.1-SNAPSHOT",
+            "module_version": "1.6.0-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibJavaArraysVersion",
@@ -30,7 +30,7 @@
         },
         {
             "name": "module-ballerina-math.vector",
-            "module_version": "1.1.1-SNAPSHOT",
+            "module_version": "1.2.0-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibMathVectorVersion",
@@ -40,7 +40,7 @@
         },
         {
             "name": "module-ballerina-time",
-            "module_version": "2.6.1-SNAPSHOT",
+            "module_version": "2.7.0-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibTimeVersion",
@@ -60,7 +60,7 @@
         },
         {
             "name": "module-ballerina-url",
-            "module_version": "2.5.1-SNAPSHOT",
+            "module_version": "2.6.0-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibUrlVersion",
@@ -889,7 +889,7 @@
         },
         {
             "name": "module-ballerinax-salesforce",
-            "module_version": "8.2.0-SNAPSHOT",
+            "module_version": "8.2.1-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibSalesforceVersion",
@@ -1529,7 +1529,7 @@
         },
         {
             "name": "edi-tools",
-            "module_version": "2.2.0",
+            "module_version": "2.1.1",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibEdi-toolsVersion",
