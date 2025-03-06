@@ -631,7 +631,7 @@
         },
         {
             "name": "module-ballerinax-persist.redis",
-            "module_version": "0.3.1-SNAPSHOT",
+            "module_version": "0.4.0-SNAPSHOT",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibPersistRedisVersion",
@@ -643,7 +643,7 @@
         },
         {
             "name": "module-ballerinax-persist.sql",
-            "module_version": "1.5.1-SNAPSHOT",
+            "module_version": "1.6.0-SNAPSHOT",
             "level": 9,
             "default_branch": "main",
             "version_key": "stdlibPersistSqlVersion",
@@ -767,7 +767,7 @@
         },
         {
             "name": "module-ballerinax-java.jdbc",
-            "module_version": "1.13.1-SNAPSHOT",
+            "module_version": "1.14.0-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibJdbcVersion",
@@ -811,7 +811,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "module_version": "1.14.1-SNAPSHOT",
+            "module_version": "1.15.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
@@ -823,7 +823,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "module_version": "1.14.1-SNAPSHOT",
+            "module_version": "1.15.0-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
@@ -845,7 +845,7 @@
         },
         {
             "name": "module-ballerinax-oracledb",
-            "module_version": "1.13.1-SNAPSHOT",
+            "module_version": "1.14.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibOracledbVersion",
@@ -855,7 +855,7 @@
         },
         {
             "name": "module-ballerinax-postgresql",
-            "module_version": "1.14.1-SNAPSHOT",
+            "module_version": "1.15.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
@@ -1509,7 +1509,7 @@
     "tools": [
         {
             "name": "asyncapi-tools",
-            "module_version": "0.10.1-SNAPSHOT",
+            "module_version": "0.11.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibAsyncapi-toolsVersion",
@@ -1559,7 +1559,7 @@
         },
         {
             "name": "persist-tools",
-            "module_version": "1.5.1-SNAPSHOT",
+            "module_version": "1.6.0-SNAPSHOT",
             "level": 10,
             "default_branch": "main",
             "version_key": "stdlibPersist-toolsVersion",
