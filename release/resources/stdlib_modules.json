@@ -88,7 +88,8 @@
             "version_key": "stdlibAvroVersion",
             "release": true,
             "dependents": [
-                "module-ballerinax-confluent.cavroserdes"
+                "module-ballerinax-confluent.cavroserdes",
+                "module-ballerinax-kafka"
             ],
             "is_multiple_connectors": false
         },
@@ -789,7 +790,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "module_version": "4.3.1-SNAPSHOT",
+            "module_version": "4.5.0-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
