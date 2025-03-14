@@ -224,7 +224,7 @@
         },
         {
             "name": "module-ballerina-xslt",
-            "module_version": "2.9.1-SNAPSHOT",
+            "module_version": "2.9.2-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibXsltVersion",
@@ -398,7 +398,7 @@
         },
         {
             "name": "module-ballerina-edi",
-            "module_version": "1.5.0-SNAPSHOT",
+            "module_version": "1.5.1-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibEdiVersion",
@@ -452,7 +452,7 @@
         },
         {
             "name": "module-ballerina-toml",
-            "module_version": "0.8.0-SNAPSHOT",
+            "module_version": "0.8.1-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibTomlVersion",
@@ -462,7 +462,7 @@
         },
         {
             "name": "module-ballerina-yaml",
-            "module_version": "0.8.0-SNAPSHOT",
+            "module_version": "0.8.1-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibYamlVersion",
@@ -578,7 +578,7 @@
         },
         {
             "name": "module-ballerina-sql",
-            "module_version": "1.16.0-SNAPSHOT",
+            "module_version": "1.16.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
@@ -768,7 +768,7 @@
         },
         {
             "name": "module-ballerinax-java.jdbc",
-            "module_version": "1.14.0-SNAPSHOT",
+            "module_version": "1.14.1-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibJdbcVersion",
@@ -812,7 +812,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "module_version": "1.15.0-SNAPSHOT",
+            "module_version": "1.15.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
@@ -824,7 +824,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "module_version": "1.15.0-SNAPSHOT",
+            "module_version": "1.15.1-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
@@ -846,7 +846,7 @@
         },
         {
             "name": "module-ballerinax-oracledb",
-            "module_version": "1.14.0-SNAPSHOT",
+            "module_version": "1.14.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibOracledbVersion",
@@ -856,7 +856,7 @@
         },
         {
             "name": "module-ballerinax-postgresql",
-            "module_version": "1.15.0-SNAPSHOT",
+            "module_version": "1.15.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
@@ -1012,7 +1012,7 @@
         },
         {
             "name": "module-ballerinax-googleapis.gmail",
-            "module_version": "4.0.2-SNAPSHOT",
+            "module_version": "4.1.0-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibGoogleapis.gmailVersion",
@@ -1484,7 +1484,7 @@
         },
         {
             "name": "module-ballerinax-postgresql.driver",
-            "module_version": "1.6.1-SNAPSHOT",
+            "module_version": "1.6.2-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlDriverVersion",
@@ -1550,7 +1550,7 @@
         },
         {
             "name": "openapi-tools",
-            "module_version": "2.3.0-SNAPSHOT",
+            "module_version": "2.3.1-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibOpenapi-toolsVersion",
