@@ -656,7 +656,7 @@
         },
         {
             "name": "module-ballerinax-wso2.controlplane",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.1.0",
             "level": 6,
             "default_branch": "main",
             "version_key": "stdlibWso2ControlplaneVersion",
