@@ -45,7 +45,7 @@ jobs:
           echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
 
       - name: Build Package
-        run: ./gradlew build ${{ inputs.additional-build-flags }}
+        run: ./gradlew build ${{ inputs.additional-build-flags }} -PignoreVersionMismatch
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
