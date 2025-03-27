@@ -282,6 +282,12 @@
             "name": "module-ballerinax-hubspot.automation.actions"
         },
         {
+            "name": "module-ballerinax-hubspot.crm.associations"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.associations.schema"
+        },
+        {
             "name": "module-ballerinax-hubspot.crm.commerce.carts"
         },
         {
@@ -297,10 +303,28 @@
             "name": "module-ballerinax-hubspot.crm.commerce.taxes"
         },
         {
+            "name": "module-ballerinax-hubspot.crm.engagements.calls"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.engagements.communications"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.engagements.email"
+        },
+        {
             "name": "module-ballerinax-hubspot.crm.engagement.meeting"
         },
         {
             "name": "module-ballerinax-hubspot.crm.engagement.notes"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.engagements.tasks"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.extensions.timelines"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.extensions.videoconferencing"
         },
         {
             "name": "module-ballerinax-hubspot.crm.import"
@@ -334,6 +358,9 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.object.tickets"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.owners"
         },
         {
             "name": "module-ballerinax-hubspot.crm.pipelines"
