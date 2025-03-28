@@ -1041,6 +1041,26 @@
             "is_multiple_connectors": false
         },
         {
+            "name": "module-ballerinax-hubspot.crm.associations",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.associationsVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.associations.schema",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.associations.schemaVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
             "name": "module-ballerinax-hubspot.crm.commerce.carts",
             "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
@@ -1106,6 +1126,66 @@
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.engagement.notesVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.engagements.calls",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.engagements.callsVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.engagements.communications",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.engagements.communicationsVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.engagements.email",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.engagements.emailVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.engagements.tasks",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.engagements.tasksVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.extensions.timelines",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.extensions.timelinesVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.extensions.videoconferencing",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.extensions.videoconferencingVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
@@ -1216,6 +1296,16 @@
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.object.ticketsVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.owners",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.ownersVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
