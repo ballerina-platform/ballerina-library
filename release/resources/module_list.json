@@ -303,6 +303,12 @@
             "name": "module-ballerinax-hubspot.crm.commerce.taxes"
         },
         {
+            "name": "module-ballerinax-hubspot.crm.engagement.meeting"
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.engagement.notes"
+        },
+        {
             "name": "module-ballerinax-hubspot.crm.engagements.calls"
         },
         {
@@ -310,12 +316,6 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.engagements.email"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.engagement.meeting"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.engagement.notes"
         },
         {
             "name": "module-ballerinax-hubspot.crm.engagements.tasks"
