@@ -418,7 +418,7 @@
         },
         {
             "name": "module-ballerina-jwt",
-            "module_version": "2.15.0-SNAPSHOT",
+            "module_version": "2.15.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibJwtVersion",
