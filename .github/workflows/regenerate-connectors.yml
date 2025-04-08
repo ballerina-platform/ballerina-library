@@ -48,7 +48,7 @@ jobs:
   build:
     name: Regenerate OpenAPI Connectors
     runs-on: ubuntu-latest
-    # if: github.repository_owner == 'ballerina-platform'
+    if: github.repository_owner == 'ballerina-platform'
     steps:
       - uses: actions/checkout@v2
 
