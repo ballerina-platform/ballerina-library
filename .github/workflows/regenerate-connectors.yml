@@ -1,0 +1,70 @@
+name: Regenerate OpenAPI Connectors
+
+on:
+  workflow_dispatch:
+    inputs:
+      flatten-openapi:
+        description: "Enable OpenAPI Flattening"
+        required: false
+        type: boolean
+        default: true
+      additional-flatten-flags:
+        description: "Additional flags for OpenAPI Flattening"
+        required: false
+        type: string
+        default: ""
+      align-openapi:
+        description: "Enable OpenAPI Alignment"
+        required: false
+        type: boolean
+        default: true
+      additional-align-flags:
+        description: "Additional flags for OpenAPI Alignment"
+        required: false
+        type: string
+        default: ""
+      additional-generation-flags:
+        description: "Additional flags for OpenAPI Generation"
+        required: false
+        type: string
+        default: ""
+      distribution-zip:
+        description: "Distribution of the Ballerina version to be used"
+        required: false
+        type: string
+        default: ""
+      auto-merge:
+        description: "Enable auto-merge of the PR"
+        required: false
+        type: boolean
+        default: true
+      ballerina-version:
+        description: "Ballerina Language Version"
+        required: false
+        type: string
+        default: ""
+
+jobs:
+  build:
+    name: Regenerate OpenAPI Connectors
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'ballerina-platform'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Regenerate OpenAPI Connectors
+        uses: ballerina-platform/ballerina-action@2201.9.0
+        with:
+          args: run
+        env:
+          WORKING_DIR: ./regenerate-openapi-connectors
+          BALLERINA_BOT_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          FLATTEN_OPENAPI: ${{ github.event.inputs.flatten-openapi }}
+          ADDITIONAL_FLATTEN_FLAGS: ${{ github.event.inputs.additional-flatten-flags }}
+          ALIGN_OPENAPI: ${{ github.event.inputs.align-openapi }}
+          ADDITIONAL_ALIGN_FLAGS: ${{ github.event.inputs.additional-align-flags }}
+          ADDITIONAL_GENERATION_FLAGS: ${{ github.event.inputs.additional-generation-flags }}
+          DISTRIBUTION_ZIP: ${{ github.event.inputs.distribution-zip }}
+          AUTO_MERGE: ${{ github.event.inputs.auto-merge }}
+          BALLERINA_VERSION: ${{ github.event.inputs.ballerina-version }}
+          BAL_CONFIG_VAR_WORKFLOW: "regenerate-connector.yml"

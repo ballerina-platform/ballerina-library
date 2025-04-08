@@ -1,0 +1,5 @@
+[package]
+org = "ballerina_library"
+name = "regenerate_openapi_connectors"
+version = "0.1.0"
+distribution = "2201.11.0"
