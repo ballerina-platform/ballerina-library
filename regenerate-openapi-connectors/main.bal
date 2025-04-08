@@ -30,7 +30,7 @@ const string AUTO_MERGE = "AUTO_MERGE";
 const string BALLERINA_VERSION = "BALLERINA_VERSION";
 
 const string MODULE_LIST_JSON = "./resources/stdlib_modules.json";
-const string GITHUB_ORG = "chathushkaayash";
+const string GITHUB_ORG = "ballerina-platform";
 
 const decimal WORKFLOW_START_WAIT_TIME = 2;
 const decimal WORKFLOW_POLL_INTERVAL = 5;
