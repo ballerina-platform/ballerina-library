@@ -29,7 +29,7 @@ const string DISTRIBUTION_ZIP = "DISTRIBUTION_ZIP";
 const string AUTO_MERGE = "AUTO_MERGE";
 const string BALLERINA_VERSION = "BALLERINA_VERSION";
 
-const string MODULE_LIST_JSON = "./resources/stdlib_modules.json";
+const string MODULE_LIST_JSON = "../release/resources/stdlib_modules.json";
 const string GITHUB_ORG = "ballerina-platform";
 
 const decimal WORKFLOW_START_WAIT_TIME = 2;
