@@ -73,14 +73,14 @@ public function main() returns error? {
     if modules.length() == 0 {
         return;
     }
-    foreach Module m in modules {
-        int|error workflowId = triggerModuleRegeneration(m);
+    foreach Module module in modules {
+        int|error workflowId = triggerModuleRegeneration(module);
         if workflowId is error {
             continue;
         }
         processingModules.push({
             workflowId,
-            m
+            module
         });
     }
     check waitForRegeneration(processingModules);
@@ -109,7 +109,7 @@ isolated function waitForRegeneration(ProcessingModule[] processingModules) retu
                 continue;
             }
             if result {
-                regeneratedModules.push(processingModule.m);
+                regeneratedModules.push(processingModule.module);
                 _ = removeModule(processingModules, processingModule);
                 processedCount += 1;
             }
@@ -158,7 +158,7 @@ isolated function isModuleRegenerated(ProcessingModule processingModule) returns
     if workflowId == 0 {
         return true;
     }
-    github:WorkflowRun workflow = check github->/repos/[GITHUB_ORG]/[processingModule.m.name]/actions/runs/[workflowId];
+    github:WorkflowRun workflow = check github->/repos/[GITHUB_ORG]/[processingModule.module.name]/actions/runs/[workflowId];
     string? status = workflow.status;
     string? conclusion = workflow.conclusion;
 
@@ -166,7 +166,7 @@ isolated function isModuleRegenerated(ProcessingModule processingModule) returns
         if conclusion == "success" {
             return true;
         } else {
-            return error(string `Failed to regenerate module: ${processingModule.m.name}`);
+            return error(string `Failed to regenerate module: ${processingModule.module.name}`);
         }
     }
     return false;

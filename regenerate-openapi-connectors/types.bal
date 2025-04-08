@@ -35,5 +35,5 @@ type Module record {
 
 type ProcessingModule record {|
     int workflowId;
-    Module m;
+    Module module;
 |};
