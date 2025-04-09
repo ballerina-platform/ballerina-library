@@ -28,6 +28,11 @@ on:
         required: false
         type: string
         default: ""
+      generation-path:
+        description: "Generation path for the OpenAPI Connector"
+        required: false
+        type: string
+        default: "ballerina"
       distribution-zip:
         description: "Distribution of the Ballerina version to be used"
         required: false
@@ -64,6 +69,7 @@ jobs:
           ALIGN_OPENAPI: ${{ github.event.inputs.align-openapi }}
           ADDITIONAL_ALIGN_FLAGS: ${{ github.event.inputs.additional-align-flags }}
           ADDITIONAL_GENERATION_FLAGS: ${{ github.event.inputs.additional-generation-flags }}
+          GENERATION_PATH: ${{ github.event.inputs.generation-path }}
           DISTRIBUTION_ZIP: ${{ github.event.inputs.distribution-zip }}
           AUTO_MERGE: ${{ github.event.inputs.auto-merge }}
           BALLERINA_VERSION: ${{ github.event.inputs.ballerina-version }}

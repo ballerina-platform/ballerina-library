@@ -32,6 +32,11 @@ on:
         required: false
         type: string
         default: ""
+      generation-path:
+        description: "Generation path for the OpenAPI Connector"
+        required: false
+        type: string
+        default: "ballerina"
       distribution-zip:
         description: "Distribution of the Ballerina version to be used"
         required: false
@@ -92,7 +97,7 @@ jobs:
           echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
 
       - name: Remove Existing Client Files
-        working-directory: ballerina
+        working-directory: ${{ inputs.generation-path }}
         run: |
           rm -f client.bal utils.bal types.bal
 
@@ -141,7 +146,7 @@ jobs:
         working-directory: docs/spec
         run: |
           echo "Generating Ballerina code from OpenAPI Specification..."
-          ${{ env.BALLERINA_CMD }} openapi -i openapi.${{ env.EXTENSION}} -o ../../ballerina/  --mode client --license ../license.txt ${{ inputs.additional-generation-flags }}
+          ${{ env.BALLERINA_CMD }} openapi -i openapi.${{ env.EXTENSION}} -o ../../${{ inputs.generation-path }}/  --mode client --license ../license.txt ${{ inputs.additional-generation-flags }}
 
       - name: Configure Git Identity
         run: |
@@ -156,7 +161,7 @@ jobs:
       - name: Commit Files
         id: commitFiles
         run: |
-          git checkout -b regenerate-openapi-connector-${{ github.run_number }}
+          git checkout -b automated/regenerate-connector
           git add .
           if git diff --cached --quiet;
           then
@@ -169,7 +174,7 @@ jobs:
 
       - name: Push Results
         if: ${{ steps.commitFiles.outputs.hasChanged == 'true' }}
-        run: git push origin regenerate-openapi-connector-${{ github.run_number }}
+        run: git push origin automated/regenerate-connector
         env:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
@@ -181,7 +186,7 @@ jobs:
             --title "[Automated] Regenerate OpenAPI Connector" \
             --body "Automated regenerate of the OpenAPI-based Ballerina connector." \
             --base ${{ github.ref }} \
-            --head regenerate-openapi-connector-${{ github.run_number }})
+            --head automated/regenerate-connector)
           echo "prUrl=$prUrl" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}

@@ -25,14 +25,16 @@ const string ADDITIONAL_FLATTEN_FLAGS = "ADDITIONAL_FLATTEN_FLAGS";
 const string ALIGN_OPENAPI = "ALIGN_OPENAPI";
 const string ADDITIONAL_ALIGN_FLAGS = "ADDITIONAL_ALIGN_FLAGS";
 const string ADDITIONAL_GENERATION_FLAGS = "ADDITIONAL_GENERATION_FLAGS";
+const string GENERATION_PATH = "GENERATION_PATH";
 const string DISTRIBUTION_ZIP = "DISTRIBUTION_ZIP";
 const string AUTO_MERGE = "AUTO_MERGE";
 const string BALLERINA_VERSION = "BALLERINA_VERSION";
 
 const string MODULE_LIST_JSON = "../release/resources/stdlib_modules.json";
 const string GITHUB_ORG = "ballerina-platform";
+const string REGENERATION_BRANCH = "automated/regenerate-connector";
 
-const decimal WORKFLOW_START_WAIT_TIME = 2;
+const decimal WORKFLOW_START_WAIT_TIME = 5;
 const decimal WORKFLOW_POLL_INTERVAL = 5;
 
 configurable string token = os:getEnv(ACCESS_TOKEN_ENV);
@@ -42,6 +44,7 @@ configurable string additionalFlattenFlags = os:getEnv(ADDITIONAL_FLATTEN_FLAGS)
 configurable boolean alignOpenAPI = check boolean:fromString(os:getEnv(ALIGN_OPENAPI));
 configurable string additionalAlignFlags = os:getEnv(ADDITIONAL_ALIGN_FLAGS);
 configurable string additionalGenerationFlags = os:getEnv(ADDITIONAL_GENERATION_FLAGS);
+configurable string generationPath = os:getEnv(GENERATION_PATH);
 configurable string distributionZip = os:getEnv(DISTRIBUTION_ZIP);
 configurable boolean autoMerge = check boolean:fromString(os:getEnv(AUTO_MERGE));
 configurable string ballerinaVersion = os:getEnv(BALLERINA_VERSION);
@@ -128,12 +131,20 @@ isolated function triggerModuleRegeneration(Module m) returns int|error {
             "additional-flatten-flags": additionalFlattenFlags,
             "align-openapi": alignOpenAPI,
             "additional-align-flags": additionalAlignFlags,
+            "generation-path": generationPath,
             "distribution-zip": distributionZip,
             "auto-merge": autoMerge,
             "ballerina-version": ballerinaVersion,
             "additional-generation-flags": additionalGenerationFlags
         }
     };
+
+    github:BranchWithProtection|error branchResult = github->/repos/[GITHUB_ORG]/[m.name]/branches/[REGENERATION_BRANCH].get();
+    if branchResult is github:BranchWithProtection {
+        string message = string `Branch ${REGENERATION_BRANCH} already exists for module: ${m.name}`;
+        printInfo(message);
+        return error(message);
+    }
 
     error? dispatchResult = github->/repos/[GITHUB_ORG]/[m.name]/actions/workflows/[workflow]/dispatches.post(payload);
     if dispatchResult is error {
@@ -149,6 +160,9 @@ isolated function triggerModuleRegeneration(Module m) returns int|error {
     if result is error {
         printError(result);
         return result;
+    }
+    if result.workflow_runs.length() == 0 {
+        return error(string `No workflow runs found for module: ${m.name}`);
     }
     return result.workflow_runs[0].id;
 }
