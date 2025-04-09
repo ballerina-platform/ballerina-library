@@ -96,9 +96,6 @@ jobs:
         run: |
           echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
 
-      - name: Install OpenAPI changes tool
-        run: curl -fsSL https://pb33f.io/openapi-changes/install.sh | sh
-
       - name: Remove Existing Client Files
         working-directory: ${{ inputs.generation-path }}
         run: |
@@ -129,7 +126,6 @@ jobs:
           file=$(echo openapi.*)
           ext="${file##*.}"
           echo "EXTENSION=$ext" >> "$GITHUB_ENV"
-          cp openapi.$ext openapi_old.$ext
 
       - name: Flatten OpenAPI Specification
         if: ${{ inputs.flatten-openapi }}
@@ -147,18 +143,6 @@ jobs:
           ${{ env.BALLERINA_CMD }} openapi align -i openapi.${{ env.EXTENSION}} ${{ inputs.additional-align-flags }}
           mv aligned_ballerina_openapi.${{ env.EXTENSION}} openapi.${{ env.EXTENSION}}
 
-      - name: Generate OpenAPI change report
-        working-directory: docs/spec
-        run: |
-          echo "Generating OpenAPI change report..."
-          openapi-changes html-report openapi_old.${{ env.EXTENSION}} openapi.${{ env.EXTENSION}}
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: openapi-changes-report
-          path: docs/spec/report.html
-
       - name: Generate Ballerina Code
         working-directory: docs/spec
         run: |
@@ -173,8 +157,6 @@ jobs:
       - name: Remove uncommitted files
         run: |
           rm -f -r ballerina-dist/
-          rm -f docs/spec/report.html
-          rm -f docs/spec/openapi_old.${{ env.EXTENSION}}
 
       - name: Commit Files
         id: commitFiles
