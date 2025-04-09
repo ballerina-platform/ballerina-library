@@ -121,6 +121,7 @@ jobs:
           wget -O openapi.json "${{ inputs.openapi-url }}"
 
       - name: Read File Extension
+        working-directory: docs/spec
         run: |
           file=$(echo openapi.*)
           ext="${file##*.}"
