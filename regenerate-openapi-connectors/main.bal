@@ -32,7 +32,7 @@ const string BALLERINA_VERSION = "BALLERINA_VERSION";
 const string MODULE_LIST_JSON = "../release/resources/stdlib_modules.json";
 const string GITHUB_ORG = "ballerina-platform";
 
-const decimal WORKFLOW_START_WAIT_TIME = 2;
+const decimal WORKFLOW_START_WAIT_TIME = 5;
 const decimal WORKFLOW_POLL_INTERVAL = 5;
 
 configurable string token = os:getEnv(ACCESS_TOKEN_ENV);
@@ -149,6 +149,9 @@ isolated function triggerModuleRegeneration(Module m) returns int|error {
     if result is error {
         printError(result);
         return result;
+    }
+    if result.workflow_runs.length() == 0 {
+        return error(string `No workflow runs found for module: ${m.name}`);
     }
     return result.workflow_runs[0].id;
 }
