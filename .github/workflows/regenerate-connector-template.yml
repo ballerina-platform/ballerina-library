@@ -156,7 +156,7 @@ jobs:
       - name: Commit Files
         id: commitFiles
         run: |
-          git checkout -b regenerate-openapi-connector-${{ github.run_number }}
+          git checkout -b automated/regenerate-connector
           git add .
           if git diff --cached --quiet;
           then
@@ -169,7 +169,7 @@ jobs:
 
       - name: Push Results
         if: ${{ steps.commitFiles.outputs.hasChanged == 'true' }}
-        run: git push origin regenerate-openapi-connector-${{ github.run_number }}
+        run: git push origin automated/regenerate-connector
         env:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
@@ -181,7 +181,7 @@ jobs:
             --title "[Automated] Regenerate OpenAPI Connector" \
             --body "Automated regenerate of the OpenAPI-based Ballerina connector." \
             --base ${{ github.ref }} \
-            --head regenerate-openapi-connector-${{ github.run_number }})
+            --head automated/regenerate-connector)
           echo "prUrl=$prUrl" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
