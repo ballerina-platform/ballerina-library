@@ -115,14 +115,22 @@ jobs:
           rm -r temp_folder/ ballerina.zip
           echo "BALLERINA_CMD=${PWD}/ballerina-dist/bin/bal" >> $GITHUB_ENV
 
-      - name: Download openapi.json
+      - name: Download spec file
         if: ${{ inputs.openapi-url }}
         working-directory: docs/spec
         run: |
-          echo "Downloading openapi.json from provided URL..."
-          rm -f openapi.json
-          wget -O openapi.json "${{ inputs.openapi-url }}"
-
+          echo "Downloading openapi spec from provided URL..."
+          if [[ "${{ inputs.openapi-url }}" == *.json ]]; then
+            rm -f openapi.json
+            wget -O openapi.json "${{ inputs.openapi-url }}"
+          elif [[ "${{ inputs.openapi-url }}" == *.yaml ]]; then
+            rm -f openapi.yaml
+            wget -O openapi.yaml "${{ inputs.openapi-url }}"
+          else
+            echo "Unsupported file extension: ${{ inputs.openapi-url }}"
+            exit 1
+          fi
+          
       - name: Read File Extension
         working-directory: docs/spec
         run: |
