@@ -1012,7 +1012,7 @@
         },
         {
             "name": "module-ballerinax-googleapis.gmail",
-            "module_version": "4.1.0-SNAPSHOT",
+            "module_version": "4.1.1-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibGoogleapis.gmailVersion",
