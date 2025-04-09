@@ -25,6 +25,7 @@ const string ADDITIONAL_FLATTEN_FLAGS = "ADDITIONAL_FLATTEN_FLAGS";
 const string ALIGN_OPENAPI = "ALIGN_OPENAPI";
 const string ADDITIONAL_ALIGN_FLAGS = "ADDITIONAL_ALIGN_FLAGS";
 const string ADDITIONAL_GENERATION_FLAGS = "ADDITIONAL_GENERATION_FLAGS";
+const string GENERATION_PATH = "GENERATION_PATH";
 const string DISTRIBUTION_ZIP = "DISTRIBUTION_ZIP";
 const string AUTO_MERGE = "AUTO_MERGE";
 const string BALLERINA_VERSION = "BALLERINA_VERSION";
@@ -43,6 +44,7 @@ configurable string additionalFlattenFlags = os:getEnv(ADDITIONAL_FLATTEN_FLAGS)
 configurable boolean alignOpenAPI = check boolean:fromString(os:getEnv(ALIGN_OPENAPI));
 configurable string additionalAlignFlags = os:getEnv(ADDITIONAL_ALIGN_FLAGS);
 configurable string additionalGenerationFlags = os:getEnv(ADDITIONAL_GENERATION_FLAGS);
+configurable string generationPath = os:getEnv(GENERATION_PATH);
 configurable string distributionZip = os:getEnv(DISTRIBUTION_ZIP);
 configurable boolean autoMerge = check boolean:fromString(os:getEnv(AUTO_MERGE));
 configurable string ballerinaVersion = os:getEnv(BALLERINA_VERSION);
@@ -129,6 +131,7 @@ isolated function triggerModuleRegeneration(Module m) returns int|error {
             "additional-flatten-flags": additionalFlattenFlags,
             "align-openapi": alignOpenAPI,
             "additional-align-flags": additionalAlignFlags,
+            "generation-path": generationPath,
             "distribution-zip": distributionZip,
             "auto-merge": autoMerge,
             "ballerina-version": ballerinaVersion,
