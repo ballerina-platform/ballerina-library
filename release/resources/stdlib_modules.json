@@ -1202,7 +1202,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.lists",
-            "module_version": "0.1.1-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.listsVersion",
@@ -1442,7 +1442,7 @@
         },
         {
             "name": "module-ballerinax-sap.s4hana.sales",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibSap.s4hana.salesVersion",
