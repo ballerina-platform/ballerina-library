@@ -163,14 +163,29 @@ jobs:
         id: commitFiles
         run: |
           git checkout -b automated/regenerate-connector
+
+          changed=false
+          # First commit: OpenAPI spec changes
+          git add docs/spec/ 
+          if ! git diff --cached --quiet; then
+            git commit -m "[AUTOMATED] Update OpenAPI spec"
+            changed=true
+          fi
+
+          # Second commit: all other changes
           git add .
-          if git diff --cached --quiet;
-          then
-              echo "hasChanged=false" >> $GITHUB_OUTPUT
-              echo "No changes to commit."
+          git reset docs/spec/
+          if ! git diff --cached --quiet; then
+            git commit -m "[AUTOMATED] Client Regeneration"
+            changed=true
+          fi
+
+          # Set output if anything changed
+          if [ "$changed" = true ]; then
+            echo "hasChanged=true" >> $GITHUB_OUTPUT
           else
-              git commit -m "[AUTOMATED] Regenerate the OpenAPI Connector"
-              echo "hasChanged=true" >> $GITHUB_OUTPUT
+            echo "hasChanged=false" >> $GITHUB_OUTPUT
+            echo "No changes to commit."
           fi
 
       - name: Push Results
