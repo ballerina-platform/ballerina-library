@@ -96,6 +96,9 @@ jobs:
         run: |
           echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
 
+      - name: Install OpenAPI changes tool
+        run: curl -fsSL https://pb33f.io/openapi-changes/install.sh | sh
+
       - name: Remove Existing Client Files
         working-directory: ${{ inputs.generation-path }}
         run: |
@@ -126,6 +129,7 @@ jobs:
           file=$(echo openapi.*)
           ext="${file##*.}"
           echo "EXTENSION=$ext" >> "$GITHUB_ENV"
+          cp openapi.$ext openapi_old.$ext
 
       - name: Flatten OpenAPI Specification
         if: ${{ inputs.flatten-openapi }}
@@ -142,6 +146,18 @@ jobs:
           echo "Aligning OpenAPI Specification..."
           ${{ env.BALLERINA_CMD }} openapi align -i openapi.${{ env.EXTENSION}} ${{ inputs.additional-align-flags }}
           mv aligned_ballerina_openapi.${{ env.EXTENSION}} openapi.${{ env.EXTENSION}}
+
+      - name: Generate OpenAPI change report
+        working-directory: docs/spec
+        run: |
+          echo "Generating OpenAPI change report..."
+          openapi-changes html-report openapi_old.${{ env.EXTENSION}} openapi.${{ env.EXTENSION}}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-changes-report
+          path: docs/spec/report.html
 
       - name: Generate Ballerina Code
         working-directory: docs/spec
@@ -162,20 +178,35 @@ jobs:
       - name: Commit Files
         id: commitFiles
         run: |
-          git checkout -b automated/regenerate-connector
+          git checkout -b regenerate-connector
+
+          changed=false
+          # First commit: OpenAPI spec changes
+          git add docs/spec/ 
+          if ! git diff --cached --quiet; then
+            git commit -m "[AUTOMATED] Update OpenAPI spec"
+            changed=true
+          fi
+
+          # Second commit: all other changes
           git add .
-          if git diff --cached --quiet;
-          then
-              echo "hasChanged=false" >> $GITHUB_OUTPUT
-              echo "No changes to commit."
+          git reset docs/spec/
+          if ! git diff --cached --quiet; then
+            git commit -m "[AUTOMATED] Client Regeneration"
+            changed=true
+          fi
+
+          # Set output if anything changed
+          if [ "$changed" = true ]; then
+            echo "hasChanged=true" >> $GITHUB_OUTPUT
           else
-              git commit -m "[AUTOMATED] Regenerate the OpenAPI Connector"
-              echo "hasChanged=true" >> $GITHUB_OUTPUT
+            echo "hasChanged=false" >> $GITHUB_OUTPUT
+            echo "No changes to commit."
           fi
 
       - name: Push Results
         if: ${{ steps.commitFiles.outputs.hasChanged == 'true' }}
-        run: git push origin automated/regenerate-connector
+        run: git push origin regenerate-connector
         env:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
@@ -185,9 +216,9 @@ jobs:
         run: |
           prUrl=$(gh pr create \
             --title "[Automated] Regenerate OpenAPI Connector" \
-            --body "Automated regenerate of the OpenAPI-based Ballerina connector." \
+            --body $'Automated regenerate of the OpenAPI-based Ballerina connector.\n\nFollow the steps to view the OpenAPI changes:\n1. Copy the following URL:\n```\nhttps://github.com/ballerina-platform/${{ github.event.repository.name }}/blob/regenerate-connector/docs/spec/openapi.${{ env.EXTENSION }}\n```\n\n2. Visit [pb33f OpenAPI Changes](https://pb33f.io/openapi-changes/demo/) and provide the above URL as the GitHub URL.' \
             --base ${{ github.ref }} \
-            --head automated/regenerate-connector)
+            --head regenerate-connector)
           echo "prUrl=$prUrl" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}

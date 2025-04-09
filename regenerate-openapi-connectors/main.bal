@@ -32,7 +32,7 @@ const string BALLERINA_VERSION = "BALLERINA_VERSION";
 
 const string MODULE_LIST_JSON = "../release/resources/stdlib_modules.json";
 const string GITHUB_ORG = "ballerina-platform";
-const string REGENERATION_BRANCH = "automated/regenerate-connector";
+const string REGENERATION_BRANCH = "regenerate-connector";
 
 const decimal WORKFLOW_START_WAIT_TIME = 5;
 const decimal WORKFLOW_POLL_INTERVAL = 5;
