@@ -170,10 +170,11 @@ jobs:
           git config user.name "ballerina-bot"
           git config user.email "ballerina-bot@ballerina.org"
 
-      - name: Remove Downloaded Ballerina Distribution
-        if: ${{ inputs.distribution-zip }}
+      - name: Remove uncommitted files
         run: |
-          rm -r ballerina-dist/
+          rm -f -r ballerina-dist/
+          rm -f docs/spec/report.html
+          rm -f docs/spec/openapi_old.${{ env.EXTENSION}}
 
       - name: Commit Files
         id: commitFiles
