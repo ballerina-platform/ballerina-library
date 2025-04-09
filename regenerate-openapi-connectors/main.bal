@@ -31,6 +31,7 @@ const string BALLERINA_VERSION = "BALLERINA_VERSION";
 
 const string MODULE_LIST_JSON = "../release/resources/stdlib_modules.json";
 const string GITHUB_ORG = "ballerina-platform";
+const string REGENERATION_BRANCH = "automated/regenerate-connector";
 
 const decimal WORKFLOW_START_WAIT_TIME = 5;
 const decimal WORKFLOW_POLL_INTERVAL = 5;
@@ -134,6 +135,13 @@ isolated function triggerModuleRegeneration(Module m) returns int|error {
             "additional-generation-flags": additionalGenerationFlags
         }
     };
+
+    github:BranchWithProtection|error branchResult = github->/repos/[GITHUB_ORG]/[m.name]/branches/[REGENERATION_BRANCH].get();
+    if branchResult is github:BranchWithProtection {
+        string message = string `Branch ${REGENERATION_BRANCH} already exists for module: ${m.name}`;
+        printInfo(message);
+        return error(message);
+    }
 
     error? dispatchResult = github->/repos/[GITHUB_ORG]/[m.name]/actions/workflows/[workflow]/dispatches.post(payload);
     if dispatchResult is error {
