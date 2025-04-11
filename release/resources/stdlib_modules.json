@@ -931,36 +931,6 @@
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-candid",
-            "module_version": "0.1.2-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibCandidVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-dayforce",
-            "module_version": "0.1.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibDayforceVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-discord",
-            "module_version": "1.0.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibDiscordVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
             "name": "module-ballerinax-docusign.dsadmin",
             "module_version": "3.0.0-SNAPSHOT\r",
             "level": 100,
@@ -971,61 +941,11 @@
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-docusign.dsclick",
-            "module_version": "2.0.1-SNAPSHOT\r",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibDocusign.dsclickVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-docusign.dsesign",
-            "module_version": "1.0.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibDocusign.dsesignVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-github",
-            "module_version": "5.1.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "master",
-            "version_key": "stdlibGithubVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
             "name": "module-ballerinax-googleapis.calendar",
             "module_version": "5.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibGoogleapis.calendarVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-googleapis.gmail",
-            "module_version": "5.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "master",
-            "version_key": "stdlibGoogleapis.gmailVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-guidewire.insnow",
-            "module_version": "0.1.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibGuidewire.insnowVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
@@ -1391,31 +1311,11 @@
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-openai.assistants",
-            "module_version": "1.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibOpenai.assistantsVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
             "name": "module-ballerinax-openai.audio",
             "module_version": "3.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibOpenai.audioVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-openai.chat",
-            "module_version": "4.0.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibOpenai.chatVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
@@ -1431,26 +1331,6 @@
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-openai.images",
-            "module_version": "2.0.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibOpenai.imagesVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-sap.s4hana.sales",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibSap.s4hana.salesVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": true
-        },
-        {
             "name": "module-ballerinax-slack",
             "module_version": "4.0.1-SNAPSHOT",
             "level": 100,
@@ -1461,41 +1341,11 @@
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-stripe",
-            "module_version": "2.0.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibStripeVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-twilio",
-            "module_version": "5.0.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "master",
-            "version_key": "stdlibTwilioVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
             "name": "module-ballerinax-twitter",
             "module_version": "5.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibTwitterVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-zendesk",
-            "module_version": "2.0.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibZendeskVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
