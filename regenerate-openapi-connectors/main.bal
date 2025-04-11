@@ -89,7 +89,9 @@ public function main() returns error? {
 
 public function getGeneratedModuleList() returns Module[]|error {
     List moduleList = check (check io:fileReadJson(MODULE_LIST_JSON)).fromJsonWithType();
-    return moduleList.generated_connectors;
+    return from Module module in moduleList.generated_connectors
+        where module.is_multiple_connectors == false
+        select module;
 }
 
 isolated function waitForRegeneration(ProcessingModule[] processingModules) returns error? {
