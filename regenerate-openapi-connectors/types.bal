@@ -14,23 +14,15 @@
 //  specific language governing permissions and limitations
 //  under the License.
 
-type List record {|
-    Module[] library_modules;
-    Module[] extended_modules;
-    Module[] handwritten_connectors;
-    Module[] driver_modules;
+type List record {
     Module[] generated_connectors;
-    Module[] tools;
-|};
+};
 
 type Module record {
     string name;
-    string module_version;
-    int level;
     string default_branch;
-    boolean release;
-    string version_key;
     boolean inProgress = false;
+    boolean is_multiple_connectors = false;
 };
 
 type ProcessingModule record {|
