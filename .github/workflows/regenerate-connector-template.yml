@@ -127,13 +127,21 @@ jobs:
             echo "Unsupported file extension: ${{ inputs.openapi-url }}"
             exit 1
           fi
-          
+
       - name: Read File Extension
         working-directory: docs/spec
         run: |
           file=$(echo openapi.*)
           ext="${file##*.}"
           echo "EXTENSION=$ext" >> "$GITHUB_ENV"
+
+      - name: Checkout or Create Branch
+        run: |
+          if git show-ref --verify --quiet refs/heads/regenerate-connector; then
+            git checkout regenerate-connector
+          else
+            git checkout -b regenerate-connector
+          fi
 
       - name: Flatten OpenAPI Specification
         if: ${{ inputs.flatten-openapi }}
@@ -169,11 +177,9 @@ jobs:
       - name: Commit Files
         id: commitFiles
         run: |
-          git checkout -b regenerate-connector
-
           changed=false
           # First commit: OpenAPI spec changes
-          git add docs/spec/ 
+          git add docs/spec/
           if ! git diff --cached --quiet; then
             git commit -m "[AUTOMATED] Update OpenAPI spec"
             changed=true
