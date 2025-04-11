@@ -69,7 +69,6 @@ public function main() returns error? {
         printError(modules);
         return modules;
     }
-    modules.forEach((m) => io:println(m.name));
     ProcessingModule[] processingModules = [];
     if modules.length() == 0 {
         return;
@@ -141,7 +140,6 @@ isolated function triggerModuleRegeneration(Module m) returns int|error {
     if branchResult is github:BranchWithProtection {
         string message = string `Branch ${REGENERATION_BRANCH} already exists for module: ${m.name}`;
         printInfo(message);
-        return error(message);
     }
 
     error? dispatchResult = github->/repos/[GITHUB_ORG]/[m.name]/actions/workflows/[workflow]/dispatches.post(payload);
