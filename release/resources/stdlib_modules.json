@@ -922,7 +922,7 @@
     "generated_connectors": [
         {
             "name": "module-ballerinax-asana",
-            "module_version": "2.0.1-SNAPSHOT",
+            "module_version": "3.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAsanaVersion",
@@ -1052,7 +1052,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.associations.schema",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.associations.schemaVersion",
@@ -1132,7 +1132,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.engagements.calls",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.engagements.callsVersion",
@@ -1142,7 +1142,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.engagements.communications",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.engagements.communicationsVersion",
@@ -1152,7 +1152,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.engagements.email",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.engagements.emailVersion",
@@ -1172,7 +1172,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.extensions.timelines",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.extensions.timelinesVersion",
@@ -1182,7 +1182,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.extensions.videoconferencing",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.extensions.videoconferencingVersion",
@@ -1212,7 +1212,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.object.companies",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.object.companiesVersion",
@@ -1222,7 +1222,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.object.contacts",
-            "module_version": "0.1.0-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.object.contactsVersion",
@@ -1242,7 +1242,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.object.feedback",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.object.feedbackVersion",
@@ -1252,7 +1252,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.object.leads",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.object.leadsVersion",
@@ -1262,7 +1262,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.object.lineitems",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.object.lineitemsVersion",
