@@ -962,7 +962,7 @@
         },
         {
             "name": "module-ballerinax-docusign.dsadmin",
-            "module_version": "3.0.0-SNAPSHOT\r",
+            "module_version": "3.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibDocusign.dsadminVersion",
@@ -1032,7 +1032,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.automation.actions",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.automation.actionsVersion",
@@ -1062,7 +1062,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.commerce.carts",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.commerce.cartsVersion",
@@ -1162,7 +1162,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.engagements.tasks",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.engagements.tasksVersion",
@@ -1192,7 +1192,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.import",
-            "module_version": "3.0.1-SNAPSHOT",
+            "module_version": "4.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.importVersion",
@@ -1332,7 +1332,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.campaigns",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.campaignsVersion",
@@ -1342,7 +1342,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.emails",
-            "module_version": "0.1.1-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.emailsVersion",
@@ -1352,7 +1352,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.events",
-            "module_version": "0.1.1-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.eventsVersion",
@@ -1362,7 +1362,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.forms",
-            "module_version": "0.1.1-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.formsVersion",
@@ -1372,7 +1372,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.subscriptions",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.subscriptionsVersion",
@@ -1382,7 +1382,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.transactional",
-            "module_version": "0.1.1-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.transactionalVersion",
@@ -1452,7 +1452,7 @@
         },
         {
             "name": "module-ballerinax-slack",
-            "module_version": "4.0.1-SNAPSHOT",
+            "module_version": "5.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibSlackVersion",
