@@ -231,24 +231,16 @@ jobs:
       - name: Merge PR
         if: ${{ steps.commitFiles.outputs.hasChanged == 'true' && inputs.auto-merge == true }}
         run: |
-          checkComplete="0"
-          while [ "$checkComplete" != "1" ]; do
+          checkCount="0"
+          while [ "$checkCount" != "1" ]
+          do
             sleep 20
-
-            allChecks=$(gh pr status --json statusCheckRollup --jq '.currentBranch.statusCheckRollup')
-            failedCount=$(echo "$allChecks" | jq '[.[] | select(.conclusion == "FAILURE" or .conclusion == "CANCELLED")] | length')
-            incompleteCount=$(echo "$allChecks" | jq '[.[] | select(.conclusion != "SUCCESS" and .conclusion != "SKIPPED" and .conclusion != "FAILURE" and .conclusion != "CANCELLED")] | length')
-
-            if [[ "$failedCount" -gt 0 ]]; then
-              echo "Some status checks failed or were cancelled."
+            checkCount=$(gh pr view ${{ steps.createPR.outputs.prUrl }} --jq '[.statusCheckRollup[] | select((.conclusion=="SUCCESS") and ((.name=="Run PR Build Workflow / Build")))] | length' --json statusCheckRollup)
+            failedCount=$(gh pr view ${{ steps.createPR.outputs.prUrl }} --jq '[.statusCheckRollup[] | select((.conclusion=="FAILURE") and ((.name=="Run PR Build Workflow / Build")))] | length' --json statusCheckRollup)
+            if [[ "$failedCount" != "0" ]]
+            then
+              echo "PR Build has Failed"
               exit 1
-            fi
-
-            if [[ "$incompleteCount" -eq 0 ]]; then
-              checkComplete="1"
-              echo "All required checks have passed."
-            else
-              echo "Waiting for checks to complete... ($incompleteCount remaining)"
             fi
           done
           sleep 20
