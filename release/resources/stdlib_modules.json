@@ -910,7 +910,7 @@
         },
         {
             "name": "module-ballerinax-snowflake",
-            "module_version": "2.2.0-SNAPSHOT",
+            "module_version": "2.2.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibSnowflakeVersion",
