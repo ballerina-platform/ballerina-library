@@ -231,27 +231,41 @@ jobs:
       - name: Merge PR
         if: ${{ steps.commitFiles.outputs.hasChanged == 'true' && inputs.auto-merge == true }}
         run: |
-          checkComplete="0"
-          while [ "$checkComplete" != "1" ]; do
-            sleep 20
+          max_retries=100
+          retry_count=0
 
-            allChecks=$(gh pr status --json statusCheckRollup --jq '.currentBranch.statusCheckRollup')
-            failedCount=$(echo "$allChecks" | jq '[.[] | select(.conclusion == "FAILURE" or .conclusion == "CANCELLED")] | length')
-            incompleteCount=$(echo "$allChecks" | jq '[.[] | select(.conclusion != "SUCCESS" and .conclusion != "SKIPPED" and .conclusion != "FAILURE" and .conclusion != "CANCELLED")] | length')
+          while [[ $retry_count -lt $max_retries ]]
+          do
+            retry_count=$((retry_count + 1))
+            
+            echo "[$retry_count/$max_retries] Checking PR Build Workflow status..."
 
-            if [[ "$failedCount" -gt 0 ]]; then
-              echo "Some status checks failed or were cancelled."
+            result=$(gh pr view ${{ steps.createPR.outputs.prUrl }} \
+              --jq '[.statusCheckRollup[] | select((.name == "Run PR Build Workflow / Build") and (.status == "COMPLETED"))][0]' \
+              --json statusCheckRollup)
+
+            if [[ -z "$result" ]]; then
+              sleep 20
+              continue
+            fi
+
+            conclusion=$(echo "$result" | jq -r '.conclusion')
+
+            if [[ "$conclusion" == "SUCCESS" ]]; then
+              echo "PR Build Workflow succeeded."
+              break
+            else
+              echo "PR Build Workflow failed with conclusion: $conclusion"
               exit 1
             fi
-
-            if [[ "$incompleteCount" -eq 0 ]]; then
-              checkComplete="1"
-              echo "All required checks have passed."
-            else
-              echo "Waiting for checks to complete... ($incompleteCount remaining)"
-            fi
           done
-          sleep 20
+
+          if [[ $retry_count -ge $max_retries ]]; then
+            echo "Reached max retry limit ($max_retries). Workflow did not complete in time."
+            exit 1
+          fi
+
+          sleep 5
           gh pr merge --merge --delete-branch
         env:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
