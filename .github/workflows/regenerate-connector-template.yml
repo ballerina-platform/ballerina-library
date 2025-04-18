@@ -236,7 +236,6 @@ jobs:
 
           while [[ $retry_count -lt $max_retries ]]
           do
-            sleep 20
             retry_count=$((retry_count + 1))
             
             echo "[$retry_count/$max_retries] Checking PR Build Workflow status..."
@@ -246,6 +245,7 @@ jobs:
               --json statusCheckRollup)
 
             if [[ -z "$result" ]]; then
+              sleep 20
               continue
             fi
 
