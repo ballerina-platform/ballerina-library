@@ -231,15 +231,24 @@ jobs:
       - name: Merge PR
         if: ${{ steps.commitFiles.outputs.hasChanged == 'true' && inputs.auto-merge == true }}
         run: |
-          checkCount="0"
-          while [ "$checkCount" != "1" ]
+          while true
           do
             sleep 20
-            checkCount=$(gh pr view ${{ steps.createPR.outputs.prUrl }} --jq '[.statusCheckRollup[] | select((.conclusion=="SUCCESS") and ((.name=="Run PR Build Workflow / Build")))] | length' --json statusCheckRollup)
-            failedCount=$(gh pr view ${{ steps.createPR.outputs.prUrl }} --jq '[.statusCheckRollup[] | select((.conclusion=="FAILURE") and ((.name=="Run PR Build Workflow / Build")))] | length' --json statusCheckRollup)
-            if [[ "$failedCount" != "0" ]]
-            then
-              echo "PR Build has Failed"
+            result=$(gh pr view ${{ steps.createPR.outputs.prUrl }} \
+              --jq '[.statusCheckRollup[] | select((.name == "Run PR Build Workflow / Build") and (.status == "COMPLETED"))][0]' \
+              --json statusCheckRollup)
+
+            if [[ -z "$result" ]]; then
+              echo "Waiting for PR Build Workflow to complete..."
+              continue
+            fi
+
+            conclusion=$(echo "$result" | jq -r '.conclusion')
+            if [[ "$conclusion" == "SUCCESS" ]]; then
+              echo "PR Build Workflow succeeded."
+              break
+            else
+              echo "PR Build Workflow failed with conclusion: $conclusion"
               exit 1
             fi
           done
