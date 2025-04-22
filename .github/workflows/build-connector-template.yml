@@ -23,7 +23,7 @@ on:
 jobs:
     ubuntu-build:
         name: Build
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         concurrency:
           group: ${{ github.head_ref }}-ubuntu-build
           cancel-in-progress: true

@@ -8,7 +8,7 @@ on:
 jobs:
     publish-stdlib-modules:
         name: Publish Ballerina Library Modules
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         if: github.repository_owner == 'ballerina-platform'
         steps:
             -   name: Checkout Repository

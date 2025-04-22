@@ -10,7 +10,7 @@ on:
 jobs:
   build-examples:
     name: Build Examples
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -35,7 +35,7 @@ jobs:
 
   generate-matrix:
     name: Generate Matrix
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       directories: ${{ steps.set-matrix.outputs.directories }}
     steps:
@@ -56,7 +56,7 @@ jobs:
 
   build-connectors:
     name: Build Connectors
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: generate-matrix
     strategy:
       matrix:
@@ -81,7 +81,7 @@ jobs:
 
   send-notification:
     name: Send Failure Notification
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [ build-examples, build-connectors ]
     if: ${{ failure() }}
     steps:

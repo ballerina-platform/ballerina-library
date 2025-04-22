@@ -22,7 +22,7 @@ on:
 jobs:
     trigger-graalvm-checks:
         name: Run workflows
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout Module Repository
               uses: actions/checkout@v3
