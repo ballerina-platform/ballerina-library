@@ -5,7 +5,7 @@ on:
     types: [closed]
 jobs:
   check-resolution-label:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if:
       ${{ contains(github.event.issue.labels.*.name, 'Type/Bug') && !(contains(github.event.issue.labels.*.name, 'Reason/EngineeringMistake') ||
       contains(github.event.issue.labels.*.name, 'Reason/Complex') ||

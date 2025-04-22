@@ -11,7 +11,7 @@ on:
 jobs:
   test-patch-versions:
     name: Test Ballerina Library Package Patch Releases
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -41,7 +41,7 @@ jobs:
 
   test-minor-versions:
     name: Test Minor Ballerina Library Package Releases
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3

@@ -13,7 +13,7 @@ on:
 jobs:
   generate-matrix:
     name: Generate Matrix
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       directories: ${{ steps.set-matrix.outputs.directories }}
     steps:
@@ -33,7 +33,7 @@ jobs:
           echo "directories=$(jq -nc --args '$ARGS.positional' ${folders[@]})" >> $GITHUB_OUTPUT
 
   publish-release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: generate-matrix
     strategy:
       matrix:

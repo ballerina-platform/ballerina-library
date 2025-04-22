@@ -10,7 +10,7 @@ on:
 jobs:
   generate-matrix:
     name: Generate Matrix
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       directories: ${{ steps.set-matrix.outputs.directories }}
     steps:
@@ -31,7 +31,7 @@ jobs:
 
   build-connectors:
     name: Build Connectors
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: generate-matrix
     strategy:
       matrix:
@@ -62,7 +62,7 @@ jobs:
 
   upload-codcov:
     name: Upload Codecov
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: build-connectors
     steps:
       - name: Download coverage reports
@@ -76,7 +76,7 @@ jobs:
 
   build-examples:
     name: Build Examples
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: build-connectors
     steps:
       - name: Checkout Repository
