@@ -79,6 +79,9 @@
             "name": "module-ballerina-mqtt"
         },
         {
+            "name": "module-ballerina-np"
+        },
+        {
             "name": "module-ballerina-oauth2",
             "version_key": "stdlibOAuth2Version"
         },
