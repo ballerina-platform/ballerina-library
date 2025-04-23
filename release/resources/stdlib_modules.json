@@ -479,6 +479,7 @@
             "release": true,
             "dependents": [
                 "module-ballerina-grpc",
+                "module-ballerina-np",
                 "module-ballerina-soap",
                 "module-ballerinai-transaction",
                 "module-ballerina-websocket",
@@ -501,6 +502,16 @@
                 "openapi-tools",
                 "protoc-tools"
             ],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerina-np",
+            "module_version": "0.3.0-SNAPSHOT",
+            "level": 6,
+            "default_branch": "main",
+            "version_key": "stdlibNpVersion",
+            "release": true,
+            "dependents": [],
             "is_multiple_connectors": false
         },
         {
