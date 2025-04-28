@@ -45,15 +45,16 @@ jobs:
                   java-version: '21'
 
             - name: Checkout Ballerina Lang Repository
-              if: ${{ inputs.lang_version == '' }}
+              if: ${{ inputs.lang_version == '' && github.event_name != 'pull_request' }}
               uses: actions/checkout@v3
               with:
                   repository: 'ballerina-platform/ballerina-lang'
                   ref: ${{ inputs.lang_tag || 'master' }}
 
             - name: Set Ballerina Lang version
+              if: ${{ github.event_name != 'pull_request' }}
               run: |
-                  if ${{ inputs.lang_version != ''}}; then
+                  if ${{ inputs.lang_version != '' }}; then
                       LANG_VERSION=${{ inputs.lang_version }}
                   else
                       VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties | rev | cut --complement -d- -f1 | rev)
@@ -63,7 +64,7 @@ jobs:
                   echo "BALLERINA_LANG_VERSION: $LANG_VERSION"
 
             - name: Build Ballerina Lang
-              if: ${{ inputs.lang_version == '' }}
+              if: ${{ inputs.lang_version == '' && github.event_name != 'pull_request' }}
               run: |
                   perl -pi -e "s/^\s*version=.*/version=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
                   ./gradlew build -x test publishToMavenLocal --scan --no-daemon
@@ -101,7 +102,9 @@ jobs:
                   CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
                   REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
               run: |
-                  perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
+                  if ${{ github.event_name != 'pull_request' }}; then
+                      perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
+                  fi
                   ./gradlew build -PbalGraalVMTest ${{ inputs.additional_ubuntu_build_flags }}
 
     windows-build-with-bal-test-graalvm:
@@ -120,13 +123,14 @@ jobs:
               run: git config --global core.longpaths true
 
             - name: Checkout Ballerina Lang Repository
-              if: ${{ inputs.lang_version == '' }}
+              if: ${{ inputs.lang_version == '' && github.event_name != 'pull_request' }}
               uses: actions/checkout@v3
               with:
                   repository: 'ballerina-platform/ballerina-lang'
                   ref: ${{ inputs.lang_tag || 'master' }}
 
             - name: Set Ballerina Lang version
+              if: ${{ github.event_name != 'pull_request' }}
               run: |
                   if ("${{ inputs.lang_version }}" -eq "") {
                     $properties = convertfrom-stringdata (get-content ./gradle.properties -raw)
@@ -138,16 +142,18 @@ jobs:
                   Write-Output "BALLERINA_LANG_VERSION: $LANG_VERSION"
 
             - name: Configure Pagefile
+              if: ${{ github.event_name != 'pull_request' }}
               uses: al-cheb/configure-pagefile-action@v1.3
               with:
                   minimum-size: 10GB
                   maximum-size: 16GB
 
             - name: Get configured pagefile base size
+              if: ${{ github.event_name != 'pull_request' }}
               run: (Get-CimInstance Win32_PageFileUsage).AllocatedBaseSize
 
             - name: Build Ballerina Lang
-              if: ${{ inputs.lang_version == '' }}
+              if: ${{ inputs.lang_version == '' && github.event_name != 'pull_request' }}
               run: |
                   perl -pi -e "s/^\s*version=.*/version=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
                   ./gradlew.bat build -x test publishToMavenLocal --continue -x javadoc --stacktrace -scan --console=plain --no-daemon --no-parallel
@@ -194,5 +200,7 @@ jobs:
                   CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
                   REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
               run: |
-                  perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
+                  if (${{ github.event_name != 'pull_request' }}) {
+                      perl -pi -e "s/^\s*version=.*/version=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
+                  }
                   ./gradlew.bat build -PbalGraalVMTest ${{ inputs.additional_windows_build_flags }}
