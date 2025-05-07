@@ -356,7 +356,6 @@
                 "module-ballerina-websub",
                 "module-ballerina-websubhub",
                 "module-ballerinax-persist.redis",
-                "module-ballerinax-wso2.controlplane",
                 "module-ballerinax-ibm.ibmmq",
                 "module-ballerinax-java.jms"
             ],
@@ -486,7 +485,6 @@
                 "module-ballerina-websub",
                 "module-ballerina-websubhub",
                 "module-ballerinax-persist.redis",
-                "module-ballerinax-wso2.controlplane",
                 "module-ballerinax-confluent.cavroserdes"
             ],
             "is_multiple_connectors": false
@@ -667,8 +665,8 @@
         },
         {
             "name": "module-ballerinax-wso2.controlplane",
-            "module_version": "1.1.0",
-            "level": 6,
+            "module_version": "1.1.0-SNAPSHOT",
+            "level": 1,
             "default_branch": "main",
             "version_key": "stdlibWso2ControlplaneVersion",
             "release": true,
