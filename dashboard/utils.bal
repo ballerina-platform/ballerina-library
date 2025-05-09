@@ -51,11 +51,9 @@ isolated function getGeneratedConnectorDashboardRow(Module module) returns strin
     string repoLink = getRepoLink(module.name);
     string releaseBadge = getBadge(repoBadges.release);
     string buildStatusBadge = getBadge(repoBadges.buildStatus);
-    string trivyBadge = getBadge(repoBadges.trivy);
     string bugsBadge = getBadge(repoBadges.bugs);
     string pullRequestsBadge = getBadge(repoBadges.pullRequests);
-    string graalvmCheck = getBadge(repoBadges.graalvmCheck);
-    return string `|${repoLink}|${releaseBadge}|${buildStatusBadge}|${trivyBadge}|${bugsBadge}|${pullRequestsBadge}|${graalvmCheck}|`;
+    return string `|${repoLink}|${releaseBadge}|${buildStatusBadge}|${bugsBadge}|${pullRequestsBadge}|`;
 }
 
 function getDriverConnectorsDashboardRow(Module module) returns string|error {
