@@ -462,6 +462,9 @@
             "name": "asyncapi-tools"
         },
         {
+            "name": "consolidate-packages-tools"
+        },
+        {
             "name": "copybook-tools"
         },
         {
@@ -477,7 +480,10 @@
             "name": "persist-tools"
         },
         {
-            "name": "protoc-tools"
+            "name": "wsdl-tools"
+        },
+        {
+            "name": "xsd-tools"
         }
     ]
 }
