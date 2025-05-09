@@ -210,7 +210,7 @@
         },
         {
             "name": "module-ballerina-task",
-            "module_version": "2.9.0-SNAPSHOT",
+            "module_version": "2.9.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibTaskVersion",
