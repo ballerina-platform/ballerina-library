@@ -50,14 +50,14 @@ const DASHBOARD_TITLE = "## Status Dashboard";
 const HEADER_LIBRARY_MODULES_DASHBOARD = "| Level | Name | Latest Version | Build | Security Check | Code Coverage | Bugs | Open PRs | Load Test Results | GraalVM Check |";
 const HEADER_EXTENDED_MODULES_DASHBOARD = "| Name | Latest Version | Build | Security Check | Code Coverage | Bugs | Open PRs | Load Test Results | GraalVM Check |";
 const HEADER_HANDWRITTEN_CONNECTOR_DASHBOARD = "| Name | Latest Version | Build | Security Check | Code Coverage | Bugs | Open PRs | Load Test Results | GraalVM Check |";
-const HEADER_GENERATED_CONNECTOR_DASHBOARD = "| Name | Latest Version | Build | Security Check | Bugs | Open PRs | GraalVM Check |";
+const HEADER_GENERATED_CONNECTOR_DASHBOARD = "| Name | Latest Version | Build | Bugs | Open PRs |";
 const HEADER_DRIVER_MODULES_DASHBOARD = "| Name | Latest Version | Build | Security Check |";
 const HEADER_TOOLS_DASHBOARD = "| Name | Latest Version | Build | Security Check | Code Coverage | Bugs | Open PRs |";
 
 const HEADER_SEPARATOR_LIBRARY_MODULES = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|";
 const HEADER_SEPARATOR_EXTENDED_MODULES = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|";
 const HEADER_SEPARATOR_HANDWRITTEN_CONNECTORS = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|";
-const HEADER_SEPARATOR_GENERATED_CONNECTORS = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|";
+const HEADER_SEPARATOR_GENERATED_CONNECTORS = "|:---:|:---:|:---:|:---:|:---:|";
 const HEADER_SEPARATOR_DRIVER_MODULES = "|:---:|:---:|:---:|:---:|";
 const HEADER_SEPARATOR_TOOLS = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|";
 
