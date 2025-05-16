@@ -182,7 +182,6 @@ jobs:
           git add docs/spec/
           if ! git diff --cached --quiet; then
             git commit -m "[AUTOMATED] Update OpenAPI spec"
-            changed=true
           fi
 
           # Second commit: all other changes
@@ -198,7 +197,7 @@ jobs:
             echo "hasChanged=true" >> $GITHUB_OUTPUT
           else
             echo "hasChanged=false" >> $GITHUB_OUTPUT
-            echo "No changes to commit."
+            echo "No changes in the client generation to commit."
           fi
 
       - name: Push Results
