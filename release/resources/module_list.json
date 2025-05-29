@@ -148,6 +148,9 @@
     ],
     "extended_modules": [
         {
+            "name": "module-ballerinax-cdc"
+        },
+        {
             "name": "module-ballerinax-copybook"
         },
         {
@@ -437,8 +440,14 @@
             "version_key": "stdlibH2DriverVersion"
         },
         {
+            "name": "module-ballerinax-mssql.cdc.driver"
+        },
+        {
             "name": "module-ballerinax-mssql.driver",
             "version_key": "stdlibMssqlDriverVersion"
+        },
+        {
+            "name": "module-ballerinax-mysql.cdc.driver"
         },
         {
             "name": "module-ballerinax-mysql.driver",
@@ -447,6 +456,9 @@
         {
             "name": "module-ballerinax-oracledb.driver",
             "version_key": "stdlibOracledbDriverVersion"
+        },
+        {
+            "name": "module-ballerinax-postgresql.cdc.driver"
         },
         {
             "name": "module-ballerinax-postgresql.driver",
