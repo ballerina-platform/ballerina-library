@@ -474,7 +474,7 @@
             "name": "asyncapi-tools"
         },
         {
-            "name": "consolidate-packages-tools"
+            "name": "consolidate-packages-tool"
         },
         {
             "name": "copybook-tools"
