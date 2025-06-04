@@ -360,7 +360,7 @@
         },
         {
             "name": "module-ballerina-task",
-            "module_version": "2.10.0-SNAPSHOT",
+            "module_version": "2.10.1-SNAPSHOT",
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibTaskVersion",
@@ -944,7 +944,7 @@
         },
         {
             "name": "module-ballerinax-candid",
-            "module_version": "0.1.2-SNAPSHOT",
+            "module_version": "0.2.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibCandidVersion",
