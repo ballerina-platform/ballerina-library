@@ -12,20 +12,16 @@ on:
       target_repo:
         description: 'The repository where the selected template will be applied.'
         required: true
-        example: 'module-ballerinax-openai.chat'
       module_name:
         description: 'The module name as defined in the Ballerina.toml file.'
         required: true
-        example: 'openai.chat'
       ballerina_version:
         description: 'The Ballerina version that the library should be compatible with.'
         required: true
-        example: '2201.9.0'
       module_version:
         description: 'The version number of the library module.'
         required: true
         default: '0.1.0'
-        example: '1.0.0'
       target_branch:
         description: 'The branch in the target repository where changes will be applied.'
         required: false
@@ -33,12 +29,10 @@ on:
       library_name:
         description: 'A descriptive name for the library, used in the documentation. If not provided, the module name will be used instead.'
         required: false
-        example: 'OpenAI Chat'
         default: ''
       code_owners:
         description: 'The CODEOWNERS of the repository'
         required: true
-        example: '@user1 @user2'
         default: ''
 
 jobs:
