@@ -31,6 +31,7 @@ public type TemplateFileType "bal"|"md"|"json"|"yaml"|"yml"|"toml"|"gradle"|"pro
 # + moduleVersion - The version of the module to be used in the `Ballerina.toml` file
 # + balVersion - The Ballerina version to be used
 # + connectorName - The descriptive name of the connector to be used in the generated files
+# + codeOwners - The code owners of the connector to be used in the `CODEOWNERS` file
 # + return - An error if an error occurs while generating the connector template
 public function main(string path, string moduleName, string repoName, string moduleVersion, string balVersion, string connectorName, string codeOwners) returns error? {
     log:printInfo("Generating connector template with the following metadata:");
@@ -48,7 +49,7 @@ public function main(string path, string moduleName, string repoName, string mod
         "MODULE_VERSION": moduleVersion,
         "BAL_VERSION": balVersion,
         "LICENSE_YEAR": time:utcToCivil(time:utcNow()).year.toString(),
-        "@@CODEOWNERS@@": codeOwners
+        "CODEOWNERS": codeOwners
     };
 
     // Recursively process all files in the target directory
