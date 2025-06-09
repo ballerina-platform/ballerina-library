@@ -10,7 +10,7 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# .DS_Store files
+# macOS Files
 *.DS_Store
 
 # Package Files
@@ -34,17 +34,14 @@ target
 *.iml
 *.iws
 *.ipr
-.idea
 .m2
 .vscode/
+.cursor/
+.idea
 
 # Ignore ballerina files
-accessToken.bal
-temp.bal.ballerina/
 target/
 generated/
-.DS_Store
-*Ballerina.lock
 .ballerina
 **/Config.toml
 
