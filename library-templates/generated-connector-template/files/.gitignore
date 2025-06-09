@@ -37,6 +37,8 @@ target
 .idea
 .m2
 .vscode/
+.cursor/
+.idea
 
 # Ignore ballerina files
 accessToken.bal
