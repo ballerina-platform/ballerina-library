@@ -23,6 +23,8 @@ import ballerina/time;
 // Define file extensions to be accepted as template files
 public type TemplateFileType "bal"|"md"|"json"|"yaml"|"yml"|"toml"|"gradle"|"properties"|"gitignore"|"txt"|"sh"|"bat"|"LICENSE"|"CODEOWNERS";
 
+final string[] SKIP_DIRS = [".git", ".gradle"];
+
 # This function generates a connector template with the given metadata.
 #
 # + path - The relative path to the directory where the connector template is located
@@ -57,6 +59,12 @@ public function main(string path, string moduleName, string repoName, string mod
 }
 
 function processDirectory(string dir, map<string> placeholders) returns error? {
+    string name = check file:basename(dir);
+    if SKIP_DIRS.indexOf(name) is int {
+        log:printInfo(string `Skipping directory: ${name}`);
+        return;
+    }
+
     file:MetaData[] files = check file:readDir(dir);
     foreach file:MetaData file in files {
         if file.dir {
@@ -68,9 +76,11 @@ function processDirectory(string dir, map<string> placeholders) returns error? {
 }
 
 function processFile(string filePath, map<string> placeholders) returns error? {
-    string ext = getExtension(filePath);
+    string fileName = check file:basename(filePath);
+    int? lastDotIndex = fileName.lastIndexOf(".");
+    string ext = lastDotIndex is int ? fileName.substring(lastDotIndex + 1) : fileName;
     if ext !is TemplateFileType {
-        log:printInfo("Skipping file: " + filePath);
+        log:printInfo(string `Skipping file: ${fileName}`);
         return;
     }
 
@@ -85,10 +95,15 @@ function processFile(string filePath, map<string> placeholders) returns error? {
     }
 
     check io:fileWriteString(filePath, content + "\n");
-    log:printInfo("Added file: " + filePath);
+    log:printInfo(string `Added file: ${fileName}`);
 }
 
-function getExtension(string filePath) returns string {
-    string[] nameParts = regexp:split(re `\.`, filePath);
-    return nameParts[nameParts.length() - 1];
+# Returns the name and the extension of a given file path.
+#
+# + filePath - The path of the file to get the extension of
+# + return - The name and the extension of the file, as a tuple. The first element is the name and the second element is the extension.
+function getFileInfo(string filePath) returns [string, string]|error {
+    string fileName = check file:basename(filePath);
+    string[] nameParts = regexp:split(re `\.`, fileName);
+    return [nameParts[0], nameParts[nameParts.length() - 1]];
 }
