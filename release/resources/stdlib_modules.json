@@ -41,6 +41,21 @@
             "is_multiple_connectors": false
         },
         {
+            "name": "module-ballerina-persist",
+            "module_version": "1.6.1-SNAPSHOT",
+            "level": 1,
+            "default_branch": "main",
+            "version_key": "stdlibPersistVersion",
+            "release": true,
+            "dependents": [
+                "module-ballerinax-persist.googlesheets",
+                "module-ballerinax-persist.inmemory",
+                "module-ballerinax-persist.redis",
+                "module-ballerinax-persist.sql"
+            ],
+            "is_multiple_connectors": false
+        },
+        {
             "name": "module-ballerina-time",
             "module_version": "2.8.0-SNAPSHOT",
             "level": 1,
@@ -51,9 +66,9 @@
                 "module-ballerina-constraint",
                 "module-ballerina-crypto",
                 "module-ballerina-file",
-                "module-ballerina-persist",
                 "module-ballerina-protobuf",
                 "module-ballerina-random",
+                "module-ballerinax-persist.inmemory",
                 "module-ballerinax-aws.marketplace.mpe",
                 "module-ballerinax-aws.marketplace.mpm"
             ],
@@ -158,21 +173,6 @@
             "release": true,
             "dependents": [
                 "module-ballerina-file"
-            ],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerina-persist",
-            "module_version": "1.6.1-SNAPSHOT",
-            "level": 2,
-            "default_branch": "main",
-            "version_key": "stdlibPersistVersion",
-            "release": true,
-            "dependents": [
-                "module-ballerinax-persist.googlesheets",
-                "module-ballerinax-persist.inmemory",
-                "module-ballerinax-persist.redis",
-                "module-ballerinax-persist.sql"
             ],
             "is_multiple_connectors": false
         },
@@ -633,7 +633,7 @@
         {
             "name": "module-ballerinax-persist.inmemory",
             "module_version": "1.6.1-SNAPSHOT",
-            "level": 3,
+            "level": 2,
             "default_branch": "main",
             "version_key": "stdlibPersistInmemoryVersion",
             "release": true,
