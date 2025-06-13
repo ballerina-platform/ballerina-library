@@ -93,7 +93,9 @@
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
             "release": true,
-            "dependents": [],
+            "dependents": [
+                "module-ballerina-ai"
+            ],
             "is_multiple_connectors": false
         },
         {
@@ -389,7 +391,9 @@
             "default_branch": "main",
             "version_key": "stdlibYamlVersion",
             "release": true,
-            "dependents": [],
+            "dependents": [
+                "module-ballerina-ai"
+            ],
             "is_multiple_connectors": false
         },
         {
@@ -470,6 +474,7 @@
             "version_key": "stdlibHttpVersion",
             "release": true,
             "dependents": [
+                "module-ballerina-ai",
                 "module-ballerina-grpc",
                 "module-ballerina-np",
                 "module-ballerina-soap",
@@ -480,6 +485,16 @@
                 "module-ballerinax-persist.redis",
                 "module-ballerinax-confluent.cavroserdes"
             ],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerina-ai",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 8,
+            "default_branch": "main",
+            "version_key": "stdlibAiVersion",
+            "release": true,
+            "dependents": [],
             "is_multiple_connectors": false
         },
         {
@@ -868,7 +883,7 @@
         },
         {
             "name": "module-ballerinax-postgresql",
-            "module_version": "1.16.1-SNAPSHOT",
+            "module_version": "1.16.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
