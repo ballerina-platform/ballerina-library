@@ -1,6 +1,9 @@
 {
     "library_modules": [
         {
+            "name": "module-ballerina-ai"
+        },
+        {
             "name": "module-ballerina-auth"
         },
         {
@@ -80,9 +83,6 @@
         },
         {
             "name": "module-ballerina-np"
-        },
-        {
-            "name": "module-ballerina-ai"
         },
         {
             "name": "module-ballerina-oauth2",
