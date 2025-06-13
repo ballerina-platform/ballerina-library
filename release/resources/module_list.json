@@ -82,6 +82,9 @@
             "name": "module-ballerina-np"
         },
         {
+            "name": "module-ballerina-ai"
+        },
+        {
             "name": "module-ballerina-oauth2",
             "version_key": "stdlibOAuth2Version"
         },
