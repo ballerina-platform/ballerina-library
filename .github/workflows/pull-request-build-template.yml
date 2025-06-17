@@ -65,11 +65,6 @@ jobs:
           group: ${{ github.head_ref }}-windows-build
           cancel-in-progress: true
         steps:
-            - name: Set git to use LF
-              run: |
-                git config --global core.autocrlf false
-                git config --global core.eol lf
-                
             -   name: Checkout Repository
                 uses: actions/checkout@v3
 
