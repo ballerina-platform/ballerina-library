@@ -1717,7 +1717,7 @@
         },
         {
             "name": "persist-tools",
-            "module_version": "1.6.1-SNAPSHOT",
+            "module_version": "1.7.0-SNAPSHOT",
             "level": 14,
             "default_branch": "main",
             "version_key": "stdlibPersist-toolsVersion",
