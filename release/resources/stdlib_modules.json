@@ -851,7 +851,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "module_version": "1.16.1-SNAPSHOT",
+            "module_version": "1.16.2-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
