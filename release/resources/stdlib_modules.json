@@ -1019,7 +1019,7 @@
         },
         {
             "name": "module-ballerinax-elastic.elasticcloud",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibElastic.elasticcloudVersion",
@@ -1429,7 +1429,7 @@
         },
         {
             "name": "module-ballerinax-jira",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibJiraVersion",
@@ -1439,7 +1439,7 @@
         },
         {
             "name": "module-ballerinax-mailchimp.marketing",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibMailchimp.marketingVersion",
@@ -1449,7 +1449,7 @@
         },
         {
             "name": "module-ballerinax-mailchimp.transactional",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibMailchimp.transactionalVersion",
@@ -1459,7 +1459,7 @@
         },
         {
             "name": "module-ballerinax-openai",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibOpenaiVersion",
@@ -1469,7 +1469,7 @@
         },
         {
             "name": "module-ballerinax-paypal.invoices",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPaypal.invoicesVersion",
@@ -1479,7 +1479,7 @@
         },
         {
             "name": "module-ballerinax-paypal.orders",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPaypal.ordersVersion",
@@ -1489,7 +1489,7 @@
         },
         {
             "name": "module-ballerinax-paypal.payments",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPaypal.paymentsVersion",
@@ -1499,7 +1499,7 @@
         },
         {
             "name": "module-ballerinax-paypal.subscriptions",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPaypal.subscriptionsVersion",
@@ -1539,7 +1539,7 @@
         },
         {
             "name": "module-ballerinax-trello",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibTrelloVersion",
@@ -1579,7 +1579,7 @@
         },
         {
             "name": "module-ballerinax-zoom.meetings",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibZoom.meetingsVersion",
@@ -1589,7 +1589,7 @@
         },
         {
             "name": "module-ballerinax-zoom.scheduler",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibZoom.schedulerVersion",
