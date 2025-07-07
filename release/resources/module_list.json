@@ -396,21 +396,6 @@
             "name": "module-ballerinax-hubspot.marketing.transactional"
         },
         {
-            "name": "module-ballerinax-openai.assistants"
-        },
-        {
-            "name": "module-ballerinax-openai.audio"
-        },
-        {
-            "name": "module-ballerinax-openai.chat"
-        },
-        {
-            "name": "module-ballerinax-openai.finetunes"
-        },
-        {
-            "name": "module-ballerinax-openai.images"
-        },
-        {
             "name": "module-ballerinax-sap.s4hana.sales",
             "is_multiple_connectors": true
         },
@@ -428,6 +413,42 @@
         },
         {
             "name": "module-ballerinax-zendesk"
+        },
+        {
+            "name": "module-ballerinax-openai"
+        },
+        {
+            "name": "module-ballerinax-mailchimp.marketing"
+        },
+        {
+            "name": "module-ballerinax-mailchimp.transactional"
+        },
+        {
+            "name": "module-ballerinax-zoom.meetings"
+        },
+        {
+            "name": "module-ballerinax-zoom.scheduler"
+        },
+        {
+            "name": "module-ballerinax-trello"
+        },
+        {
+            "name": "module-ballerinax-jira"
+        },
+        {
+            "name": "module-ballerinax-elastic.elasticcloud"
+        },
+        {
+            "name": "module-ballerinax-paypal.subscriptions"
+        },
+        {
+            "name": "module-ballerinax-paypal.orders"
+        },
+        {
+            "name": "module-ballerinax-paypal.payments"
+        },
+        {
+            "name": "module-ballerinax-paypal.invoices"
         }
     ],
     "driver_modules": [
