@@ -1018,6 +1018,16 @@
             "is_multiple_connectors": false
         },
         {
+            "name": "module-ballerinax-elastic.elasticcloud",
+            "module_version": "1.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibElastic.elasticcloudVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
             "name": "module-ballerinax-github",
             "module_version": "5.1.1-SNAPSHOT",
             "level": 100,
@@ -1418,51 +1428,81 @@
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-openai.assistants",
+            "name": "module-ballerinax-jira",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibJiraVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-mailchimp.marketing",
             "module_version": "1.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibOpenai.assistantsVersion",
+            "version_key": "stdlibMailchimp.marketingVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-openai.audio",
-            "module_version": "3.0.0-SNAPSHOT",
+            "name": "module-ballerinax-mailchimp.transactional",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibOpenai.audioVersion",
+            "version_key": "stdlibMailchimp.transactionalVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-openai.chat",
-            "module_version": "4.0.1-SNAPSHOT",
+            "name": "module-ballerinax-openai",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibOpenai.chatVersion",
+            "version_key": "stdlibOpenaiVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-openai.finetunes",
-            "module_version": "3.0.0-SNAPSHOT",
+            "name": "module-ballerinax-paypal.invoices",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibOpenai.finetunesVersion",
+            "version_key": "stdlibPaypal.invoicesVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-openai.images",
-            "module_version": "2.0.1-SNAPSHOT",
+            "name": "module-ballerinax-paypal.orders",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibOpenai.imagesVersion",
+            "version_key": "stdlibPaypal.ordersVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-paypal.payments",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibPaypal.paymentsVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-paypal.subscriptions",
+            "module_version": "1.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibPaypal.subscriptionsVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
@@ -1498,6 +1538,16 @@
             "is_multiple_connectors": false
         },
         {
+            "name": "module-ballerinax-trello",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibTrelloVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
             "name": "module-ballerinax-twilio",
             "module_version": "5.0.1-SNAPSHOT",
             "level": 100,
@@ -1523,6 +1573,26 @@
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibZendeskVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-zoom.meetings",
+            "module_version": "1.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibZoom.meetingsVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-zoom.scheduler",
+            "module_version": "1.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibZoom.schedulerVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
