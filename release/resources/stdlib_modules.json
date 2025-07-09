@@ -37,7 +37,9 @@
             "default_branch": "main",
             "version_key": "stdlibMathVectorVersion",
             "release": true,
-            "dependents": [],
+            "dependents": [
+                "module-ballerina-ai"
+            ],
             "is_multiple_connectors": false
         },
         {
@@ -93,9 +95,7 @@
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
             "release": true,
-            "dependents": [
-                "module-ballerina-ai"
-            ],
+            "dependents": [],
             "is_multiple_connectors": false
         },
         {
@@ -227,6 +227,7 @@
             "version_key": "stdlibDataXmldataVersion",
             "release": true,
             "dependents": [
+                "module-ballerina-ai",
                 "asyncapi-tools",
                 "openapi-tools"
             ],
@@ -489,7 +490,7 @@
         },
         {
             "name": "module-ballerina-ai",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibAiVersion",
