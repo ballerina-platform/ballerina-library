@@ -477,7 +477,6 @@
             "dependents": [
                 "module-ballerina-ai",
                 "module-ballerina-grpc",
-                "module-ballerina-np",
                 "module-ballerina-soap",
                 "module-ballerinai-transaction",
                 "module-ballerina-websocket",
@@ -495,7 +494,9 @@
             "default_branch": "main",
             "version_key": "stdlibAiVersion",
             "release": true,
-            "dependents": [],
+            "dependents": [
+                "module-ballerina-np"
+            ],
             "is_multiple_connectors": false
         },
         {
@@ -508,16 +509,6 @@
             "dependents": [
                 "openapi-tools"
             ],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerina-np",
-            "module_version": "0.3.1-SNAPSHOT",
-            "level": 8,
-            "default_branch": "main",
-            "version_key": "stdlibNpVersion",
-            "release": true,
-            "dependents": [],
             "is_multiple_connectors": false
         },
         {
@@ -591,6 +582,16 @@
                 "graphql-tools",
                 "openapi-tools"
             ],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerina-np",
+            "module_version": "0.4.0-SNAPSHOT",
+            "level": 9,
+            "default_branch": "main",
+            "version_key": "stdlibNpVersion",
+            "release": true,
+            "dependents": [],
             "is_multiple_connectors": false
         },
         {
