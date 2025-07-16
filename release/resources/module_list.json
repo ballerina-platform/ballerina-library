@@ -423,6 +423,9 @@
             "name": "module-ballerinax-paypal.subscriptions"
         },
         {
+            "name": "module-ballerinax-salesforce.marketingcloud"
+        },
+        {
             "name": "module-ballerinax-sap.s4hana.sales",
             "is_multiple_connectors": true
         },
