@@ -343,7 +343,7 @@
         },
         {
             "name": "module-ballerina-edi",
-            "module_version": "1.5.2-SNAPSHOT",
+            "module_version": "1.5.3-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibEdiVersion",
@@ -1505,6 +1505,16 @@
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPaypal.subscriptionsVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-salesforce.marketingcloud",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibSalesforce.marketingcloudVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
