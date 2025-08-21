@@ -93,7 +93,7 @@ jobs:
           CENTRAL_VERBOSE_ENABLED: true
         run: |
           ./gradlew clean release -Prelease.useAutomaticVersion=true
-          ./gradlew -Pversion=${VERSION} publish -x test -PpublishToCentral=true ${{ inputs.additional-publish-flags }}
+          ./gradlew -Pversion=${VERSION} publish -x test -PpublishToCentral=false ${{ inputs.additional-publish-flags }}
 
       - name: GitHub Release and Release Sync PR
         env:
