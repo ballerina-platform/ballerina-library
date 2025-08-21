@@ -105,7 +105,6 @@ jobs:
           publishPAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
         run: |
           ./gradlew clean release -Prelease.useAutomaticVersion=true ${{ inputs.additional-release-flags }}
-          ./gradlew -Pversion=${VERSION} publish -x test -PpublishToCentral=false ${{ inputs.additional-publish-flags }}
 
       - name: GitHub Release and Release Sync PR
         env:
