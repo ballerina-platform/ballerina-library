@@ -433,6 +433,9 @@
             "name": "module-ballerinax-slack"
         },
         {
+            "name": "module-ballerinax-smartsheet"
+        },
+        {
             "name": "module-ballerinax-stripe"
         },
         {
