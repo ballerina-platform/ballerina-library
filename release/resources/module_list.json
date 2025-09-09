@@ -408,6 +408,9 @@
             "name": "module-ballerinax-mailchimp.transactional"
         },
         {
+            "name": "module-ballerinax-microsoft.onedrive"
+        },
+        {
             "name": "module-ballerinax-openai"
         },
         {
