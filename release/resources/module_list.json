@@ -4,6 +4,9 @@
             "name": "module-ballerina-ai"
         },
         {
+            "name": "module-ballerina-ai.np"
+        },
+        {
             "name": "module-ballerina-auth"
         },
         {
@@ -80,9 +83,6 @@
         },
         {
             "name": "module-ballerina-mqtt"
-        },
-        {
-            "name": "module-ballerina-ai.np"
         },
         {
             "name": "module-ballerina-oauth2",
