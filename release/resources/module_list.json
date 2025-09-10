@@ -82,7 +82,7 @@
             "name": "module-ballerina-mqtt"
         },
         {
-            "name": "module-ballerina-np"
+            "name": "module-ballerina-ai.np"
         },
         {
             "name": "module-ballerina-oauth2",
