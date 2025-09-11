@@ -1540,6 +1540,16 @@
             "is_multiple_connectors": true
         },
         {
+            "name": "module-ballerinax-scim",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibScimVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
             "name": "module-ballerinax-slack",
             "module_version": "5.0.0-SNAPSHOT",
             "level": 100,
