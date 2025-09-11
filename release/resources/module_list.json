@@ -433,6 +433,9 @@
             "is_multiple_connectors": true
         },
         {
+            "name": "module-ballerinax-scim"
+        },
+        {
             "name": "module-ballerinax-slack"
         },
         {
