@@ -1819,7 +1819,7 @@
         },
         {
             "name": "openapi-tools",
-            "module_version": "2.3.3-SNAPSHOT",
+            "module_version": "2.4.0-SNAPSHOT",
             "level": 10,
             "default_branch": "master",
             "version_key": "stdlibOpenapi-toolsVersion",
