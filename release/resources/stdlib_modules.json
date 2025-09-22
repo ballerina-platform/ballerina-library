@@ -489,7 +489,7 @@
         },
         {
             "name": "module-ballerina-ai",
-            "module_version": "1.5.2-SNAPSHOT",
+            "module_version": "1.5.3-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibAiVersion",
@@ -596,7 +596,7 @@
         },
         {
             "name": "module-ballerina-sql",
-            "module_version": "1.17.0-SNAPSHOT",
+            "module_version": "1.17.1-SNAPSHOT",
             "level": 9,
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
