@@ -445,7 +445,7 @@
         },
         {
             "name": "module-ballerina-jwt",
-            "module_version": "2.15.1-SNAPSHOT",
+            "module_version": "2.16.0-SNAPSHOT",
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibJwtVersion",
@@ -563,7 +563,7 @@
         },
         {
             "name": "module-ballerina-websubhub",
-            "module_version": "1.15.1-SNAPSHOT",
+            "module_version": "1.15.2-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibWebsubhubVersion",
