@@ -119,11 +119,9 @@ jobs:
                   distribution: 'temurin'
                   java-version: '21'
 
-            - name: Git configure long path & eol 
+            - name: Git configure long path
               run: |
                   git config --global core.longpaths true
-                  git config --global core.autocrlf false
-                  git config --global core.eol lf
                 
             - name: Checkout Ballerina Lang Repository
               if: ${{ inputs.lang_version == '' && github.event_name != 'pull_request' }}
