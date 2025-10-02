@@ -819,7 +819,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "module_version": "4.6.1-SNAPSHOT",
+            "module_version": "4.6.2-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
