@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSE Client - Ballerina HTTP Module Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+        input, button {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .messages {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .message {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .chat-message {
+            background-color: #e3f2fd;
+            border-left: 3px solid #2196f3;
+        }
+        .time-update {
+            background-color: #f3e5f5;
+            border-left: 3px solid #9c27b0;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .status.connected {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .endpoint-info {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SSE Client - Ballerina HTTP Module Example</h1>
+        
+        <div class="endpoint-info">
+            <strong>Server Endpoints:</strong><br>
+            • Chat SSE: <code>GET /sse/chat</code><br>
+            • Time SSE: <code>GET /sse/time</code><br>
+            • Send Message: <code>POST /sse/messages</code><br>
+            • Get Messages: <code>GET /sse/messages</code><br>
+            • Health Check: <code>GET /sse/health</code>
+        </div>
+
+        <div class="section">
+            <h3>Connection Status</h3>
+            <div id="status" class="status disconnected">Disconnected</div>
+            <button id="connectBtn" onclick="connectToSSE()">Connect to Chat SSE</button>
+            <button id="disconnectBtn" onclick="disconnectFromSSE()" disabled>Disconnect</button>
+        </div>
+
+        <div class="section">
+            <h3>Send Message</h3>
+            <input type="text" id="username" placeholder="Username" value="WebClient">
+            <input type="text" id="message" placeholder="Enter your message">
+            <button onclick="sendMessage()">Send Message</button>
+        </div>
+
+        <div class="section">
+            <h3>SSE Messages</h3>
+            <div id="messages" class="messages"></div>
+            <button onclick="clearMessages()">Clear Messages</button>
+        </div>
+
+        <div class="section">
+            <h3>Server Actions</h3>
+            <button onclick="getAllMessages()">Get All Messages</button>
+            <button onclick="checkHealth()">Health Check</button>
+        </div>
+    </div>
+
+    <script>
+        let eventSource = null;
+        const serverUrl = 'http://localhost:9090';
+
+        function updateStatus(message, isConnected) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${isConnected ? 'connected' : 'disconnected'}`;
+        }
+
+        function addMessage(content, type = 'info') {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${content}`;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function connectToSSE() {
+            if (eventSource) {
+                eventSource.close();
+            }
+
+            eventSource = new EventSource(`${serverUrl}/sse/chat`);
+            
+            eventSource.onopen = function() {
+                updateStatus('Connected to Chat SSE', true);
+                document.getElementById('connectBtn').disabled = true;
+                document.getElementById('disconnectBtn').disabled = false;
+                addMessage('Connected to SSE stream', 'chat-message');
+            };
+
+            eventSource.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    addMessage(`<strong>${data.user}:</strong> ${data.message} <em>(${data.timestamp})</em>`, 'chat-message');
+                } catch (e) {
+                    addMessage(`Raw data: ${event.data}`, 'chat-message');
+                }
+            };
+
+            eventSource.addEventListener('chat-message', function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    addMessage(`<strong>${data.user}:</strong> ${data.message} <em>(${data.timestamp})</em>`, 'chat-message');
+                } catch (e) {
+                    addMessage(`Chat message: ${event.data}`, 'chat-message');
+                }
+            });
+
+            eventSource.addEventListener('time-update', function(event) {
+                addMessage(`Time update: ${event.data}`, 'time-update');
+            });
+
+            eventSource.onerror = function(event) {
+                updateStatus('Connection error', false);
+                document.getElementById('connectBtn').disabled = false;
+                document.getElementById('disconnectBtn').disabled = true;
+                addMessage('SSE connection error', 'error');
+            };
+        }
+
+        function disconnectFromSSE() {
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+            }
+            updateStatus('Disconnected', false);
+            document.getElementById('connectBtn').disabled = false;
+            document.getElementById('disconnectBtn').disabled = true;
+            addMessage('Disconnected from SSE stream', 'info');
+        }
+
+        async function sendMessage() {
+            const username = document.getElementById('username').value;
+            const message = document.getElementById('message').value;
+            
+            if (!username || !message) {
+                alert('Please enter both username and message');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${serverUrl}/sse/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user: username,
+                        message: message
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    addMessage(`Message sent successfully: ${result.status}`, 'info');
+                    document.getElementById('message').value = '';
+                } else {
+                    addMessage(`Error: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                addMessage(`Error sending message: ${error.message}`, 'error');
+            }
+        }
+
+        async function getAllMessages() {
+            try {
+                const response = await fetch(`${serverUrl}/sse/messages`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    addMessage(`Retrieved ${result.messages.length} messages`, 'info');
+                    result.messages.forEach(msg => {
+                        addMessage(`<strong>${msg.user}:</strong> ${msg.message} <em>(${msg.timestamp})</em>`, 'chat-message');
+                    });
+                } else {
+                    addMessage(`Error: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                addMessage(`Error getting messages: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkHealth() {
+            try {
+                const response = await fetch(`${serverUrl}/sse/health`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    addMessage(`Health check: ${result.status} (Port: ${result.port})`, 'info');
+                } else {
+                    addMessage(`Health check failed: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                addMessage(`Health check error: ${error.message}`, 'error');
+            }
+        }
+
+        function clearMessages() {
+            document.getElementById('messages').innerHTML = '';
+        }
+
+        // Auto-connect on page load
+        window.onload = function() {
+            addMessage('SSE Client loaded. Click "Connect to Chat SSE" to start receiving messages.', 'info');
+        };
+
+        // Clean up on page unload
+        window.onbeforeunload = function() {
+            if (eventSource) {
+                eventSource.close();
+            }
+        };
+    </script>
+</body>
+</html>
