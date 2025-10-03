@@ -26,13 +26,45 @@ jobs:
         with:
           version: nightly
 
-      - name: Set up GraalVM
+      - name: Check libc configuration
+        id: check_libc
+        run: |
+          if [ -f "ballerina/Ballerina.toml" ]; then
+            if grep -q 'libc.*=.*"musl"' ballerina/Ballerina.toml; then
+              echo "use_musl=true" >> $GITHUB_OUTPUT
+              echo "graalvm_variant=musl" >> $GITHUB_OUTPUT
+              echo "Using musl-based GraalVM configuration"
+            else
+              echo "use_musl=false" >> $GITHUB_OUTPUT
+              echo "graalvm_variant=glibc" >> $GITHUB_OUTPUT
+              echo "Using default glibc-based GraalVM configuration"
+            fi
+          else
+            echo "use_musl=false" >> $GITHUB_OUTPUT
+            echo "graalvm_variant=glibc" >> $GITHUB_OUTPUT
+            echo "Ballerina.toml not found, using default glibc-based GraalVM configuration"
+          fi
+
+      - name: Set up GraalVM (glibc)
+        if: steps.check_libc.outputs.use_musl != 'true'
         uses: graalvm/setup-graalvm@v1
         with:
           java-version: "21"
           distribution: "graalvm-community"
           set-java-home: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up GraalVM (musl)
+        if: steps.check_libc.outputs.use_musl == 'true'
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: "21"
+          distribution: "graalvm-community"
+          set-java-home: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          # Configure GraalVM for musl-based builds
+          GRAALVM_MUSL_SUPPORT: true
 
       - name: Check GraalVM installation
         run: |
@@ -53,7 +85,14 @@ jobs:
       - name: Remove Target Directory
         run: sudo rm -rf ballerina/target
 
-      - name: Test with GraalVM
+      - name: Test with GraalVM (glibc)
+        if: steps.check_libc.outputs.use_musl != 'true'
         run: |
           cd ballerina
           bal test --graalvm ${{ inputs.additional-test-flags }}
+
+      - name: Test with GraalVM (musl)
+        if: steps.check_libc.outputs.use_musl == 'true'
+        run: |
+          cd ballerina
+          bal test --graalvm --graalvm-build-options="--libc=musl" ${{ inputs.additional-test-flags }}

@@ -11,6 +11,7 @@ repository = "https://github.com/ballerina-platform/{{REPO_NAME}}"
 
 [build-options]
 observabilityIncluded = true
+# libc = "musl" # Remove Comment to use musl-based base image for GraalVM native builds
 
 [platform.java21]
 graalvmCompatible = true
