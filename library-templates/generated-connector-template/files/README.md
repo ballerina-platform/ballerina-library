@@ -98,6 +98,17 @@ Execute the commands below to build from the source.
    ./gradlew clean build -PpublishToCentral=true
    ```
 
+### GraalVM Native Image Options
+
+For building native executables using GraalVM, you can configure the libc implementation in the `Ballerina.toml` file:
+
+```toml
+[build-options]
+libc = "musl"
+```
+
+When `libc = "musl"` is set, the build will use musl-based images for GraalVM native compilation, resulting in smaller binaries compatible with Alpine Linux and other musl-based distributions. If not specified, the default glibc implementation is used.
+
 ## Contribute to Ballerina
 
 As an open-source project, Ballerina welcomes contributions from the community.

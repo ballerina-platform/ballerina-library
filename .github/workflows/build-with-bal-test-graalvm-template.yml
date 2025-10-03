@@ -86,6 +86,17 @@ jobs:
             - name: Checkout Module Repository
               uses: actions/checkout@v3
 
+            - name: Check libc configuration
+              id: check_libc
+              run: |
+                  if find . -name "Ballerina.toml" -exec grep -l 'libc.*=.*"musl"' {} \; | head -1; then
+                      echo "use_musl=true" >> $GITHUB_OUTPUT
+                      echo "Using musl-based GraalVM configuration"
+                  else
+                      echo "use_musl=false" >> $GITHUB_OUTPUT
+                      echo "Using default glibc-based GraalVM configuration"
+                  fi
+
             - name: Set default native-image options
               if: ${{  inputs.native_image_options != '' }}
               run: |
@@ -101,11 +112,18 @@ jobs:
                   CLIENT_ID: ${{ secrets.CLIENT_ID }}
                   CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
                   REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+                  BAL_GRAALVM_LIBC: ${{ steps.check_libc.outputs.use_musl == 'true' && 'musl' || 'glibc' }}
               run: |
                   if ${{ github.event_name != 'pull_request' }}; then
                       perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
                   fi
-                  ./gradlew build -PbalGraalVMTest ${{ inputs.additional_ubuntu_build_flags }}
+                  if [[ "${{ steps.check_libc.outputs.use_musl }}" == "true" ]]; then
+                      echo "Building with musl libc support"
+                      ./gradlew build -PbalGraalVMTest -PgraalvmLibc=musl ${{ inputs.additional_ubuntu_build_flags }}
+                  else
+                      echo "Building with default glibc support"
+                      ./gradlew build -PbalGraalVMTest ${{ inputs.additional_ubuntu_build_flags }}
+                  fi
 
     windows-build-with-bal-test-graalvm:
         name: Build with bal test graalvm on Windows
@@ -177,6 +195,18 @@ jobs:
             - name: Checkout Module Repository
               uses: actions/checkout@v3
 
+            - name: Check libc configuration
+              id: check_libc_windows
+              run: |
+                  $found = Get-ChildItem -Recurse -Name "Ballerina.toml" | Where-Object { (Get-Content $_) -match 'libc.*=.*"musl"' }
+                  if ($found) {
+                      "use_musl=true" >> $env:GITHUB_OUTPUT
+                      Write-Output "Using musl-based GraalVM configuration"
+                  } else {
+                      "use_musl=false" >> $env:GITHUB_OUTPUT
+                      Write-Output "Using default glibc-based GraalVM configuration"
+                  }
+
             - name: Set default native-image options
               if: ${{  inputs.native_image_options != '' }}
               run: |
@@ -200,8 +230,15 @@ jobs:
                   CLIENT_ID: ${{ secrets.CLIENT_ID }}
                   CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
                   REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+                  BAL_GRAALVM_LIBC: ${{ steps.check_libc_windows.outputs.use_musl == 'true' && 'musl' || 'glibc' }}
               run: |
                   if (${{ github.event_name != 'pull_request' }}) {
                       perl -pi -e "s/^\s*version=.*/version=${{ env.BALLERINA_LANG_VERSION }}/" gradle.properties
                   }
-                  ./gradlew.bat build -PbalGraalVMTest ${{ inputs.additional_windows_build_flags }}
+                  if ("${{ steps.check_libc_windows.outputs.use_musl }}" -eq "true") {
+                      Write-Output "Building with musl libc support"
+                      ./gradlew.bat build -PbalGraalVMTest -PgraalvmLibc=musl ${{ inputs.additional_windows_build_flags }}
+                  } else {
+                      Write-Output "Building with default glibc support"
+                      ./gradlew.bat build -PbalGraalVMTest ${{ inputs.additional_windows_build_flags }}
+                  }

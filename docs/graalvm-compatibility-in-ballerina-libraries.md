@@ -226,3 +226,14 @@ If you get GraalVM compatibility warnings when building or packing the library, 
 [platform.java21]
 graalvmCompatible = true
 ```
+
+### Configure libc for GraalVM native builds
+
+When building GraalVM native images, you can specify the libc implementation to use. By default, the build uses glibc. To use musl libc (which results in smaller, statically linked binaries suitable for Alpine Linux containers), add the following to the `Ballerina.toml`:
+
+```toml
+[build-options]
+libc = "musl"
+```
+
+When `libc = "musl"` is specified, the build system will automatically use a musl-based base image for the GraalVM native build, resulting in binaries that are compatible with Alpine Linux and other musl-based distributions.
