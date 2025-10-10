@@ -365,7 +365,7 @@ def get_stdlib_module_list(build_distribution, build_extended_modules, build_con
         print("append tools")
         if build_tools:
             modules = modules + module_list["tools"]
-        return module_list["modules"]
+        return modules
     except Exception as e:
         print("Failed to read the module list JSON file: " + str(e))
         sys.exit()
