@@ -413,7 +413,7 @@
         },
         {
             "name": "module-ballerina-email",
-            "module_version": "2.12.2-SNAPSHOT",
+            "module_version": "2.13.0-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibEmailVersion",
