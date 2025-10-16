@@ -489,7 +489,7 @@
         },
         {
             "name": "module-ballerina-ai",
-            "module_version": "1.5.5-SNAPSHOT",
+            "module_version": "1.6.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibAiVersion",
