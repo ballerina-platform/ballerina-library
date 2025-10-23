@@ -596,7 +596,7 @@
         },
         {
             "name": "module-ballerina-sql",
-            "module_version": "1.17.1-SNAPSHOT",
+            "module_version": "1.18.0-SNAPSHOT",
             "level": 9,
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
