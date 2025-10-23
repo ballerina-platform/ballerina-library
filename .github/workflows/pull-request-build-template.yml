@@ -74,12 +74,6 @@ jobs:
                     distribution: 'temurin'
                     java-version: 21.0.3
 
-            -   name: Git configure long path & eol
-                run: |
-                  git config --global core.longpaths true
-                  git config --global core.autocrlf false
-                  git config --global core.eol lf
-
             - name: Set ENV Variables
               run: |
                 echo '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' | Out-File -FilePath $env:GITHUB_ENV -Append
