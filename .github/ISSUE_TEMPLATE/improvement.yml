@@ -2,6 +2,35 @@ name: "🚀 Improvement Request"
 description: Suggest an improvement to the product.
 labels: ["Type/Improvement"]
 body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Select the area this issue relates to
+      options:
+        - Area/AI
+        - Area/AIAgent
+        - Area/AzureWebsubHub
+        - Area/BallerinaToOpenapi
+        - Area/Build
+        - Area/CompilerPlugin
+        - Area/Connector
+        - Area/Docs
+        - Area/EventIntegration
+        - Area/FileIntegration
+        - Area/GraalVM
+        - Area/GradlePlugin
+        - Area/Healthcare
+        - Area/KafkaHub
+        - Area/LangLibrary
+        - Area/Library
+        - Area/Observerbility
+        - Area/OpenapiToBallerina
+        - Area/Security
+        - Area/StaticCode
+        - Area/Tooling
+    validations:
+      required: false
   - type: textarea
     id: limitation
     attributes:
