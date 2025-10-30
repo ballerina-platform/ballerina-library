@@ -423,7 +423,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "module_version": "2.14.2-SNAPSHOT",
+            "module_version": "2.15.0-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
@@ -489,7 +489,7 @@
         },
         {
             "name": "module-ballerina-ai",
-            "module_version": "1.6.1-SNAPSHOT",
+            "module_version": "1.6.2-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibAiVersion",
