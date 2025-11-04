@@ -1,0 +1,8 @@
+[package]
+org = "hansika"
+name = "connector_automator"
+version = "0.1.0"
+distribution = "2201.13.0-20250927-204700-7b3ef131"
+
+[build-options]
+observabilityIncluded = true
