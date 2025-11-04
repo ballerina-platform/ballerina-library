@@ -1,0 +1,228 @@
+name: Auto-Generate Connector Template
+
+on:
+  workflow_call:
+    inputs:
+      openapi-url:
+        description: "URL of the OpenAPI specification (JSON/YAML)"
+        required: true
+        type: string
+      include-sanitization:
+        description: "Enable OpenAPI sanitization with AI enhancements"
+        required: false
+        type: boolean
+        default: true
+      include-client-generation:
+        description: "Generate Ballerina client code"
+        required: false
+        type: boolean
+        default: true
+      include-examples:
+        description: "Generate usage examples"
+        required: false
+        type: boolean
+        default: true
+      include-tests:
+        description: "Generate test cases with mock server"
+        required: false
+        type: boolean
+      include-docs:
+        description: "Generate documentation (README files)"
+        required: false
+        type: boolean
+        default: true
+      include-code-fixing:
+        description: "Automatically fix compilation errors using AI"
+        required: false
+        type: boolean
+        default: true
+      generation-path:
+        description: "Path where Ballerina client should be generated"
+        required: false
+        type: string
+        default: "ballerina"
+      license-file:
+        description: "Path to license file relative to docs directory"
+        required: false
+        type: string
+        default: "license.txt"
+      auto-confirm:
+        description: "Auto-confirm all prompts during execution"
+        required: false
+        type: boolean
+        default: true
+      quiet-mode:
+        description: "Enable quiet mode (reduced logging)"
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  auto-generate:
+    name: Auto-generate connector
+    runs-on: ubuntu-22.04
+    env:
+      ANTHROPIC_API_KEY: ${{secrets.ANTHROPIC_API_KEY}}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.BALLERINA_BOT_TOKEN }}
+
+      - name: Setup Ballerina Nightly
+        uses: ballerina-platform/setup-ballerina@v1.1.3
+        with:
+          version: nightly
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: 21.0.3
+
+      - name: Verify API Key
+        run: |
+          if [ -z "ANTHROPIC_API_KEY"]; then
+            echo "AI-powered features require Claude API access"
+            exit 1
+          fi
+          echo "API key is configured"
+
+      - name: Clone Connector Automator
+        run: |
+          echo "Clonning connector automator tool from the ballerina-library.."
+          git clone https://github.com/ballerina-platform/ballerina-library.git temp-library
+          cp -r temp-library/connector_automator ./
+          rm -rf temp-library
+          echo "Connector automator cloned successfully"
+
+      - name: Download openAPI Specification
+        run: |
+          mkdir -p docs/spec
+          cd docs/spec
+
+          echo "Downloading OpenAPI spec from: ${{inputs.openapi-url}}"
+          if [[ "${{ inputs.openapi-url }}" == *.json ]]; then
+              rm -f openapi.json
+              wget -O openapi.json "${{ inputs.openapi-url }}"
+              echo "SPEC_FILE=openapi.json" >> $GITHUB_ENV
+          elif [[ "${{ inputs.openapi-url }}" == *.yaml || "${{ inputs.openapi-url }}" == *.yml ]]; then
+              rm -f openapi.yaml openapi.yml
+              wget -O openapi.yaml "${{ inputs.openapi-url }}"
+              echo "SPEC_FILE=openapi.yaml" >> $GITHUB_ENV
+          else
+              echo "Error: Unsupported file extension for OpenAPI spec"
+              echo "Supported extensions: .json, .yaml, .yml"
+              exit 1
+          fi
+
+          echo "✓ OpenAPI spec downloaded: ${{ env.SPEC_FILE }}"
+
+      - name: Prepare Pipeline Arguments
+        run: |
+          # Build common arguments for all steps
+          COMMON_ARGS=""
+          if [ "${{ inputs.auto-confirm }}" = "true" ]; then
+            COMMON_ARGS="$COMMON_ARGS yes"
+          fi
+          if [ "${{ inputs.quiet-mode }}" = "true" ]; then
+            COMMON_ARGS="$COMMON_ARGS quiet"
+          fi
+          echo "COMMON_ARGS=$COMMON_ARGS" >> $GITHUB_ENV
+
+          # Set paths
+          echo "SPEC_PATH=docs/spec/${{env.SPEC_FILE}}" >> $GITHUB_ENV
+          echo "OUTPUT_PATH=." >> $GITHUB_ENV
+          echo "CLIENT_PATH=${{inputs.generation-path}}" >> $GITHUB_ENV
+
+      - name: Create Branch
+        run: |
+          git checkout -b auto-generate-connector
+          echo "Created branch: auto-generate-connector"
+
+      - name: Step 1 - Sanitize OpenAPI Specification
+        if: inputs.include-sanitization
+        run: |
+          cd connector_automator
+          echo "Step 1: Sanitizing OpenAPI specification"
+          echo "Running: bal run -- sanitize ../${{ env.SPEC_PATH }} ../${{ env.OUTPUT_PATH }} ${{ env.COMMON_ARGS }}"
+          bal run -- sanitize ../${{ env.SPEC_PATH }} ../${{ env.OUTPUT_PATH }} ${{ env.COMMON_ARGS }}"
+
+      - name: Update Spec Path After Sanitization
+        if: inputs.include-sanitization
+        run: |
+          # After sanitization use the aligned spec for rest of the steps
+          if [ -f "docs/spec/aligned_ballerina_openapi.json" ]; then 
+            echo "SPEC_PATH=docs/spec/aligned_ballerina_openapi.json" >> $GITHUB_ENV
+          fi
+
+      - name: Step 2 - Generate Ballerina Client
+        if: inputs.include-client-generation
+        run: |
+          cd connector_automator
+          # Remove existing client files
+          rm -f "../${{ env.CLIENT_PATH }}/client.bal" "../${{ env.CLIENT_PATH }}/utils.bal" "../${{ env.CLIENT_PATH }}/types.bal"
+
+          # Prepare client generation arguments.
+          CLIENT_ARGS="../${{ env.SPEC_PATH }} ../${{ env.CLIENT_PATH }}"
+
+          # Add common args
+          if [ -n "${{ env.COMMON_ARGS }}" ]; then
+            CLIENT_ARGS="$CLIENT_ARGS ${{ env.COMMON_ARGS }}"
+          fi
+
+          # Add default client method type
+          CLIENT_ARGS="$CLIENT_ARGS resource"
+
+          # Add license file if available
+          if [ -f "../docs/${{ inputs.license-file }}" ]; then
+            CLIENT_ARGS="$CLIENT_ARGS license=../docs/${{ inputs.license-file }}"
+          fi
+
+          echo "Running: bal run -- generate-client $CLIENT_ARGS"
+          bal run -- generate-client $CLIENT_ARGS
+          echo "Client generation completed"
+
+      - name: Step 3 - Generate Examples
+        if: inputs.include-examples
+        run: |
+          cd connector_automator
+          if bal run -- generate-examples "../${{ env.OUTPUT_PATH }}"; then
+              echo "✓Example generation completed"
+          else
+              echo "Example generation completed with warnings"
+          fi
+
+      - name: Step 4 - Generate Tests
+        if: inputs.include-tests
+        run: |
+          cd connector_automator
+          TEST_ARGS="../${{ env.OUTPUT_PATH }} ../${{ env.SPEC_PATH }}"
+
+          # Add common args
+          if [ -n "${{ env.COMMON_ARGS}}" ]; then
+            TEST_ARGS="TEST_ARGS ${{ env.COMMON_ARGS }}"
+          fi
+
+          echo "Running: bal run -- generate-tests $TEST_ARGS"
+
+          echo "Running: bal run -- generate-tests $TEST_ARGS"
+                
+          if bal run -- generate-tests $TEST_ARGS; then
+            echo "✓ Test generation completed"
+          else
+            echo "⚠ Test generation completed with warnings"
+          fi
+
+      - name: Step 5 - Generate Documentation
+        if: inputs.include-docs
+        run: |
+          cd connector_automator
+          DOC_ARGS="generate-all ../${{ env.OUTPUT_PATH }}"
+          
+
+
+
+
+
