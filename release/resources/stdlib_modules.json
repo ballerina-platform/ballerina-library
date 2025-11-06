@@ -471,7 +471,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "module_version": "2.15.0-SNAPSHOT",
+            "module_version": "2.15.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibHttpVersion",
