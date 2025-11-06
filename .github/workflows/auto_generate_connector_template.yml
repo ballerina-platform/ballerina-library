@@ -12,16 +12,6 @@ on:
         required: false
         type: string
         default: "nightly"
-      use-pipeline:
-        description: "Runs all steps of the connector generation process"
-        required: false
-        type: boolean
-        default: true
-      generation-path:
-        description: "Path where Ballerina client should be generated"
-        required: false
-        type: string
-        default: "ballerina"
       license-file:
         description: "Path to license file relative to docs directory"
         required: false
@@ -106,7 +96,6 @@ jobs:
           echo "Created branch: auto-generate-connector"
 
       - name: Run Full Connector Generation Pipeline
-        if: inputs.use-pipeline
         run: |
           cd connector_automator
           SPEC_PATH="../docs/spec/${{ env.SPEC_FILE }}"
@@ -208,7 +197,7 @@ jobs:
         run: |
           prUrl=$(gh pr create \
             --title "[Automated] Auto-generate connector from OpenAPI specification" \
-            --body $'## Auto-Generated Connector from OpenAPI Specification\n\n**WARNING: This PR contains AI-generated content. Please review thoroughly before merging.**\n\n### Generation Details\n- **Generation Path**: `${{ inputs.generation-path }}`\n- **Ballerina Version**: ${{ inputs.ballerina-version }}\n- \n### Generated Components\n- Complete connector generation using full pipeline\n- All components: sanitization, client generation, examples generation, tests generation, documentation\n\n### AI Generation Disclaimer\nThis connector was generated using AI technology. Manual validation is essential to ensure correctness, security, and compatibility with the target API.\n\nPlease do not merge this PR without thorough review and testing.' \
+            --body $'## Auto-Generated Connector from OpenAPI Specification\n\n**WARNING: This PR contains AI-generated content. Please review thoroughly before merging.**\n\n### Generation Details\n- **Ballerina Version**: ${{ inputs.ballerina-version }}\n- \n### Generated Components\n- Complete connector generation using full pipeline\n- All components: sanitization, client generation, examples generation, tests generation, documentation\n\n### AI Generation Disclaimer\nThis connector was generated using AI technology. Manual validation is essential to ensure correctness, security, and compatibility with the target API.\n\nPlease do not merge this PR without thorough review and testing.' \
             --base ${{ github.ref }} \
             --head auto-generate-connector)
           echo "prUrl=$prUrl" >> $GITHUB_OUTPUT
