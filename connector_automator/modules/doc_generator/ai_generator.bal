@@ -3,6 +3,7 @@ import connector_automator.utils;
 
 import ballerina/file;
 import ballerina/io;
+import ballerina/lang.regexp;
 
 const string TEMPLATES_PATH = "/home/hansika/dev/connector_automation/connector_automator/modules/doc_generator/templates";
 
@@ -117,7 +118,7 @@ public function generateIndividualExampleReadmes(string connectorPath) returns e
 
     foreach file:MetaData example in examples {
         if example.dir {
-            string exampleDirName = example.absPath.substring(examplesPath.length() + 1);
+            string exampleDirName = extractDirectoryName(example.absPath);
             string exampleDirPath = examplesPath + "/" + exampleDirName;
 
             error? result = generateSingleExampleReadme(example.absPath, exampleDirName, metadata);
@@ -135,6 +136,15 @@ public function generateIndividualExampleReadmes(string connectorPath) returns e
     if exampleCount > 0 {
         io:println(string `Total Individual Examples Cost: $${totalIndividualCost.toString()} (${exampleCount} examples)`);
     }
+}
+
+function extractDirectoryName(string fullPath) returns string {
+    // Get the last segment of the path
+    string[] pathParts = regexp:split(re `/`, fullPath);
+    if pathParts.length() > 0 {
+        return pathParts[pathParts.length() - 1];
+    }
+    return fullPath;
 }
 
 function generateSingleExampleReadme(string examplePath, string exampleDirName, ConnectorMetadata metadata) returns error? {
