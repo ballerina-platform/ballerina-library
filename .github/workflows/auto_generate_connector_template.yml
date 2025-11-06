@@ -5,35 +5,15 @@ on:
     inputs:
       openapi-url:
         description: "URL of the OpenAPI specification (JSON/YAML)"
-        required: true
+        required: false
         type: string
+      ballerina-version:
+        description: "Ballerina version to use"
+        required: false
+        type: string
+        default: "nightly"
       use-pipeline:
         description: "Runs all steps of the connector generation process"
-        required: false
-        type: boolean
-        default: true
-      include-sanitization:
-        description: "Enable OpenAPI sanitization with AI enhancements"
-        required: false
-        type: boolean
-        default: false
-      include-client-generation:
-        description: "Generate Ballerina client code"
-        required: false
-        type: boolean
-        default: false
-      include-examples:
-        description: "Generate usage examples"
-        required: false
-        type: boolean
-        default: false
-      include-tests:
-        description: "Generate test cases with mock server"
-        required: false
-        type: boolean
-        default: false
-      include-docs:
-        description: "Generate documentation (README files)"
         required: false
         type: boolean
         default: true
@@ -51,9 +31,9 @@ on:
         description: "Auto-confirm all prompts during execution"
         required: false
         type: boolean
-        default: true
+        default: false
       quiet-mode:
-        description: "Enable quiet mode (reduced logging)"
+        description: "Enable quiet mode"
         required: false
         type: boolean
         default: true
@@ -71,16 +51,10 @@ jobs:
         with:
           token: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
-      - name: Setup Ballerina Nightly
+      - name: Setup Ballerina
         uses: ballerina-platform/setup-ballerina@v1.1.3
         with:
-          version: nightly
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v3
-        with:
-          distribution: "temurin"
-          java-version: 21.0.3
+          version: ${{ inputs.ballerina-version }}
 
       - name: Verify API Key
         run: |
@@ -101,45 +75,35 @@ jobs:
           echo "Connector automator cloned successfully"
 
       - name: Download OpenAPI Specification
+        if: inputs.openapi-url
+        working-directory: docs/spec
         run: |
-          mkdir -p docs/spec
-          cd docs/spec
-
-          echo "Downloading OpenAPI spec from: ${{ inputs.openapi-url }}"
+          echo "Downloading openapi spec from provided URL..."
           if [[ "${{ inputs.openapi-url }}" == *.json ]]; then
-              rm -f openapi.json
-              wget -O openapi.json "${{ inputs.openapi-url }}"
-              echo "SPEC_FILE=openapi.json" >> $GITHUB_ENV
-              echo "ORIGINAL_EXTENSION=json" >> $GITHUB_ENV
+            rm -f openapi.json
+            wget -O openapi.json "${{ inputs.openapi-url }}"
           elif [[ "${{ inputs.openapi-url }}" == *.yaml || "${{ inputs.openapi-url }}" == *.yml ]]; then
-              rm -f openapi.yaml openapi.yml
-              wget -O openapi.yaml "${{ inputs.openapi-url }}"
-              echo "SPEC_FILE=openapi.yaml" >> $GITHUB_ENV
-              echo "ORIGINAL_EXTENSION=yaml" >> $GITHUB_ENV
+            rm -f openapi.yaml openapi.yml
+            wget -O openapi.yaml "${{ inputs.openapi-url }}"
           else
-              echo "Error: Unsupported file extension for OpenAPI spec"
-              echo "Supported extensions: .json, .yaml, .yml"
-              exit 1
+            echo "Unsupported file extension: ${{ inputs.openapi-url }}"
+            exit 1
           fi
 
-          echo "OpenAPI spec downloaded: ${{ env.SPEC_FILE }}"
-
-      - name: Prepare Pipeline Arguments
+      - name: Read File Extension
+        working-directory: docs/spec
         run: |
-          # Build common arguments for all steps
-          COMMON_ARGS=""
-          if [ "${{ inputs.auto-confirm }}" = "true" ]; then
-            COMMON_ARGS="$COMMON_ARGS yes"
+          file=$(echo openapi.*)
+          if [[ "$file" == "openapi.*" ]]; then
+            echo "Error: No OpenAPI specification found in docs/spec/"
+            echo "Either provide openapi-url input or commit a spec file to docs/spec/"
+            echo "Supported files: openapi.json, openapi.yaml, openapi.yml"
+            exit 1
           fi
-          if [ "${{ inputs.quiet-mode }}" = "true" ]; then
-            COMMON_ARGS="$COMMON_ARGS quiet"
-          fi
-          echo "COMMON_ARGS=$COMMON_ARGS" >> $GITHUB_ENV
-
-          # Set paths
-          echo "SPEC_PATH=docs/spec/${{ env.SPEC_FILE }}" >> $GITHUB_ENV
-          echo "OUTPUT_PATH=." >> $GITHUB_ENV
-          echo "CLIENT_PATH=${{ inputs.generation-path }}" >> $GITHUB_ENV
+          ext="${file##*.}"
+          echo "EXTENSION=$ext" >> "$GITHUB_ENV"
+          echo "SPEC_FILE=$file" >> "$GITHUB_ENV"
+          echo "Found OpenAPI spec: $file"
 
       - name: Create Branch
         run: |
@@ -150,12 +114,12 @@ jobs:
         if: inputs.use-pipeline
         run: |
           cd connector_automator
-          SPEC_PATH="../${{ env.SPEC_PATH }}"
-          OUTPUT_PATH="../${{ env.OUTPUT_PATH }}"
+          SPEC_PATH="../docs/spec/${{ env.SPEC_FILE }}"
+          OUTPUT_PATH="../."
 
           echo "Running full connector generation pipeline..."
-          echo "Spec: $SPEC_PATH"
-          echo "Output: $OUTPUT_PATH"
+          echo "Spec path : $SPEC_PATH"
+          echo "Output path: $OUTPUT_PATH"
 
           # Build pipeline arguments
           PIPELINE_ARGS=("$SPEC_PATH" "$OUTPUT_PATH")
@@ -173,95 +137,6 @@ jobs:
 
           echo "Full connector generation pipeline completed"
 
-      - name: Sanitize OpenAPI Specification
-        if: ${{ !inputs.use-pipeline && inputs.include-sanitization }}
-        run: |
-          cd connector_automator
-          echo "Step 1: Sanitizing OpenAPI specification"
-          echo "Running: bal run -- sanitize ../${{ env.SPEC_PATH }} ../${{ env.OUTPUT_PATH }} ${{ env.COMMON_ARGS }}"
-          bal run -- sanitize ../${{ env.SPEC_PATH }} ../${{ env.OUTPUT_PATH }} ${{ env.COMMON_ARGS }}
-
-      - name: Update Spec Path After Sanitization
-        if: ${{ !inputs.use-pipeline && inputs.include-sanitization }}
-        run: |
-          # After sanitization use the aligned spec for rest of the steps
-          if [ -f "docs/spec/aligned_ballerina_openapi.json" ]; then 
-            echo "SPEC_PATH=docs/spec/aligned_ballerina_openapi.json" >> $GITHUB_ENV
-          fi
-
-      - name: Generate Ballerina Client
-        if: ${{ !inputs.use-pipeline && inputs.include-client-generation }} 
-        run: |
-          cd connector_automator
-          # Remove existing client files
-          rm -f "../${{ env.CLIENT_PATH }}/client.bal" "../${{ env.CLIENT_PATH }}/utils.bal" "../${{ env.CLIENT_PATH }}/types.bal"
-
-          # Prepare client generation arguments.
-          CLIENT_ARGS="../${{ env.SPEC_PATH }} ../${{ env.CLIENT_PATH }}"
-
-          # Add common args
-          if [ -n "${{ env.COMMON_ARGS }}" ]; then
-            CLIENT_ARGS="$CLIENT_ARGS ${{ env.COMMON_ARGS }}"
-          fi
-
-          # Add default client method type
-          CLIENT_ARGS="$CLIENT_ARGS resource"
-
-          # Add license file if available
-          if [ -f "../docs/${{ inputs.license-file }}" ]; then
-            CLIENT_ARGS="$CLIENT_ARGS license=../docs/${{ inputs.license-file }}"
-          fi
-
-          echo "Running: bal run -- generate-client $CLIENT_ARGS"
-          bal run -- generate-client $CLIENT_ARGS
-          echo "Client generation completed"
-
-      - name: Generate Examples
-        if: ${{ !inputs.use-pipeline && inputs.include-examples }}
-        run: |
-          cd connector_automator
-          if bal run -- generate-examples "../${{ env.OUTPUT_PATH }}"; then
-              echo "Example generation completed"
-          else
-              echo "Example generation completed with warnings"
-          fi
-
-      - name: Generate Tests
-        if: ${{ !inputs.use-pipeline && inputs.include-tests }}
-        run: |
-          cd connector_automator
-          TEST_ARGS="../${{ env.OUTPUT_PATH }} ../${{ env.SPEC_PATH }}"
-
-          # Add common args
-          if [ -n "${{ env.COMMON_ARGS }}" ]; then
-            TEST_ARGS="$TEST_ARGS ${{ env.COMMON_ARGS }}"
-          fi
-
-          echo "Running: bal run -- generate-tests $TEST_ARGS"
-                
-          if bal run -- generate-tests $TEST_ARGS; then
-            echo "Test generation completed"
-          else
-            echo "Test generation completed with warnings"
-          fi
-
-      - name: Generate Documentation
-        if: ${{ !inputs.use-pipeline && inputs.include-docs }}
-        run: |
-          cd connector_automator
-          DOC_ARGS="generate-all ../${{ env.OUTPUT_PATH }}"
-
-          # Add common args
-          if [ -n "${{ env.COMMON_ARGS }}" ]; then
-            DOC_ARGS="$DOC_ARGS ${{ env.COMMON_ARGS }}"
-          fi
-
-          if bal run -- generate-docs $DOC_ARGS; then
-            echo "Documentation generation completed"
-          else
-            echo "Documentation generation completed with warnings"
-          fi
-
       - name: Cleanup and Organize Spec Files
         run: |
           cd docs/spec
@@ -273,8 +148,8 @@ jobs:
 
           # Rename original spec to original_openapi.*
           if [ -f "${{ env.SPEC_FILE }}" ]; then
-            mv "${{ env.SPEC_FILE }}" "original_openapi.${{ env.ORIGINAL_EXTENSION }}"
-            echo "Renamed ${{ env.SPEC_FILE }} to original_openapi.${{ env.ORIGINAL_EXTENSION }}"
+            mv "${{ env.SPEC_FILE }}" "original_openapi.${{ env.EXTENSION }}"
+            echo "Renamed ${{ env.SPEC_FILE }} to original_openapi.${{ env.EXTENSION }}"
           fi
 
           # Rename final aligned spec to openapi.json
@@ -311,51 +186,11 @@ jobs:
       - name: Commit Generated Files
         id: commitFiles
         run: |
-          # Build commit message based on mode used
-          if [ "${{ inputs.use-pipeline }}" = "true" ]; then
-            COMMIT_MSG="[AUTOMATED] Auto-generate connector from OpenAPI spec
+          # Build commit message 
+          COMMIT_MSG="[AUTOMATED] Auto-generate connector from OpenAPI spec
 
-            Source: ${{ inputs.openapi-url }}
-            
-            Complete connector generation using full pipeline with all components.
-            Generated using Ballerina nightly build with AI-powered automation."
-          else
-            # Build commit message based on enabled individual features
-            COMMIT_MSG="[AUTOMATED] Auto-generate connector from OpenAPI spec
-
-            Source: ${{ inputs.openapi-url }}
-            
-            Generated components:"
-            
-            if [ "${{ inputs.include-sanitization }}" = "true" ]; then
-              COMMIT_MSG="$COMMIT_MSG
-            - Sanitized OpenAPI specification with AI enhancements"
-            fi
-
-            if [ "${{ inputs.include-client-generation }}" = "true" ]; then
-              COMMIT_MSG="$COMMIT_MSG
-            - Generated Ballerina client code"
-            fi
-
-            if [ "${{ inputs.include-examples }}" = "true" ]; then
-              COMMIT_MSG="$COMMIT_MSG
-            - AI generated usage examples with realistic scenarios"
-            fi
-
-            if [ "${{ inputs.include-tests }}" = "true" ]; then
-              COMMIT_MSG="$COMMIT_MSG
-            - AI generated test cases with mock server setup"
-            fi
-
-            if [ "${{ inputs.include-docs }}" = "true" ]; then
-              COMMIT_MSG="$COMMIT_MSG
-            - AI generated comprehensive documentation"
-            fi
-
-            COMMIT_MSG="$COMMIT_MSG
-
-            Generated using Ballerina nightly build with AI-powered automation."
-          fi
+          Complete connector generation using full pipeline with all components.
+          Generated using Ballerina with AI-powered automation."
 
           # Add all changes
           git add .
@@ -372,63 +207,19 @@ jobs:
 
       - name: Push Results
         if: ${{ steps.commitFiles.outputs.hasChanged == 'true' }}
-        run: |
-          git push origin auto-generate-connector
-          echo "Changes pushed to branch: auto-generate-connector"
+        run: git push origin auto-generate-connector
         env:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
       - name: Create Pull Request
+        id: createPR
         if: ${{ steps.commitFiles.outputs.hasChanged == 'true' }}
         run: |
-          # Determine which approach was used and build feature list
-          if [ "${{ inputs.use-pipeline }}" = "true" ]; then
-            APPROACH="Full Pipeline"
-            FEATURES_LIST="- Complete connector generation using full pipeline
-            - All components: sanitization, client generation, examples generation, tests generation, documentation"
-            DISABLED_FEATURES=""
-          else
-            APPROACH="Individual Steps"
-            FEATURES_LIST=""
-            [ "${{ inputs.include-sanitization }}" = "true" ] && FEATURES_LIST="${FEATURES_LIST}- OpenAPI Sanitization with AI enhancements\n"
-            [ "${{ inputs.include-client-generation }}" = "true" ] && FEATURES_LIST="${FEATURES_LIST}- Ballerina client code generation\n"
-            [ "${{ inputs.include-examples }}" = "true" ] && FEATURES_LIST="${FEATURES_LIST}- Usage examples generation\n"
-            [ "${{ inputs.include-tests }}" = "true" ] && FEATURES_LIST="${FEATURES_LIST}- Test cases with mock server\n"
-            [ "${{ inputs.include-docs }}" = "true" ] && FEATURES_LIST="${FEATURES_LIST}- Documentation generation\n"
-
-            # Show skipped components for individual steps
-            DISABLED_FEATURES=""
-            [ "${{ inputs.include-sanitization }}" = "false" ] && DISABLED_FEATURES="${DISABLED_FEATURES}- OpenAPI Sanitization (skipped)\n"
-            [ "${{ inputs.include-client-generation }}" = "false" ] && DISABLED_FEATURES="${DISABLED_FEATURES}- Client Generation (skipped)\n"
-            [ "${{ inputs.include-examples }}" = "false" ] && DISABLED_FEATURES="${DISABLED_FEATURES}- Examples Generation (skipped)\n"
-            [ "${{ inputs.include-tests }}" = "false" ] && DISABLED_FEATURES="${DISABLED_FEATURES}- Tests Generation (skipped)\n"
-            [ "${{ inputs.include-docs }}" = "false" ] && DISABLED_FEATURES="${DISABLED_FEATURES}- Documentation (skipped)\n"
-          fi
-
-          PR_BODY="## Auto-Generated Connector from OpenAPI Specification
-
-          **WARNING: This PR contains AI-generated content. Please review thoroughly before merging.**
-
-          ### Generation Details
-          - **OpenAPI Spec**: \`${{ inputs.openapi-url }}\`
-          - **Generation Path**: \`${{ inputs.generation-path }}\`
-          - **Ballerina Version**: Nightly build
-          - **Approach Used**: $APPROACH
-
-          ### Generated Components
-          $FEATURES_LIST
-          $( [ -n \"$DISABLED_FEATURES\" ] && echo -e \"### Skipped Components\n$DISABLED_FEATURES\" )
-
-          ### AI Generation Disclaimer
-          This connector was generated using AI technology. Manual validation is essential to ensure correctness, security, and compatibility with the target API.
-
-          Please do not merge this PR without thorough review and testing."
-
-          gh pr create \
+          prUrl=$(gh pr create \
             --title "[Automated] Auto-generate connector from OpenAPI specification" \
-            --body "$PR_BODY" \
-            --head auto-generate-connector
-
-          echo "Pull request created successfully"
+            --body $'## Auto-Generated Connector from OpenAPI Specification\n\n**WARNING: This PR contains AI-generated content. Please review thoroughly before merging.**\n\n### Generation Details\n- **Generation Path**: `${{ inputs.generation-path }}`\n- **Ballerina Version**: ${{ inputs.ballerina-version }}\n- \n### Generated Components\n- Complete connector generation using full pipeline\n- All components: sanitization, client generation, examples generation, tests generation, documentation\n\n### AI Generation Disclaimer\nThis connector was generated using AI technology. Manual validation is essential to ensure correctness, security, and compatibility with the target API.\n\nPlease do not merge this PR without thorough review and testing.' \
+            --base ${{ github.ref }} \
+            --head auto-generate-connector)
+          echo "prUrl=$prUrl" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
