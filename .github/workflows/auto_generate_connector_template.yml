@@ -27,11 +27,6 @@ on:
         required: false
         type: string
         default: "license.txt"
-      auto-confirm:
-        description: "Auto-confirm all prompts during execution"
-        required: false
-        type: boolean
-        default: false
       quiet-mode:
         description: "Enable quiet mode"
         required: false
@@ -122,11 +117,7 @@ jobs:
           echo "Output path: $OUTPUT_PATH"
 
           # Build pipeline arguments
-          PIPELINE_ARGS=("$SPEC_PATH" "$OUTPUT_PATH")
-
-          if [ "${{ inputs.auto-confirm }}" = "true" ]; then
-            PIPELINE_ARGS+=("yes")
-          fi
+          PIPELINE_ARGS=("$SPEC_PATH" "$OUTPUT_PATH" "yes")
 
           if [ "${{ inputs.quiet-mode }}" = "true" ]; then
             PIPELINE_ARGS+=("quiet")
