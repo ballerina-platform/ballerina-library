@@ -425,7 +425,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "module_version": "2.15.1-SNAPSHOT",
+            "module_version": "2.15.2-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
