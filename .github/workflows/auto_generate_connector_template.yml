@@ -7,32 +7,33 @@ on:
         description: "URL of the OpenAPI specification (JSON/YAML)"
         required: true
         type: string
+      use-pipeline:
+        description: "Runs all steps of the connector generation process"
+        required: false
+        type: boolean
+        default: true
       include-sanitization:
         description: "Enable OpenAPI sanitization with AI enhancements"
         required: false
         type: boolean
-        default: true
+        default: false
       include-client-generation:
         description: "Generate Ballerina client code"
         required: false
         type: boolean
-        default: true
+        default: false
       include-examples:
         description: "Generate usage examples"
         required: false
         type: boolean
-        default: true
+        default: false
       include-tests:
         description: "Generate test cases with mock server"
         required: false
         type: boolean
+        default: false
       include-docs:
         description: "Generate documentation (README files)"
-        required: false
-        type: boolean
-        default: true
-      include-code-fixing:
-        description: "Automatically fix compilation errors using AI"
         required: false
         type: boolean
         default: true
@@ -62,7 +63,7 @@ jobs:
     name: Auto-generate connector
     runs-on: ubuntu-22.04
     env:
-      ANTHROPIC_API_KEY: ${{secrets.ANTHROPIC_API_KEY}}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
     steps:
       - name: Checkout Repository
@@ -83,41 +84,45 @@ jobs:
 
       - name: Verify API Key
         run: |
-          if [ -z "ANTHROPIC_API_KEY"]; then
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "Error: ANTHROPIC_API_KEY secret is not set"
             echo "AI-powered features require Claude API access"
+            echo "Please configure the ANTHROPIC_API_KEY secret in your repository and try again"
             exit 1
           fi
           echo "API key is configured"
 
       - name: Clone Connector Automator
         run: |
-          echo "Clonning connector automator tool from the ballerina-library.."
+          echo "Cloning connector automator tool from ballerina-library..."
           git clone https://github.com/ballerina-platform/ballerina-library.git temp-library
           cp -r temp-library/connector_automator ./
           rm -rf temp-library
           echo "Connector automator cloned successfully"
 
-      - name: Download openAPI Specification
+      - name: Download OpenAPI Specification
         run: |
           mkdir -p docs/spec
           cd docs/spec
 
-          echo "Downloading OpenAPI spec from: ${{inputs.openapi-url}}"
+          echo "Downloading OpenAPI spec from: ${{ inputs.openapi-url }}"
           if [[ "${{ inputs.openapi-url }}" == *.json ]]; then
               rm -f openapi.json
               wget -O openapi.json "${{ inputs.openapi-url }}"
               echo "SPEC_FILE=openapi.json" >> $GITHUB_ENV
+              echo "ORIGINAL_EXTENSION=json" >> $GITHUB_ENV
           elif [[ "${{ inputs.openapi-url }}" == *.yaml || "${{ inputs.openapi-url }}" == *.yml ]]; then
               rm -f openapi.yaml openapi.yml
               wget -O openapi.yaml "${{ inputs.openapi-url }}"
               echo "SPEC_FILE=openapi.yaml" >> $GITHUB_ENV
+              echo "ORIGINAL_EXTENSION=yaml" >> $GITHUB_ENV
           else
               echo "Error: Unsupported file extension for OpenAPI spec"
               echo "Supported extensions: .json, .yaml, .yml"
               exit 1
           fi
 
-          echo "✓ OpenAPI spec downloaded: ${{ env.SPEC_FILE }}"
+          echo "OpenAPI spec downloaded: ${{ env.SPEC_FILE }}"
 
       - name: Prepare Pipeline Arguments
         run: |
@@ -132,33 +137,60 @@ jobs:
           echo "COMMON_ARGS=$COMMON_ARGS" >> $GITHUB_ENV
 
           # Set paths
-          echo "SPEC_PATH=docs/spec/${{env.SPEC_FILE}}" >> $GITHUB_ENV
+          echo "SPEC_PATH=docs/spec/${{ env.SPEC_FILE }}" >> $GITHUB_ENV
           echo "OUTPUT_PATH=." >> $GITHUB_ENV
-          echo "CLIENT_PATH=${{inputs.generation-path}}" >> $GITHUB_ENV
+          echo "CLIENT_PATH=${{ inputs.generation-path }}" >> $GITHUB_ENV
 
       - name: Create Branch
         run: |
           git checkout -b auto-generate-connector
           echo "Created branch: auto-generate-connector"
 
-      - name: Step 1 - Sanitize OpenAPI Specification
-        if: inputs.include-sanitization
+      - name: Run Full Connector Generation Pipeline
+        if: inputs.use-pipeline
+        run: |
+          cd connector_automator
+          SPEC_PATH="../${{ env.SPEC_PATH }}"
+          OUTPUT_PATH="../${{ env.OUTPUT_PATH }}"
+
+          echo "Running full connector generation pipeline..."
+          echo "Spec: $SPEC_PATH"
+          echo "Output: $OUTPUT_PATH"
+
+          # Build pipeline arguments
+          PIPELINE_ARGS=("$SPEC_PATH" "$OUTPUT_PATH")
+
+          if [ "${{ inputs.auto-confirm }}" = "true" ]; then
+            PIPELINE_ARGS+=("yes")
+          fi
+
+          if [ "${{ inputs.quiet-mode }}" = "true" ]; then
+            PIPELINE_ARGS+=("quiet")
+          fi
+
+          # Run the complete pipeline
+          bal run -- pipeline "${PIPELINE_ARGS[@]}"
+
+          echo "Full connector generation pipeline completed"
+
+      - name: Sanitize OpenAPI Specification
+        if: ${{ !inputs.use-pipeline && inputs.include-sanitization }}
         run: |
           cd connector_automator
           echo "Step 1: Sanitizing OpenAPI specification"
           echo "Running: bal run -- sanitize ../${{ env.SPEC_PATH }} ../${{ env.OUTPUT_PATH }} ${{ env.COMMON_ARGS }}"
-          bal run -- sanitize ../${{ env.SPEC_PATH }} ../${{ env.OUTPUT_PATH }} ${{ env.COMMON_ARGS }}"
+          bal run -- sanitize ../${{ env.SPEC_PATH }} ../${{ env.OUTPUT_PATH }} ${{ env.COMMON_ARGS }}
 
       - name: Update Spec Path After Sanitization
-        if: inputs.include-sanitization
+        if: ${{ !inputs.use-pipeline && inputs.include-sanitization }}
         run: |
           # After sanitization use the aligned spec for rest of the steps
           if [ -f "docs/spec/aligned_ballerina_openapi.json" ]; then 
             echo "SPEC_PATH=docs/spec/aligned_ballerina_openapi.json" >> $GITHUB_ENV
           fi
 
-      - name: Step 2 - Generate Ballerina Client
-        if: inputs.include-client-generation
+      - name: Generate Ballerina Client
+        if: ${{ !inputs.use-pipeline && inputs.include-client-generation }} 
         run: |
           cd connector_automator
           # Remove existing client files
@@ -184,45 +216,219 @@ jobs:
           bal run -- generate-client $CLIENT_ARGS
           echo "Client generation completed"
 
-      - name: Step 3 - Generate Examples
-        if: inputs.include-examples
+      - name: Generate Examples
+        if: ${{ !inputs.use-pipeline && inputs.include-examples }}
         run: |
           cd connector_automator
           if bal run -- generate-examples "../${{ env.OUTPUT_PATH }}"; then
-              echo "✓Example generation completed"
+              echo "Example generation completed"
           else
               echo "Example generation completed with warnings"
           fi
 
-      - name: Step 4 - Generate Tests
-        if: inputs.include-tests
+      - name: Generate Tests
+        if: ${{ !inputs.use-pipeline && inputs.include-tests }}
         run: |
           cd connector_automator
           TEST_ARGS="../${{ env.OUTPUT_PATH }} ../${{ env.SPEC_PATH }}"
 
           # Add common args
-          if [ -n "${{ env.COMMON_ARGS}}" ]; then
-            TEST_ARGS="TEST_ARGS ${{ env.COMMON_ARGS }}"
+          if [ -n "${{ env.COMMON_ARGS }}" ]; then
+            TEST_ARGS="$TEST_ARGS ${{ env.COMMON_ARGS }}"
           fi
-
-          echo "Running: bal run -- generate-tests $TEST_ARGS"
 
           echo "Running: bal run -- generate-tests $TEST_ARGS"
                 
           if bal run -- generate-tests $TEST_ARGS; then
-            echo "✓ Test generation completed"
+            echo "Test generation completed"
           else
-            echo "⚠ Test generation completed with warnings"
+            echo "Test generation completed with warnings"
           fi
 
-      - name: Step 5 - Generate Documentation
-        if: inputs.include-docs
+      - name: Generate Documentation
+        if: ${{ !inputs.use-pipeline && inputs.include-docs }}
         run: |
           cd connector_automator
           DOC_ARGS="generate-all ../${{ env.OUTPUT_PATH }}"
-          
 
+          # Add common args
+          if [ -n "${{ env.COMMON_ARGS }}" ]; then
+            DOC_ARGS="$DOC_ARGS ${{ env.COMMON_ARGS }}"
+          fi
 
+          if bal run -- generate-docs $DOC_ARGS; then
+            echo "Documentation generation completed"
+          else
+            echo "Documentation generation completed with warnings"
+          fi
 
+      - name: Cleanup and Organize Spec Files
+        run: |
+          cd docs/spec
+          echo "Cleaning up OpenAPI spec files..."
 
+          # List all files before cleanup
+          echo "Files before cleanup:"
+          ls -la
 
+          # Rename original spec to original_openapi.*
+          if [ -f "${{ env.SPEC_FILE }}" ]; then
+            mv "${{ env.SPEC_FILE }}" "original_openapi.${{ env.ORIGINAL_EXTENSION }}"
+            echo "Renamed ${{ env.SPEC_FILE }} to original_openapi.${{ env.ORIGINAL_EXTENSION }}"
+          fi
+
+          # Rename final aligned spec to openapi.json
+          if [ -f "aligned_ballerina_openapi.json" ]; then
+            mv "aligned_ballerina_openapi.json" "openapi.json"
+            echo "Renamed aligned_ballerina_openapi.json to openapi.json"
+          fi
+
+          # Remove intermediate files (flattened_openapi.*)
+          rm -f flattened_openapi.json flattened_openapi.yaml flattened_openapi.yml
+          echo "Removed intermediate flattened files"
+
+          # Remove any other aligned files if they exist
+          rm -f aligned_ballerina_openapi.yaml aligned_ballerina_openapi.yml
+          echo "Removed remaining aligned files"
+
+          # List files after cleanup
+          echo "Files after cleanup:"
+          ls -la
+
+          echo "OpenAPI spec file cleanup completed"
+
+      - name: Cleanup Connector Automator Tool
+        run: |
+          echo "Removing connector automator tool from repository..."
+          rm -rf connector_automator
+          echo "Connector automator tool removed"
+
+      - name: Configure Git Identity
+        run: |
+          git config user.name "ballerina-bot"
+          git config user.email "ballerina-bot@ballerina.org"
+
+      - name: Commit Generated Files
+        id: commitFiles
+        run: |
+          # Build commit message based on mode used
+          if [ "${{ inputs.use-pipeline }}" = "true" ]; then
+            COMMIT_MSG="[AUTOMATED] Auto-generate connector from OpenAPI spec
+
+            Source: ${{ inputs.openapi-url }}
+            
+            Complete connector generation using full pipeline with all components.
+            Generated using Ballerina nightly build with AI-powered automation."
+          else
+            # Build commit message based on enabled individual features
+            COMMIT_MSG="[AUTOMATED] Auto-generate connector from OpenAPI spec
+
+            Source: ${{ inputs.openapi-url }}
+            
+            Generated components:"
+            
+            if [ "${{ inputs.include-sanitization }}" = "true" ]; then
+              COMMIT_MSG="$COMMIT_MSG
+            - Sanitized OpenAPI specification with AI enhancements"
+            fi
+
+            if [ "${{ inputs.include-client-generation }}" = "true" ]; then
+              COMMIT_MSG="$COMMIT_MSG
+            - Generated Ballerina client code"
+            fi
+
+            if [ "${{ inputs.include-examples }}" = "true" ]; then
+              COMMIT_MSG="$COMMIT_MSG
+            - AI generated usage examples with realistic scenarios"
+            fi
+
+            if [ "${{ inputs.include-tests }}" = "true" ]; then
+              COMMIT_MSG="$COMMIT_MSG
+            - AI generated test cases with mock server setup"
+            fi
+
+            if [ "${{ inputs.include-docs }}" = "true" ]; then
+              COMMIT_MSG="$COMMIT_MSG
+            - AI generated comprehensive documentation"
+            fi
+
+            COMMIT_MSG="$COMMIT_MSG
+
+            Generated using Ballerina nightly build with AI-powered automation."
+          fi
+
+          # Add all changes
+          git add .
+
+          # Check if there are changes to commit
+          if git diff --cached --quiet; then
+            echo "hasChanged=false" >> $GITHUB_OUTPUT
+            echo "No changes to commit"
+          else
+            echo "$COMMIT_MSG" | git commit -F -
+            echo "hasChanged=true" >> $GITHUB_OUTPUT
+            echo "Changes committed successfully"
+          fi
+
+      - name: Push Results
+        if: ${{ steps.commitFiles.outputs.hasChanged == 'true' }}
+        run: |
+          git push origin auto-generate-connector
+          echo "Changes pushed to branch: auto-generate-connector"
+        env:
+          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+
+      - name: Create Pull Request
+        if: ${{ steps.commitFiles.outputs.hasChanged == 'true' }}
+        run: |
+          # Determine which approach was used and build feature list
+          if [ "${{ inputs.use-pipeline }}" = "true" ]; then
+            APPROACH="Full Pipeline"
+            FEATURES_LIST="- Complete connector generation using full pipeline
+            - All components: sanitization, client generation, examples generation, tests generation, documentation"
+            DISABLED_FEATURES=""
+          else
+            APPROACH="Individual Steps"
+            FEATURES_LIST=""
+            [ "${{ inputs.include-sanitization }}" = "true" ] && FEATURES_LIST="${FEATURES_LIST}- OpenAPI Sanitization with AI enhancements\n"
+            [ "${{ inputs.include-client-generation }}" = "true" ] && FEATURES_LIST="${FEATURES_LIST}- Ballerina client code generation\n"
+            [ "${{ inputs.include-examples }}" = "true" ] && FEATURES_LIST="${FEATURES_LIST}- Usage examples generation\n"
+            [ "${{ inputs.include-tests }}" = "true" ] && FEATURES_LIST="${FEATURES_LIST}- Test cases with mock server\n"
+            [ "${{ inputs.include-docs }}" = "true" ] && FEATURES_LIST="${FEATURES_LIST}- Documentation generation\n"
+
+            # Show skipped components for individual steps
+            DISABLED_FEATURES=""
+            [ "${{ inputs.include-sanitization }}" = "false" ] && DISABLED_FEATURES="${DISABLED_FEATURES}- OpenAPI Sanitization (skipped)\n"
+            [ "${{ inputs.include-client-generation }}" = "false" ] && DISABLED_FEATURES="${DISABLED_FEATURES}- Client Generation (skipped)\n"
+            [ "${{ inputs.include-examples }}" = "false" ] && DISABLED_FEATURES="${DISABLED_FEATURES}- Examples Generation (skipped)\n"
+            [ "${{ inputs.include-tests }}" = "false" ] && DISABLED_FEATURES="${DISABLED_FEATURES}- Tests Generation (skipped)\n"
+            [ "${{ inputs.include-docs }}" = "false" ] && DISABLED_FEATURES="${DISABLED_FEATURES}- Documentation (skipped)\n"
+          fi
+
+          PR_BODY="## Auto-Generated Connector from OpenAPI Specification
+
+          **WARNING: This PR contains AI-generated content. Please review thoroughly before merging.**
+
+          ### Generation Details
+          - **OpenAPI Spec**: \`${{ inputs.openapi-url }}\`
+          - **Generation Path**: \`${{ inputs.generation-path }}\`
+          - **Ballerina Version**: Nightly build
+          - **Approach Used**: $APPROACH
+
+          ### Generated Components
+          $FEATURES_LIST
+          $( [ -n \"$DISABLED_FEATURES\" ] && echo -e \"### Skipped Components\n$DISABLED_FEATURES\" )
+
+          ### AI Generation Disclaimer
+          This connector was generated using AI technology. Manual validation is essential to ensure correctness, security, and compatibility with the target API.
+
+          Please do not merge this PR without thorough review and testing."
+
+          gh pr create \
+            --title "[Automated] Auto-generate connector from OpenAPI specification" \
+            --body "$PR_BODY" \
+            --head auto-generate-connector
+
+          echo "Pull request created successfully"
+        env:
+          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
