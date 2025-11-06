@@ -493,11 +493,6 @@ function runFullPipeline(string... args) returns error? {
     io:println("5. Generate tests");
     io:println("6. Generate documentation");
 
-    if !getUserConfirmation("\nProceed with full pipeline?") {
-        io:println("Operation cancelled by user.");
-        return;
-    }
-
     decimal sanitizationCost = 0.0d;
     decimal exampleGenCost = 0.0d;
     decimal testGenCost = 0.0d;
