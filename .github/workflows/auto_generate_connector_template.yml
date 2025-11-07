@@ -129,7 +129,7 @@ jobs:
       - name: Clone Connector Automator
         run: |
           echo "Cloning connector automator tool from ballerina-library..."
-           git clone -b connector-automation https://nostoc/ballerina-library.git temp-library
+           git clone -b connector-automation https://github.com/nostoc/ballerina-library.git temp-library
           cp -r temp-library/connector_automator ./
           rm -rf temp-library
           echo "Connector automator cloned successfully"
