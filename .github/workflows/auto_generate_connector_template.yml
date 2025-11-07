@@ -61,9 +61,6 @@ jobs:
       - name: Get Ballerina Distribution
         if: inputs.distribution-zip
         run: |
-      - name: Get Ballerina Distribution
-        if: inputs.distribution-zip
-        run: |
           pwd
           echo "Downloading Ballerina distribution from provided URL..."
           curl -H "Authorization: token ${{ secrets.BALLERINA_BOT_TOKEN }}" \
