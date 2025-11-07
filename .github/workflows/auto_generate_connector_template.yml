@@ -61,14 +61,18 @@ jobs:
       - name: Get Ballerina Distribution
         if: inputs.distribution-zip
         run: |
+      - name: Get Ballerina Distribution
+        if: inputs.distribution-zip
+        run: |
           pwd
           echo "Downloading Ballerina distribution from provided URL..."
-          wget -q --no-check-certificate -O ballerina.zip "${{ inputs.distribution-zip }}"
+          curl -H "Authorization: token ${{ secrets.BALLERINA_BOT_TOKEN }}" \
+               -L -o ballerina.zip \
+               "${{ inputs.distribution-zip }}"
           unzip -o -q ballerina.zip -d temp_folder/
           cp -r temp_folder/ballerina-*/. ballerina-dist/
           rm -r temp_folder/ ballerina.zip
-          echo "BALLERINA_CMD=${PWD}/ballerina-dist/bin/bal" >> $GITHUB_ENV  
-          echo
+          echo "BALLERINA_CMD=${PWD}/ballerina-dist/bin/bal" >> $GITHUB_ENV
 
       - name: Verify API Key
         run: |
