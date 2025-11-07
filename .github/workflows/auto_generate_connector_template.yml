@@ -13,7 +13,7 @@ on:
         type: string
         default: "nightly"
       distribution-zip:
-        description: "Distribution of the Ballerina version to be used"
+        description: "Distribution URL of the Ballerina version to be used"
         required: false
         type: string
         default: ""
