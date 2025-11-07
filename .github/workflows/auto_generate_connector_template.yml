@@ -71,21 +71,37 @@ jobs:
                "${{ inputs.distribution-zip }}"
           
           echo "Extracting artifact.zip..."
-          unzip -o -q artifact.zip  # -o flag forces overwrite without prompting
+          unzip -o -q artifact.zip
+          
+          echo "Contents after first extraction:"
+          ls -la
           
           # Handle nested ZIP if present
           if ls *.zip 1> /dev/null 2>&1; then
             echo "Found nested ZIP file, extracting..."
-            unzip -o -q *.zip && rm *.zip  # Add -o flag here too
+            for zip_file in *.zip; do
+              echo "Extracting: $zip_file"
+              unzip -o -q "$zip_file"
+              echo "Contents after extracting $zip_file:"
+              ls -la
+            done
+            # Remove ZIP files after extraction
+            rm *.zip
+            echo "Removed ZIP files"
           fi
           
           # Clean up the original artifact.zip
           rm -f artifact.zip
           
+          echo "Final contents of temp_folder:"
+          ls -la
+          
           cd ..
           
           # Copy distribution
           if ls temp_folder/ballerina-* 1> /dev/null 2>&1; then
+            echo "Found Ballerina directory:"
+            ls -la temp_folder/ballerina-*
             cp -r temp_folder/ballerina-*/. ballerina-dist/
             rm -r temp_folder/
             echo "BALLERINA_CMD=${PWD}/ballerina-dist/bin/bal" >> $GITHUB_ENV
@@ -94,9 +110,12 @@ jobs:
             echo "Error: No Ballerina directory found after extraction"
             echo "Contents of temp_folder:"
             ls -la temp_folder/
+            echo "Looking for any directories:"
+            find temp_folder/ -type d -name "*"
+            echo "Looking for any files:"
+            find temp_folder/ -type f -name "*" | head -10
             exit 1
           fi
-          
       - name: Verify API Key
         run: |
           if [ -z "$ANTHROPIC_API_KEY" ]; then
