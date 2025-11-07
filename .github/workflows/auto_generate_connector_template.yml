@@ -63,23 +63,39 @@ jobs:
         run: |
           echo "Downloading and extracting Ballerina distribution..."
           
-          # Download and extract in one go
+          # Create temp folder and download to file
           mkdir -p temp_folder
+          cd temp_folder
           curl -H "Authorization: token ${{ secrets.BALLERINA_BOT_TOKEN }}" \
-               -L "${{ inputs.distribution-zip }}" | \
-               unzip -q - -d temp_folder/
+               -L -o artifact.zip \
+               "${{ inputs.distribution-zip }}"
+          
+          echo "Extracting artifact.zip..."
+          unzip -q artifact.zip
           
           # Handle nested ZIP if present
-          cd temp_folder
           if ls *.zip 1> /dev/null 2>&1; then
+            echo "Found nested ZIP file, extracting..."
             unzip -q *.zip && rm *.zip
           fi
+          
+          # Clean up the original artifact.zip
+          rm -f artifact.zip
+          
           cd ..
           
           # Copy distribution
-          cp -r temp_folder/ballerina-*/. ballerina-dist/
-          rm -r temp_folder/
-          echo "BALLERINA_CMD=${PWD}/ballerina-dist/bin/bal" >> $GITHUB_ENV
+          if ls temp_folder/ballerina-* 1> /dev/null 2>&1; then
+            cp -r temp_folder/ballerina-*/. ballerina-dist/
+            rm -r temp_folder/
+            echo "BALLERINA_CMD=${PWD}/ballerina-dist/bin/bal" >> $GITHUB_ENV
+            echo "Ballerina distribution setup completed"
+          else
+            echo "Error: No Ballerina directory found after extraction"
+            echo "Contents of temp_folder:"
+            ls -la temp_folder/
+            exit 1
+          fi
           
       - name: Verify API Key
         run: |
