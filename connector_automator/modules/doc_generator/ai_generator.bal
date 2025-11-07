@@ -5,7 +5,7 @@ import ballerina/file;
 import ballerina/io;
 import ballerina/lang.regexp;
 
-const string TEMPLATES_PATH = "/home/hansika/dev/connector_automation/connector_automator/modules/doc_generator/templates";
+const string TEMPLATES_PATH = "./modules/doc_generator/templates";
 
 public function initDocumentationGenerator() returns error? {
     return utils:initAIService();
