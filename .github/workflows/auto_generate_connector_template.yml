@@ -181,6 +181,19 @@ jobs:
           echo "Output path: $OUTPUT_PATH"
           echo "Ballerina command: ${{ env.BALLERINA_CMD }}"
 
+          # create Config.toml for the connector automator. 
+
+          cat > Config.toml << EOF
+          [connector_automator.code_fixer]
+          maxIterations = 3
+
+          [connector_automator.utils]
+          apiKey = "${{ secrets.ANTHROPIC_API_KEY }}"
+          EOF
+
+          echo "Created Config.toml"
+          
+
           # Build pipeline arguments
           PIPELINE_ARGS=("$SPEC_PATH" "$OUTPUT_PATH" "yes")
 
