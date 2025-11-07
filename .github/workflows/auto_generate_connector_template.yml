@@ -181,6 +181,18 @@ jobs:
           echo "Output path: $OUTPUT_PATH"
           echo "Ballerina command: ${{ env.BALLERINA_CMD }}"
 
+          # Add Ballerina bin directory to PATH if using custom distribution
+          if [ -n "${{ env.BALLERINA_CMD }}" ] && [ "${{ env.BALLERINA_CMD }}" != "bal" ]; then
+            # Extract the directory containing bal
+            BALLERINA_BIN_DIR=$(dirname "${{ env.BALLERINA_CMD }}")
+            export PATH="$BALLERINA_BIN_DIR:$PATH"
+            echo "Added $BALLERINA_BIN_DIR to PATH"
+            
+            # Verify bal is now available
+            which bal
+            bal version
+          fi
+
           # create Config.toml for the connector automator. 
 
           cat > Config.toml << EOF
@@ -192,7 +204,6 @@ jobs:
           EOF
 
           echo "Created Config.toml"
-          
 
           # Build pipeline arguments
           PIPELINE_ARGS=("$SPEC_PATH" "$OUTPUT_PATH" "yes")
