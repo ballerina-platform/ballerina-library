@@ -130,10 +130,31 @@ jobs:
         run: |
           echo "Cloning connector automator tool from ballerina-library..."
           git clone https://github.com/ballerina-platform/ballerina-library.git temp-library
-          cp -r temp-library/connector_automator ./
+          
+          echo "Contents of temp-library:"
+          ls -la temp-library/
+          
+          echo "Looking for connector_automator or similar directories:"
+          find temp-library/ -name "*connector*" -type d
+          find temp-library/ -name "*automator*" -type d
+          find temp-library/ -name "*automation*" -type d
+          
+          # Try to find the correct path
+          if [ -d "temp-library/connector_automator" ]; then
+            cp -r temp-library/connector_automator ./
+          elif [ -d "temp-library/automation" ]; then
+            cp -r temp-library/automation ./connector_automator
+          elif [ -d "temp-library/tools/connector_automator" ]; then
+            cp -r temp-library/tools/connector_automator ./
+          else
+            echo "Error: Could not find connector_automator directory"
+            echo "Available directories:"
+            find temp-library/ -maxdepth 2 -type d
+            exit 1
+          fi
+          
           rm -rf temp-library
           echo "Connector automator cloned successfully"
-
       - name: Download OpenAPI Specification
         if: inputs.openapi-url
         working-directory: docs/spec
