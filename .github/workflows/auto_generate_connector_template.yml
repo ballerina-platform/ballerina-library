@@ -17,11 +17,11 @@ on:
         required: false
         type: string
         default: ""
-      license-file:
-        description: "Path to license file relative to docs directory"
-        required: false
-        type: string
-        default: "license.txt"
+      # license-file:
+      #   description: "Path to license file relative to docs directory"
+      #   required: false
+      #   type: string
+      #   default: "license.txt"
       quiet-mode:
         description: "Enable quiet mode"
         required: false
@@ -212,8 +212,6 @@ jobs:
             PIPELINE_ARGS+=("quiet")
           fi
 
-          # Add license path as argument (relative to the root, not docs)
-          PIPELINE_ARGS+=("license=../docs/${{ inputs.license-file }}")
 
           # Run the complete pipeline
           ${{ env.BALLERINA_CMD }} run -- pipeline "${PIPELINE_ARGS[@]}"
