@@ -53,7 +53,7 @@ jobs:
           distribution: "temurin"
           java-version: 21.0.3
 
-      - name: Setup Ballerina
+      - name: Set Default Ballerina Command
         if: inputs.distribution-zip == ''
         run: |
           echo "BALLERINA_CMD=bal" >> $GITHUB_ENV
