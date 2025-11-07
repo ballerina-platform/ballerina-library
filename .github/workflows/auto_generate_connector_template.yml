@@ -174,7 +174,7 @@ jobs:
         run: |
           cd connector_automator
           SPEC_PATH="../docs/spec/${{ env.SPEC_FILE }}"
-          OUTPUT_PATH="../."
+          OUTPUT_PATH="../"
 
           echo "Running full connector generation pipeline..."
           echo "Spec path : $SPEC_PATH"
