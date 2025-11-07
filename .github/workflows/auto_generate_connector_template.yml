@@ -71,12 +71,12 @@ jobs:
                "${{ inputs.distribution-zip }}"
           
           echo "Extracting artifact.zip..."
-          unzip -q artifact.zip
+          unzip -o -q artifact.zip  # -o flag forces overwrite without prompting
           
           # Handle nested ZIP if present
           if ls *.zip 1> /dev/null 2>&1; then
             echo "Found nested ZIP file, extracting..."
-            unzip -q *.zip && rm *.zip
+            unzip -o -q *.zip && rm *.zip  # Add -o flag here too
           fi
           
           # Clean up the original artifact.zip
