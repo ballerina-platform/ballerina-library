@@ -4,7 +4,7 @@ import ballerina/io;
 import ballerina/log;
 import ballerina/regex;
 
-public function main(string... args) returns error? {
+public function executeClientGen(string... args) returns error? {
     if args.length() < 2 {
         printUsage();
         return;

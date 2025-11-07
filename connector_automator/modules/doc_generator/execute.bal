@@ -3,7 +3,7 @@ import connector_automator.cost_calculator;
 import ballerina/io;
 import ballerina/os;
 
-public function main(string... args) returns error? {
+public function executeDocGen(string... args) returns error? {
     io:println("Starting Ballerina Connector Documentation Generator...\n");
 
     if args.length() == 0 {

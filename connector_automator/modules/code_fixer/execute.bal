@@ -3,7 +3,7 @@ import connector_automator.cost_calculator;
 import ballerina/io;
 import ballerina/log;
 
-public function main(string... args) returns error? {
+public function executeCodeFixer(string... args) returns error? {
     if args.length() < 1 {
         printCodeFixerUsage();
         return;

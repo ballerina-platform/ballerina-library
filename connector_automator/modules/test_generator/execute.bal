@@ -3,7 +3,7 @@ import connector_automator.utils;
 
 import ballerina/io;
 
-public function main(string... args) returns error? {
+public function executeTestGen(string... args) returns error? {
     if args.length() < 2 {
         printUsage();
         return;

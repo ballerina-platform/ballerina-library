@@ -33,22 +33,22 @@ function handleCommandLineMode(string[] args) returns error? {
 
     match command {
         "sanitize" => {
-            return sanitizor:main(...remainingArgs);
+            return sanitizor:executeSanitizor(...remainingArgs);
         }
         "generate-client" => {
-            return client_generator:main(...remainingArgs);
+            return client_generator:executeClientGen(...remainingArgs);
         }
         "generate-examples" => {
-            return example_generator:main(...remainingArgs);
+            return example_generator:executeExampleGen(...remainingArgs);
         }
         "generate-tests" => {
-            return test_generator:main(...remainingArgs);
+            return test_generator:executeTestGen(...remainingArgs);
         }
         "generate-docs" => {
-            return doc_generator:main(...remainingArgs);
+            return doc_generator:executeDocGen(...remainingArgs);
         }
         "fix-code" => {
-            return code_fixer:main(...remainingArgs);
+            return code_fixer:executeCodeFixer(...remainingArgs);
         }
         "pipeline" => {
             return runFullPipeline(...remainingArgs);
@@ -219,7 +219,7 @@ function handleSanitizeOperation() returns error? {
         args.push("quiet");
     }
 
-    return sanitizor:main(...args);
+    return sanitizor:executeSanitizor(...args);
 }
 
 function handleClientGeneration() returns error? {
@@ -286,7 +286,7 @@ function handleClientGeneration() returns error? {
         }
     }
 
-    return client_generator:main(...args);
+    return client_generator:executeClientGen(...args);
 }
 
 function handleExampleGeneration() returns error? {
@@ -302,7 +302,7 @@ function handleExampleGeneration() returns error? {
         return error("Failed to read connector path");
     }
 
-    return example_generator:main(connectorPath.trim());
+    return example_generator:executeExampleGen(connectorPath.trim());
 }
 
 function handleTestGeneration() returns error? {
@@ -333,7 +333,7 @@ function handleTestGeneration() returns error? {
         args.push("quiet");
     }
 
-    return test_generator:main(...args);
+    return test_generator:executeTestGen(...args);
 }
 
 function handleDocGeneration() returns error? {
@@ -393,7 +393,7 @@ function handleDocGeneration() returns error? {
         args.push("quiet");
     }
 
-    return doc_generator:main(...args);
+    return doc_generator:executeDocGen(...args);
 }
 
 function handleCodeFixer() returns error? {
@@ -420,7 +420,7 @@ function handleCodeFixer() returns error? {
         args.push("quiet");
     }
 
-    return code_fixer:main(...args);
+    return code_fixer:executeCodeFixer(...args);
 }
 
 function handleFullPipeline() returns error? {
@@ -503,7 +503,7 @@ function runFullPipeline(string... args) returns error? {
     io:println("\n=== Step 1: Sanitizing OpenAPI Specification ===");
     string[] sanitizeArgs = [openApiSpec, outputDir];
     sanitizeArgs.push(...pipelineOptions);
-    error? sanitizeResult = sanitizor:main(...sanitizeArgs);
+    error? sanitizeResult = sanitizor:executeSanitizor(...sanitizeArgs);
     if sanitizeResult is error {
         io:println("Pipeline failed at sanitization step: " + sanitizeResult.message());
         decimal partialCost = cost_calculator:getTotalCost();
@@ -522,7 +522,7 @@ function runFullPipeline(string... args) returns error? {
     string clientPath = outputDir + "/ballerina";
     string[] clientArgs = [sanitizedSpec, clientPath];
     clientArgs.push(...pipelineOptions);
-    error? clientResult = client_generator:main(...clientArgs);
+    error? clientResult = client_generator:executeClientGen(...clientArgs);
     if clientResult is error {
         io:println("Warning: Client generation failed: " + clientResult.message());
         io:println("Continuing with pipeline...");
@@ -535,7 +535,7 @@ function runFullPipeline(string... args) returns error? {
     io:println("Checking for compilation errors in generated client...");
     string[] buildArgs = [clientPath];
     buildArgs.push(...pipelineOptions);
-    error? buildResult = code_fixer:main(...buildArgs);
+    error? buildResult = code_fixer:executeCodeFixer(...buildArgs);
     if buildResult is error {
         io:println("Pipeline failed: Generated client has compilation errors.");
         io:println("Error details: " + buildResult.message());
@@ -557,7 +557,7 @@ function runFullPipeline(string... args) returns error? {
     io:println("\n=== Step 4: Generating Examples ===");
     decimal beforeExamples = cost_calculator:getTotalCost();
     string[] exampleArgs = [outputDir];
-    error? exampleResult = example_generator:main(...exampleArgs);
+    error? exampleResult = example_generator:executeExampleGen(...exampleArgs);
     if exampleResult is error {
         io:println("Warning: Example generation failed: " + exampleResult.message());
         io:println("Continuing with pipeline...");
@@ -573,7 +573,7 @@ function runFullPipeline(string... args) returns error? {
     decimal beforeTests = cost_calculator:getTotalCost();
     string[] testArgs = [outputDir, sanitizedSpec];
     testArgs.push(...pipelineOptions);
-    error? testResult = test_generator:main(...testArgs);
+    error? testResult = test_generator:executeTestGen(...testArgs);
     if testResult is error {
         io:println("Warning: Test generation failed: " + testResult.message());
         io:println("Continuing with pipeline...");
@@ -588,7 +588,7 @@ function runFullPipeline(string... args) returns error? {
     decimal beforeDocs = cost_calculator:getTotalCost();
     string[] docArgs = ["generate-all", outputDir];
     docArgs.push(...pipelineOptions);
-    error? docResult = doc_generator:main(...docArgs);
+    error? docResult = doc_generator:executeDocGen(...docArgs);
     if docResult is error {
         io:println("Warning: Documentation generation failed: " + docResult.message());
     } else {

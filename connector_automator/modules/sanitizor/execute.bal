@@ -7,7 +7,7 @@ import ballerina/log;
 import ballerina/regex;
 import ballerina/yaml;
 
-public function main(string... args) returns error? {
+public function executeSanitizor(string... args) returns error? {
     io:println("Starting OpenAPI Sanitizor...");
     // Check command line arguments
     if args.length() < 2 {

@@ -5,7 +5,7 @@ import ballerina/io;
 import ballerina/lang.runtime;
 import ballerina/log;
 
-public function main(string... args) returns error? {
+public function executeExampleGen(string... args) returns error? {
     if args.length() < 1 {
         io:println("Please provide the path to the connector module.");
         return;
