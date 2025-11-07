@@ -59,7 +59,7 @@
         },
         {
             "name": "module-ballerina-time",
-            "module_version": "2.8.0-SNAPSHOT",
+            "module_version": "2.8.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibTimeVersion",
@@ -78,7 +78,7 @@
         },
         {
             "name": "module-ballerina-url",
-            "module_version": "2.6.1-SNAPSHOT",
+            "module_version": "2.6.2-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibUrlVersion",
@@ -90,7 +90,7 @@
         },
         {
             "name": "module-ballerina-xmldata",
-            "module_version": "2.9.1-SNAPSHOT",
+            "module_version": "2.9.2-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
@@ -425,7 +425,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "module_version": "2.15.2-SNAPSHOT",
+            "module_version": "2.16.0-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
