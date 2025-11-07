@@ -173,13 +173,23 @@ jobs:
       - name: Run Full Connector Generation Pipeline
         run: |
           cd connector_automator
-          SPEC_PATH="../docs/spec/${{ env.SPEC_FILE }}"
-          OUTPUT_PATH="../"
+          SPEC_PATH="${GITHUB_WORKSPACE}/docs/spec/${{ env.SPEC_FILE }}"
+          OUTPUT_PATH="${GITHUB_WORKSPACE}"
 
           echo "Running full connector generation pipeline..."
           echo "Spec path : $SPEC_PATH"
           echo "Output path: $OUTPUT_PATH"
+          echo "Working directory: $(pwd)"
+          echo "GITHUB_WORKSPACE: ${GITHUB_WORKSPACE}"
           echo "Ballerina command: ${{ env.BALLERINA_CMD }}"
+
+          # Verify the spec file exists
+          if [ ! -f "$SPEC_PATH" ]; then
+            echo "Error: OpenAPI spec file does not exist at: $SPEC_PATH"
+            echo "Contents of docs/spec directory:"
+            ls -la "${GITHUB_WORKSPACE}/docs/spec/"
+            exit 1
+          fi
 
           # Add Ballerina bin directory to PATH if using custom distribution
           if [ -n "${{ env.BALLERINA_CMD }}" ] && [ "${{ env.BALLERINA_CMD }}" != "bal" ]; then
@@ -212,12 +222,10 @@ jobs:
             PIPELINE_ARGS+=("quiet")
           fi
 
-
           # Run the complete pipeline
           ${{ env.BALLERINA_CMD }} run -- pipeline "${PIPELINE_ARGS[@]}"
 
           echo "Full connector generation pipeline completed"
-
       - name: Cleanup and Organize Spec Files
         run: |
           cd docs/spec
