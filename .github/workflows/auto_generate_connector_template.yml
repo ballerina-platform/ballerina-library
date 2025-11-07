@@ -212,6 +212,9 @@ jobs:
             PIPELINE_ARGS+=("quiet")
           fi
 
+          # Add license path as argument (relative to the root, not docs)
+          PIPELINE_ARGS+=("license=../docs/${{ inputs.license-file }}")
+
           # Run the complete pipeline
           ${{ env.BALLERINA_CMD }} run -- pipeline "${PIPELINE_ARGS[@]}"
 
