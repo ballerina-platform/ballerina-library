@@ -1,11 +1,9 @@
-import connector_automator.cost_calculator;
 import connector_automator.utils;
 
 import ballerina/file;
 import ballerina/io;
 import ballerina/lang.array;
 import ballerina/lang.regexp;
-import ballerina/log;
 
 configurable int maxIterations = ?;
 
@@ -89,7 +87,7 @@ function prepareErrorContext(CompilationError[] errors) returns string {
 // Fix errors in a single file
 public function fixFileWithLLM(string projectPath, string filePath, CompilationError[] errors, boolean quietMode = false) returns FixResponse|error {
     if !quietMode {
-        log:printInfo("Attempting to fix file with LLM", filePath = filePath, errorCount = errors.length());
+        io:println(string `  Analyzing ${filePath} (${errors.length()} error${errors.length() == 1 ? "" : "s"})`);
     }
 
     // Check if AI service is initialized
@@ -110,44 +108,31 @@ public function fixFileWithLLM(string projectPath, string filePath, CompilationE
     string|io:Error fileContent = io:fileReadString(fullFilePath);
     if fileContent is io:Error {
         if !quietMode {
-            log:printError("Failed to read file", filePath = fullFilePath, 'error = fileContent);
+            io:println(string `  ✗ Failed to read ${filePath}`);
         }
         return fileContent;
     }
 
     // Create fix prompt
     string prompt = createFixPrompt(fileContent, errors, filePath);
-    if !quietMode {
-        //io:println(prompt);
-        log:printInfo("Sending fix request to LLM");
-    }
 
     // Get fix from LLM using centralized service
     string|error llmResponse = utils:callAI(prompt);
     if llmResponse is error {
         if !quietMode {
-            log:printError("LLM failed to generate fix", 'error = llmResponse);
+            io:println(string `  ✗ AI failed to generate fix for ${filePath}`);
         }
         return error(string `LLM failed to generate fix: ${llmResponse.message()}`);
     }
 
-    // ✅ Track cost for code fixing
-    cost_calculator:trackUsageFromText("code_fixer", prompt, llmResponse, "claude-4-sonnet");
-
-    // ✅ Show fix cost per file (optional - can be disabled in quiet mode)
     if !quietMode {
-        decimal fixCost = cost_calculator:getStageCost("code_fixer");
-        // Calculate cost for just this fix (rough estimation)
-        int fixCount = cost_calculator:getStageMetrics("code_fixer").calls;
-        decimal avgCostPerFix = fixCount > 0 ? fixCost / <decimal>fixCount : 0.0d;
-        io:println(string ` Fix cost for ${filePath}: ~$${avgCostPerFix.toString()}`);
+        io:println(string `  ✓ Generated fix for ${filePath}`);
     }
 
-    // Return the response
     return {
         success: true,
         fixedCode: llmResponse,
-        explanation: "Fixed using LLM"
+        explanation: "Fixed using AI"
     };
 }
 
@@ -165,7 +150,7 @@ public function applyFix(string projectPath, string filePath, string fixedCode, 
     io:Error? backupResult = io:fileWriteString(backupPath, originalContent, io:OVERWRITE);
     if backupResult is io:Error {
         if !quietMode {
-            log:printError("Failed to create backup", filePath = backupPath, 'error = backupResult);
+            io:println(string `  ⚠  Failed to create backup for ${filePath}`);
         }
         return backupResult;
     }
@@ -174,31 +159,25 @@ public function applyFix(string projectPath, string filePath, string fixedCode, 
     io:Error? writeResult = io:fileWriteString(fullFilePath, fixedCode, io:OVERWRITE);
     if writeResult is io:Error {
         if !quietMode {
-            log:printError("Failed to write fixed code", filePath = fullFilePath, 'error = writeResult);
+            io:println(string `  ✗ Failed to apply fix to ${filePath}`);
         }
 
         // Attempt to restore from backup
         io:Error? restoreResult = io:fileWriteString(fullFilePath, originalContent, io:OVERWRITE);
         if restoreResult is io:Error && !quietMode {
-            log:printError("Failed to restore original content", filePath = fullFilePath, 'error = restoreResult);
+            io:println(string `  ⚠  Failed to restore original content for ${filePath}`);
         }
         return writeResult;
     }
 
     if !quietMode {
-        log:printInfo("Applied fix to file", filePath = fullFilePath);
+        io:println(string `  ✓ Applied fix to ${filePath}`);
     }
     return true;
 }
 
 // Main function to fix all errors in a project
 public function fixAllErrors(string projectPath, boolean quietMode = true, boolean autoYes = false) returns FixResult|BallerinaFixerError {
-    if !quietMode {
-        log:printInfo("Starting error fixing process", projectPath = projectPath);
-    }
-
-    cost_calculator:resetCostTracking();
-
     // Initialize AI service if not already initialized
     if !utils:isAIServiceInitialized() {
         error? initResult = utils:initAIService(quietMode);
@@ -220,29 +199,33 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
     int initialErrorCount = 0;
     boolean initialErrorCountSet = false;
 
+    if !quietMode {
+        io:println("Starting error fixing process...");
+    }
+
     while iteration <= maxIterations {
         if !quietMode {
-            log:printInfo("Starting iteration", iteration = iteration, maxIterations = maxIterations);
+            io:println("");
+            io:println(string `[Iteration ${iteration}/${maxIterations}] Building project...`);
         }
 
         // Build the project and get diagnostics
         utils:CommandResult buildResult = utils:executeBalBuild(projectPath, quietMode);
 
         if utils:isCommandSuccessfull(buildResult) {
-            if !quietMode {
-                log:printInfo("Build successful! All errors fixed.", iteration = iteration);
-            }
             result.success = true;
             result.errorsRemaining = 0;
-            // If this is the first iteration and build is successful, no errors to fix
+            
             if iteration == 1 {
                 result.errorsFixed = 0;
+                if !quietMode {
+                    io:println("✓ Project builds successfully (no errors to fix)");
+                }
             } else {
-                result.errorsFixed = initialErrorCount; // All initial errors were fixed
-            }
-            decimal totalCost = cost_calculator:getTotalCost();
-            if !quietMode && totalCost > 0.0d {
-                io:println(string ` All errors fixed! Total fixing cost: $${totalCost.toString()}`);
+                result.errorsFixed = initialErrorCount;
+                if !quietMode {
+                    io:println("✓ All compilation errors resolved!");
+                }
             }
             return result;
         }
@@ -251,57 +234,42 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
         CompilationError[] currentErrors = parseCompilationErrors(buildResult.stderr);
 
         if currentErrors.length() == 0 {
-            if !quietMode {
-                log:printInfo("No compilation errors found.");
-            }
-            // If we reach here, build failed but no compilation errors were parsed
-            // This might be due to different types of build issues (warnings, other errors, etc.)
-            // Let's check the build output to see if it's actually successful
-
-            // Sometimes builds fail with warnings or other issues that aren't compilation errors
-            // If no compilation errors were found, we should consider this a success
-            if !quietMode {
-                log:printInfo("No compilation errors detected - considering build successful", iteration = iteration);
-            }
             result.success = true;
             result.errorsRemaining = 0;
             result.errorsFixed = initialErrorCountSet ? initialErrorCount : 0;
-
-            decimal totalCost = cost_calculator:getTotalCost();
-            if !quietMode && totalCost > 0.0d {
-                io:println(string ` No compilation errors found! Total cost: $${totalCost.toString()}`);
+            
+            if !quietMode {
+                io:println("✓ No compilation errors detected");
             }
             return result;
-        }
-
-        if !quietMode {
-            log:printInfo("Found compilation errors", count = currentErrors.length(), iteration = iteration);
         }
 
         // Set initial error count for tracking progress
         if !initialErrorCountSet {
             initialErrorCount = currentErrors.length();
             initialErrorCountSet = true;
+            
+            if !quietMode {
+                io:println(string `Found ${initialErrorCount} compilation error${initialErrorCount == 1 ? "" : "s"}`);
+            }
         }
 
-        // Check if we're making progress (error count should decrease or errors should change)
+        // Check progress
         if iteration > 1 {
-            if currentErrors.length() >= previousErrors.length() {
-                // Check if errors are exactly the same (no progress)
+            int progressMade = previousErrors.length() - currentErrors.length();
+            
+            if progressMade > 0 {
+                if !quietMode {
+                    io:println(string `  Progress: Fixed ${progressMade} error${progressMade == 1 ? "" : "s"}`);
+                }
+            } else if currentErrors.length() >= previousErrors.length() {
                 boolean sameErrors = checkIfErrorsAreSame(currentErrors, previousErrors);
                 if sameErrors {
                     if !quietMode {
-                        log:printWarn("No progress made in this iteration - same errors persist", iteration = iteration);
+                        io:println("  ⚠  No progress made - same errors persist");
                     }
                     result.remainingFixes.push(string `Iteration ${iteration}: No progress - same errors persist`);
-
-                }
-            } else {
-                if !quietMode {
-                    log:printInfo("Progress made - error count reduced",
-                            previousCount = previousErrors.length(),
-                            currentCount = currentErrors.length(),
-                            iteration = iteration);
+                    break;
                 }
             }
         }
@@ -313,65 +281,64 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
         // Group errors by file
         map<CompilationError[]> errorsByFile = groupErrorsByFile(currentErrors);
 
+        if !quietMode {
+            io:println(string `Processing ${errorsByFile.keys().length()} file${errorsByFile.keys().length() == 1 ? "" : "s"}...`);
+        }
+
         boolean anyFixApplied = false;
 
         // Process each file
         foreach string filePath in errorsByFile.keys() {
             CompilationError[] fileErrors = errorsByFile.get(filePath);
 
-            if !quietMode {
-                log:printInfo("Processing file", filePath = filePath, errorCount = fileErrors.length(), iteration = iteration);
-            }
-
             // Get fix from LLM
             FixResponse|error fixResponse = fixFileWithLLM(projectPath, filePath, fileErrors, quietMode);
             if fixResponse is error {
                 if !quietMode {
-                    log:printError("Failed to get fix from LLM", filePath = filePath, 'error = fixResponse, iteration = iteration);
+                    io:println(string `  ⚠  Could not generate fix for ${filePath}: ${fixResponse.message()}`);
                 }
                 result.remainingFixes.push(string `Iteration ${iteration}: Failed to fix ${filePath}: ${fixResponse.message()}`);
                 continue;
             }
 
-            // Ask user for confirmation
+            // Show fix to user and ask for confirmation
             boolean shouldApplyFix = false;
+            
             if autoYes {
-                if !quietMode {
-                    io:println(string `\n=== Iteration ${iteration} - Fix for ${filePath} ===`);
-                    io:println("Errors to fix:");
-                    foreach CompilationError err in fileErrors {
-                        io:println(string `  Line ${err.line}: ${err.message}`);
-                    }
-                    io:println("\nProposed fix:");
-                    io:println("```ballerina");
-                    io:println(fixResponse.fixedCode);
-                    io:println("```");
-                }
-                io:println("\nApply this fix? (y/n): y [auto-confirmed]");
                 shouldApplyFix = true;
-            } else {
                 if !quietMode {
-                    io:println(string `\n=== Iteration ${iteration} - Fix for ${filePath} ===`);
-                    io:println("Errors to fix:");
-                    foreach CompilationError err in fileErrors {
-                        io:println(string `  Line ${err.line}: ${err.message}`);
-                    }
-                    io:println("\nProposed fix:");
-                    io:println("```ballerina");
-                    io:println(fixResponse.fixedCode);
-                    io:println("```");
+                    io:println(string `  Auto-applying fix to ${filePath} [${fileErrors.length()} error${fileErrors.length() == 1 ? "" : "s"}]`);
                 }
-                io:print(string `\nApply this fix? (y/n): `);
+            } else {
+                // Show the fix to user
+                io:println("");
+                io:println(string `Fix for ${filePath}:`);
+                io:println("  Errors:");
+                foreach CompilationError err in fileErrors {
+                    io:println(string `    Line ${err.line}: ${err.message}`);
+                }
+                io:println("");
+                io:println("  Proposed solution:");
+                io:println("```ballerina");
+                io:println(fixResponse.fixedCode);
+                io:println("```");
+                io:println("");
+                
+                io:print("Apply this fix? (y/n): ");
                 string|io:Error userInput = io:readln();
                 if userInput is io:Error {
-                    if !quietMode {
-                        log:printError("Failed to read user input", 'error = userInput);
-                    }
+                    io:println("  ⚠  Failed to read input - skipping fix");
                     continue;
                 }
 
                 string trimmedInput = userInput.trim().toLowerAscii();
                 shouldApplyFix = trimmedInput == "y" || trimmedInput == "yes";
+                
+                if shouldApplyFix {
+                    io:println("  ✓ Fix approved");
+                } else {
+                    io:println("  ✗ Fix declined");
+                }
             }
 
             if shouldApplyFix {
@@ -379,98 +346,119 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
                 boolean|error applyResult = applyFix(projectPath, filePath, fixResponse.fixedCode, quietMode);
                 if applyResult is error {
                     if !quietMode {
-                        log:printError("Failed to apply fix", filePath = filePath, 'error = applyResult, iteration = iteration);
+                        io:println(string `  ✗ Failed to apply fix: ${applyResult.message()}`);
                     }
                     result.remainingFixes.push(string `Iteration ${iteration}: Failed to apply fix to ${filePath}: ${applyResult.message()}`);
                     continue;
                 }
 
                 anyFixApplied = true;
-                result.appliedFixes.push(string `Iteration ${iteration}: Applied fix to ${filePath} (${fileErrors.length()} errors)`);
-                if !quietMode {
-                    log:printInfo("Successfully applied fix to file", filePath = filePath, iteration = iteration);
-                }
+                result.appliedFixes.push(string `Fixed ${filePath} (${fileErrors.length()} error${fileErrors.length() == 1 ? "" : "s"})`);
             } else {
-                result.remainingFixes.push(string `Iteration ${iteration}: User declined fix for ${filePath}`);
-                if !quietMode {
-                    log:printInfo("User declined fix", filePath = filePath, iteration = iteration);
-                }
+                result.remainingFixes.push(string `User declined fix for ${filePath}`);
             }
         }
 
-        // If no fixes were applied in this iteration, break to avoid infinite loop
+        // If no fixes were applied, break to avoid infinite loop
         if !anyFixApplied {
             if !quietMode {
-                log:printWarn("No fixes were applied in this iteration", iteration = iteration);
+                io:println("  ⚠  No fixes were applied - stopping iterations");
             }
             result.remainingFixes.push(string `Iteration ${iteration}: No fixes applied - stopping iterations`);
-
+            break;
         }
-        if !quietMode {
-            decimal iterationCost = cost_calculator:getTotalCost();
-            io:println(string `Iteration ${iteration} total cost so far: $${iterationCost.toString()}`);
-        }
-
+        
         iteration += 1;
     }
 
     // Final status check
     if iteration > maxIterations {
         if !quietMode {
-            log:printWarn("Maximum iterations reached", maxIterations = maxIterations);
+            io:println(string `⚠  Reached maximum iterations (${maxIterations})`);
         }
         result.remainingFixes.push(string `Maximum iterations (${maxIterations}) reached`);
     }
 
     // Final build check
-    utils:CommandResult finalBuildResult = utils:executeBalBuild(projectPath, quietMode);
+    if !quietMode {
+        io:println("");
+        io:println("Running final build check...");
+    }
+    
+    utils:CommandResult finalBuildResult = utils:executeBalBuild(projectPath, true); // Always quiet for final check
+    
     if utils:isCommandSuccessfull(finalBuildResult) {
         result.success = true;
         result.errorsRemaining = 0;
-        result.errorsFixed = initialErrorCount; // All initial errors were fixed
+        result.errorsFixed = initialErrorCount;
+        
         if !quietMode {
-            log:printInfo("All errors fixed successfully after iterations!", totalIterations = iteration - 1);
+            io:println("✓ Final build successful - all errors resolved!");
         }
     } else {
         CompilationError[] remainingErrors = parseCompilationErrors(finalBuildResult.stderr);
         result.errorsRemaining = remainingErrors.length();
-        result.errorsFixed = initialErrorCount - remainingErrors.length(); // Calculate how many were fixed
+        result.errorsFixed = initialErrorCount - remainingErrors.length();
+        
         if !quietMode {
-            log:printInfo("Some errors remain after iterations",
-                    count = remainingErrors.length(),
-                    totalIterations = iteration - 1);
+            io:println(string `⚠  ${remainingErrors.length()} error${remainingErrors.length() == 1 ? "" : "s"} still remain`);
+            if remainingErrors.length() <= 5 {
+                io:println("  Remaining errors:");
+                foreach CompilationError err in remainingErrors {
+                    io:println(string `    ${err.filePath}:${err.line} - ${err.message}`);
+                }
+            }
         }
     }
 
-    decimal finalCost = cost_calculator:getTotalCost();
-    if finalCost > 0.0d {
-        if !quietMode {
-            utils:repeat();
-            io:println("CODE FIXING COST SUMMARY");
-            utils:repeat();
-            io:println(string `Total Iterations: ${iteration - 1}`);
-            io:println(string `Fixes Applied: ${result.appliedFixes.length()}`);
-            io:println(string `Total Cost: $${finalCost.toString()}`);
-
-            int totalCalls = cost_calculator:getStageMetrics("code_fixer").calls;
-            if totalCalls > 0 {
-                decimal avgCostPerFix = finalCost / <decimal>totalCalls;
-                io:println(string `Average Cost per Fix: $${avgCostPerFix.toString()}`);
-            }
-
-            if result.success {
-                io:println(" Status: All compilation errors resolved");
-            } else {
-                io:println(string `  Status: ${result.errorsRemaining} errors remaining`);
-            }
-            utils:repeat();
-        } else {
-            // Even in quiet mode, show final cost
-            io:println(string ` Code fixing completed. Total cost: $${finalCost.toString()}`);
-        }
+    // Print summary
+    if !quietMode && (result.appliedFixes.length() > 0 || !result.success) {
+        printFixingSummary(result, iteration - 1);
     }
 
     return result;
+}
+
+// Print a user-friendly summary of the fixing process
+function printFixingSummary(FixResult result, int totalIterations) {
+    // Create separator using array concatenation
+    string[] separatorChars = [];
+    int i = 0;
+    while i < 50 {
+        separatorChars.push("-");
+        i += 1;
+    }
+    string sep = string:'join("", ...separatorChars);
+    
+    io:println("");
+    io:println(sep);
+    io:println("ERROR FIXING SUMMARY");
+    io:println(sep);
+    
+    io:println(string `Iterations: ${totalIterations}`);
+    io:println(string `Fixed     : ${result.errorsFixed} error${result.errorsFixed == 1 ? "" : "s"}`);
+    io:println(string `Remaining : ${result.errorsRemaining} error${result.errorsRemaining == 1 ? "" : "s"}`);
+    
+    if result.success {
+        io:println("Status    : ✓ All errors resolved");
+    } else {
+        io:println("Status    : ⚠  Some errors remain");
+    }
+    
+    if result.appliedFixes.length() > 0 {
+        io:println("");
+        io:println("Applied fixes:");
+        foreach string fix in result.appliedFixes {
+            io:println(string `  • ${fix}`);
+        }
+    }
+    
+    if result.remainingFixes.length() > 0 && result.errorsRemaining > 0 {
+        io:println("");
+        io:println("Manual intervention may be required for remaining errors.");
+    }
+    
+    io:println(sep);
 }
 
 // Helper function to check if two error arrays contain the same errors

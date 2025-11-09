@@ -1,4 +1,3 @@
-import connector_automator.cost_calculator;
 import connector_automator.utils;
 
 import ballerina/file;
@@ -12,41 +11,15 @@ public function initDocumentationGenerator() returns error? {
 }
 
 public function generateAllDocumentation(string connectorPath) returns error? {
-
-    cost_calculator:resetCostTracking();
-
-    io:println(" Starting Document generation...");
+    io:println("Starting documentation generation...");
+    
     check generateBallerinaReadme(connectorPath);
     check generateTestsReadme(connectorPath);
     check generateExamplesReadme(connectorPath);
     check generateIndividualExampleReadmes(connectorPath);
     check generateMainReadme(connectorPath);
 
-    utils:repeat();
-    io:println("DOCUMENTATION GENERATION COST SUMMARY");
-    utils:repeat();
-
-    decimal overviewCost = cost_calculator:getStageCost("doc_generator_overview");
-    decimal setupCost = cost_calculator:getStageCost("doc_generator_setup");
-    decimal quickstartCost = cost_calculator:getStageCost("doc_generator_quickstart");
-    decimal examplesCost = cost_calculator:getStageCost("doc_generator_examples");
-    decimal testsCost = cost_calculator:getStageCost("doc_generator_tests");
-    decimal individualCost = cost_calculator:getStageCost("doc_generator_individual");
-    decimal mainExamplesCost = cost_calculator:getStageCost("doc_generator_main_examples");
-    decimal totalCost = cost_calculator:getTotalCost();
-
-    io:println(string `Overview Sections: $${overviewCost.toString()}`);
-    io:println(string `Setup Guides: $${setupCost.toString()}`);
-    io:println(string `Quickstart Sections: $${quickstartCost.toString()}`);
-    io:println(string `Examples Lists: $${examplesCost.toString()}`);
-    io:println(string `Test READMEs: $${testsCost.toString()}`);
-    io:println(string `Individual Example READMEs: $${individualCost.toString()}`);
-    io:println(string `Main Examples READMEs: $${mainExamplesCost.toString()}`);
-    utils:repeat();
-    io:println(string `Total Documentation Cost: $${totalCost.toString()}`);
-    utils:repeat();
-
-    io:println("All documentation generated successfully!");
+    io:println("✓ All documentation generated successfully!");
 }
 
 public function generateBallerinaReadme(string connectorPath) returns error? {
@@ -69,12 +42,7 @@ public function generateBallerinaReadme(string connectorPath) returns error? {
     }
     check writeOutput(content, outputPath);
 
-    // ✅ Show section-specific cost
-    decimal sectionCost = cost_calculator:getStageCost("doc_generator_overview") +
-                        cost_calculator:getStageCost("doc_generator_setup") +
-                        cost_calculator:getStageCost("doc_generator_quickstart") +
-                        cost_calculator:getStageCost("doc_generator_examples");
-    io:println(string `Generated: ${outputPath} (Cost: $${sectionCost.toString()})`);
+    io:println(string `  ✓ ${outputPath}`);
 }
 
 public function generateTestsReadme(string connectorPath) returns error? {
@@ -96,11 +64,10 @@ public function generateTestsReadme(string connectorPath) returns error? {
         check ensureDirectoryExists(parentPath);
     }
     check writeOutput(content, outputPath);
-    decimal testCost = cost_calculator:getStageCost("doc_generator_tests");
-    io:println(string `Generated: ${outputPath} (Cost: $${testCost.toString()})`);
+    
+    io:println(string `  ✓ ${outputPath}`);
 }
 
-// Generate Examples README
 public function generateIndividualExampleReadmes(string connectorPath) returns error? {
     ConnectorMetadata metadata = check analyzeConnector(connectorPath);
 
@@ -108,13 +75,14 @@ public function generateIndividualExampleReadmes(string connectorPath) returns e
 
     // Check if examples directory exists
     if !check file:test(examplesPath, file:EXISTS) {
-        io:println("No examples directory found at: " + examplesPath);
+        io:println("  ⚠  No examples directory found - skipping individual READMEs");
         return;
     }
 
     // Get all example directories
     file:MetaData[] examples = check file:readDir(examplesPath);
     int exampleCount = 0;
+    int successCount = 0;
 
     foreach file:MetaData example in examples {
         if example.dir {
@@ -123,18 +91,17 @@ public function generateIndividualExampleReadmes(string connectorPath) returns e
 
             error? result = generateSingleExampleReadme(example.absPath, exampleDirName, metadata);
             if result is error {
-                io:println("Failed to generate README for " + exampleDirName + ": " + result.message());
+                io:println(string `  ✗ Failed: ${exampleDirName} - ${result.message()}`);
             } else {
-                exampleCount += 1;
-                decimal avgCost = exampleCount > 0 ? cost_calculator:getStageCost("doc_generator_individual") / <decimal>exampleCount : 0.0d;
-                io:println(string `Generated: ${exampleDirPath}/README.md (Approx. cost: $${avgCost.toString()})`);
+                successCount += 1;
+                io:println(string `  ✓ ${exampleDirPath}/README.md`);
             }
+            exampleCount += 1;
         }
     }
 
-    decimal totalIndividualCost = cost_calculator:getStageCost("doc_generator_individual");
     if exampleCount > 0 {
-        io:println(string `Total Individual Examples Cost: $${totalIndividualCost.toString()} (${exampleCount} examples)`);
+        io:println(string `  Generated ${successCount}/${exampleCount} individual example READMEs`);
     }
 }
 
@@ -174,8 +141,6 @@ function generateIndividualExampleContent(ExampleData exampleData, ConnectorMeta
     string prompt = createIndividualExamplePrompt(exampleData, connectorMetadata);
     string result = check callAI(prompt);
 
-    cost_calculator:trackUsageFromText("doc_generator_individual", prompt, result, "claude-4-sonnet");
-
     content["individual_readme"] = result;
     return content;
 }
@@ -196,8 +161,8 @@ public function generateExamplesReadme(string connectorPath) returns error? {
         check ensureDirectoryExists(parentPath);
     }
     check writeOutput(content, outputPath);
-    decimal examplesCost = cost_calculator:getStageCost("doc_generator_main_examples");
-    io:println(string `Generated: ${outputPath} (Cost: $${examplesCost.toString()})`);
+    
+    io:println(string `  ✓ ${outputPath}`);
 }
 
 public function generateMainReadme(string connectorPath) returns error? {
@@ -216,29 +181,27 @@ public function generateMainReadme(string connectorPath) returns error? {
         check ensureDirectoryExists(parentPath);
     }
     check writeOutput(content, outputPath);
-    io:println(string `Generated: ${outputPath}`);
+    
+    io:println(string `  ✓ ${outputPath}`);
 }
 
 function generateBallerinaContent(ConnectorMetadata metadata) returns map<string>|error {
     map<string> content = {};
+    
     string overviewPrompt = createBallerinaOverviewPrompt(metadata);
     string overviewResult = check callAI(overviewPrompt);
-    cost_calculator:trackUsageFromText("doc_generator_overview", overviewPrompt, overviewResult, "claude-4-sonnet");
     content["overview"] = overviewResult;
 
     string setupPrompt = createBallerinaSetupPrompt(metadata);
     string setupResult = check callAI(setupPrompt);
-    cost_calculator:trackUsageFromText("doc_generator_setup", setupPrompt, setupResult, "claude-4-sonnet");
     content["setup"] = setupResult;
 
     string quickstartPrompt = createBallerinaQuickstartPrompt(metadata);
     string quickstartResult = check callAI(quickstartPrompt);
-    cost_calculator:trackUsageFromText("doc_generator_quickstart", quickstartPrompt, quickstartResult, "claude-4-sonnet");
     content["quickstart"] = quickstartResult;
 
     string examplesPrompt = createBallerinaExamplesPrompt(metadata);
     string examplesResult = check callAI(examplesPrompt);
-    cost_calculator:trackUsageFromText("doc_generator_examples", examplesPrompt, examplesResult, "claude-4-sonnet");
     content["examples"] = examplesResult;
 
     return content;
@@ -248,7 +211,6 @@ function generateTestsContent(ConnectorMetadata metadata) returns map<string>|er
     map<string> content = {};
     string testsPrompt = createTestReadmePrompt(metadata);
     string testsResult = check callAI(testsPrompt);
-    cost_calculator:trackUsageFromText("doc_generator_tests", testsPrompt, testsResult, "claude-4-sonnet");
     content["testing_approach"] = testsResult;
 
     return content;
@@ -258,7 +220,6 @@ function generateExamplesContent(ConnectorMetadata metadata) returns map<string>
     map<string> content = {};
     string mainExamplesPrompt = createMainExampleReadmePrompt(metadata);
     string mainExamplesResult = check callAI(mainExamplesPrompt);
-    cost_calculator:trackUsageFromText("doc_generator_main_examples", mainExamplesPrompt, mainExamplesResult, "claude-4-sonnet");
     content["main_examples_readme"] = mainExamplesResult;
 
     return content;
@@ -272,23 +233,20 @@ function generateMainContent(ConnectorMetadata metadata) returns map<string>|err
 
     string overviewPrompt = createBallerinaOverviewPrompt(metadata);
     string overviewResult = check callAI(overviewPrompt);
-    cost_calculator:trackUsageFromText("doc_generator_overview", overviewPrompt, overviewResult, "claude-4-sonnet");
     content["overview"] = overviewResult;
 
     string setupPrompt = createBallerinaSetupPrompt(metadata);
     string setupResult = check callAI(setupPrompt);
-    cost_calculator:trackUsageFromText("doc_generator_setup", setupPrompt, setupResult, "claude-4-sonnet");
     content["setup"] = setupResult;
 
     string quickstartPrompt = createBallerinaQuickstartPrompt(metadata);
     string quickstartResult = check callAI(quickstartPrompt);
-    cost_calculator:trackUsageFromText("doc_generator_quickstart", quickstartPrompt, quickstartResult, "claude-4-sonnet");
     content["quickstart"] = quickstartResult;
 
     string examplesPrompt = createBallerinaExamplesPrompt(metadata);
     string examplesResult = check callAI(examplesPrompt);
-    cost_calculator:trackUsageFromText("doc_generator_examples", examplesPrompt, examplesResult, "claude-4-sonnet");
     content["examples"] = examplesResult;
+    
     return content;
 }
 
@@ -382,14 +340,17 @@ function substituteVariables(string template, TemplateData data) returns string 
     if usefulLinks != "" {
         result = simpleReplace(result, "{{AI_GENERATED_USEFUL_LINKS}}", usefulLinks);
     }
+    
     string individualReadme = data.AI_GENERATED_INDIVIDUAL_README ?: "";
     if individualReadme != "" {
         result = simpleReplace(result, "{{AI_GENERATED_INDIVIDUAL_README}}", individualReadme);
     }
+    
     string mainExamplesReadme = data.AI_GENERATED_MAIN_EXAMPLES_README ?: "";
     if mainExamplesReadme != "" {
         result = simpleReplace(result, "{{AI_GENERATED_MAIN_EXAMPLES_README}}", mainExamplesReadme);
     }
+    
     return result;
 }
 
@@ -413,7 +374,6 @@ function createTemplateData(ConnectorMetadata metadata) returns TemplateData {
     return {
         CONNECTOR_NAME: metadata.connectorName,
         VERSION: metadata.version
-
     };
 }
 
@@ -461,10 +421,8 @@ function mergeAIContent(TemplateData baseData, map<string> aiContent) returns Te
             "main_examples_readme" => {
                 merged.AI_GENERATED_MAIN_EXAMPLES_README = value;
             }
-
         }
     }
 
     return merged;
 }
-

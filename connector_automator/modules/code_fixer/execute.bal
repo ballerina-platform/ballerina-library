@@ -1,17 +1,14 @@
-import connector_automator.cost_calculator;
-
 import ballerina/io;
 import ballerina/log;
 
 public function executeCodeFixer(string... args) returns error? {
     if args.length() < 1 {
-        printCodeFixerUsage();
+        printUsage();
         return;
     }
 
     string projectPath = args[0];
 
-    // Check for auto flag for automated mode and quiet mode for log control
     boolean autoYes = false;
     boolean quietMode = false;
     foreach string arg in args {
@@ -22,127 +19,158 @@ public function executeCodeFixer(string... args) returns error? {
         }
     }
 
-    if autoYes {
-        if !quietMode {
-            io:println("Running in automated mode - all prompts will be auto-confirmed");
-        }
+    if autoYes && !quietMode {
+        io:println("ℹ  Auto-confirm mode enabled");
     }
-
     if quietMode {
-        if !autoYes {
-            io:println("Running in quiet mode - reduced logging output");
-        }
-        io:println("Quiet mode enabled - minimal logging output");
+        io:println("ℹ  Quiet mode enabled");
     }
 
-    if !quietMode {
-        log:printInfo("Starting Ballerina code fixer", projectPath = projectPath);
-    }
-    io:println("=== AI-Powered Ballerina Code Fixer ===");
-    io:println(string `Project path: ${projectPath}`);
-    io:println("\nOperations to be performed:");
-    io:println("1. Analyze Ballerina compilation errors");
-    io:println("2. Generate AI-powered fixes for detected issues");
-    io:println("3. Apply fixes with user confirmation");
-    io:println("4. Iterate until all errors are resolved");
+    printOperationPlan(projectPath, quietMode);
 
-    if !getUserConfirmation("\nProceed with error fixing?", autoYes) {
-        io:println("Operation cancelled by user.");
+    if !getUserConfirmation("Proceed with error fixing?", autoYes) {
+        io:println("✗ Operation cancelled");
         return;
     }
 
-    io:println("Starting AI-powered Ballerina code fixer...");
+    io:println("");
+    io:println("Analyzing and fixing errors...");
 
     FixResult|BallerinaFixerError result = fixAllErrors(projectPath, quietMode, autoYes);
 
     if result is FixResult {
-        decimal totalCost = cost_calculator:getTotalCost();
-        if result.success {
-            io:println("\nAll compilation errors fixed successfully!");
-            io:println(string `✓ Fixed ${result.errorsFixed} errors`);
-            io:println("✓ All Ballerina files compile without errors!");
-
-            if totalCost > 0.0d {
-                io:println(string ` Total cost: $${totalCost.toString()}`);
-
-                int totalCalls = cost_calculator:getStageMetrics("code_fixer").calls;
-                if totalCalls > 0 {
-                    decimal avgCostPerFix = totalCost / <decimal>totalCalls;
-                    io:println(string ` Average cost per fix: $${avgCostPerFix.toString()}`);
-                }
-            }
-        } else {
-            io:println("\n⚠ Partial success:");
-            io:println(string `✓ Fixed ${result.errorsFixed} errors`);
-            io:println(string `${result.errorsRemaining} errors remain`);
-            io:println("⚠ Some errors may require manual intervention");
-
-            if totalCost > 0.0d {
-                io:println(string `Total cost: $${totalCost.toString()}`);
-
-                if result.errorsFixed > 0 {
-                    decimal costPerFixedError = totalCost / <decimal>result.errorsFixed;
-                    io:println(string ` Cost per fixed error: $${costPerFixedError.toString()}`);
-                }
-            }
-        }
-
-        if result.appliedFixes.length() > 0 {
-            io:println("\nApplied fixes:");
-            foreach string fix in result.appliedFixes {
-                io:println(string `  • ${fix}`);
-            }
-        }
-
+        printFixSummary(result, quietMode);
     } else {
-        log:printError("Code fixer failed", 'error = result);
-        io:println("Code fixing failed. Please check logs for details.");
-
-        decimal totalCost = cost_calculator:getTotalCost();
-        if totalCost > 0.0d {
-            io:println(string `Cost incurred before failure: $${totalCost.toString()}`);
+        if !quietMode {
+            log:printError("Code fixer failed", 'error = result);
         }
+        io:println(string `✗ Fixing failed: ${result.message()}`);
         return result;
     }
 }
 
-// Helper function to get user confirmation
+function printOperationPlan(string projectPath, boolean quietMode) {
+    if quietMode {
+        return;
+    }
+    
+    string sep = createSeparator("=", 70);
+    io:println(sep);
+    io:println("Code Error Fixing");
+    io:println(sep);
+    io:println(string `Project: ${projectPath}`);
+    io:println("");
+    io:println("Operations:");
+    io:println("  1. Analyze compilation errors");
+    io:println("  2. Generate AI-powered fixes");
+    io:println("  3. Apply fixes with confirmation");
+    io:println("  4. Iterate until resolved");
+    io:println(sep);
+}
+
+function printFixSummary(FixResult result, boolean quietMode) {
+    string sep = createSeparator("=", 70);
+    
+    io:println("");
+    io:println(sep);
+    
+    if result.success {
+        io:println("✓ All Errors Fixed");
+        io:println(sep);
+        io:println("");
+        io:println(string `Fixed: ${result.errorsFixed} error${result.errorsFixed == 1 ? "" : "s"}`);
+        if result.errorsFixed > 0 {
+            io:println("✓ Project compiles successfully");
+        } else {
+            io:println("✓ No errors found (project already compiles)");
+        }
+    } else {
+        io:println("⚠  Partial Success");
+        io:println(sep);
+        io:println("");
+        io:println(string `Fixed     : ${result.errorsFixed} error${result.errorsFixed == 1 ? "" : "s"}`);
+        io:println(string `Remaining : ${result.errorsRemaining} error${result.errorsRemaining == 1 ? "" : "s"}`);
+        io:println("");
+        io:println("⚠  Manual intervention may be required");
+    }
+    
+    if result.appliedFixes.length() > 0 && !quietMode {
+        io:println("");
+        io:println("Applied Fixes:");
+        foreach string fix in result.appliedFixes {
+            io:println(string `  • ${fix}`);
+        }
+    }
+    
+    if result.remainingFixes.length() > 0 && result.errorsRemaining > 0 && !quietMode {
+        io:println("");
+        io:println("Remaining Issues:");
+        foreach string issue in result.remainingFixes {
+            io:println(string `  • ${issue}`);
+        }
+    }
+    
+    io:println("");
+    io:println("Next Steps:");
+    if result.success {
+        io:println("  • Run tests: bal test");
+        io:println("  • Generate examples: bal run -- generate-examples <path>");
+        io:println("  • Generate docs: bal run -- generate-docs generate-all <path>");
+    } else {
+        io:println("  • Review remaining errors manually");
+        io:println("  • Check backup files (*.backup) if needed");
+        io:println("  • Run: bal build to see current status");
+    }
+    
+    io:println(sep);
+}
+
 function getUserConfirmation(string message, boolean autoYes = false) returns boolean {
     if autoYes {
-        io:println(string `${message} (y/n): y [auto-confirmed]`);
         return true;
     }
-
     io:print(string `${message} (y/n): `);
     string|io:Error userInput = io:readln();
     if userInput is io:Error {
-        log:printError("Failed to read user input", 'error = userInput);
+        log:printError("Failed to read input", 'error = userInput);
         return false;
     }
-    string trimmedInput = userInput.trim().toLowerAscii();
-    return trimmedInput == "y" || trimmedInput == "yes";
+    return userInput.trim().toLowerAscii() is "y"|"yes";
 }
 
-function printCodeFixerUsage() {
-    io:println("Ballerina AI Code Fixer");
-    io:println("Usage: bal run -- <project-path> [yes] [quiet]");
-    io:println("  <project-path>: Path to the Ballerina project directory");
-    io:println("  yes: Automatically answer 'yes' to all prompts (for CI/CD)");
-    io:println("  quiet: Reduce logging output (minimal logs for CI/CD)");
+function createSeparator(string char, int length) returns string {
+    string[] chars = [];
+    int i = 0;
+    while i < length {
+        chars.push(char);
+        i += 1;
+    }
+    return string:'join("", ...chars);
+}
+
+function printUsage() {
+    io:println("Code Error Fixer");
     io:println("");
-    io:println("Environment Variables:");
-    io:println("  ANTHROPIC_API_KEY: Required for AI-powered fixes");
+    io:println("USAGE");
+    io:println("  bal run -- fix-code <project-path> [options]");
     io:println("");
-    io:println("Example:");
-    io:println("  bal run -- ./my-ballerina-project");
-    io:println("  bal run -- ./my-ballerina-project yes");
-    io:println("  bal run -- ./my-ballerina-project yes quiet");
+    io:println("OPTIONS");
+    io:println("  yes      Auto-confirm all fixes");
+    io:println("  quiet    Minimal logging output");
     io:println("");
-    io:println("Interactive Features:");
-    io:println("  • Step-by-step confirmation for each fix");
-    io:println("  • Review AI-generated changes before applying");
-    io:println("  • Automatic backup creation before modifications");
-    io:println("  • Progress feedback and iteration summaries");
-    io:println("  • Use 'yes' argument to skip all prompts for automated execution");
-    io:println("  • Use 'quiet' argument to reduce logging output for CI/CD");
+    io:println("EXAMPLES");
+    io:println("  bal run -- fix-code ./ballerina-project");
+    io:println("  bal run -- fix-code ./ballerina-project yes");
+    io:println("  bal run -- fix-code ./ballerina-project yes quiet");
+    io:println("");
+    io:println("ENVIRONMENT");
+    io:println("  ANTHROPIC_API_KEY    Required for AI-powered fixes");
+    io:println("");
+    io:println("FEATURES");
+    io:println("  • Interactive fix confirmation");
+    io:println("  • Automatic backup creation");
+    io:println("  • Progress tracking and summaries");
+    io:println("  • Iterative error resolution");
+    io:println("  • CI/CD friendly with auto-confirm mode");
+    io:println("");
 }
