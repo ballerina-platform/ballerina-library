@@ -223,10 +223,12 @@ jobs:
           fi
 
           # Add license file if provided
-          if [ - "${{ inputs.license-file }}" ]; then
-          LICENSE_PATH="${GITHUB_WORKSPACE}/docs/${{ inputs.license-file }}"
-          if [ -f "$LICENSE_PATH" ]; then
-            PIPELINE_ARGS+=("license=${LICENSE_PATH}")
+          if [ -n "${{ inputs.license-file }}" ]; then
+            LICENSE_PATH="${GITHUB_WORKSPACE}/docs/${{ inputs.license-file }}"
+            if [ -f "$LICENSE_PATH" ]; then
+              PIPELINE_ARGS+=("license=${LICENSE_PATH}")
+              echo "Using license file: $LICENSE_PATH"
+            fi
           fi
         
           # Run the complete pipeline
