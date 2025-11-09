@@ -17,11 +17,11 @@ on:
         required: false
         type: string
         default: ""
-      # license-file:
-      #   description: "Path to license file relative to docs directory"
-      #   required: false
-      #   type: string
-      #   default: "license.txt"
+      license-file:
+        description: "Path to license file relative to docs directory"
+        required: false
+        type: string
+        default: "license.txt"
       quiet-mode:
         description: "Enable quiet mode"
         required: false
@@ -62,20 +62,20 @@ jobs:
         if: inputs.distribution-zip
         run: |
           echo "Downloading and extracting Ballerina distribution..."
-          
+
           # Create temp folder and download to file
           mkdir -p temp_folder
           cd temp_folder
           curl -H "Authorization: token ${{ secrets.BALLERINA_BOT_TOKEN }}" \
                -L -o artifact.zip \
                "${{ inputs.distribution-zip }}"
-          
+
           echo "Extracting artifact.zip..."
           unzip -o -q artifact.zip
-          
+
           echo "Contents after first extraction:"
           ls -la
-          
+
           # Handle nested ZIP if present
           if ls *.zip 1> /dev/null 2>&1; then
             echo "Found nested ZIP file, extracting..."
@@ -89,15 +89,15 @@ jobs:
             rm *.zip
             echo "Removed ZIP files"
           fi
-          
+
           # Clean up the original artifact.zip
           rm -f artifact.zip
-          
+
           echo "Final contents of temp_folder:"
           ls -la
-          
+
           cd ..
-          
+
           # Copy distribution
           if ls temp_folder/ballerina-* 1> /dev/null 2>&1; then
             echo "Found Ballerina directory:"
@@ -222,6 +222,13 @@ jobs:
             PIPELINE_ARGS+=("quiet")
           fi
 
+          # Add license file if provided
+          if [ - "${{ inputs.license-file }}" ]; then
+          LICENSE_PATH="${GITHUB_WORKSPACE}/docs/${{ inputs.license-file }}"
+          if [ -f "$LICENSE_PATH" ]; then
+            PIPELINE_ARGS+=("license=${LICENSE_PATH}")
+          fi
+        
           # Run the complete pipeline
           ${{ env.BALLERINA_CMD }} run -- pipeline "${PIPELINE_ARGS[@]}"
 
