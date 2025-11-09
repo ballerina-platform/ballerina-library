@@ -1,4 +1,3 @@
-import connector_automator.cost_calculator;
 import connector_automator.utils;
 
 public function initExampleGenerator() returns error? {
@@ -14,10 +13,7 @@ public function generateUseCaseAndFunctions(ConnectorDetails details, string[] u
 
     string result = check utils:callAI(prompt);
 
-    cost_calculator:trackUsageFromText("example_generator_usecase", prompt, result, "claude-4-sonnet");
-
     return result.fromJsonString();
-
 }
 
 public function generateExampleCode(ConnectorDetails details, string useCase, string targetedContext) returns string|error {
@@ -28,9 +24,8 @@ public function generateExampleCode(ConnectorDetails details, string useCase, st
     }
 
     string result = check utils:callAI(prompt);
-    cost_calculator:trackUsageFromText("example_generator_code", prompt, result, "claude-4-sonnet");
+    
     return result;
-
 }
 
 public function generateExampleName(string useCase) returns string|error {
@@ -45,6 +40,5 @@ public function generateExampleName(string useCase) returns string|error {
         return error("Failed to generate example name", result);
     }
 
-    cost_calculator:trackUsageFromText("example_generator_name", prompt, result, "claude-4-sonnet");
     return result == "" ? "example-1" : result;
 }

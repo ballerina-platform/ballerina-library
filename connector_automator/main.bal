@@ -1,6 +1,5 @@
 import connector_automator.client_generator;
 import connector_automator.code_fixer;
-import connector_automator.cost_calculator;
 import connector_automator.doc_generator;
 import connector_automator.example_generator;
 import connector_automator.sanitizor;
@@ -10,12 +9,13 @@ import ballerina/io;
 import ballerina/os;
 
 const string VERSION = "0.1.0";
+
 public function main(string... args) returns error? {
     // Check for API key
     string|error apiKey = os:getEnv("ANTHROPIC_API_KEY");
     if apiKey is error {
-        io:println("⚠ ANTHROPIC_API_KEY not configured.");
-        io:println("AI-powered features will not be available.");
+        io:println("⚠  ANTHROPIC_API_KEY not configured");
+        io:println("   AI-powered features will not be available");
         io:println("");
     }
 
@@ -58,7 +58,7 @@ function handleCommandLineMode(string[] args) returns error? {
             printUsage();
         }
         _ => {
-            io:println("✗ Unknown command '" + command + "'");
+            io:println(string `✗ Unknown command: '${command}'`);
             printUsage();
             return error("Invalid command: " + command);
         }
@@ -140,13 +140,7 @@ function handleInteractiveMode() returns error? {
 }
 
 function showMainMenu() {
-    // Build a separator line of 80 '=' characters 
-    string sep = "";
-    int i = 0;
-    while i < 80 {
-        sep += "=";
-        i += 1;
-    }
+    string sep = createSeparator("=", 80);
 
     io:println("");
     io:println(sep);
@@ -220,7 +214,6 @@ function handleClientGeneration() returns error? {
         return error("Failed to read output directory");
     }
 
-    // Ask for optional configurations
     boolean autoYes = getUserConfirmation("Auto-confirm all prompts?");
     boolean quietMode = getUserConfirmation("Enable quiet mode?");
 
@@ -234,7 +227,6 @@ function handleClientGeneration() returns error? {
         clientMethodArg = "remote-methods";
     }
 
-    // Ask for optional configurations
     boolean wantAdvanced = getUserConfirmation("Configure advanced options?");
 
     string[] args = [specPath.trim(), outputDir.trim()];
@@ -247,12 +239,6 @@ function handleClientGeneration() returns error? {
     args.push(clientMethodArg);
 
     if wantAdvanced {
-        // // License file
-        // string|io:Error licenseInput = getUserInput("license file path (optional): ");
-        // if licenseInput is string && licenseInput.trim().length() > 0 {
-        //     args.push(string `license=${licenseInput.trim()}`);
-        // }
-
         // Tags
         string|io:Error tagsInput = getUserInput("Filter tags (comma-separated, optional): ");
         if tagsInput is string && tagsInput.trim().length() > 0 {
@@ -277,7 +263,18 @@ function handleExampleGeneration() returns error? {
         return error("Failed to read connector path");
     }
 
-    return example_generator:executeExampleGen(connectorPath.trim());
+    boolean autoYes = getUserConfirmation("Auto-confirm all prompts?");
+    boolean quietMode = getUserConfirmation("Enable quiet mode?");
+
+    string[] args = [connectorPath.trim()];
+    if autoYes {
+        args.push("yes");
+    }
+    if quietMode {
+        args.push("quiet");
+    }
+
+    return example_generator:executeExampleGen(...args);
 }
 
 function handleTestGeneration() returns error? {
@@ -293,12 +290,13 @@ function handleTestGeneration() returns error? {
         return error("Failed to read OpenAPI specification path");
     }
 
-    // Add quiet mode confirmation 
+    boolean autoYes = getUserConfirmation("Auto-confirm all prompts?");
     boolean quietMode = getUserConfirmation("Enable quiet mode?");
 
     string[] args = [connectorPath.trim(), specPath.trim()];
-
-    // Add quiet mode flag if selected
+    if autoYes {
+        args.push("yes");
+    }
     if quietMode {
         args.push("quiet");
     }
@@ -307,6 +305,8 @@ function handleTestGeneration() returns error? {
 }
 
 function handleDocGeneration() returns error? {
+    printSectionHeader("Documentation Generation");
+
     io:println("Documentation Types:");
     io:println("  1. All README files");
     io:println("  2. Ballerina module README");
@@ -351,7 +351,7 @@ function handleDocGeneration() returns error? {
         return error("Failed to read connector path");
     }
 
-    boolean autoYes = getUserConfirmation("Auto-confirm fixes?");
+    boolean autoYes = getUserConfirmation("Auto-confirm all prompts?");
     boolean quietMode = getUserConfirmation("Enable quiet mode?");
 
     string[] args = [command, connectorPath.trim()];
@@ -388,6 +388,8 @@ function handleCodeFixer() returns error? {
 }
 
 function handleFullPipeline() returns error? {
+    printSectionHeader("Full Pipeline");
+
     io:println("Pipeline Steps:");
     io:println("  1. Sanitize OpenAPI specification");
     io:println("  2. Generate Ballerina client");
@@ -408,10 +410,14 @@ function handleFullPipeline() returns error? {
     }
 
     boolean autoYes = getUserConfirmation("Auto-confirm all prompts?");
+    boolean quietMode = getUserConfirmation("Enable quiet mode?");
 
     string[] args = [openApiSpec.trim(), outputDir.trim()];
     if autoYes {
         args.push("yes");
+    }
+    if quietMode {
+        args.push("quiet");
     }
 
     return runFullPipeline(...args);
@@ -432,21 +438,13 @@ function getUserConfirmation(string message) returns boolean {
     return trimmedInput == "y" || trimmedInput == "yes";
 }
 
-
 function printSectionHeader(string title) {
-    string sep = "";
-    int i = 0;
-    while i < 100 {
-        sep += "=";
-        i += 1;
-    }
-    io:println(sep);
+    string sep = createSeparator("=", 60);
     io:println("");
     io:println(sep);
     io:println(title);
     io:println(sep);
 }
-
 
 function runFullPipeline(string... args) returns error? {
     if args.length() < 2 {
@@ -458,39 +456,39 @@ function runFullPipeline(string... args) returns error? {
     string openApiSpec = args[0];
     string outputDir = args[1];
     string[] pipelineOptions = args.slice(2);
+    
+    boolean quietMode = false;
+    boolean autoYes = false;
+    foreach string option in pipelineOptions {
+        if option == "quiet" {
+            quietMode = true;
+        } else if option == "yes" {
+            autoYes = true;
+        }
+    }
 
-    cost_calculator:resetCostTracking();
+    if autoYes && !quietMode {
+        io:println("ℹ  Auto-confirm mode enabled");
+    }
+    if quietMode {
+        io:println("ℹ  Quiet mode enabled");
+    }
 
-    printSectionHeader("Connector Automation Pipeline");
-    io:println(string `Specification : ${openApiSpec}`);
-    io:println(string `Output        : ${outputDir}`);
-    io:println("");
-
-    decimal sanitizationCost = 0.0d;
-    decimal exampleGenCost = 0.0d;
-    decimal testGenCost = 0.0d;
-    decimal docGenCost = 0.0d;
-    decimal codeFixCost = 0.0d;
+    printPipelineHeader(openApiSpec, outputDir, quietMode);
 
     // Step 1: Sanitize OpenAPI spec
-    printStepHeader(1, "Sanitizing OpenAPI Specification");
+    printStepHeader(1, "Sanitizing OpenAPI Specification", quietMode);
     string[] sanitizeArgs = [openApiSpec, outputDir];
     sanitizeArgs.push(...pipelineOptions);
     error? sanitizeResult = sanitizor:executeSanitizor(...sanitizeArgs);
     if sanitizeResult is error {
         io:println(string `✗ Sanitization failed: ${sanitizeResult.message()}`);
-        decimal partialCost = cost_calculator:getTotalCost();
-        if partialCost > 0.0d {
-            io:println(string `Cost incurred before failure: $${partialCost.toString()}`);
-        }
         return sanitizeResult;
     }
-
-    sanitizationCost = cost_calculator:getTotalCost();
-    io:println(string `✓ Sanitization completed (Cost: $${sanitizationCost.toString()})`);
+    io:println("✓ Sanitization completed successfully");
 
     // Step 2: Generate Ballerina client
-    printStepHeader(2, "Generating Ballerina Client");
+    printStepHeader(2, "Generating Ballerina Client", quietMode);
     string sanitizedSpec = outputDir + "/docs/spec/aligned_ballerina_openapi.json";
     string clientPath = outputDir + "/ballerina";
     string[] clientArgs = [sanitizedSpec, clientPath];
@@ -503,45 +501,33 @@ function runFullPipeline(string... args) returns error? {
         io:println("✓ Client generation completed successfully");
     }
 
-    // Step 3: Build and validate client (check for compilation errors)
-    printStepHeader(3, "Building and Validating Client");
+    // Step 3: Build and validate client
+    printStepHeader(3, "Building and Validating Client", quietMode);
     string[] buildArgs = [clientPath];
     buildArgs.push(...pipelineOptions);
     error? buildResult = code_fixer:executeCodeFixer(...buildArgs);
     if buildResult is error {
         io:println(string `✗ Build validation failed: ${buildResult.message()}`);
-        decimal partialCost = cost_calculator:getTotalCost();
-        io:println(string ` Cost incurred before pipeline termination: $${partialCost.toString()}`);
-        io:println("\nThe pipeline has been terminated due to client compilation errors.");
-        io:println("Please review the generated client code and fix the compilation errors manually.");
+        io:println("   Pipeline terminated due to compilation errors");
+        io:println("   Please review generated client and fix manually");
         return buildResult;
     }
-    decimal totalAfterFixing = cost_calculator:getTotalCost();
-    codeFixCost = totalAfterFixing - sanitizationCost;
-    if codeFixCost > 0.0d {
-        io:println(string `✓ Code fixing completed (Cost: $${codeFixCost.toString()})`);
-    } else {
-        io:println("✓ Client built successfully without compilation errors");
-    }
+    io:println("✓ Client built and validated successfully");
 
     // Step 4: Generate examples
-    printStepHeader(4, "Generating Examples");
-    decimal beforeExamples = cost_calculator:getTotalCost();
+    printStepHeader(4, "Generating Examples", quietMode);
     string[] exampleArgs = [outputDir];
+    exampleArgs.push(...pipelineOptions);
     error? exampleResult = example_generator:executeExampleGen(...exampleArgs);
     if exampleResult is error {
         io:println(string `⚠  Example generation failed: ${exampleResult.message()}`);
         io:println("   Continuing pipeline...");
     } else {
-
-        decimal afterExamples = cost_calculator:getTotalCost();
-        exampleGenCost = afterExamples - beforeExamples;
-        io:println(string `✓ Example generation completed (Cost: $${exampleGenCost.toString()})`);
+        io:println("✓ Example generation completed successfully");
     }
 
     // Step 5: Generate tests
-    printStepHeader(5, "Generating Tests");
-    decimal beforeTests = cost_calculator:getTotalCost();
+    printStepHeader(5, "Generating Tests", quietMode);
     string[] testArgs = [outputDir, sanitizedSpec];
     testArgs.push(...pipelineOptions);
     error? testResult = test_generator:executeTestGen(...testArgs);
@@ -549,145 +535,112 @@ function runFullPipeline(string... args) returns error? {
         io:println(string `⚠  Test generation failed: ${testResult.message()}`);
         io:println("   Continuing pipeline...");
     } else {
-        decimal afterTests = cost_calculator:getTotalCost();
-        testGenCost = afterTests - beforeTests;
-        io:println(string `✓ Test generation completed (Cost: $${testGenCost.toString()})`);
+        io:println("✓ Test generation completed successfully");
     }
 
     // Step 6: Generate documentation
-    printStepHeader(6, "Generating Documentation");
-    decimal beforeDocs = cost_calculator:getTotalCost();
+    printStepHeader(6, "Generating Documentation", quietMode);
     string[] docArgs = ["generate-all", outputDir];
     docArgs.push(...pipelineOptions);
     error? docResult = doc_generator:executeDocGen(...docArgs);
     if docResult is error {
         io:println(string `⚠  Documentation generation failed: ${docResult.message()}`);
     } else {
-        decimal afterDocs = cost_calculator:getTotalCost();
-        docGenCost = afterDocs - beforeDocs;
-        io:println(string `✓ Documentation generation completed (Cost: $${docGenCost.toString()})`);
+        io:println("✓ Documentation generation completed successfully");
     }
 
-
-
-    decimal totalPipelineCost = cost_calculator:getTotalCost();
-
-    repeat();
-    io:println("CONNECTOR AUTOMATION PIPELINE - FINAL COST SUMMARY");
-    repeat();
-
-    // Stage-by-stage breakdown
-    io:println("COST BREAKDOWN BY PIPELINE STAGE:");
-    repeat();
-    io:println(string `1. OpenAPI Sanitization: $${sanitizationCost.toString()}`);
-    if codeFixCost > 0.0d {
-        io:println(string `2. Client Generation & Fixing: $${codeFixCost.toString()}`);
-    } else {
-        io:println("2. Client Generation & Fixing: $0.00 (no fixes needed)");
-    }
-    io:println(string `3. Example Generation: $${exampleGenCost.toString()}`);
-    io:println(string `4. Test Generation: $${testGenCost.toString()}`);
-    io:println(string `5. Documentation Generation: $${docGenCost.toString()}`);
-    repeat();
-    io:println(string `TOTAL PIPELINE COST: $${totalPipelineCost.toString()}`);
-
-    // ✅ Detailed AI usage breakdown by operation type
-    io:println("\nDETAILED AI OPERATION COSTS:");
-    repeat();
-
-    // Sanitization operations
-    decimal operationIdCost = cost_calculator:getStageCost("sanitizor_operationids");
-    decimal schemaRenameCost = cost_calculator:getStageCost("sanitizor_schema_names");
-    decimal descriptionsCost = cost_calculator:getStageCost("sanitizor_descriptions");
-
-    if sanitizationCost > 0.0d {
-        io:println("Sanitization Operations:");
-        io:println(string `  • OperationId Generation: $${operationIdCost.toString()}`);
-        io:println(string `  • Schema Renaming: $${schemaRenameCost.toString()}`);
-        io:println(string `  • Documentation Enhancement: $${descriptionsCost.toString()}`);
-    }
-
-    // Example generation operations
-    decimal useCaseCost = cost_calculator:getStageCost("example_generator_usecase");
-    decimal codeCost = cost_calculator:getStageCost("example_generator_code");
-    decimal nameCost = cost_calculator:getStageCost("example_generator_name");
-
-    if exampleGenCost > 0.0d {
-        io:println("Example Generation Operations:");
-        io:println(string `  • Use Case Generation: $${useCaseCost.toString()}`);
-        io:println(string `  • Code Generation: $${codeCost.toString()}`);
-        io:println(string `  • Name Generation: $${nameCost.toString()}`);
-    }
-
-    // Test generation operations
-    decimal mockCost = cost_calculator:getStageCost("test_generator_mock");
-    decimal testCost = cost_calculator:getStageCost("test_generator");
-    decimal selectionCost = cost_calculator:getStageCost("test_generator_selection");
-
-    if testGenCost > 0.0d {
-        io:println("Test Generation Operations:");
-        io:println(string `  • Mock Server Generation: $${mockCost.toString()}`);
-        io:println(string `  • Test Code Generation: $${testCost.toString()}`);
-        if selectionCost > 0.0d {
-            io:println(string `  • Operation Selection: $${selectionCost.toString()}`);
-        }
-    }
-
-    // Documentation generation operations  
-    decimal overviewCost = cost_calculator:getStageCost("doc_generator_overview");
-    decimal setupCost = cost_calculator:getStageCost("doc_generator_setup");
-    decimal quickstartCost = cost_calculator:getStageCost("doc_generator_quickstart");
-    decimal exampleDocsCost = cost_calculator:getStageCost("doc_generator_examples");
-    decimal testDocsCost = cost_calculator:getStageCost("doc_generator_tests");
-    decimal individualCost = cost_calculator:getStageCost("doc_generator_individual");
-    decimal mainExamplesCost = cost_calculator:getStageCost("doc_generator_main_examples");
-
-    if docGenCost > 0.0d {
-        io:println("Documentation Generation Operations:");
-        io:println(string `  • Overview Sections: $${overviewCost.toString()}`);
-        io:println(string `  • Setup Guides: $${setupCost.toString()}`);
-        io:println(string `  • Quickstart Sections: $${quickstartCost.toString()}`);
-        io:println(string `  • Example Documentation: $${exampleDocsCost.toString()}`);
-        io:println(string `  • Test Documentation: $${testDocsCost.toString()}`);
-        io:println(string `  • Individual Example READMEs: $${individualCost.toString()}`);
-        io:println(string `  • Main Examples READMEs: $${mainExamplesCost.toString()}`);
-    }
-
-    // Code fixing operations (if any)
-    decimal fixingCost = cost_calculator:getStageCost("code_fixer");
-    if fixingCost > 0.0d {
-        io:println("Code Fixing Operations:");
-        io:println(string `  • Compilation Error Fixes: $${fixingCost.toString()}`);
-    }
-
-    io:println("\n=== Pipeline Completed Successfully! ===");
-    io:println("Generated files are available in: " + outputDir);
-
-    if totalPipelineCost > 0.0d {
-        string costReportPath = outputDir + "/cost_report.json";
-        error? exportResult = cost_calculator:exportCostReport(costReportPath);
-        if exportResult is error {
-            io:println("Warning: Failed to export detailed cost report");
-        } else {
-            io:println(string `Detailed cost report exported to: ${costReportPath}`);
-        }
-    }
-
+    // Final completion summary
+    printPipelineCompletion(outputDir, quietMode);
     return;
 }
 
-function printStepHeader(int stepNum, string title) {
-    string sep = "";
-    int i = 0;
-    while i < 100 {
-        sep += "-";
-        i += 1;
+function printPipelineHeader(string openApiSpec, string outputDir, boolean quietMode) {
+    if quietMode {
+        return;
     }
+    
+    string sep = createSeparator("=", 70);
+    io:println("");
     io:println(sep);
+    io:println("Connector Automation Pipeline");
+    io:println(sep);
+    io:println(string `Input : ${openApiSpec}`);
+    io:println(string `Output: ${outputDir}`);
+    io:println("");
+    io:println("Pipeline Steps:");
+    io:println("  1. Sanitize OpenAPI specification");
+    io:println("  2. Generate Ballerina client");
+    io:println("  3. Build and validate client");
+    io:println("  4. Generate examples");
+    io:println("  5. Generate tests");
+    io:println("  6. Generate documentation");
+    io:println(sep);
+}
+
+function printStepHeader(int stepNum, string title, boolean quietMode) {
+    if quietMode {
+        return;
+    }
+    
+    string sep = createSeparator("-", 60);
     io:println("");
     io:println(string `[${stepNum}/6] ${title}`);
     io:println(sep);
 }
+
+function printPipelineCompletion(string outputDir, boolean quietMode) {
+    string sep = createSeparator("=", 70);
+    
+    io:println("");
+    io:println(sep);
+    io:println("✓ Pipeline Completed Successfully");
+    io:println(sep);
+    io:println("");
+    io:println("Generated Components:");
+    io:println(string `  • Sanitized specification: ${outputDir}/docs/spec/`);
+    io:println(string `  • Ballerina client: ${outputDir}/ballerina/`);
+    io:println(string `  • Usage examples: ${outputDir}/examples/`);
+    io:println(string `  • Test suite: ${outputDir}/ballerina/tests/`);
+    io:println(string `  • Documentation: ${outputDir}/README.md`);
+    
+    if !quietMode {
+        io:println("");
+        io:println("What was accomplished:");
+        io:println("  • OpenAPI spec enhanced with AI-generated metadata");
+        io:println("  • Ballerina client generated with proper conventions");
+        io:println("  • Compilation errors automatically resolved");
+        io:println("  • Realistic usage examples created");
+        io:println("  • Comprehensive test suite with mock server");
+        io:println("  • Complete documentation package");
+    }
+    
+    io:println("");
+    io:println("Next Steps:");
+    io:println("  • Review generated components for accuracy");
+    io:println("  • Test the client with your API credentials");
+    io:println("  • Customize examples and documentation as needed");
+    io:println(string `  • Build and test: cd ${outputDir}/ballerina && bal test`);
+    
+    if !quietMode {
+        io:println("");
+        io:println("Publishing Commands:");
+        io:println(string `  cd ${outputDir}/ballerina && bal pack`);
+        io:println(string `  cd ${outputDir}/ballerina && bal push --repository=local`);
+    }
+    
+    io:println(sep);
+}
+
+function createSeparator(string char, int length) returns string {
+    string[] chars = [];
+    int i = 0;
+    while i < length {
+        chars.push(char);
+        i += 1;
+    }
+    return string:'join("", ...chars);
+}
+
 function printUsage() {
     io:println("");
     io:println("Connector Automation CLI");
@@ -710,6 +663,8 @@ function printUsage() {
     io:println("");
     io:println("  generate-docs <command> <connector-path>");
     io:println("    Generate documentation (README files)");
+    io:println("    Commands: generate-all, generate-ballerina, generate-tests,");
+    io:println("              generate-examples, generate-individual-examples, generate-main");
     io:println("");
     io:println("  fix-code <project-path>");
     io:println("    Fix compilation errors using AI");
@@ -728,17 +683,18 @@ function printUsage() {
     io:println("  bal run -- sanitize ./openapi.yaml ./output");
     io:println("  bal run -- generate-client ./spec.json ./client");
     io:println("  bal run -- pipeline ./openapi.yaml ./output yes");
+    io:println("  bal run -- pipeline ./openapi.yaml ./output yes quiet");
     io:println("");
     io:println("ENVIRONMENT");
     io:println("  ANTHROPIC_API_KEY    Required for AI-powered features");
     io:println("");
-}
-function repeat() {
-    string sep = "";
-    int i = 0;
-    while i < 80 {
-        sep += "=";
-        i += 1;
-    }
-    io:println(sep);
+    io:println("FEATURES");
+    io:println("  • AI-enhanced OpenAPI specification sanitization");
+    io:println("  • Automated Ballerina client generation");
+    io:println("  • Intelligent example and test case creation");
+    io:println("  • Comprehensive documentation generation");
+    io:println("  • Automatic compilation error resolution");
+    io:println("  • Complete end-to-end automation pipeline");
+    io:println("  • Interactive and command-line interfaces");
+    io:println("");
 }
