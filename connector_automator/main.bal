@@ -239,6 +239,12 @@ function handleClientGeneration() returns error? {
     args.push(clientMethodArg);
 
     if wantAdvanced {
+        // License file
+        string|io:Error licenseInput = getUserInput("License file path (optional): ");
+        if licenseInput is string && licenseInput.trim().length() > 0 {
+            args.push(string `license=${licenseInput.trim()}`);
+        }
+        
         // Tags
         string|io:Error tagsInput = getUserInput("Filter tags (comma-separated, optional): ");
         if tagsInput is string && tagsInput.trim().length() > 0 {
@@ -459,11 +465,19 @@ function runFullPipeline(string... args) returns error? {
     
     boolean quietMode = false;
     boolean autoYes = false;
+    string licenseFile = "";
+
+    string[] clientOptions = [];
     foreach string option in pipelineOptions {
         if option == "quiet" {
             quietMode = true;
         } else if option == "yes" {
             autoYes = true;
+        } else if option.startsWith("license=") {
+            licenseFile = option;
+            clientOptions.push(option);
+        } else {
+            clientOptions.push(option);
         }
     }
 
@@ -472,6 +486,12 @@ function runFullPipeline(string... args) returns error? {
     }
     if quietMode {
         io:println("ℹ  Quiet mode enabled");
+    }
+    if licenseFile is string {
+        string licensePath = licenseFile.substring(8); // Remove "license=" prefix
+        if !quietMode {
+            io:println(string `ℹ  License file: ${licensePath}`);
+        }
     }
 
     printPipelineHeader(openApiSpec, outputDir, quietMode);
