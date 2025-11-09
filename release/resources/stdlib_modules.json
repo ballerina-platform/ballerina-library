@@ -540,7 +540,7 @@
         },
         {
             "name": "module-ballerina-websocket",
-            "module_version": "2.15.0-SNAPSHOT",
+            "module_version": "2.15.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibWebsocketVersion",
@@ -1771,7 +1771,7 @@
     "tools": [
         {
             "name": "asyncapi-tools",
-            "module_version": "0.12.0-SNAPSHOT",
+            "module_version": "0.12.1-SNAPSHOT",
             "level": 10,
             "default_branch": "main",
             "version_key": "stdlibAsyncapi-toolsVersion",
