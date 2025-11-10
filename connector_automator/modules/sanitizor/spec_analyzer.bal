@@ -446,31 +446,34 @@ function collectOperationDescriptionRequests(json spec, DescriptionRequest[] req
                     foreach string responseCode in responses.keys() {
                         Response response = responses.get(responseCode);
 
-                        // Check if response has empty description
-                        if response.description.trim().length() == 0 {
+                        // Check if response has missing or empty description
+                        boolean needsDescription = response.description is () ||
+                            (response.description is string && (<string>response.description).trim().length() == 0);
+
+                        if needsDescription {
                             // Try to get from referenced schema
                             string? schemaDescription = getReferencedSchemaDescription(response, parsedSpec);
 
-                            if schemaDescription is string {
-                                string operationId = operation.operationId ?: string `${method.toUpperAscii()} ${path}`;
-                                string summary = operation.summary ?: "";
+                            string operationId = operation.operationId ?: string `${method.toUpperAscii()} ${path}`;
+                            string summary = operation.summary ?: "";
 
-                                string requestId = generateRequestId("response", string `${path}_${method}_${responseCode}`, "description");
-                                string context = string `Response description for ${responseCode} status in operation '${operationId}' (${method.toUpperAscii()} ${path}).`;
-                                if summary.length() > 0 {
-                                    context += string ` Operation summary: ${summary}.`;
-                                }
-                                context += string ` Referenced schema description: "${schemaDescription}".`;
-                                context += " Generate a response-specific description that explains what this HTTP response represents.";
-
-                                requests.push({
-                                    id: requestId,
-                                    name: string `${operationId}_${responseCode}_Response`,
-                                    context: context,
-                                    schemaPath: string `paths.${path}.${method}.responses.${responseCode}.description`
-                                });
-                                locationMap[requestId] = string `paths.${path}.${method}.responses.${responseCode}.description`;
+                            string requestId = generateRequestId("response", string `${path}_${method}_${responseCode}`, "description");
+                            string context = string `Response description for ${responseCode} status in operation '${operationId}' (${method.toUpperAscii()} ${path}).`;
+                            if summary.length() > 0 {
+                                context += string ` Operation summary: ${summary}.`;
                             }
+                            if schemaDescription is string {
+                                context += string ` Referenced schema description: "${schemaDescription}".`;
+                            }
+                            context += " Generate a response-specific description that explains what this HTTP response represents.";
+
+                            requests.push({
+                                id: requestId,
+                                name: string `${operationId}_${responseCode}_Response`,
+                                context: context,
+                                schemaPath: string `paths.${path}.${method}.responses.${responseCode}.description`
+                            });
+                            locationMap[requestId] = string `paths.${path}.${method}.responses.${responseCode}.description`;
                         }
                     }
                 }
@@ -514,7 +517,7 @@ function getReferencedSchemaDescription(Response response, OpenAPISpec spec) ret
 
 // Helper function to get schema description from components/schemas
 function getSchemaDescriptionFromSpec(string schemaName, OpenAPISpec spec) returns string? {
-        Components? components = spec.components;
+    Components? components = spec.components;
     if components is Components {
         map<Schema>? schemas = components.schemas;
         if schemas is map<Schema> {

@@ -266,8 +266,7 @@ public function addMissingDescriptionsBatchWithRetry(string specFilePath, int ba
 
     // Convert back to JSON and save
     json updatedJson = jsondata:toJson(parsedSpec);
-    string prettifiedJson = jsondata:prettify(updatedJson);
-    error? writeResult = io:fileWriteJson(specFilePath, prettifiedJson);
+    error? writeResult = io:fileWriteJson(specFilePath, updatedJson);
     if writeResult is error {
         return error LLMServiceError("Failed to write updated OpenAPI spec", writeResult);
     }
@@ -455,11 +454,10 @@ public function renameInlineResponseSchemasBatchWithRetry(string specFilePath, i
         // Update all $ref references throughout the spec
         json specAsJson = jsondata:toJson(updatedSpec);
         json updatedSpecResult = updateSchemaReferences(specAsJson, nameMapping, quietMode);
-        string prettifiedJson = jsondata:prettify(updatedSpecResult);
 
         // Write the updated spec back to file
-        error? writeResult = io:fileWriteJson(specFilePath, prettifiedJson);
-        if (writeResult is error) {
+        error? writeResult = io:fileWriteJson(specFilePath, updatedSpecResult);
+        if writeResult is error {
             return error LLMServiceError("Failed to write updated OpenAPI spec", writeResult);
         }
     }
@@ -571,8 +569,7 @@ public function addMissingOperationIdsBatchWithRetry(string specFilePath, int ba
 
     // Convert back to JSON and save
     json updatedJson = jsondata:toJson(parsedSpec);
-    string prettifiedJson = jsondata:prettify(updatedJson);
-    error? writeResult = io:fileWriteJson(specFilePath, prettifiedJson);
+    error? writeResult = io:fileWriteJson(specFilePath, updatedJson);
     if writeResult is error {
         return error LLMServiceError("Failed to write updated OpenAPI spec", writeResult);
     }

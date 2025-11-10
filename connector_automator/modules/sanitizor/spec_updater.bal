@@ -63,15 +63,15 @@ function updateParameterDescriptionInSpec(map<PathItem> paths, string location, 
 
             // Extract parameter name from parameters[name={paramName}]
             if paramLocation.startsWith("parameters[name=") && paramLocation.endsWith("]") {
-                string paramName = paramLocation.substring(16, paramLocation.length() - 1); 
+                string paramName = paramLocation.substring(16, paramLocation.length() - 1);
 
                 if paths.hasKey(path) {
                     PathItem pathItem = paths.get(path);
                     Operation? operation = getOperationByMethod(pathItem, method);
-                    
+
                     if operation is Operation && operation.parameters is Parameter[] {
                         Parameter[] parameters = <Parameter[]>operation.parameters;
-                        
+
                         // Find and update the parameter
                         foreach int i in 0 ..< parameters.length() {
                             Parameter param = parameters[i];
@@ -85,7 +85,7 @@ function updateParameterDescriptionInSpec(map<PathItem> paths, string location, 
                                     schema: param.schema
                                 };
                                 parameters[i] = updatedParam;
-                                
+
                                 // Update the operation with new parameters
                                 Operation updatedOperation = {
                                     operationId: operation.operationId,
@@ -95,7 +95,7 @@ function updateParameterDescriptionInSpec(map<PathItem> paths, string location, 
                                     parameters: parameters,
                                     responses: operation.responses
                                 };
-                                
+
                                 // Update the path item with the updated operation
                                 PathItem updatedPathItem = updatePathItemOperation(pathItem, method, updatedOperation);
                                 paths[path] = updatedPathItem;
@@ -126,7 +126,7 @@ function updateOperationDescriptionInSpec(map<PathItem> paths, string location, 
             if paths.hasKey(path) {
                 PathItem pathItem = paths.get(path);
                 Operation? operation = getOperationByMethod(pathItem, method);
-                
+
                 if operation is Operation {
                     // Create updated operation
                     Operation updatedOperation = {
@@ -137,7 +137,7 @@ function updateOperationDescriptionInSpec(map<PathItem> paths, string location, 
                         parameters: operation.parameters,
                         responses: operation.responses
                     };
-                    
+
                     // Update the path item with the updated operation
                     PathItem updatedPathItem = updatePathItemOperation(pathItem, method, updatedOperation);
                     paths[path] = updatedPathItem;
@@ -179,20 +179,20 @@ function updateResponseDescriptionInSpec(map<PathItem> paths, string location, s
                 if paths.hasKey(path) {
                     PathItem pathItem = paths.get(path);
                     Operation? operation = getOperationByMethod(pathItem, method);
-                    
+
                     if operation is Operation && operation.responses is map<Response> {
                         map<Response> responses = <map<Response>>operation.responses;
-                        
+
                         if responses.hasKey(responseCode) {
                             Response response = responses.get(responseCode);
-                            
-                            // Create updated response
+
+                            // Create updated response with description (handle optional description)
                             Response updatedResponse = {
                                 description: description,
                                 content: response.content
                             };
                             responses[responseCode] = updatedResponse;
-                            
+
                             // Update the operation with new responses
                             Operation updatedOperation = {
                                 operationId: operation.operationId,
@@ -202,7 +202,7 @@ function updateResponseDescriptionInSpec(map<PathItem> paths, string location, s
                                 parameters: operation.parameters,
                                 responses: responses
                             };
-                            
+
                             // Update the path item with the updated operation
                             PathItem updatedPathItem = updatePathItemOperation(pathItem, method, updatedOperation);
                             paths[path] = updatedPathItem;
@@ -234,7 +234,7 @@ function updateOperationIdInSpec(map<PathItem> paths, string location, string op
         if paths.hasKey(path) {
             PathItem pathItem = paths.get(path);
             Operation? operation = getOperationByMethod(pathItem, method);
-            
+
             if operation is Operation {
                 // Create updated operation
                 Operation updatedOperation = {
@@ -245,7 +245,7 @@ function updateOperationIdInSpec(map<PathItem> paths, string location, string op
                     parameters: operation.parameters,
                     responses: operation.responses
                 };
-                
+
                 // Update the path item with the updated operation
                 PathItem updatedPathItem = updatePathItemOperation(pathItem, method, updatedOperation);
                 paths[path] = updatedPathItem;
@@ -396,7 +396,7 @@ function updateNestedSchemaDescription(Schema schema, string[] pathParts, int in
             } else if arrayName == "anyOf" {
                 nestedArray = schema.anyOf;
             }
-            
+
             if nestedArray is Schema[] && indexResult < nestedArray.length() {
                 return updateNestedSchemaDescription(nestedArray[indexResult], pathParts, index + 1, description);
             }
