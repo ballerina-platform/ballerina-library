@@ -7,6 +7,7 @@ import connector_automator.test_generator;
 
 import ballerina/io;
 import ballerina/os;
+import connector_automator.utils;
 
 const string VERSION = "0.1.0";
 
@@ -525,13 +526,21 @@ function runFullPipeline(string... args) returns error? {
     printStepHeader(3, "Building and Validating Client", quietMode);
     string[] buildArgs = [clientPath];
     buildArgs.push(...pipelineOptions);
-    error? buildResult = code_fixer:executeCodeFixer(...buildArgs);
-    if buildResult is error {
-        io:println(string `✗ Build validation failed: ${buildResult.message()}`);
+    utils:CommandResult buildResult = utils:executeBalBuild(clientPath,quietMode);
+
+    if !utils:isCommandSuccessfull(buildResult) {
+        io:println(string `✗ Build validation failed: Client contains compilation errors`);
         io:println("   Pipeline terminated due to compilation errors");
-        io:println("   Please review generated client and fix manually");
-        return buildResult;
+        io:println("   Please review the generated client and fix manually");
+        
+        if !quietMode && buildResult.stderr.length() > 0 {
+            io:println("   Build errors:");
+            io:println(buildResult.stderr);
+        }
+        
+        return error(string `Client build failed: ${buildResult.stderr}`);
     }
+    
     io:println("✓ Client built and validated successfully");
 
     // Step 4: Generate examples
