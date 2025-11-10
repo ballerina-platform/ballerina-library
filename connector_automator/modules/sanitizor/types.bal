@@ -1,5 +1,79 @@
 public type LLMServiceError distinct error; // custom error type for LLM related failures
 
+// OpenAPI 3.0 specification types
+public type OpenAPISpec record {|
+    string openapi;
+    Info info;
+    map<PathItem> paths?;
+    Components components?;
+    // Other OpenAPI fields can be added as needed
+|};
+
+public type Info record {|
+    string title;
+    string description?;
+    string 'version;
+    // Other info fields as needed
+|};
+
+public type PathItem record {|
+    Operation get?;
+    Operation post?;
+    Operation put?;
+    Operation delete?;
+    Operation patch?;
+    Operation head?;
+    Operation options?;
+    Operation trace?;
+    Parameter[] parameters?;
+|};
+
+public type Operation record {|
+    string operationId?;
+    string summary?;
+    string description?;
+    string[] tags?;
+    Parameter[] parameters?;
+    map<Response> responses?;
+|};
+
+public type Parameter record {|
+    string name;
+    string 'in; // query, path, header, cookie
+    string description?;
+    boolean required?;
+    Schema schema?;
+|};
+
+public type Response record {|
+    string description;
+    map<MediaType> content?;
+|};
+
+public type MediaType record {|
+    Schema schema?;
+|};
+
+public type Schema record {|
+    string 'type?;
+    string description?;
+    map<Schema> properties?;
+    Schema items?;
+    string \$ref?;
+    Schema[] allOf?;
+    Schema[] oneOf?;
+    Schema[] anyOf?;
+    json[] 'enum?;
+    decimal minimum?;
+    decimal maximum?;
+    string pattern?;
+    // Other schema properties as needed
+|};
+
+public type Components record {|
+    map<Schema> schemas?;
+|};
+
 // Batch processing types
 public type DescriptionRequest record {
     string id;
