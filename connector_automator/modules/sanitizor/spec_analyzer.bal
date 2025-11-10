@@ -321,13 +321,17 @@ function collectParameterDescriptionRequests(json spec, DescriptionRequest[] req
                     Parameter[] parameters = <Parameter[]>operation.parameters;
 
                     foreach Parameter param in parameters {
+                        string paramIn = param.'in ?: "unknown";
+                        if paramIn == "unknown" {
+                            continue;
+                        }
                         boolean needsDescription = param.description is () ||
                             (param.description is string && (<string>param.description).trim().length() == 0);
 
                         if needsDescription {
                             string operationId = operation.operationId ?: string `${method.toUpperAscii()} ${path}`;
                             string requestId = generateRequestId("param", string `${path}_${method}_${param.name}`, "parameter");
-                            string context = string `${param.'in} parameter '${param.name}' for operation: ${operationId}. Parameter definition: ${param.toJsonString()}`;
+                            string context = string `${paramIn} parameter '${param.name}' for operation: ${operationId}. Parameter definition: ${param.toJsonString()}`;
 
                             // Add schema type info for better context
                             if param.schema is Schema {
