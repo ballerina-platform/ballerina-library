@@ -39,7 +39,7 @@ public type Operation record {|
 
 public type Parameter record {|
     string name;
-    string 'in; // query, path, header, cookie
+    string 'in?; // query, path, header, cookie
     string description?;
     boolean required?;
     Schema schema?;

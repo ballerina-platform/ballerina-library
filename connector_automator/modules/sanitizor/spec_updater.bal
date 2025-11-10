@@ -63,7 +63,7 @@ function updateParameterDescriptionInSpec(map<PathItem> paths, string location, 
 
             // Extract parameter name from parameters[name={paramName}]
             if paramLocation.startsWith("parameters[name=") && paramLocation.endsWith("]") {
-                string paramName = paramLocation.substring(16, paramLocation.length() - 1); // Remove "parameters[name=" and "]"
+                string paramName = paramLocation.substring(16, paramLocation.length() - 1); 
 
                 if paths.hasKey(path) {
                     PathItem pathItem = paths.get(path);
