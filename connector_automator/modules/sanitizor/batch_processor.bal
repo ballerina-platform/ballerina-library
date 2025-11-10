@@ -1,7 +1,7 @@
-import ballerina/data.jsondata;
 import ballerina/io;
 import ballerina/lang.runtime;
 import ballerina/log;
+import ballerina/data.jsondata;
 
 configurable RetryConfig retryConfig = {};
 
@@ -152,121 +152,126 @@ public function addMissingDescriptionsBatchWithRetry(string specFilePath, int ba
     json specJson = specResult;
     int descriptionsAdded = 0;
 
-    // Parse as typed OpenAPI spec
-    OpenAPISpec|error parsedSpec = jsondata:parseAsType(specJson);
-    if parsedSpec is error {
-        return error LLMServiceError("Failed to parse OpenAPI spec", parsedSpec);
-    }
+    if specJson is map<json> {
+        map<json> specMap = <map<json>>specJson;
+        string apiContext = extractApiContext(specJson);
 
-    string apiContext = extractApiContext(specJson);
+        // Collect all missing description requests
+        DescriptionRequest[] allRequests = [];
+        map<string> requestToLocationMap = {}; // Map request ID to location for updating
 
-    // Collect all missing description requests
-    DescriptionRequest[] allRequests = [];
-    map<string> requestToLocationMap = {}; // Map request ID to location for updating
+        // 1. Collect schema and property descriptions (existing logic)
+        json|error componentsResult = specMap.get("components");
+        if componentsResult is map<json> {
+            json|error schemasResult = componentsResult.get("schemas");
+            if schemasResult is map<json> {
+                map<json> schemas = <map<json>>schemasResult;
 
-    // 1. Collect schema and property descriptions
-    if parsedSpec.components is Components {
-        Components components = <Components>parsedSpec.components;
-        if components.schemas is map<Schema> {
-            map<Schema> schemas = <map<Schema>>components.schemas;
-
-            foreach string schemaName in schemas.keys() {
-                Schema schema = schemas.get(schemaName);
-                collectDescriptionRequests(schema, schemaName, "", allRequests, requestToLocationMap, parsedSpec);
-            }
-        }
-    }
-
-    // 2. Collect parameter descriptions
-    collectParameterDescriptionRequests(specJson, allRequests, requestToLocationMap);
-
-    // 3. Collect operation descriptions
-    collectOperationDescriptionRequests(specJson, allRequests, requestToLocationMap);
-
-    // Process requests in batches with retry
-    int totalRequests = allRequests.length();
-    if !quietMode {
-        log:printInfo("Collected description requests", totalRequests = totalRequests);
-    }
-
-    int startIdx = 0;
-    while startIdx < totalRequests {
-        int endIdx = startIdx + batchSize;
-        if endIdx > totalRequests {
-            endIdx = totalRequests;
-        }
-
-        DescriptionRequest[] batch = allRequests.slice(startIdx, endIdx);
-        if !quietMode {
-            log:printInfo("Processing batch with retry", batchNumber = (startIdx / batchSize) + 1,
-                    batchSize = batch.length());
-        }
-
-        BatchDescriptionResponse[]|LLMServiceError batchResult = generateDescriptionsBatchWithRetry(batch, apiContext, quietMode, config);
-        if batchResult is BatchDescriptionResponse[] {
-            if !quietMode {
-                io:println(string `  ✓ Batch ${(startIdx / batchSize) + 1} processed (${batchResult.length()} descriptions)`);
-            }
-            
-            // Apply the generated descriptions
-            foreach BatchDescriptionResponse response in batchResult {
-                string? location = requestToLocationMap[response.id];
-                if location is string {
-                    error? updateResult = ();
-
-                    // Determine update method based on location type
-                    if location.startsWith("paths.") && location.includes("parameters[name=") {
-                        // Parameter description - need to work with typed paths
-                        if parsedSpec.paths is map<PathItem> {
-                            map<PathItem> paths = <map<PathItem>>parsedSpec.paths;
-                            updateResult = updateParameterDescriptionInSpec(paths, location, response.description);
-                        }
-                    } else if location.startsWith("paths.") && location.includes(".responses.") && location.endsWith(".description") {
-                        // Response description
-                        if parsedSpec.paths is map<PathItem> {
-                            map<PathItem> paths = <map<PathItem>>parsedSpec.paths;
-                            updateResult = updateResponseDescriptionInSpec(paths, location, response.description);
-                        }
-                    } else if location.startsWith("paths.") && !location.includes(".properties.") && !location.includes(".responses.") {
-                        // Operation description
-                        if parsedSpec.paths is map<PathItem> {
-                            map<PathItem> paths = <map<PathItem>>parsedSpec.paths;
-                            updateResult = updateOperationDescriptionInSpec(paths, location, response.description);
-                        }
-                    } else {
-                        // Schema/property description
-                        if parsedSpec.components is Components {
-                            Components components = <Components>parsedSpec.components;
-                            if components.schemas is map<Schema> {
-                                map<Schema> schemas = <map<Schema>>components.schemas;
-                                updateResult = updateDescriptionInSpec(schemas, location, response.description);
-                            }
-                        }
-                    }
-
-                    if updateResult is () {
-                        descriptionsAdded += 1;
-                        if !quietMode {
-                            log:printInfo("Applied batch description", id = response.id, location = location);
-                        }
-                    } else {
-                        log:printError("Failed to apply description", id = response.id, 'error = updateResult);
+                foreach string schemaName in schemas.keys() {
+                    json|error schemaResult = schemas.get(schemaName);
+                    if schemaResult is map<json> {
+                        map<json> schemaMap = <map<json>>schemaResult;
+                        collectDescriptionRequests(schemaMap, schemaName, "", allRequests, requestToLocationMap, specJson);
                     }
                 }
             }
-        } else {
-            if !quietMode {
-                log:printError("Batch processing failed after all retries", batchNumber = (startIdx / batchSize) + 1, 'error = batchResult);
-                io:println(string `  ✗ Batch ${(startIdx / batchSize) + 1} failed`);
-            }
-            // Continue with next batch instead of failing completely
         }
-        startIdx += batchSize;
+
+        // 2. Collect parameter descriptions (ENHANCED - only processes existing parameters)
+        collectParameterDescriptionRequests(specJson, allRequests, requestToLocationMap);
+
+        // 3. Collect operation descriptions for return parameters (ENHANCED - includes response descriptions)
+        collectOperationDescriptionRequests(specJson, allRequests, requestToLocationMap);
+
+        // Process requests in batches with retry
+        int totalRequests = allRequests.length();
+        if !quietMode {
+            log:printInfo("Collected description requests", totalRequests = totalRequests);
+        }
+
+        int startIdx = 0;
+        while startIdx < totalRequests {
+            int endIdx = startIdx + batchSize;
+            if endIdx > totalRequests {
+                endIdx = totalRequests;
+            }
+
+            DescriptionRequest[] batch = allRequests.slice(startIdx, endIdx);
+            if !quietMode {
+                log:printInfo("Processing batch with retry", batchNumber = (startIdx / batchSize) + 1,
+                        batchSize = batch.length());
+            }
+
+            BatchDescriptionResponse[]|LLMServiceError batchResult = generateDescriptionsBatchWithRetry(batch, apiContext, quietMode, config);
+            if batchResult is BatchDescriptionResponse[] {
+                if !quietMode {
+                    io:println(string `  ✓ Batch ${(startIdx / batchSize) + 1} processed (${batchResult.length()} descriptions)`);
+                }
+                
+                // Apply the generated descriptions
+                foreach BatchDescriptionResponse response in batchResult {
+                    string? location = requestToLocationMap[response.id];
+                    if location is string {
+                        error? updateResult = ();
+
+                        // Determine update method based on location type
+                        if location.startsWith("paths.") && location.includes("parameters[name=") {
+                            // Parameter description
+                            json|error pathsResult = specMap.get("paths");
+                            if pathsResult is map<json> {
+                                updateResult = updateParameterDescriptionInSpec(<map<json>>pathsResult, location, response.description);
+                            }
+                        } else if location.startsWith("paths.") && location.includes(".responses.") && location.endsWith(".description") {
+                            // Response description (NEW)
+                            json|error pathsResult = specMap.get("paths");
+                            if pathsResult is map<json> {
+                                updateResult = updateResponseDescriptionInSpec(<map<json>>pathsResult, location, response.description);
+                            }
+                        } else if location.startsWith("paths.") && !location.includes(".properties.") && !location.includes(".responses.") {
+                            // Operation description
+                            json|error pathsResult = specMap.get("paths");
+                            if pathsResult is map<json> {
+                                updateResult = updateOperationDescriptionInSpec(<map<json>>pathsResult, location, response.description);
+                            }
+                        } else {
+                            // Schema/property description 
+                            json|error componentsResult2 = specMap.get("components");
+                            if componentsResult2 is map<json> {
+                                json|error schemasResult2 = componentsResult2.get("schemas");
+                                if schemasResult2 is map<json> {
+                                    updateResult = updateDescriptionInSpec(<map<json>>schemasResult2, location, response.description);
+                                }
+                            }
+                        }
+
+                        if updateResult is () {
+                            descriptionsAdded += 1;
+                            if !quietMode {
+                                log:printInfo("Applied batch description", id = response.id, location = location);
+                            }
+                        } else {
+                            log:printError("Failed to apply description", id = response.id, 'error = updateResult);
+                        }
+                    }
+                }
+            } else {
+                if !quietMode {
+                    log:printError("Batch processing failed after all retries", batchNumber = (startIdx / batchSize) + 1, 'error = batchResult);
+                    io:println(string `  ✗ Batch ${(startIdx / batchSize) + 1} failed`);
+                }
+                // Continue with next batch instead of failing completely
+            }
+            startIdx += batchSize;
+        }
     }
 
-    // Convert back to JSON and save
-    json updatedJson = jsondata:toJson(parsedSpec);
-    error? writeResult = io:fileWriteJson(specFilePath, updatedJson);
+    // Save updated spec back to file
+    string|error prettifiedResult = jsondata:prettify(specJson);
+    if prettifiedResult is error {
+        return error LLMServiceError("Failed to prettify JSON", prettifiedResult);
+    }
+    
+    error? writeResult = io:fileWriteString(specFilePath, prettifiedResult);
     if writeResult is error {
         return error LLMServiceError("Failed to write updated OpenAPI spec", writeResult);
     }
@@ -289,23 +294,25 @@ public function renameInlineResponseSchemasBatchWithRetry(string specFilePath, i
 
     json specJson = specResult;
 
-    // Parse as typed OpenAPI spec
-    OpenAPISpec|error parsedSpec = jsondata:parseAsType(specJson);
-    if parsedSpec is error {
-        return error LLMServiceError("Failed to parse OpenAPI spec", parsedSpec);
+    if !(specJson is map<json>) {
+        return error LLMServiceError("Invalid OpenAPI spec format");
     }
 
+    map<json> specMap = <map<json>>specJson;
+
     // Get components/schemas
-    if !(parsedSpec.components is Components) {
+    json|error componentsResult = specMap.get("components");
+    if !(componentsResult is map<json>) {
         return error LLMServiceError("No components section found in OpenAPI spec");
     }
 
-    Components components = <Components>parsedSpec.components;
-    if !(components.schemas is map<Schema>) {
+    map<json> components = <map<json>>componentsResult;
+    json|error schemasResult = components.get("schemas");
+    if !(schemasResult is map<json>) {
         return error LLMServiceError("No schemas section found in components");
     }
 
-    map<Schema> schemas = <map<Schema>>components.schemas;
+    map<json> schemas = <map<json>>schemasResult;
 
     // Collect all existing schema names to ensure global uniqueness
     string[] allExistingNames = [];
@@ -317,19 +324,21 @@ public function renameInlineResponseSchemasBatchWithRetry(string specFilePath, i
 
     // Collect all InlineResponse schemas for batch processing
     SchemaRenameRequest[] renameRequests = [];
-    string apiContext = extractApiContext(specJson);
+    string apiContext = extractApiContext(specMap);
 
     foreach string schemaName in schemas.keys() {
         if (schemaName.startsWith("InlineResponse") || schemaName.endsWith("AllOf2") || schemaName.endsWith("OneOf2")) {
-            Schema schema = schemas.get(schemaName);
-            string schemaDefinition = (jsondata:toJson(schema)).toJsonString();
-            string usageContext = extractSchemaUsageContext(schemaName, specJson);
+            json|error schemaResult = schemas.get(schemaName);
+            if (schemaResult is map<json>) {
+                string schemaDefinition = (<map<json>>schemaResult).toJsonString();
+                string usageContext = extractSchemaUsageContext(schemaName, specMap);
 
-            renameRequests.push({
-                originalName: schemaName,
-                schemaDefinition: schemaDefinition,
-                usageContext: usageContext
-            });
+                renameRequests.push({
+                    originalName: schemaName,
+                    schemaDefinition: schemaDefinition,
+                    usageContext: usageContext
+                });
+            }
         }
     }
 
@@ -427,36 +436,35 @@ public function renameInlineResponseSchemasBatchWithRetry(string specFilePath, i
     // Apply the renaming if we have any mappings
     if (nameMapping.length() > 0) {
         // First, rename the schema definitions in the schemas map
-        map<Schema> newSchemas = {};
+        map<json> newSchemas = {};
         foreach string oldName in schemas.keys() {
-            Schema schemaValue = schemas.get(oldName);
-            if (nameMapping.hasKey(oldName)) {
-                string? newNameResult = nameMapping[oldName];
-                if (newNameResult is string) {
-                    newSchemas[newNameResult] = schemaValue;
+            json|error schemaValue = schemas.get(oldName);
+            if (schemaValue is json) {
+                if (nameMapping.hasKey(oldName)) {
+                    string? newNameResult = nameMapping[oldName];
+                    if (newNameResult is string) {
+                        newSchemas[newNameResult] = schemaValue;
+                    }
+                } else {
+                    newSchemas[oldName] = schemaValue;
                 }
-            } else {
-                newSchemas[oldName] = schemaValue;
             }
         }
 
         // Update the schemas in the components section
-        Components updatedComponents = {
-            schemas: newSchemas
-        };
-        OpenAPISpec updatedSpec = {
-            openapi: parsedSpec.openapi,
-            info: parsedSpec.info,
-            paths: parsedSpec.paths,
-            components: updatedComponents
-        };
+        components["schemas"] = newSchemas;
+        specMap["components"] = components;
 
         // Update all $ref references throughout the spec
-        json specAsJson = jsondata:toJson(updatedSpec);
-        json updatedSpecResult = updateSchemaReferences(specAsJson, nameMapping, quietMode);
+        json updatedSpecResult = updateSchemaReferences(specMap, nameMapping, quietMode);
 
         // Write the updated spec back to file
-        error? writeResult = io:fileWriteJson(specFilePath, updatedSpecResult);
+        string|error prettifiedResult = jsondata:prettify(updatedSpecResult);
+        if prettifiedResult is error {
+            return error LLMServiceError("Failed to prettify JSON", prettifiedResult);
+        }
+        
+        error? writeResult = io:fileWriteString(specFilePath, prettifiedResult);
         if writeResult is error {
             return error LLMServiceError("Failed to write updated OpenAPI spec", writeResult);
         }
@@ -480,18 +488,19 @@ public function addMissingOperationIdsBatchWithRetry(string specFilePath, int ba
 
     json specJson = specResult;
 
-    // Parse as typed OpenAPI spec
-    OpenAPISpec|error parsedSpec = jsondata:parseAsType(specJson);
-    if parsedSpec is error {
-        return error LLMServiceError("Failed to parse OpenAPI spec", parsedSpec);
+    if !(specJson is map<json>) {
+        return error LLMServiceError("Invalid OpenAPI spec format");
     }
 
+    map<json> specMap = <map<json>>specJson;
+
     // Get paths section
-    if !(parsedSpec.paths is map<PathItem>) {
+    json|error pathsResult = specMap.get("paths");
+    if !(pathsResult is map<json>) {
         return error LLMServiceError("No paths section found in OpenAPI spec");
     }
 
-    map<PathItem> paths = <map<PathItem>>parsedSpec.paths;
+    map<json> paths = <map<json>>pathsResult;
 
     // Collect all existing operationIds to ensure uniqueness
     string[] existingOperationIds = [];
@@ -501,7 +510,7 @@ public function addMissingOperationIdsBatchWithRetry(string specFilePath, int ba
     OperationIdRequest[] missingOperationIds = [];
     map<string> requestToLocationMap = {}; // Map request ID to location for updating
 
-    string apiContext = extractApiContext(specJson);
+    string apiContext = extractApiContext(specMap);
     collectMissingOperationIdRequests(paths, missingOperationIds, requestToLocationMap, apiContext);
 
     int totalRequests = missingOperationIds.length();
@@ -567,9 +576,13 @@ public function addMissingOperationIdsBatchWithRetry(string specFilePath, int ba
         startIdx += batchSize;
     }
 
-    // Convert back to JSON and save
-    json updatedJson = jsondata:toJson(parsedSpec);
-    error? writeResult = io:fileWriteJson(specFilePath, updatedJson);
+    // Save updated spec back to file
+    string|error prettifiedResult = jsondata:prettify(specJson);
+    if prettifiedResult is error {
+        return error LLMServiceError("Failed to prettify JSON", prettifiedResult);
+    }
+    
+    error? writeResult = io:fileWriteString(specFilePath, prettifiedResult);
     if writeResult is error {
         return error LLMServiceError("Failed to write updated OpenAPI spec", writeResult);
     }
