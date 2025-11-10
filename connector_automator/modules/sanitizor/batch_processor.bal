@@ -1,6 +1,7 @@
 import ballerina/io;
 import ballerina/lang.runtime;
 import ballerina/log;
+import ballerina/data.jsondata;
 
 configurable RetryConfig retryConfig = {};
 
@@ -265,7 +266,12 @@ public function addMissingDescriptionsBatchWithRetry(string specFilePath, int ba
     }
 
     // Save updated spec back to file
-    error? writeResult = io:fileWriteJson(specFilePath, specJson);
+    string|error prettifiedResult = jsondata:prettify(specJson);
+    if prettifiedResult is error {
+        return error LLMServiceError("Failed to prettify JSON", prettifiedResult);
+    }
+    
+    error? writeResult = io:fileWriteString(specFilePath, prettifiedResult);
     if writeResult is error {
         return error LLMServiceError("Failed to write updated OpenAPI spec", writeResult);
     }
@@ -453,8 +459,13 @@ public function renameInlineResponseSchemasBatchWithRetry(string specFilePath, i
         json updatedSpecResult = updateSchemaReferences(specMap, nameMapping, quietMode);
 
         // Write the updated spec back to file
-        error? writeResult = io:fileWriteJson(specFilePath, updatedSpecResult);
-        if (writeResult is error) {
+        string|error prettifiedResult = jsondata:prettify(updatedSpecResult);
+        if prettifiedResult is error {
+            return error LLMServiceError("Failed to prettify JSON", prettifiedResult);
+        }
+        
+        error? writeResult = io:fileWriteString(specFilePath, prettifiedResult);
+        if writeResult is error {
             return error LLMServiceError("Failed to write updated OpenAPI spec", writeResult);
         }
     }
@@ -566,7 +577,12 @@ public function addMissingOperationIdsBatchWithRetry(string specFilePath, int ba
     }
 
     // Save updated spec back to file
-    error? writeResult = io:fileWriteJson(specFilePath, specJson);
+    string|error prettifiedResult = jsondata:prettify(specJson);
+    if prettifiedResult is error {
+        return error LLMServiceError("Failed to prettify JSON", prettifiedResult);
+    }
+    
+    error? writeResult = io:fileWriteString(specFilePath, prettifiedResult);
     if writeResult is error {
         return error LLMServiceError("Failed to write updated OpenAPI spec", writeResult);
     }
