@@ -25,7 +25,7 @@ public type PathItem record {|
     Operation head?;
     Operation options?;
     Operation trace?;
-    Parameter[] parameters?;
+    (Parameter|ParameterRef)[] parameters?; // Allow both inline parameters and references
 |};
 
 public type Operation record {|
@@ -33,20 +33,26 @@ public type Operation record {|
     string summary?;
     string description?;
     string[] tags?;
-    Parameter[] parameters?;
+    (Parameter|ParameterRef)[] parameters?; // Allow both inline parameters and references
     map<Response> responses?;
 |};
 
+// Inline parameter definition
 public type Parameter record {|
     string name;
-    string 'in?; // query, path, header, cookie
+    string 'in?; // query, path, header, cookie - optional to handle malformed specs
     string description?;
     boolean required?;
     Schema schema?;
 |};
 
+// Parameter reference
+public type ParameterRef record {|
+    string \$ref;
+|};
+
 public type Response record {|
-    string description;
+    string description?;
     map<MediaType> content?;
 |};
 
@@ -72,6 +78,7 @@ public type Schema record {|
 
 public type Components record {|
     map<Schema> schemas?;
+    map<Parameter> parameters?; // Add parameters to components
 |};
 
 // Batch processing types
