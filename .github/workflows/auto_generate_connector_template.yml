@@ -274,6 +274,20 @@ jobs:
         run: |
           rm -rf connector_automator
           rm -f -r ballerina-dist/
+      
+      - name: Cleanup
+        run: |
+          # Remove all Dependencies.toml files
+          find . -name "Dependencies.toml" -type f -delete
+          echo "Removed Dependencies.toml files"
+          
+          # Remove all .backup files
+          find . -name "*.backup" -type f -delete
+          echo "Removed .backup files"
+          
+          # Remove all target directories
+          find . -name "target" -type d -exec rm -rf {} +
+          echo "Removed target directories"
 
       - name: Configure Git Identity
         run: |
