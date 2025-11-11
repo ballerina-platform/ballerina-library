@@ -215,7 +215,7 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
         if utils:isCommandSuccessfull(buildResult) {
             result.success = true;
             result.errorsRemaining = 0;
-            
+
             if iteration == 1 {
                 result.errorsFixed = 0;
                 if !quietMode {
@@ -237,7 +237,7 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
             result.success = true;
             result.errorsRemaining = 0;
             result.errorsFixed = initialErrorCountSet ? initialErrorCount : 0;
-            
+
             if !quietMode {
                 io:println("✓ No compilation errors detected");
             }
@@ -248,7 +248,7 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
         if !initialErrorCountSet {
             initialErrorCount = currentErrors.length();
             initialErrorCountSet = true;
-            
+
             if !quietMode {
                 io:println(string `Found ${initialErrorCount} compilation error${initialErrorCount == 1 ? "" : "s"}`);
             }
@@ -257,7 +257,7 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
         // Check progress
         if iteration > 1 {
             int progressMade = previousErrors.length() - currentErrors.length();
-            
+
             if progressMade > 0 {
                 if !quietMode {
                     io:println(string `  Progress: Fixed ${progressMade} error${progressMade == 1 ? "" : "s"}`);
@@ -303,7 +303,7 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
 
             // Show fix to user and ask for confirmation
             boolean shouldApplyFix = false;
-            
+
             if autoYes {
                 shouldApplyFix = true;
                 if !quietMode {
@@ -323,7 +323,7 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
                 io:println(fixResponse.fixedCode);
                 io:println("```");
                 io:println("");
-                
+
                 io:print("Apply this fix? (y/n): ");
                 string|io:Error userInput = io:readln();
                 if userInput is io:Error {
@@ -333,7 +333,7 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
 
                 string trimmedInput = userInput.trim().toLowerAscii();
                 shouldApplyFix = trimmedInput == "y" || trimmedInput == "yes";
-                
+
                 if shouldApplyFix {
                     io:println("  ✓ Fix approved");
                 } else {
@@ -367,7 +367,7 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
             result.remainingFixes.push(string `Iteration ${iteration}: No fixes applied - stopping iterations`);
             break;
         }
-        
+
         iteration += 1;
     }
 
@@ -384,14 +384,14 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
         io:println("");
         io:println("Running final build check...");
     }
-    
+
     utils:CommandResult finalBuildResult = utils:executeBalBuild(projectPath, true); // Always quiet for final check
-    
+
     if utils:isCommandSuccessfull(finalBuildResult) {
         result.success = true;
         result.errorsRemaining = 0;
         result.errorsFixed = initialErrorCount;
-        
+
         if !quietMode {
             io:println("✓ Final build successful - all errors resolved!");
         }
@@ -399,7 +399,7 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
         CompilationError[] remainingErrors = parseCompilationErrors(finalBuildResult.stderr);
         result.errorsRemaining = remainingErrors.length();
         result.errorsFixed = initialErrorCount - remainingErrors.length();
-        
+
         if !quietMode {
             io:println(string `⚠  ${remainingErrors.length()} error${remainingErrors.length() == 1 ? "" : "s"} still remain`);
             if remainingErrors.length() <= 5 {
@@ -429,22 +429,22 @@ function printFixingSummary(FixResult result, int totalIterations) {
         i += 1;
     }
     string sep = string:'join("", ...separatorChars);
-    
+
     io:println("");
     io:println(sep);
     io:println("ERROR FIXING SUMMARY");
     io:println(sep);
-    
+
     io:println(string `Iterations: ${totalIterations}`);
     io:println(string `Fixed     : ${result.errorsFixed} error${result.errorsFixed == 1 ? "" : "s"}`);
     io:println(string `Remaining : ${result.errorsRemaining} error${result.errorsRemaining == 1 ? "" : "s"}`);
-    
+
     if result.success {
         io:println("Status    : ✓ All errors resolved");
     } else {
         io:println("Status    : ⚠  Some errors remain");
     }
-    
+
     if result.appliedFixes.length() > 0 {
         io:println("");
         io:println("Applied fixes:");
@@ -452,12 +452,12 @@ function printFixingSummary(FixResult result, int totalIterations) {
             io:println(string `  • ${fix}`);
         }
     }
-    
+
     if result.remainingFixes.length() > 0 && result.errorsRemaining > 0 {
         io:println("");
         io:println("Manual intervention may be required for remaining errors.");
     }
-    
+
     io:println(sep);
 }
 

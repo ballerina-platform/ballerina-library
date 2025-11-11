@@ -136,9 +136,11 @@ jobs:
 
       - name: Download OpenAPI Specification
         if: inputs.openapi-url
-        working-directory: docs/spec
         run: |
           echo "Downloading openapi spec from provided URL..."
+          # Create docs/spec directory if doesn't exist
+          mkdir -p docs/spec
+          cd docs/spec
           if [[ "${{ inputs.openapi-url }}" == *.json ]]; then
             rm -f openapi.json
             wget -O openapi.json "${{ inputs.openapi-url }}"
@@ -298,7 +300,7 @@ jobs:
         id: commitFiles
         run: |
           # Build commit message 
-          COMMIT_MSG="[AUTOMATED] Auto-generate connector from OpenAPI spec
+          COMMIT_MSG="[AUTOMATED] [AI] Auto-generate connector from OpenAPI spec
 
           Complete connector generation using full pipeline with all components.
           Generated using Ballerina with AI-powered automation."
@@ -327,8 +329,8 @@ jobs:
         if: ${{ steps.commitFiles.outputs.hasChanged == 'true' }}
         run: |
           prUrl=$(gh pr create \
-            --title "[Automated] Auto-generate connector from OpenAPI specification" \
-            --body $'## Auto-Generated Connector from OpenAPI Specification\n\n**This PR contains AI-generated content that requires review before merging.**\n\n### What was generated:\n- Sanitized OpenAPI specification with AI enhancements\n- Ballerina client library with proper type definitions\n- Usage examples demonstrating key API operations\n- Test suite with mock server implementation\n- Complete documentation package\n\n### Generated using:\n- Ballerina version: ${{ inputs.ballerina-version }}\n- Full automation pipeline with AI-powered improvements\n- Automatic compilation error fixes\n\n### Before merging:\n- Test examples with real API credentials\n- Verify client methods work as expected\n- Review AI-generated descriptions for accuracy\n- Validate mock server responses match actual API\n\n**Manual validation is required before production use.**' \
+            --title "[Automated] [AI] Auto-generate connector from OpenAPI specification" \
+            --body $'## **This PR contains AI-generated content that requires review before merging.**\n\n### What was generated:\n- Sanitized OpenAPI specification with AI enhancements\n- Ballerina client library with proper type definitions\n- Usage examples demonstrating key API operations\n- Test suite with mock server implementation\n- Complete documentation package\n\n### Generated using:\n- Ballerina version: ${{ inputs.ballerina-version }}\n- Full automation pipeline with AI-powered improvements\n- Automatic compilation error fixes\n\n### Before merging:\n- Test examples with real API credentials\n- Verify client methods work as expected\n- Review AI-generated descriptions for accuracy\n- Validate mock server responses match actual API\n\n**Manual validation is required before production use.**' \
             --base ${{ github.ref }} \
             --head auto-generate-connector)
           echo "prUrl=$prUrl" >> $GITHUB_OUTPUT

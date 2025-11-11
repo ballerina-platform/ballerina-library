@@ -151,7 +151,7 @@ public function executeSanitizor(string... args) returns error? {
             if !quietMode {
                 log:printInfo("Aligned YAML spec converted to JSON successfully");
             }
-            io:println("✓ Aligned YAML spec converted to JSON");
+            //io:println("✓ Aligned YAML spec converted to JSON");
         }
     }
 
@@ -288,7 +288,7 @@ function printSanitizationPlan(string inputSpecPath, string outputDir, boolean q
     if quietMode {
         return;
     }
-    
+
     string sep = createSeparator("=", 70);
     io:println(sep);
     io:println("OpenAPI Sanitization Plan");
@@ -309,7 +309,7 @@ function printStepHeader(decimal stepNum, string title, boolean quietMode) {
     if quietMode {
         return;
     }
-    
+
     string sep = createSeparator("-", 60);
     io:println("");
     io:println(string `Step ${stepNum.toString()}: ${title}`);
@@ -318,14 +318,14 @@ function printStepHeader(decimal stepNum, string title, boolean quietMode) {
 
 function printCompletionSummary(string alignedSpec, string inputSpecPath, string outputDir, boolean quietMode) {
     string sep = createSeparator("=", 70);
-    
+
     io:println("");
     io:println(sep);
     io:println("✓ OpenAPI Sanitization Complete");
     io:println(sep);
     io:println("");
     io:println(string `Sanitized: ${alignedSpec}`);
-    
+
     if !quietMode {
         io:println("");
         io:println("What was processed:");
@@ -333,19 +333,19 @@ function printCompletionSummary(string alignedSpec, string inputSpecPath, string
         io:println("  • Aligned with Ballerina conventions");
         io:println("  • Enhanced with AI-generated metadata");
     }
-    
+
     io:println("");
     io:println("Next Steps:");
     io:println("  • Generate client: bal run -- client-gen <spec> <output>");
     io:println("  • Run full pipeline: bal run -- pipeline <spec> <output>");
-    
+
     if !quietMode {
         io:println("");
         io:println("Commands:");
         io:println(string `  bal run -- client-gen ${alignedSpec} ${outputDir}/ballerina`);
         io:println(string `  bal run -- pipeline ${inputSpecPath} ${outputDir}`);
     }
-    
+
     io:println(sep);
 }
 

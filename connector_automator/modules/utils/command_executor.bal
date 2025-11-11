@@ -220,11 +220,8 @@ public function hasCompilationErrors(CommandResult result) returns boolean {
     if result.exitCode != 0 {
         return true;
     }
-
     string stderrLower = result.stderr.toLowerAscii();
-
     boolean hasError = stderrLower.includes("error:") || stderrLower.includes("error [") || stderrLower.includes("compilation failed");
-
     return hasError;
 }
 

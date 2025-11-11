@@ -24,7 +24,7 @@ public function generateExampleCode(ConnectorDetails details, string useCase, st
     }
 
     string result = check utils:callAI(prompt);
-    
+
     return result;
 }
 

@@ -53,7 +53,7 @@ function printOperationPlan(string projectPath, boolean quietMode) {
     if quietMode {
         return;
     }
-    
+
     string sep = createSeparator("=", 70);
     io:println(sep);
     io:println("Code Error Fixing");
@@ -70,10 +70,10 @@ function printOperationPlan(string projectPath, boolean quietMode) {
 
 function printFixSummary(FixResult result, boolean quietMode) {
     string sep = createSeparator("=", 70);
-    
+
     io:println("");
     io:println(sep);
-    
+
     if result.success {
         io:println("✓ All Errors Fixed");
         io:println(sep);
@@ -93,7 +93,7 @@ function printFixSummary(FixResult result, boolean quietMode) {
         io:println("");
         io:println("⚠  Manual intervention may be required");
     }
-    
+
     if result.appliedFixes.length() > 0 && !quietMode {
         io:println("");
         io:println("Applied Fixes:");
@@ -101,7 +101,7 @@ function printFixSummary(FixResult result, boolean quietMode) {
             io:println(string `  • ${fix}`);
         }
     }
-    
+
     if result.remainingFixes.length() > 0 && result.errorsRemaining > 0 && !quietMode {
         io:println("");
         io:println("Remaining Issues:");
@@ -109,7 +109,7 @@ function printFixSummary(FixResult result, boolean quietMode) {
             io:println(string `  • ${issue}`);
         }
     }
-    
+
     io:println("");
     io:println("Next Steps:");
     if result.success {
@@ -121,7 +121,7 @@ function printFixSummary(FixResult result, boolean quietMode) {
         io:println("  • Check backup files (*.backup) if needed");
         io:println("  • Run: bal build to see current status");
     }
-    
+
     io:println(sep);
 }
 

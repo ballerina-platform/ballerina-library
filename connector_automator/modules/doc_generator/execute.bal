@@ -121,7 +121,7 @@ function genBallerinaReadme(string connectorPath, boolean autoYes, boolean quiet
     io:println("");
     io:println("✓ README generated successfully");
     io:println(string `  Output: ${connectorPath}/ballerina/README.md`);
-    
+
     if !quietMode {
         io:println("");
         io:println("⚠  Review required: API URLs, setup steps, code examples");
@@ -149,7 +149,7 @@ function genTestsReadme(string connectorPath, boolean autoYes, boolean quietMode
     io:println("");
     io:println("✓ README generated successfully");
     io:println(string `  Output: ${connectorPath}/tests/README.md`);
-    
+
     if !quietMode {
         io:println("");
         io:println("⚠  Review required: Environment variables, test commands");
@@ -177,7 +177,7 @@ function genExamplesReadme(string connectorPath, boolean autoYes, boolean quietM
     io:println("");
     io:println("✓ README generated successfully");
     io:println(string `  Output: ${connectorPath}/examples/README.md`);
-    
+
     if !quietMode {
         io:println("");
         io:println("⚠  Review required: Example descriptions, GitHub links");
@@ -205,7 +205,7 @@ function genIndividualExampleReadmes(string connectorPath, boolean autoYes, bool
     io:println("");
     io:println("✓ READMEs generated successfully");
     io:println(string `  Output: ${connectorPath}/examples/*/README.md`);
-    
+
     if !quietMode {
         io:println("");
         io:println("⚠  Review required: Config.toml values, curl commands");
@@ -233,7 +233,7 @@ function genMainReadme(string connectorPath, boolean autoYes, boolean quietMode)
     io:println("");
     io:println("✓ README generated successfully");
     io:println(string `  Output: ${connectorPath}/README.md`);
-    
+
     if !quietMode {
         io:println("");
         io:println("⚠  Review required: CI/CD badges, package links");
@@ -244,7 +244,7 @@ function printDocumentationPlan(string connectorPath, boolean quietMode) {
     if quietMode {
         return;
     }
-    
+
     string sep = createSeparator("=", 70);
     io:println(sep);
     io:println("Documentation Generation");
@@ -264,7 +264,7 @@ function printDocTypeHeader(string docType, string connectorPath, boolean quietM
     if quietMode {
         return;
     }
-    
+
     string sep = createSeparator("-", 60);
     io:println("");
     io:println(docType);
@@ -275,7 +275,7 @@ function printDocTypeHeader(string docType, string connectorPath, boolean quietM
 
 function printDocCompletionSummary(string connectorPath, boolean quietMode) {
     string sep = createSeparator("=", 70);
-    
+
     io:println("");
     io:println(sep);
     io:println("Documentation Generation Complete");
@@ -287,7 +287,7 @@ function printDocCompletionSummary(string connectorPath, boolean quietMode) {
     io:println(string `  • ${connectorPath}/tests/README.md`);
     io:println(string `  • ${connectorPath}/examples/README.md`);
     io:println(string `  • ${connectorPath}/examples/*/README.md`);
-    
+
     if !quietMode {
         io:println("");
         io:println("⚠  Manual Review Required:");
@@ -297,7 +297,7 @@ function printDocCompletionSummary(string connectorPath, boolean quietMode) {
         io:println("   • GitHub repository links and CI/CD badges");
         io:println("   • Example descriptions and functionality");
     }
-    
+
     io:println("");
     io:println("Next Steps:");
     io:println("  • Review generated READMEs for accuracy");
