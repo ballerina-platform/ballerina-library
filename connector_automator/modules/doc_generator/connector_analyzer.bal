@@ -3,23 +3,6 @@ import ballerina/io;
 import ballerina/lang.'string as strings;
 import ballerina/lang.regexp;
 
-public type ConnectorMetadata record {
-    string connectorName;
-    string version;
-    string[] examples;
-    string clientBalContent;
-    string typesBalContent;
-
-};
-
-public type ExampleData record {|
-    string exampleName;
-    string exampleDirName;
-    string[] balFiles;
-    string[] balFileContents;
-    string mainBalContent;
-|};
-
 public function analyzeConnector(string connectorPath) returns ConnectorMetadata|error {
     file:MetaData|error pathMeta = file:getMetaData(connectorPath);
     if pathMeta is error {
@@ -144,7 +127,13 @@ public function analyzeExampleDirectory(string examplePath, string exampleDirNam
 
     foreach file:MetaData fileInfo in files {
         if !fileInfo.dir && fileInfo.absPath.endsWith(".bal") {
+            // Fix: Get just the filename without the leading slash
             string fileName = fileInfo.absPath.substring(examplePath.length());
+            // Remove leading slash if present
+            if fileName.startsWith("/") {
+                fileName = fileName.substring(1);
+            }
+
             string content = check io:fileReadString(fileInfo.absPath);
 
             exampleData.balFiles.push(fileName);

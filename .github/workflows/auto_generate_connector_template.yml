@@ -167,8 +167,8 @@ jobs:
 
       - name: Create Branch
         run: |
-          git checkout -b dry-run
-          echo "Created branch: dry-run"
+          git checkout -b auto-generate-connector
+          echo "Created branch: auto-generate-connector"
 
       - name: Run Full Connector Generation Pipeline
         run: |
@@ -318,7 +318,7 @@ jobs:
 
       - name: Push Results
         if: ${{ steps.commitFiles.outputs.hasChanged == 'true' }}
-        run: git push origin dry-run
+        run: git push origin auto-generate-connector
         env:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
@@ -330,7 +330,7 @@ jobs:
             --title "[Automated] Auto-generate connector from OpenAPI specification" \
             --body $'## Auto-Generated Connector from OpenAPI Specification\n\n**This PR contains AI-generated content that requires review before merging.**\n\n### What was generated:\n- Sanitized OpenAPI specification with AI enhancements\n- Ballerina client library with proper type definitions\n- Usage examples demonstrating key API operations\n- Test suite with mock server implementation\n- Complete documentation package\n\n### Generated using:\n- Ballerina version: ${{ inputs.ballerina-version }}\n- Full automation pipeline with AI-powered improvements\n- Automatic compilation error fixes\n\n### Before merging:\n- Test examples with real API credentials\n- Verify client methods work as expected\n- Review AI-generated descriptions for accuracy\n- Validate mock server responses match actual API\n\n**Manual validation is required before production use.**' \
             --base ${{ github.ref }} \
-            --head dry-run)
+            --head auto-generate-connector)
           echo "prUrl=$prUrl" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}

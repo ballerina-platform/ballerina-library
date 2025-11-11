@@ -528,7 +528,7 @@ function runFullPipeline(string... args) returns error? {
     buildArgs.push(...pipelineOptions);
     utils:CommandResult buildResult = utils:executeBalBuild(clientPath,quietMode);
 
-    if !utils:isCommandSuccessfull(buildResult) {
+    if utils:hasCompilationErrors(buildResult) {
         io:println(string `✗ Build validation failed: Client contains compilation errors`);
         io:println("   Pipeline terminated due to compilation errors");
         io:println("   Please review the generated client and fix manually");
@@ -539,6 +539,12 @@ function runFullPipeline(string... args) returns error? {
         }
         
         return error(string `Client build failed: ${buildResult.stderr}`);
+    }
+    
+    // If there are warnings but no errors, show them but continue
+    if buildResult.stderr.length() > 0 && !quietMode {
+        io:println("⚠  Build completed with warnings:");
+        io:println(buildResult.stderr);
     }
     
     io:println("✓ Client built and validated successfully");
