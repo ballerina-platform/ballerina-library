@@ -1,7 +1,7 @@
+import ballerina/data.jsondata;
 import ballerina/io;
 import ballerina/lang.runtime;
 import ballerina/log;
-import ballerina/data.jsondata;
 
 configurable RetryConfig retryConfig = {};
 
@@ -207,7 +207,7 @@ public function addMissingDescriptionsBatchWithRetry(string specFilePath, int ba
                 if !quietMode {
                     io:println(string `  ✓ Batch ${(startIdx / batchSize) + 1} processed (${batchResult.length()} descriptions)`);
                 }
-                
+
                 // Apply the generated descriptions
                 foreach BatchDescriptionResponse response in batchResult {
                     string? location = requestToLocationMap[response.id];
@@ -270,7 +270,7 @@ public function addMissingDescriptionsBatchWithRetry(string specFilePath, int ba
     if prettifiedResult is error {
         return error LLMServiceError("Failed to prettify JSON", prettifiedResult);
     }
-    
+
     error? writeResult = io:fileWriteString(specFilePath, prettifiedResult);
     if writeResult is error {
         return error LLMServiceError("Failed to write updated OpenAPI spec", writeResult);
@@ -376,7 +376,7 @@ public function renameInlineResponseSchemasBatchWithRetry(string specFilePath, i
             if !quietMode {
                 io:println(string `  ✓ Batch ${(startIdx / batchSize) + 1} processed (${batchResult.length()} schemas)`);
             }
-            
+
             // Process the generated names
             foreach BatchRenameResponse response in batchResult {
                 string newName = response.newName;
@@ -463,7 +463,7 @@ public function renameInlineResponseSchemasBatchWithRetry(string specFilePath, i
         if prettifiedResult is error {
             return error LLMServiceError("Failed to prettify JSON", prettifiedResult);
         }
-        
+
         error? writeResult = io:fileWriteString(specFilePath, prettifiedResult);
         if writeResult is error {
             return error LLMServiceError("Failed to write updated OpenAPI spec", writeResult);
@@ -546,7 +546,7 @@ public function addMissingOperationIdsBatchWithRetry(string specFilePath, int ba
             if !quietMode {
                 io:println(string `  ✓ Batch ${(startIdx / batchSize) + 1} processed (${batchResult.length()} operations)`);
             }
-            
+
             // Apply the generated operationIds
             foreach BatchOperationIdResponse response in batchResult {
                 string? location = requestToLocationMap[response.id];
@@ -581,7 +581,7 @@ public function addMissingOperationIdsBatchWithRetry(string specFilePath, int ba
     if prettifiedResult is error {
         return error LLMServiceError("Failed to prettify JSON", prettifiedResult);
     }
-    
+
     error? writeResult = io:fileWriteString(specFilePath, prettifiedResult);
     if writeResult is error {
         return error LLMServiceError("Failed to write updated OpenAPI spec", writeResult);

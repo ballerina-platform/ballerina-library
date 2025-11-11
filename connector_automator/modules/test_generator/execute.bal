@@ -47,7 +47,7 @@ public function executeTestGen(string... args) returns error? {
         io:println(string `✗ AI initialization failed: ${initResult.message()}`);
         return initResult;
     }
-    
+
     if !quietMode {
         io:println("✓ AI service initialized");
     }
@@ -111,7 +111,7 @@ function printTestGenerationPlan(string connectorPath, string specPath, boolean 
     if quietMode {
         return;
     }
-    
+
     string sep = createSeparator("=", 70);
     io:println(sep);
     io:println("Test Generation Plan");
@@ -132,7 +132,7 @@ function printStepHeader(int stepNum, string title, boolean quietMode) {
     if quietMode {
         return;
     }
-    
+
     string sep = createSeparator("-", 50);
     io:println("");
     io:println(string `Step ${stepNum}: ${title}`);
@@ -141,7 +141,7 @@ function printStepHeader(int stepNum, string title, boolean quietMode) {
 
 function printTestGenerationSummary(string connectorPath, boolean quietMode) {
     string sep = createSeparator("=", 70);
-    
+
     io:println("");
     io:println(sep);
     io:println("✓ Test Generation Complete");
@@ -150,7 +150,7 @@ function printTestGenerationSummary(string connectorPath, boolean quietMode) {
     io:println("Generated Files:");
     io:println(string `  • ${connectorPath}/ballerina/modules/mock.server/`);
     io:println(string `  • ${connectorPath}/ballerina/tests/test.bal`);
-    
+
     if !quietMode {
         io:println("");
         io:println("What was created:");
@@ -158,20 +158,20 @@ function printTestGenerationSummary(string connectorPath, boolean quietMode) {
         io:println("  • Comprehensive test suite covering key operations");
         io:println("  • Automated compilation error fixes");
     }
-    
+
     io:println("");
     io:println("Next Steps:");
     io:println("  • Review generated tests for completeness");
     io:println("  • Update test configurations if needed");
     io:println("  • Run tests: bal test");
-    
+
     if !quietMode {
         io:println("");
         io:println("Commands:");
         io:println(string `  cd ${connectorPath}/ballerina && bal test`);
         io:println(string `  cd ${connectorPath}/ballerina && bal test --code-coverage`);
     }
-    
+
     io:println(sep);
 }
 

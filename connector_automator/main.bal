@@ -4,10 +4,10 @@ import connector_automator.doc_generator;
 import connector_automator.example_generator;
 import connector_automator.sanitizor;
 import connector_automator.test_generator;
+import connector_automator.utils;
 
 import ballerina/io;
 import ballerina/os;
-import connector_automator.utils;
 
 const string VERSION = "0.1.0";
 
@@ -245,7 +245,7 @@ function handleClientGeneration() returns error? {
         if licenseInput is string && licenseInput.trim().length() > 0 {
             args.push(string `license=${licenseInput.trim()}`);
         }
-        
+
         // Tags
         string|io:Error tagsInput = getUserInput("Filter tags (comma-separated, optional): ");
         if tagsInput is string && tagsInput.trim().length() > 0 {
@@ -463,7 +463,7 @@ function runFullPipeline(string... args) returns error? {
     string openApiSpec = args[0];
     string outputDir = args[1];
     string[] pipelineOptions = args.slice(2);
-    
+
     boolean quietMode = false;
     boolean autoYes = false;
     string licenseFile = "";
@@ -526,27 +526,27 @@ function runFullPipeline(string... args) returns error? {
     printStepHeader(3, "Building and Validating Client", quietMode);
     string[] buildArgs = [clientPath];
     buildArgs.push(...pipelineOptions);
-    utils:CommandResult buildResult = utils:executeBalBuild(clientPath,quietMode);
+    utils:CommandResult buildResult = utils:executeBalBuild(clientPath, quietMode);
 
     if utils:hasCompilationErrors(buildResult) {
         io:println(string `✗ Build validation failed: Client contains compilation errors`);
         io:println("   Pipeline terminated due to compilation errors");
         io:println("   Please review the generated client and fix manually");
-        
+
         if !quietMode && buildResult.stderr.length() > 0 {
             io:println("   Build errors:");
             io:println(buildResult.stderr);
         }
-        
+
         return error(string `Client build failed: ${buildResult.stderr}`);
     }
-    
+
     // If there are warnings but no errors, show them but continue
     if buildResult.stderr.length() > 0 && !quietMode {
         io:println("⚠  Build completed with warnings:");
         io:println(buildResult.stderr);
     }
-    
+
     io:println("✓ Client built and validated successfully");
 
     // Step 4: Generate examples
@@ -593,7 +593,7 @@ function printPipelineHeader(string openApiSpec, string outputDir, boolean quiet
     if quietMode {
         return;
     }
-    
+
     string sep = createSeparator("=", 70);
     io:println("");
     io:println(sep);
@@ -616,7 +616,7 @@ function printStepHeader(int stepNum, string title, boolean quietMode) {
     if quietMode {
         return;
     }
-    
+
     string sep = createSeparator("-", 60);
     io:println("");
     io:println(string `[${stepNum}/6] ${title}`);
@@ -625,7 +625,7 @@ function printStepHeader(int stepNum, string title, boolean quietMode) {
 
 function printPipelineCompletion(string outputDir, boolean quietMode) {
     string sep = createSeparator("=", 70);
-    
+
     io:println("");
     io:println(sep);
     io:println("✓ Pipeline Completed Successfully");
@@ -637,7 +637,7 @@ function printPipelineCompletion(string outputDir, boolean quietMode) {
     io:println(string `  • Usage examples: ${outputDir}/examples/`);
     io:println(string `  • Test suite: ${outputDir}/ballerina/tests/`);
     io:println(string `  • Documentation: ${outputDir}/README.md`);
-    
+
     if !quietMode {
         io:println("");
         io:println("What was accomplished:");
@@ -648,21 +648,21 @@ function printPipelineCompletion(string outputDir, boolean quietMode) {
         io:println("  • Comprehensive test suite with mock server");
         io:println("  • Complete documentation package");
     }
-    
+
     io:println("");
     io:println("Next Steps:");
     io:println("  • Review generated components for accuracy");
     io:println("  • Test the client with your API credentials");
     io:println("  • Customize examples and documentation as needed");
     io:println(string `  • Build and test: cd ${outputDir}/ballerina && bal test`);
-    
+
     if !quietMode {
         io:println("");
         io:println("Publishing Commands:");
         io:println(string `  cd ${outputDir}/ballerina && bal pack`);
         io:println(string `  cd ${outputDir}/ballerina && bal push --repository=local`);
     }
-    
+
     io:println(sep);
 }
 

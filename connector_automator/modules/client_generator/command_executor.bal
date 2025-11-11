@@ -14,21 +14,21 @@ public function executeBalClientGenerate(string inputPath, string outputPath, Op
     if toolOptions.license is string {
         string licensePath = toolOptions.license;
 
-         // If it's a relative path, resolve it relative to the working directory (parent of output)
-         if !licensePath.startsWith("/") {
-             // Get the working directory (parent directory of output path)
-             string workingDir = utils:getDirectoryPath(outputPath);
-             licensePath = string `${workingDir}/${licensePath}`;
-         }
+        // If it's a relative path, resolve it relative to the working directory (parent of output)
+        if !licensePath.startsWith("/") {
+            // Get the working directory (parent directory of output path)
+            string workingDir = utils:getDirectoryPath(outputPath);
+            licensePath = string `${workingDir}/${licensePath}`;
+        }
 
-         // Check if license file exists before adding to command
-         boolean|file:Error licenseExists = file:test(licensePath, file:EXISTS);
-         if licenseExists is boolean && licenseExists {
-             command += string ` --license ${licensePath}`;
-         } else {
-             log:printWarn("License file not found, skipping license option", licensePath = licensePath);
-         }
-     }
+        // Check if license file exists before adding to command
+        boolean|file:Error licenseExists = file:test(licensePath, file:EXISTS);
+        if licenseExists is boolean && licenseExists {
+            command += string ` --license ${licensePath}`;
+        } else {
+            log:printWarn("License file not found, skipping license option", licensePath = licensePath);
+        }
+    }
 
     if toolOptions.tags is string[] {
         string tagsList = string:'join(",", ...toolOptions.tags ?: []);

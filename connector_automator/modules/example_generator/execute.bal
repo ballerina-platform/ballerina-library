@@ -56,7 +56,7 @@ public function executeExampleGen(string... args) returns error? {
         io:println(string `✗ AI initialization failed: ${initResult.message()}`);
         return error("AI generator initialization failed: " + initResult.message());
     }
-    
+
     if !quietMode {
         io:println("✓ AI generator initialized");
     }
@@ -73,7 +73,7 @@ public function executeExampleGen(string... args) returns error? {
 
     // 3. Determine the number of examples
     int numExamples = numberOfExamples(details.apiCount);
-    
+
     io:println("");
     io:println(string `Generating ${numExamples} example${numExamples == 1 ? "" : "s"}...`);
 
@@ -190,7 +190,7 @@ function printExampleGenerationPlan(string connectorPath, boolean quietMode) {
     if quietMode {
         return;
     }
-    
+
     string sep = createSeparator("=", 70);
     io:println(sep);
     io:println("Example Generation");
@@ -208,37 +208,37 @@ function printExampleGenerationPlan(string connectorPath, boolean quietMode) {
 
 function printExampleSummary(string connectorPath, int totalExamples, int successCount, boolean quietMode) {
     string sep = createSeparator("=", 70);
-    
+
     io:println("");
     io:println(sep);
-    
+
     if successCount == totalExamples {
         io:println("✓ Example Generation Complete");
     } else {
         io:println("⚠  Example Generation Partial Success");
     }
-    
+
     io:println(sep);
     io:println("");
     io:println(string `Generated: ${successCount}/${totalExamples} example${totalExamples == 1 ? "" : "s"}`);
-    
+
     if successCount > 0 {
         io:println(string `Output   : ${connectorPath}/examples/`);
     }
-    
+
     if successCount < totalExamples {
         io:println("");
         io:println("⚠  Some examples failed to generate");
         io:println("   Manual review may be required");
     }
-    
+
     if !quietMode && successCount > 0 {
         io:println("");
         io:println("Generated Examples:");
         // Note: In a real implementation, you'd track example names and list them here
         io:println(string `  • Check ${connectorPath}/examples/ for all generated examples`);
     }
-    
+
     io:println("");
     io:println("Next Steps:");
     if successCount > 0 {
@@ -251,7 +251,7 @@ function printExampleSummary(string connectorPath, int totalExamples, int succes
         io:println("  • Verify AI service configuration");
         io:println("  • Review error messages above");
     }
-    
+
     io:println(sep);
 }
 

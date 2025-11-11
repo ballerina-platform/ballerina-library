@@ -61,8 +61,8 @@ function parseCommandLineArgs(string[] args) returns ClientGeneratorConfig {
 
                         match key {
                             "license" => {
-                                 toolOptions.license = value;
-                                 hasToolOptions = true;
+                                toolOptions.license = value;
+                                hasToolOptions = true;
                             }
                             "tags" => {
                                 toolOptions.tags = regex:split(value, ",").map(tag => tag.trim());

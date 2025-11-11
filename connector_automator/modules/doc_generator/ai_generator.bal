@@ -12,7 +12,7 @@ public function initDocumentationGenerator() returns error? {
 
 public function generateAllDocumentation(string connectorPath) returns error? {
     io:println("Starting documentation generation...");
-    
+
     check generateBallerinaReadme(connectorPath);
     check generateTestsReadme(connectorPath);
     check generateExamplesReadme(connectorPath);
@@ -64,7 +64,7 @@ public function generateTestsReadme(string connectorPath) returns error? {
         check ensureDirectoryExists(parentPath);
     }
     check writeOutput(content, outputPath);
-    
+
     io:println(string `  ✓ ${outputPath}`);
 }
 
@@ -161,7 +161,7 @@ public function generateExamplesReadme(string connectorPath) returns error? {
         check ensureDirectoryExists(parentPath);
     }
     check writeOutput(content, outputPath);
-    
+
     io:println(string `  ✓ ${outputPath}`);
 }
 
@@ -181,13 +181,13 @@ public function generateMainReadme(string connectorPath) returns error? {
         check ensureDirectoryExists(parentPath);
     }
     check writeOutput(content, outputPath);
-    
+
     io:println(string `  ✓ ${outputPath}`);
 }
 
 function generateBallerinaContent(ConnectorMetadata metadata) returns map<string>|error {
     map<string> content = {};
-    
+
     string overviewPrompt = createBallerinaOverviewPrompt(metadata);
     string overviewResult = check callAI(overviewPrompt);
     content["overview"] = overviewResult;
@@ -246,7 +246,7 @@ function generateMainContent(ConnectorMetadata metadata) returns map<string>|err
     string examplesPrompt = createBallerinaExamplesPrompt(metadata);
     string examplesResult = check callAI(examplesPrompt);
     content["examples"] = examplesResult;
-    
+
     return content;
 }
 
@@ -340,17 +340,17 @@ function substituteVariables(string template, TemplateData data) returns string 
     if usefulLinks != "" {
         result = simpleReplace(result, "{{AI_GENERATED_USEFUL_LINKS}}", usefulLinks);
     }
-    
+
     string individualReadme = data.AI_GENERATED_INDIVIDUAL_README ?: "";
     if individualReadme != "" {
         result = simpleReplace(result, "{{AI_GENERATED_INDIVIDUAL_README}}", individualReadme);
     }
-    
+
     string mainExamplesReadme = data.AI_GENERATED_MAIN_EXAMPLES_README ?: "";
     if mainExamplesReadme != "" {
         result = simpleReplace(result, "{{AI_GENERATED_MAIN_EXAMPLES_README}}", mainExamplesReadme);
     }
-    
+
     return result;
 }
 
