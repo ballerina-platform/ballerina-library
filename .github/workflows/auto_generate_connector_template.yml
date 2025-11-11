@@ -167,8 +167,8 @@ jobs:
 
       - name: Create Branch
         run: |
-          git checkout -b auto-generate-connector
-          echo "Created branch: auto-generate-connector"
+          git checkout -b dry-run
+          echo "Created branch: dry-run"
 
       - name: Run Full Connector Generation Pipeline
         run: |
