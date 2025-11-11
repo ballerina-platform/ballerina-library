@@ -213,7 +213,19 @@ public function parseCmdCompilationErrors(string output) returns CmdCompilationE
 # + result - CommandResult to check
 # + return - true if command executed successfully, false otherwise
 public function isCommandSuccessfull(CommandResult result) returns boolean {
-    return result.success && result.exitCode == 0 && result.compilationErrors.length() == 0;
+    return result.exitCode == 0;
+}
+
+public function hasCompilationErrors(CommandResult result) returns boolean {
+    if result.exitCode != 0 {
+        return true;
+    }
+
+    string stderrLower = result.stderr.toLowerAscii();
+
+    boolean hasError = stderrLower.includes("error:") || stderrLower.includes("error [") || stderrLower.includes("compilation failed");
+
+    return hasError;
 }
 
 public function getErrorSummary(CmdCompilationError[] errors) returns string {
