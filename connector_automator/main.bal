@@ -636,7 +636,7 @@ function printPipelineCompletion(string outputDir, boolean quietMode) {
     io:println(string `  • Ballerina client: ${outputDir}/ballerina/`);
     io:println(string `  • Usage examples: ${outputDir}/examples/`);
     io:println(string `  • Test suite: ${outputDir}/ballerina/tests/`);
-    io:println(string `  • Documentation: ${outputDir}/README.md`);
+    io:println(string `  • Documentation: ${outputDir}`);
 
     if !quietMode {
         io:println("");

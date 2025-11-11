@@ -151,7 +151,7 @@ public function executeSanitizor(string... args) returns error? {
             if !quietMode {
                 log:printInfo("Aligned YAML spec converted to JSON successfully");
             }
-            io:println("✓ Aligned YAML spec converted to JSON");
+            //io:println("✓ Aligned YAML spec converted to JSON");
         }
     }
 
