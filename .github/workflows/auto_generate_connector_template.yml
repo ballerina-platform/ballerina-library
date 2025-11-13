@@ -11,7 +11,7 @@ on:
         description: "Ballerina version to use"
         required: false
         type: string
-        default: "nightly"
+        default: "2201.13.0"
       distribution-zip:
         description: "Distribution URL of the Ballerina version to be used"
         required: false
@@ -48,6 +48,7 @@ jobs:
           version: ${{ inputs.ballerina-version }}
 
       - name: Set up JDK 21
+        if: inputs.distribution-zip != '' 
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
