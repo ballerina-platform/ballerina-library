@@ -59,7 +59,7 @@
         },
         {
             "name": "module-ballerina-time",
-            "module_version": "2.8.0-SNAPSHOT",
+            "module_version": "2.8.1-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibTimeVersion",
@@ -78,7 +78,7 @@
         },
         {
             "name": "module-ballerina-url",
-            "module_version": "2.6.1-SNAPSHOT",
+            "module_version": "2.6.2-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibUrlVersion",
@@ -90,7 +90,7 @@
         },
         {
             "name": "module-ballerina-xmldata",
-            "module_version": "2.9.1-SNAPSHOT",
+            "module_version": "2.9.2-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
@@ -153,7 +153,6 @@
             "dependents": [
                 "module-ballerina-auth",
                 "module-ballerina-file",
-                "module-ballerina-ftp",
                 "module-ballerina-jwt",
                 "module-ballerina-mime",
                 "module-ballerina-mqtt",
@@ -326,7 +325,9 @@
             "default_branch": "main",
             "version_key": "stdlibDataCsvVersion",
             "release": true,
-            "dependents": [],
+            "dependents": [
+                "module-ballerina-ftp"
+            ],
             "is_multiple_connectors": false
         },
         {
@@ -337,6 +338,7 @@
             "version_key": "stdlibDataJsonDataVersion",
             "release": true,
             "dependents": [
+                "module-ballerina-ftp",
                 "module-ballerina-http"
             ],
             "is_multiple_connectors": false
@@ -423,7 +425,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "module_version": "2.14.2-SNAPSHOT",
+            "module_version": "2.16.0-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
@@ -469,7 +471,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "module_version": "2.15.0-SNAPSHOT",
+            "module_version": "2.15.1-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibHttpVersion",
@@ -489,7 +491,7 @@
         },
         {
             "name": "module-ballerina-ai",
-            "module_version": "1.6.1-SNAPSHOT",
+            "module_version": "1.8.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibAiVersion",
@@ -538,7 +540,7 @@
         },
         {
             "name": "module-ballerina-websocket",
-            "module_version": "2.15.0-SNAPSHOT",
+            "module_version": "2.15.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibWebsocketVersion",
@@ -573,7 +575,7 @@
         },
         {
             "name": "module-ballerina-ai.np",
-            "module_version": "0.5.0-SNAPSHOT",
+            "module_version": "0.5.1-SNAPSHOT",
             "level": 9,
             "default_branch": "main",
             "version_key": "stdlibAi.npVersion",
@@ -1769,7 +1771,7 @@
     "tools": [
         {
             "name": "asyncapi-tools",
-            "module_version": "0.12.0-SNAPSHOT",
+            "module_version": "0.12.1-SNAPSHOT",
             "level": 10,
             "default_branch": "main",
             "version_key": "stdlibAsyncapi-toolsVersion",
