@@ -589,14 +589,44 @@ You must analyze the provided Ballerina code and generate a README by strictly f
 **2.  Analyze Prerequisites:**
     * **Identify Connectors:** Find all ${backtick}import ballerinax/...${backtick} statements. For each unique connector, create a "Setup" prerequisite section with a link to its main setup guide.
     * **CRITICAL for Config.toml:** Analyze the ${backtick}configurable${backtick} variables at the top of the ${backtick}main.bal${backtick} file. Your ${backtick}Config.toml${backtick} example **MUST** exactly match these variables.
+        * Look for lines starting with ${backtick}configurable${backtick} (e.g., ${backtick}configurable string bearerToken = ?;${backtick})
+        * Extract the EXACT variable names used (e.g., if code has "bearerToken", use "bearerToken" not "developerToken")
         * If you see ${backtick}configurable string clientId${backtick}, you **MUST** include ${backtick}clientId${backtick}, ${backtick}clientSecret${backtick}, and ${backtick}refreshToken${backtick} in the TOML file.
-        * If you see ${backtick}configurable string token${backtick}, you **MUST** include only the ${backtick}token${backtick} in the TOML file.
-        * Use descriptive placeholder values like ${backtick}"<Your Client ID>"${backtick} or ${backtick}"YOUR_API_KEY"${backtick}.
+        * If you see ${backtick}configurable string token${backtick} or ${backtick}configurable string bearerToken${backtick}, you **MUST** include only that exact variable name in the TOML file.
+        * Use descriptive placeholder values like ${backtick}"<Your Bearer Token>"${backtick} or ${backtick}"<Your Client ID>"${backtick}.
 
 **3.  Analyze the "Run the Example" Section:**
     * **Action:** Analyze the ${backtick}main.bal${backtick} file for the presence of an ${backtick}http:Listener${backtick}.
     * **Rule A (HTTP Service):** If an ${backtick}http:Listener${backtick} is present, your "Run the Example" section **MUST** provide a sample ${backtick}curl${backtick} command to test the service, as shown in Example 1. Infer the endpoint path, HTTP method, and a realistic JSON payload from the resource function's signature.
     * **Rule B (Script):** If **NO** ${backtick}http:Listener${backtick} is present, your "Run the Example" section **MUST NOT** include a ${backtick}curl${backtick} command. It should only show the ${backtick}bal run${backtick} command.
+
+**CRITICAL CONFIG.TOML VALIDATION EXAMPLES:**
+
+**If code has:**
+${tripleBacktick}ballerina
+configurable string bearerToken = ?;
+configurable string storefront = "us";
+${tripleBacktick}
+
+**Generate Config.toml as:**
+${tripleBacktick}toml
+bearerToken = "<Your Bearer Token>"
+storefront = "us"
+${tripleBacktick}
+
+**If code has:**
+${tripleBacktick}ballerina
+configurable string clientId = ?;
+configurable string clientSecret = ?;
+configurable string refreshToken = ?;
+${tripleBacktick}
+
+**Generate Config.toml as:**
+${tripleBacktick}toml
+clientId = "<Your Client ID>"
+clientSecret = "<Your Client Secret>"  
+refreshToken = "<Your Refresh Token>"
+${tripleBacktick}
 
 **EXAMPLE CODE TO ANALYZE:**
 - **Connector:** ${connectorMetadata.connectorName}
@@ -606,7 +636,7 @@ ${tripleBacktick}ballerina
 ${exampleData.mainBalContent}
 ${tripleBacktick}
 
-Generate the complete README.md now, strictly following the checklist and adapting its structure to the code provided.
+Generate the complete README.md now, strictly following the checklist and adapting its structure to the code provided. Pay special attention to matching the EXACT variable names from configurable declarations to the Config.toml file.
 `;
 }
 

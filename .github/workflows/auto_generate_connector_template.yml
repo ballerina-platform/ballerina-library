@@ -11,7 +11,12 @@ on:
         description: "Ballerina version to use"
         required: false
         type: string
-        default: "nightly"
+        default: "2201.13.0"
+      distribution-zip:
+        description: "Distribution URL of the Ballerina version to be used"
+        required: false
+        type: string
+        default: ""
       license-file:
         description: "Path to license file relative to docs directory"
         required: false
@@ -37,10 +42,81 @@ jobs:
           token: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
       - name: Setup Ballerina
+        if: inputs.distribution-zip == ''
         uses: ballerina-platform/setup-ballerina@v1.1.3
         with:
           version: ${{ inputs.ballerina-version }}
 
+      - name: Set up JDK 21
+        if: inputs.distribution-zip != '' 
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: 21.0.3
+
+      - name: Set Default Ballerina Command
+        if: inputs.distribution-zip == ''
+        run: |
+          echo "BALLERINA_CMD=bal" >> $GITHUB_ENV
+
+      - name: Get Ballerina Distribution
+        if: inputs.distribution-zip
+        run: |
+          echo "Downloading and extracting Ballerina distribution..."
+
+          # Create temp folder and download to file
+          mkdir -p temp_folder
+          cd temp_folder
+          curl -H "Authorization: token ${{ secrets.BALLERINA_BOT_TOKEN }}" \
+               -L -o artifact.zip \
+               "${{ inputs.distribution-zip }}"
+
+          echo "Extracting artifact.zip..."
+          unzip -o -q artifact.zip
+
+          echo "Contents after first extraction:"
+          ls -la
+
+          # Handle nested ZIP if present
+          if ls *.zip 1> /dev/null 2>&1; then
+            echo "Found nested ZIP file, extracting..."
+            for zip_file in *.zip; do
+              echo "Extracting: $zip_file"
+              unzip -o -q "$zip_file"
+              echo "Contents after extracting $zip_file:"
+              ls -la
+            done
+            # Remove ZIP files after extraction
+            rm *.zip
+            echo "Removed ZIP files"
+          fi
+
+          # Clean up the original artifact.zip
+          rm -f artifact.zip
+
+          echo "Final contents of temp_folder:"
+          ls -la
+
+          cd ..
+
+          # Copy distribution
+          if ls temp_folder/ballerina-* 1> /dev/null 2>&1; then
+            echo "Found Ballerina directory:"
+            ls -la temp_folder/ballerina-*
+            cp -r temp_folder/ballerina-*/. ballerina-dist/
+            rm -r temp_folder/
+            echo "BALLERINA_CMD=${PWD}/ballerina-dist/bin/bal" >> $GITHUB_ENV
+            echo "Ballerina distribution setup completed"
+          else
+            echo "Error: No Ballerina directory found after extraction"
+            echo "Contents of temp_folder:"
+            ls -la temp_folder/
+            echo "Looking for any directories:"
+            find temp_folder/ -type d -name "*"
+            echo "Looking for any files:"
+            find temp_folder/ -type f -name "*" | head -10
+            exit 1
+          fi
       - name: Verify API Key
         run: |
           if [ -z "$ANTHROPIC_API_KEY" ]; then
@@ -54,16 +130,18 @@ jobs:
       - name: Clone Connector Automator
         run: |
           echo "Cloning connector automator tool from ballerina-library..."
-          git clone https://github.com/ballerina-platform/ballerina-library.git temp-library
+           git clone -b connector-automation https://github.com/nostoc/ballerina-library.git temp-library
           cp -r temp-library/connector_automator ./
           rm -rf temp-library
           echo "Connector automator cloned successfully"
 
       - name: Download OpenAPI Specification
         if: inputs.openapi-url
-        working-directory: docs/spec
         run: |
           echo "Downloading openapi spec from provided URL..."
+          # Create docs/spec directory if doesn't exist
+          mkdir -p docs/spec
+          cd docs/spec
           if [[ "${{ inputs.openapi-url }}" == *.json ]]; then
             rm -f openapi.json
             wget -O openapi.json "${{ inputs.openapi-url }}"
@@ -98,12 +176,47 @@ jobs:
       - name: Run Full Connector Generation Pipeline
         run: |
           cd connector_automator
-          SPEC_PATH="../docs/spec/${{ env.SPEC_FILE }}"
-          OUTPUT_PATH="../."
+          SPEC_PATH="${GITHUB_WORKSPACE}/docs/spec/${{ env.SPEC_FILE }}"
+          OUTPUT_PATH="${GITHUB_WORKSPACE}"
 
           echo "Running full connector generation pipeline..."
           echo "Spec path : $SPEC_PATH"
           echo "Output path: $OUTPUT_PATH"
+          echo "Working directory: $(pwd)"
+          echo "GITHUB_WORKSPACE: ${GITHUB_WORKSPACE}"
+          echo "Ballerina command: ${{ env.BALLERINA_CMD }}"
+
+          # Verify the spec file exists
+          if [ ! -f "$SPEC_PATH" ]; then
+            echo "Error: OpenAPI spec file does not exist at: $SPEC_PATH"
+            echo "Contents of docs/spec directory:"
+            ls -la "${GITHUB_WORKSPACE}/docs/spec/"
+            exit 1
+          fi
+
+          # Add Ballerina bin directory to PATH if using custom distribution
+          if [ -n "${{ env.BALLERINA_CMD }}" ] && [ "${{ env.BALLERINA_CMD }}" != "bal" ]; then
+            # Extract the directory containing bal
+            BALLERINA_BIN_DIR=$(dirname "${{ env.BALLERINA_CMD }}")
+            export PATH="$BALLERINA_BIN_DIR:$PATH"
+            echo "Added $BALLERINA_BIN_DIR to PATH"
+            
+            # Verify bal is now available
+            which bal
+            bal version
+          fi
+
+          # create Config.toml for the connector automator. 
+
+          cat > Config.toml << EOF
+          [connector_automator.code_fixer]
+          maxIterations = 3
+
+          [connector_automator.utils]
+          apiKey = "${{ secrets.ANTHROPIC_API_KEY }}"
+          EOF
+
+          echo "Created Config.toml"
 
           # Build pipeline arguments
           PIPELINE_ARGS=("$SPEC_PATH" "$OUTPUT_PATH" "yes")
@@ -112,11 +225,19 @@ jobs:
             PIPELINE_ARGS+=("quiet")
           fi
 
+          # Add license file if provided
+          if [ -n "${{ inputs.license-file }}" ]; then
+            LICENSE_PATH="${GITHUB_WORKSPACE}/docs/${{ inputs.license-file }}"
+            if [ -f "$LICENSE_PATH" ]; then
+              PIPELINE_ARGS+=("license=${LICENSE_PATH}")
+              echo "Using license file: $LICENSE_PATH"
+            fi
+          fi
+        
           # Run the complete pipeline
-          bal run -- pipeline "${PIPELINE_ARGS[@]}"
+          ${{ env.BALLERINA_CMD }} run -- pipeline "${PIPELINE_ARGS[@]}"
 
           echo "Full connector generation pipeline completed"
-
       - name: Cleanup and Organize Spec Files
         run: |
           cd docs/spec
@@ -152,11 +273,24 @@ jobs:
 
           echo "OpenAPI spec file cleanup completed"
 
-      - name: Cleanup Connector Automator Tool
+      - name: Remove uncommited files
         run: |
-          echo "Removing connector automator tool from repository..."
           rm -rf connector_automator
-          echo "Connector automator tool removed"
+          rm -f -r ballerina-dist/
+      
+      - name: Cleanup
+        run: |
+          # Remove all Dependencies.toml files
+          find . -name "Dependencies.toml" -type f -delete
+          echo "Removed Dependencies.toml files"
+          
+          # Remove all .backup files
+          find . -name "*.backup" -type f -delete
+          echo "Removed .backup files"
+          
+          # Remove all target directories
+          find . -name "target" -type d -exec rm -rf {} +
+          echo "Removed target directories"
 
       - name: Configure Git Identity
         run: |
@@ -167,7 +301,7 @@ jobs:
         id: commitFiles
         run: |
           # Build commit message 
-          COMMIT_MSG="[AUTOMATED] Auto-generate connector from OpenAPI spec
+          COMMIT_MSG="[AUTOMATED] [AI] Auto-generate connector from OpenAPI spec
 
           Complete connector generation using full pipeline with all components.
           Generated using Ballerina with AI-powered automation."
@@ -196,8 +330,8 @@ jobs:
         if: ${{ steps.commitFiles.outputs.hasChanged == 'true' }}
         run: |
           prUrl=$(gh pr create \
-            --title "[Automated] Auto-generate connector from OpenAPI specification" \
-            --body $'## Auto-Generated Connector from OpenAPI Specification\n\n**WARNING: This PR contains AI-generated content. Please review thoroughly before merging.**\n\n### Generation Details\n- **Ballerina Version**: ${{ inputs.ballerina-version }}\n- \n### Generated Components\n- Complete connector generation using full pipeline\n- All components: sanitization, client generation, examples generation, tests generation, documentation\n\n### AI Generation Disclaimer\nThis connector was generated using AI technology. Manual validation is essential to ensure correctness, security, and compatibility with the target API.\n\nPlease do not merge this PR without thorough review and testing.' \
+            --title "[Automated] [AI] Auto-generate connector from OpenAPI specification" \
+            --body $'## **This PR contains AI-generated content that requires review before merging.**\n\n### What was generated:\n- Sanitized OpenAPI specification with AI enhancements\n- Ballerina client library with proper type definitions\n- Usage examples demonstrating key API operations\n- Test suite with mock server implementation\n- Complete documentation package\n\n### Generated using:\n- Ballerina version: ${{ inputs.ballerina-version }}\n- Full automation pipeline with AI-powered improvements\n- Automatic compilation error fixes\n\n### Before merging:\n- Test examples with real API credentials\n- Verify client methods work as expected\n- Review AI-generated descriptions for accuracy\n- Validate mock server responses match actual API\n\n**Manual validation is required before production use.**' \
             --base ${{ github.ref }} \
             --head auto-generate-connector)
           echo "prUrl=$prUrl" >> $GITHUB_OUTPUT

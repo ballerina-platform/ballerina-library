@@ -1,5 +1,4 @@
 import connector_automator.code_fixer;
-import connector_automator.cost_calculator;
 import connector_automator.utils;
 
 import ballerina/io;
@@ -16,8 +15,6 @@ function completeMockServer(string mockServerPath, string typesPath, boolean qui
     string prompt = createMockServerPrompt(mockServerContent, typesContent);
 
     string completeMockServer = check utils:callAI(prompt);
-
-    cost_calculator:trackUsageFromText("test_generator_mock", prompt, completeMockServer, "claude-4-sonnet");
 
     check io:fileWriteString(mockServerPath, completeMockServer);
 
@@ -40,6 +37,7 @@ function generateTestFile(string connectorPath, boolean quietMode = false) retur
 
     if !quietMode {
         io:println("✓ Test file generated successfully");
+        io:println(string `  Output: ${testFilePath}`);
     }
     return;
 }
@@ -49,14 +47,12 @@ function generateTestsWithAI(ConnectorAnalysis analysis) returns string|error {
 
     string result = check utils:callAI(prompt);
 
-    cost_calculator:trackUsageFromText("test_generator", prompt, result, "claude-4-sonnet");
-
     return result;
 }
 
 function fixTestFileErrors(string connectorPath, boolean quietMode = false) returns error? {
     if !quietMode {
-        io:println("Checking and fixing compilation errors in the entire project...");
+        io:println("Fixing compilation errors...");
     }
 
     string ballerinaDir = connectorPath + "/ballerina";
@@ -69,7 +65,7 @@ function fixTestFileErrors(string connectorPath, boolean quietMode = false) retu
             if !quietMode {
                 io:println("✓ All files compile successfully!");
                 if fixResult.errorsFixed > 0 {
-                    io:println(string `  Fixed ${fixResult.errorsFixed} compilation errors`);
+                    io:println(string `  Fixed ${fixResult.errorsFixed} compilation error${fixResult.errorsFixed == 1 ? "" : "s"}`);
                     if fixResult.appliedFixes.length() > 0 {
                         io:println("  Applied fixes:");
                         foreach string fix in fixResult.appliedFixes {
@@ -77,12 +73,17 @@ function fixTestFileErrors(string connectorPath, boolean quietMode = false) retu
                         }
                     }
                 }
+            } else {
+                // In quiet mode, still show if we fixed errors
+                if fixResult.errorsFixed > 0 {
+                    io:println(string `✓ Fixed ${fixResult.errorsFixed} compilation error${fixResult.errorsFixed == 1 ? "" : "s"}`);
+                }
             }
         } else {
             if !quietMode {
-                io:println("⚠ Project partially fixed:");
-                io:println(string `  Fixed ${fixResult.errorsFixed} errors`);
-                io:println(string `  ${fixResult.errorsRemaining} errors remain`);
+                io:println("⚠  Project partially fixed:");
+                io:println(string `  Fixed: ${fixResult.errorsFixed} error${fixResult.errorsFixed == 1 ? "" : "s"}`);
+                io:println(string `  Remaining: ${fixResult.errorsRemaining} error${fixResult.errorsRemaining == 1 ? "" : "s"}`);
                 if fixResult.appliedFixes.length() > 0 {
                     io:println("  Applied fixes:");
                     foreach string fix in fixResult.appliedFixes {
@@ -90,11 +91,15 @@ function fixTestFileErrors(string connectorPath, boolean quietMode = false) retu
                     }
                 }
                 io:println("  Some errors may require manual intervention");
+            } else {
+                io:println(string `⚠  Fixed ${fixResult.errorsFixed}/${fixResult.errorsFixed + fixResult.errorsRemaining} errors (${fixResult.errorsRemaining} remaining)`);
             }
         }
     } else {
         if !quietMode {
             io:println(string `✗ Failed to fix project: ${fixResult.message()}`);
+        } else {
+            io:println("✗ Compilation fix failed");
         }
         return error("Failed to fix compilation errors in the project", fixResult);
     }
@@ -105,15 +110,13 @@ function fixTestFileErrors(string connectorPath, boolean quietMode = false) retu
 function selectOperationsUsingAI(string specPath, boolean quietMode = false) returns string|error {
     string[] allOperationIds = check extractOperationIdsFromSpec(specPath);
 
+    if !quietMode {
+        io:println(string `  Found ${allOperationIds.length()} operations, selecting ${MAX_OPERATIONS} for testing`);
+    }
+
     string prompt = createOperationSelectionPrompt(allOperationIds, MAX_OPERATIONS);
 
-    // Track input cost
-    cost_calculator:trackUsageFromText("test_generator_selection", prompt, "", "claude-4-sonnet");
-
     string aiResponse = check utils:callAI(prompt);
-
-    // Track output cost
-    cost_calculator:trackUsageFromText("test_generator_selection", "", aiResponse, "claude-4-sonnet");
 
     // Clean up the AI response - simple string operations
     string cleanedResponse = strings:trim(aiResponse);

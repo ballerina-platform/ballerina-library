@@ -4,7 +4,7 @@ import ballerina/io;
 import ballerina/log;
 import ballerina/regex;
 
-public function main(string... args) returns error? {
+public function executeClientGen(string... args) returns error? {
     if args.length() < 2 {
         printUsage();
         return;
@@ -112,9 +112,9 @@ public function generateBallerinaClient(string specPath, string outputDir, Clien
         OpenAPIToolOptions options = <OpenAPIToolOptions>config.toolOptions;
         io:println("\nConfiguration Options:");
         io:println(string `• Client method type: ${options.clientMethod}`);
-        if options.license is string {
-            io:println(string `• License file: ${options.license}`);
-        }
+        // if options.license is string {
+        //     io:println(string `• License file: ${options.license}`);
+        // }
         if options.tags is string[] {
             io:println(string `• Filtered tags: ${string:'join(", ", ...options.tags ?: [])}`);
         }

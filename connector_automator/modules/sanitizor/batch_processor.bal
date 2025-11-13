@@ -1,5 +1,4 @@
-import connector_automator.cost_calculator;
-
+import ballerina/data.jsondata;
 import ballerina/io;
 import ballerina/lang.runtime;
 import ballerina/log;
@@ -205,13 +204,10 @@ public function addMissingDescriptionsBatchWithRetry(string specFilePath, int ba
 
             BatchDescriptionResponse[]|LLMServiceError batchResult = generateDescriptionsBatchWithRetry(batch, apiContext, quietMode, config);
             if batchResult is BatchDescriptionResponse[] {
-
                 if !quietMode {
-                    decimal batchCost = cost_calculator:getStageCost("sanitizor_descriptions");
-                    int totalCalls = cost_calculator:getStageMetrics("sanitizor_descriptions").calls;
-                    decimal avgCostPerBatch = totalCalls > 0 ? batchCost / <decimal>totalCalls : 0.0d;
-                    io:println(string `💰 Batch ${(startIdx / batchSize) + 1} description cost: ~$${avgCostPerBatch.toString()}`);
+                    io:println(string `  ✓ Batch ${(startIdx / batchSize) + 1} processed (${batchResult.length()} descriptions)`);
                 }
+
                 // Apply the generated descriptions
                 foreach BatchDescriptionResponse response in batchResult {
                     string? location = requestToLocationMap[response.id];
@@ -261,6 +257,7 @@ public function addMissingDescriptionsBatchWithRetry(string specFilePath, int ba
             } else {
                 if !quietMode {
                     log:printError("Batch processing failed after all retries", batchNumber = (startIdx / batchSize) + 1, 'error = batchResult);
+                    io:println(string `  ✗ Batch ${(startIdx / batchSize) + 1} failed`);
                 }
                 // Continue with next batch instead of failing completely
             }
@@ -269,7 +266,12 @@ public function addMissingDescriptionsBatchWithRetry(string specFilePath, int ba
     }
 
     // Save updated spec back to file
-    error? writeResult = io:fileWriteJson(specFilePath, specJson);
+    string|error prettifiedResult = jsondata:prettify(specJson);
+    if prettifiedResult is error {
+        return error LLMServiceError("Failed to prettify JSON", prettifiedResult);
+    }
+
+    error? writeResult = io:fileWriteString(specFilePath, prettifiedResult);
     if writeResult is error {
         return error LLMServiceError("Failed to write updated OpenAPI spec", writeResult);
     }
@@ -371,13 +373,10 @@ public function renameInlineResponseSchemasBatchWithRetry(string specFilePath, i
 
         BatchRenameResponse[]|LLMServiceError batchResult = generateSchemaNamesBatchWithRetry(batch, apiContext, allExistingNames, quietMode, config);
         if batchResult is BatchRenameResponse[] {
-
             if !quietMode {
-                decimal batchCost = cost_calculator:getStageCost("sanitizor_schema_names");
-                int totalCalls = cost_calculator:getStageMetrics("sanitizor_schema_names").calls;
-                decimal avgCostPerBatch = totalCalls > 0 ? batchCost / <decimal>totalCalls : 0.0d;
-                io:println(string `💰 Batch ${(startIdx / batchSize) + 1} schema renaming cost: ~$${avgCostPerBatch.toString()}`);
+                io:println(string `  ✓ Batch ${(startIdx / batchSize) + 1} processed (${batchResult.length()} schemas)`);
             }
+
             // Process the generated names
             foreach BatchRenameResponse response in batchResult {
                 string newName = response.newName;
@@ -426,6 +425,7 @@ public function renameInlineResponseSchemasBatchWithRetry(string specFilePath, i
             if !quietMode {
                 log:printError("Schema rename batch processing failed after all retries",
                         batchNumber = (startIdx / batchSize) + 1, 'error = batchResult);
+                io:println(string `  ✗ Batch ${(startIdx / batchSize) + 1} failed`);
             }
             // Continue with next batch instead of failing completely
         }
@@ -459,8 +459,13 @@ public function renameInlineResponseSchemasBatchWithRetry(string specFilePath, i
         json updatedSpecResult = updateSchemaReferences(specMap, nameMapping, quietMode);
 
         // Write the updated spec back to file
-        error? writeResult = io:fileWriteJson(specFilePath, updatedSpecResult);
-        if (writeResult is error) {
+        string|error prettifiedResult = jsondata:prettify(updatedSpecResult);
+        if prettifiedResult is error {
+            return error LLMServiceError("Failed to prettify JSON", prettifiedResult);
+        }
+
+        error? writeResult = io:fileWriteString(specFilePath, prettifiedResult);
+        if writeResult is error {
             return error LLMServiceError("Failed to write updated OpenAPI spec", writeResult);
         }
     }
@@ -538,13 +543,10 @@ public function addMissingOperationIdsBatchWithRetry(string specFilePath, int ba
 
         BatchOperationIdResponse[]|LLMServiceError batchResult = generateOperationIdsBatchWithRetry(batch, apiContext, existingOperationIds, quietMode, config);
         if batchResult is BatchOperationIdResponse[] {
-
             if !quietMode {
-                decimal batchCost = cost_calculator:getStageCost("sanitizor_operationids");
-                int totalCalls = cost_calculator:getStageMetrics("sanitizor_operationids").calls;
-                decimal avgCostPerBatch = totalCalls > 0 ? batchCost / <decimal>totalCalls : 0.0d;
-                io:println(string `💰 Batch ${(startIdx / batchSize) + 1} operationId cost: ~$${avgCostPerBatch.toString()}`);
+                io:println(string `  ✓ Batch ${(startIdx / batchSize) + 1} processed (${batchResult.length()} operations)`);
             }
+
             // Apply the generated operationIds
             foreach BatchOperationIdResponse response in batchResult {
                 string? location = requestToLocationMap[response.id];
@@ -567,6 +569,7 @@ public function addMissingOperationIdsBatchWithRetry(string specFilePath, int ba
             if !quietMode {
                 log:printError("OperationId batch processing failed after all retries",
                         batchNumber = (startIdx / batchSize) + 1, 'error = batchResult);
+                io:println(string `  ✗ Batch ${(startIdx / batchSize) + 1} failed`);
             }
             // Continue with next batch instead of failing completely
         }
@@ -574,7 +577,12 @@ public function addMissingOperationIdsBatchWithRetry(string specFilePath, int ba
     }
 
     // Save updated spec back to file
-    error? writeResult = io:fileWriteJson(specFilePath, specJson);
+    string|error prettifiedResult = jsondata:prettify(specJson);
+    if prettifiedResult is error {
+        return error LLMServiceError("Failed to prettify JSON", prettifiedResult);
+    }
+
+    error? writeResult = io:fileWriteString(specFilePath, prettifiedResult);
     if writeResult is error {
         return error LLMServiceError("Failed to write updated OpenAPI spec", writeResult);
     }
