@@ -1,0 +1,42 @@
+name: Auto-Generate Connector
+
+on:
+  workflow_dispatch:
+    inputs:
+      openapi-url:
+        description: "URL of the OpenAPI specification (JSON/YAML)"
+        required: false
+        type: string
+      ballerina-version:
+        description: "Ballerina version to use"
+        required: false
+        type: string
+        default: "{{BAL_VERSION}}"
+      distribution-zip:
+        description: "Distribution URL of the Ballerina version to be used"
+        required: false
+        type: string
+        default: ""
+      license-file:
+        description: "Path to license file relative to docs directory"
+        required: false
+        type: string
+        default: "license.txt"
+      quiet-mode:
+        description: "Enable quiet mode"
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  call_workflow:
+    name: Run Auto-Generate Connector Workflow
+    if: ${{ github.repository_owner == 'ballerina-platform' }}
+    uses: ballerina-platform/ballerina-library/.github/workflows/auto_generate_connector_template.yml@connector-automation
+    secrets: inherit
+    with:
+      openapi-url: ${{ inputs.openapi-url }}
+      ballerina-version: ${{ inputs.ballerina-version }}
+      distribution-zip: ${{ inputs.distribution-zip }}
+      license-file: ${{ inputs.license-file }}
+      quiet-mode: ${{ inputs.quiet-mode }}
