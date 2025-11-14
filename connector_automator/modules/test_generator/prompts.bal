@@ -55,6 +55,29 @@ function createMockServerPrompt(string mockServerTemplate, string types) returns
 }
 
 function createTestGenerationPrompt(ConnectorAnalysis analysis) returns string {
+    string methodTypeGuidance = "";
+    string methodSignaturesSection = "";
+
+    if analysis.methodType == "remote" {
+        methodTypeGuidance = string `
+**CRITICAL - Remote Method Syntax:**
+This connector uses REMOTE methods, NOT resource methods. You MUST use the following syntax:
+- Correct: ${backtick}Type response = check client->methodName(param1, param2);${backtick}
+- WRONG: ${backtick}Type response = check client->/path/to/resource();${backtick}
+
+The method signatures are provided in <REMOTE_METHOD_SIGNATURES>. Use these exact method names and parameters.
+`;
+
+        methodSignaturesSection = string `
+      <REMOTE_METHOD_SIGNATURES>
+        ${analysis.remoteMethodSignatures}
+      </REMOTE_METHOD_SIGNATURES>
+`;
+    } else {
+        methodTypeGuidance = string `
+This connector uses resource methods. Use the resource path syntax from the mock server.
+`;
+    }
     return string `
     You are an expert Ballerina developer specializing in writing robust, production-quality test suites for connectors. Your task is to generate a comprehensive test file (${backtick}test.bal${backtick}) for the provided connector.
 
@@ -63,6 +86,7 @@ function createTestGenerationPrompt(ConnectorAnalysis analysis) returns string {
     Before generating any code, I must reflect on the key requirements for a perfect test file.
     1.  **Output Purity:** The final output must be a single, complete, raw Ballerina source code file. No conversational text, no explanations, no apologies, and absolutely no markdown formatting like ${tripleBacktick}ballerina.
     2.  **Client Initialization: This is the most critical and complex part.** The user has provided the exact ${backtick}<CLIENT_INIT_METHOD>${backtick} signature and the necessary ${backtick}<REFERENCED_TYPE_DEFINITIONS>${backtick}. I must meticulously use this information to construct the client initialization code. I cannot use a generic template; it must be tailored precisely to the provided context to avoid compilation errors.
+    ${methodTypeGuidance}
     3.  **Environment Configuration:** I need to set up a flexible testing environment. This involves:
         * A configurable boolean ${backtick}isLiveServer${backtick} to switch between environments, reading from an environment variable.
         * A configurable ${backtick}serviceUrl${backtick} that points to the real API for live tests and to ${backtick}http://localhost:9090${backtick} for mock tests.
@@ -94,6 +118,8 @@ function createTestGenerationPrompt(ConnectorAnalysis analysis) returns string {
       <REFERENCED_TYPE_DEFINITIONS>
         ${analysis.referencedTypeDefinitions}
       </REFERENCED_TYPE_DEFINITIONS>
+${methodSignaturesSection}
+  
     </CONTEXT>
 
     **Requirements:**
@@ -103,9 +129,10 @@ function createTestGenerationPrompt(ConnectorAnalysis analysis) returns string {
     4.  **Environment Setup:** Implement configurable variables for ${backtick}isLiveServer${backtick}, ${backtick}serviceUrl${backtick}, and any necessary credentials as shown in the example. The mock server URL must be ${backtick}http://localhost:9090/v1${backtick}.
     5.  **Correct Client Initialization:** You MUST use the provided ${backtick}<CLIENT_INIT_METHOD>${backtick} and ${backtick}<REFERENCED_TYPE_DEFINITIONS>${backtick} to correctly initialize the client.
     6.  **Full Test Coverage:** Generate a test function for each resource endpoint in the mock server.
-    7.  **Smart Assertions:** Each test must contain assertions. Use ${backtick}test:assertTrue(response.data.length() > 0);${backtick} for arrays and ${backtick}test:assertTrue(response?.data !is ());${backtick} for records. Also, check that the ${backtick}errors${backtick} field is nil where appropriate.
-    8.  **Proper Return Types:** For functions that return a non-record success response (e.g., HTTP 202 Accepted), the test variable should be of type ${backtick}error?${backtick}.
-    9. **Advanced, Correct Assertions:**
+    7.  **Correct Method Invocation Syntax:** ${analysis.methodType == "remote" ? "Use REMOTE method syntax (->methodName())" : "Use resource method syntax (->/path)"}.
+    8.  **Smart Assertions:** Each test must contain assertions. Use ${backtick}test:assertTrue(response.data.length() > 0);${backtick} for arrays and ${backtick}test:assertTrue(response?.data !is ());${backtick} for records. Also, check that the ${backtick}errors${backtick} field is nil where appropriate.
+    9.  **Proper Return Types:** For functions that return a non-record success response (e.g., HTTP 202 Accepted), the test variable should be of type ${backtick}error?${backtick}.
+    10. **Advanced, Correct Assertions:**
         * For functions returning ${backtick}error?${backtick}, **you must use ${backtick}test:assertTrue(response is (), "...");${backtick}**. Crucially, **DO NOT use ${backtick}test:assertNil${backtick}**.
         * Apply the nuanced assertion strategy for records: check array length for arrays, check ${backtick}!is ()${backtick} for optional records, and check a nested field for mandatory records.
     9.  **Test Groups:** All test functions must be annotated with ${backtick}@test:Config { groups: ["live_tests", "mock_tests"] }${backtick}.
