@@ -1,6 +1,7 @@
 import connector_automator.utils;
 
 import ballerina/io;
+import ballerina/lang.regexp;
 import ballerina/os;
 
 public function executeTestGen(string... args) returns error? {
@@ -68,6 +69,28 @@ public function executeTestGen(string... args) returns error? {
         io:println(string `✗ Mock server generation failed: ${mockGenResult.message()}`);
         return mockGenResult;
     }
+
+    // Extract operation IDs that were used for mock server generation
+    int operationCount = check countOperationsInSpec(specPath);
+    string[]? selectedOperationIds = ();
+
+    if operationCount > MAX_OPERATIONS {
+        string operationsList = check selectOperationsUsingAI(specPath, quietMode);
+        // Trim whitespace from each operation ID
+        string[] rawIds = regexp:split(re `,`, operationsList);
+        string[] trimmedIds = [];
+        foreach string id in rawIds {
+            string trimmedId = id.trim();
+            if trimmedId.length() > 0 {
+                trimmedIds.push(trimmedId);
+            }
+        }
+        selectedOperationIds = trimmedIds;
+        if !quietMode {
+            io:println(string `Selected operations (${trimmedIds.length()}): ${string:'join(",", ...trimmedIds)}`);
+        }
+    }
+
     io:println("✓ Mock server implementation generated");
 
     string mockServerPath = connectorPath + "/ballerina/modules/mock.server/mock_server.bal";
@@ -84,7 +107,7 @@ public function executeTestGen(string... args) returns error? {
 
     // Step 4: Generate tests
     printStepHeader(4, "Generating test file", quietMode);
-    error? testGenResult = generateTestFile(connectorPath, quietMode);
+    error? testGenResult = generateTestFile(connectorPath, selectedOperationIds, quietMode);
     if testGenResult is error {
         io:println(string `✗ Test file generation failed: ${testGenResult.message()}`);
         return testGenResult;

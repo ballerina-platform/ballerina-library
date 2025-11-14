@@ -24,9 +24,9 @@ function completeMockServer(string mockServerPath, string typesPath, boolean qui
     return;
 }
 
-function generateTestFile(string connectorPath, boolean quietMode = false) returns error? {
+function generateTestFile(string connectorPath, string[]? operationIds = (), boolean quietMode = false) returns error? {
     // Simplified analysis - only get package name and mock server content
-    ConnectorAnalysis analysis = check analyzeConnectorForTests(connectorPath);
+    ConnectorAnalysis analysis = check analyzeConnectorForTests(connectorPath, operationIds);
 
     // Generate test content using AI
     string testContent = check generateTestsWithAI(analysis);

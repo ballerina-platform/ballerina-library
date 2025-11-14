@@ -2,14 +2,7 @@ import ballerina/io;
 import ballerina/lang.'string as strings;
 import ballerina/lang.regexp;
 
-public type ConnectorAnalysis record {
-    string packageName;
-    string mockServerContent;
-    string initMethodSignature;
-    string referencedTypeDefinitions;
-};
-
-function analyzeConnectorForTests(string connectorPath) returns ConnectorAnalysis|error {
+function analyzeConnectorForTests(string connectorPath, string[]? operationIds = ()) returns ConnectorAnalysis|error {
     // Read Ballerina.toml to get package name
     string tomlContent = check io:fileReadString(connectorPath + "/ballerina/Ballerina.toml");
     string packageName = extractPackageName(tomlContent);
@@ -17,9 +10,18 @@ function analyzeConnectorForTests(string connectorPath) returns ConnectorAnalysi
     // Read mock server content
     string mockServerContent = check io:fileReadString(connectorPath + "/ballerina/modules/mock.server/mock_server.bal");
 
-    // Read client.bal to extract the init method - FIX THIS
+    // Read client.bal to extract the init method 
     string clientContent = check io:fileReadString(connectorPath + "/ballerina/client.bal");
     string initMethodSignature = extractInitMethodComplete(clientContent);
+
+    // Detect method type
+    "resource"|"remote" methodType = check detectClientMethodType(clientContent);
+
+    // Extract remote method signatures if needed and operation IDs provided
+    string remoteMethodSignatures = "";
+    if methodType == "remote" && operationIds is string[] {
+        remoteMethodSignatures = extractRemoteMethodSignatures(clientContent, operationIds);
+    }
 
     // read types.bal to get type definitions
     string typesContent = check io:fileReadString(connectorPath + "/ballerina/types.bal");
@@ -47,7 +49,9 @@ function analyzeConnectorForTests(string connectorPath) returns ConnectorAnalysi
         packageName,
         mockServerContent,
         initMethodSignature,
-        referencedTypeDefinitions
+        referencedTypeDefinitions,
+        methodType,
+        remoteMethodSignatures
     };
 }
 
@@ -291,4 +295,98 @@ function extractPackageName(string tomlContent) returns string {
         }
     }
     return connectorName;
+}
+
+function detectClientMethodType(string clientContent) returns "resource"|"remote"|error {
+    // check for resource methods in the client.bal
+    regexp:RegExp resourcePattern = re `resource\s+isolated\sfunction\s(get|post|put|patch|delete|head|otions)\s+`;
+    regexp:Span[] resourceMatches = resourcePattern.findAll(clientContent);
+
+    if resourceMatches.length() > 0 {
+        return "resource";
+    }
+
+    // check for remote methods in the client.bal
+    regexp:RegExp remotePattern = re `remote\s+isolated\s+function\s+`;
+    regexp:Span[] remoteMatches = remotePattern.findAll(clientContent);
+
+    if remoteMatches.length() > 0 {
+        return "remote";
+    }
+
+    return error("Could not determine client method type");
+
+}
+
+function extractRemoteMethodSignatures(string clientContent, string[] operationIds) returns string {
+    string[] signatures = [];
+
+    foreach string operationId in operationIds {
+        // Find the remote function with this operation ID as name
+        string? signature = findRemoteFunctionSignature(clientContent, operationId);
+        if signature is string {
+            signatures.push(signature);
+        }
+    }
+
+    return string:'join("\n\n", ...signatures);
+}
+
+function findRemoteFunctionSignature(string clientContent, string functionName) returns string? {
+    string[] lines = regexp:split(re `\n`, clientContent);
+    string signature = "";
+    boolean foundFunction = false;
+    boolean inDocComment = false;
+
+    foreach string line in lines {
+        string trimmedLine = strings:trim(line);
+
+        // Look for documentation comments before function
+        if strings:startsWith(trimmedLine, "#") && !foundFunction {
+            signature += line + "\n";
+            inDocComment = true;
+        }
+        // Look for remote function with this exact name
+        else if strings:includes(trimmedLine, string `remote isolated function ${functionName}(`) {
+            foundFunction = true;
+            signature += line + "\n";
+            inDocComment = false;
+        }
+        else if foundFunction {
+            // Continue adding lines until we hit the opening brace
+            if strings:includes(line, "{") {
+                // Found the end of the signature
+                // Remove the opening brace and everything after
+                int? braceIndex = line.indexOf("{");
+                if braceIndex is int {
+                    if braceIndex > 0 {
+                        string beforeBrace = line.substring(0, braceIndex).trim();
+                        // Reconstruct last line without the function body
+                        signature = signature.substring(0, signature.length() - line.length() - 1);
+                        if beforeBrace.length() > 0 {
+                            signature += beforeBrace;
+                        }
+                    } else {
+                        // Opening brace is at the start, remove last line
+                        signature = signature.substring(0, signature.length() - line.length() - 1);
+                    }
+                    signature += ";";
+                }
+                break;
+            } else {
+                // Still part of the signature
+                signature += line + "\n";
+            }
+        }
+        else if inDocComment && !strings:startsWith(trimmedLine, "#") && trimmedLine.length() > 0 {
+            // Reset if we found doc comments but not the function
+            signature = "";
+            inDocComment = false;
+        }
+    }
+
+    if signature.length() > 0 && foundFunction {
+        return signature.trim();
+    }
+    return ();
 }
