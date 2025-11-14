@@ -1,0 +1,8 @@
+{
+  "image": "ballerina/ballerina-devcontainer:2201.13.0-20250927-204700-7b3ef131",
+  "customizations": {
+    "vscode": {
+      "extensions": ["WSO2.ballerina"]
+    }
+  }
+}

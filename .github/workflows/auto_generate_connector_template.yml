@@ -1,0 +1,339 @@
+name: Auto-Generate Connector Template
+
+on:
+  workflow_call:
+    inputs:
+      openapi-url:
+        description: "URL of the OpenAPI specification (JSON/YAML)"
+        required: false
+        type: string
+      ballerina-version:
+        description: "Ballerina version to use"
+        required: false
+        type: string
+        default: "2201.13.0"
+      distribution-zip:
+        description: "Distribution URL of the Ballerina version to be used"
+        required: false
+        type: string
+        default: ""
+      license-file:
+        description: "Path to license file relative to docs directory"
+        required: false
+        type: string
+        default: "license.txt"
+      quiet-mode:
+        description: "Enable quiet mode"
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  auto-generate:
+    name: Auto-generate connector
+    runs-on: ubuntu-22.04
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.BALLERINA_BOT_TOKEN }}
+
+      - name: Setup Ballerina
+        if: inputs.distribution-zip == ''
+        uses: ballerina-platform/setup-ballerina@v1.1.3
+        with:
+          version: ${{ inputs.ballerina-version }}
+
+      - name: Set up JDK 21
+        if: inputs.distribution-zip != '' 
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: 21.0.3
+
+      - name: Set Default Ballerina Command
+        if: inputs.distribution-zip == ''
+        run: |
+          echo "BALLERINA_CMD=bal" >> $GITHUB_ENV
+
+      - name: Get Ballerina Distribution
+        if: inputs.distribution-zip
+        run: |
+          echo "Downloading and extracting Ballerina distribution..."
+
+          # Create temp folder and download to file
+          mkdir -p temp_folder
+          cd temp_folder
+          curl -H "Authorization: token ${{ secrets.BALLERINA_BOT_TOKEN }}" \
+               -L -o artifact.zip \
+               "${{ inputs.distribution-zip }}"
+
+          echo "Extracting artifact.zip..."
+          unzip -o -q artifact.zip
+
+          echo "Contents after first extraction:"
+          ls -la
+
+          # Handle nested ZIP if present
+          if ls *.zip 1> /dev/null 2>&1; then
+            echo "Found nested ZIP file, extracting..."
+            for zip_file in *.zip; do
+              echo "Extracting: $zip_file"
+              unzip -o -q "$zip_file"
+              echo "Contents after extracting $zip_file:"
+              ls -la
+            done
+            # Remove ZIP files after extraction
+            rm *.zip
+            echo "Removed ZIP files"
+          fi
+
+          # Clean up the original artifact.zip
+          rm -f artifact.zip
+
+          echo "Final contents of temp_folder:"
+          ls -la
+
+          cd ..
+
+          # Copy distribution
+          if ls temp_folder/ballerina-* 1> /dev/null 2>&1; then
+            echo "Found Ballerina directory:"
+            ls -la temp_folder/ballerina-*
+            cp -r temp_folder/ballerina-*/. ballerina-dist/
+            rm -r temp_folder/
+            echo "BALLERINA_CMD=${PWD}/ballerina-dist/bin/bal" >> $GITHUB_ENV
+            echo "Ballerina distribution setup completed"
+          else
+            echo "Error: No Ballerina directory found after extraction"
+            echo "Contents of temp_folder:"
+            ls -la temp_folder/
+            echo "Looking for any directories:"
+            find temp_folder/ -type d -name "*"
+            echo "Looking for any files:"
+            find temp_folder/ -type f -name "*" | head -10
+            exit 1
+          fi
+      - name: Verify API Key
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "Error: ANTHROPIC_API_KEY secret is not set"
+            echo "AI-powered features require Claude API access"
+            echo "Please configure the ANTHROPIC_API_KEY secret in your repository and try again"
+            exit 1
+          fi
+          echo "API key is configured"
+
+      - name: Clone Connector Automator
+        run: |
+          echo "Cloning connector automator tool from ballerina-library..."
+           git clone -b connector-automation https://github.com/nostoc/ballerina-library.git temp-library
+          cp -r temp-library/connector_automator ./
+          rm -rf temp-library
+          echo "Connector automator cloned successfully"
+
+      - name: Download OpenAPI Specification
+        if: inputs.openapi-url
+        run: |
+          echo "Downloading openapi spec from provided URL..."
+          # Create docs/spec directory if doesn't exist
+          mkdir -p docs/spec
+          cd docs/spec
+          if [[ "${{ inputs.openapi-url }}" == *.json ]]; then
+            rm -f openapi.json
+            wget -O openapi.json "${{ inputs.openapi-url }}"
+          elif [[ "${{ inputs.openapi-url }}" == *.yaml || "${{ inputs.openapi-url }}" == *.yml ]]; then
+            rm -f openapi.yaml openapi.yml
+            wget -O openapi.yaml "${{ inputs.openapi-url }}"
+          else
+            echo "Unsupported file extension: ${{ inputs.openapi-url }}"
+            exit 1
+          fi
+
+      - name: Read File Extension
+        working-directory: docs/spec
+        run: |
+          file=$(echo openapi.*)
+          if [[ "$file" == "openapi.*" ]]; then
+            echo "Error: No OpenAPI specification found in docs/spec/"
+            echo "Either provide openapi-url input or commit a spec file to docs/spec/"
+            echo "Supported files: openapi.json, openapi.yaml, openapi.yml"
+            exit 1
+          fi
+          ext="${file##*.}"
+          echo "EXTENSION=$ext" >> "$GITHUB_ENV"
+          echo "SPEC_FILE=$file" >> "$GITHUB_ENV"
+          echo "Found OpenAPI spec: $file"
+
+      - name: Create Branch
+        run: |
+          git checkout -b auto-generate-connector
+          echo "Created branch: auto-generate-connector"
+
+      - name: Run Full Connector Generation Pipeline
+        run: |
+          cd connector_automator
+          SPEC_PATH="${GITHUB_WORKSPACE}/docs/spec/${{ env.SPEC_FILE }}"
+          OUTPUT_PATH="${GITHUB_WORKSPACE}"
+
+          echo "Running full connector generation pipeline..."
+          echo "Spec path : $SPEC_PATH"
+          echo "Output path: $OUTPUT_PATH"
+          echo "Working directory: $(pwd)"
+          echo "GITHUB_WORKSPACE: ${GITHUB_WORKSPACE}"
+          echo "Ballerina command: ${{ env.BALLERINA_CMD }}"
+
+          # Verify the spec file exists
+          if [ ! -f "$SPEC_PATH" ]; then
+            echo "Error: OpenAPI spec file does not exist at: $SPEC_PATH"
+            echo "Contents of docs/spec directory:"
+            ls -la "${GITHUB_WORKSPACE}/docs/spec/"
+            exit 1
+          fi
+
+          # Add Ballerina bin directory to PATH if using custom distribution
+          if [ -n "${{ env.BALLERINA_CMD }}" ] && [ "${{ env.BALLERINA_CMD }}" != "bal" ]; then
+            # Extract the directory containing bal
+            BALLERINA_BIN_DIR=$(dirname "${{ env.BALLERINA_CMD }}")
+            export PATH="$BALLERINA_BIN_DIR:$PATH"
+            echo "Added $BALLERINA_BIN_DIR to PATH"
+            
+            # Verify bal is now available
+            which bal
+            bal version
+          fi
+
+          # create Config.toml for the connector automator. 
+
+          cat > Config.toml << EOF
+          [connector_automator.code_fixer]
+          maxIterations = 3
+
+          [connector_automator.utils]
+          apiKey = "${{ secrets.ANTHROPIC_API_KEY }}"
+          EOF
+
+          echo "Created Config.toml"
+
+          # Build pipeline arguments
+          PIPELINE_ARGS=("$SPEC_PATH" "$OUTPUT_PATH" "yes")
+
+          if [ "${{ inputs.quiet-mode }}" = "true" ]; then
+            PIPELINE_ARGS+=("quiet")
+          fi
+
+          # Add license file if provided
+          if [ -n "${{ inputs.license-file }}" ]; then
+            LICENSE_PATH="${GITHUB_WORKSPACE}/docs/${{ inputs.license-file }}"
+            if [ -f "$LICENSE_PATH" ]; then
+              PIPELINE_ARGS+=("license=${LICENSE_PATH}")
+              echo "Using license file: $LICENSE_PATH"
+            fi
+          fi
+        
+          # Run the complete pipeline
+          ${{ env.BALLERINA_CMD }} run -- pipeline "${PIPELINE_ARGS[@]}"
+
+          echo "Full connector generation pipeline completed"
+      - name: Cleanup and Organize Spec Files
+        run: |
+          cd docs/spec
+          echo "Cleaning up OpenAPI spec files..."
+
+          # List all files before cleanup
+          echo "Files before cleanup:"
+          ls -la
+
+          # Rename original spec to original_openapi.*
+          if [ -f "${{ env.SPEC_FILE }}" ]; then
+            mv "${{ env.SPEC_FILE }}" "original_openapi.${{ env.EXTENSION }}"
+            echo "Renamed ${{ env.SPEC_FILE }} to original_openapi.${{ env.EXTENSION }}"
+          fi
+
+          # Rename final aligned spec to openapi.json
+          if [ -f "aligned_ballerina_openapi.json" ]; then
+            mv "aligned_ballerina_openapi.json" "openapi.json"
+            echo "Renamed aligned_ballerina_openapi.json to openapi.json"
+          fi
+
+          # Remove intermediate files (flattened_openapi.*)
+          rm -f flattened_openapi.json flattened_openapi.yaml flattened_openapi.yml
+          echo "Removed intermediate flattened files"
+
+          # Remove any other aligned files if they exist
+          rm -f aligned_ballerina_openapi.yaml aligned_ballerina_openapi.yml
+          echo "Removed remaining aligned files"
+
+          # List files after cleanup
+          echo "Files after cleanup:"
+          ls -la
+
+          echo "OpenAPI spec file cleanup completed"
+
+      - name: Remove uncommited files
+        run: |
+          rm -rf connector_automator
+          rm -f -r ballerina-dist/
+      
+      - name: Cleanup
+        run: |
+          # Remove all Dependencies.toml files
+          find . -name "Dependencies.toml" -type f -delete
+          echo "Removed Dependencies.toml files"
+          
+          # Remove all .backup files
+          find . -name "*.backup" -type f -delete
+          echo "Removed .backup files"
+          
+          # Remove all target directories
+          find . -name "target" -type d -exec rm -rf {} +
+          echo "Removed target directories"
+
+      - name: Configure Git Identity
+        run: |
+          git config user.name "ballerina-bot"
+          git config user.email "ballerina-bot@ballerina.org"
+
+      - name: Commit Generated Files
+        id: commitFiles
+        run: |
+          # Build commit message 
+          COMMIT_MSG="[AUTOMATED] [AI] Auto-generate connector from OpenAPI spec
+
+          Complete connector generation using full pipeline with all components.
+          Generated using Ballerina with AI-powered automation."
+
+          # Add all changes
+          git add .
+
+          # Check if there are changes to commit
+          if git diff --cached --quiet; then
+            echo "hasChanged=false" >> $GITHUB_OUTPUT
+            echo "No changes to commit"
+          else
+            echo "$COMMIT_MSG" | git commit -F -
+            echo "hasChanged=true" >> $GITHUB_OUTPUT
+            echo "Changes committed successfully"
+          fi
+
+      - name: Push Results
+        if: ${{ steps.commitFiles.outputs.hasChanged == 'true' }}
+        run: git push origin auto-generate-connector
+        env:
+          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+
+      - name: Create Pull Request
+        id: createPR
+        if: ${{ steps.commitFiles.outputs.hasChanged == 'true' }}
+        run: |
+          prUrl=$(gh pr create \
+            --title "[Automated] [AI] Auto-generate connector from OpenAPI specification" \
+            --body $'## **This PR contains AI-generated content that requires review before merging.**\n\n### What was generated:\n- Sanitized OpenAPI specification with AI enhancements\n- Ballerina client library with proper type definitions\n- Usage examples demonstrating key API operations\n- Test suite with mock server implementation\n- Complete documentation package\n\n### Generated using:\n- Ballerina version: ${{ inputs.ballerina-version }}\n- Full automation pipeline with AI-powered improvements\n- Automatic compilation error fixes\n\n### Before merging:\n- Test examples with real API credentials\n- Verify client methods work as expected\n- Review AI-generated descriptions for accuracy\n- Validate mock server responses match actual API\n\n**Manual validation is required before production use.**' \
+            --base ${{ github.ref }} \
+            --head auto-generate-connector)
+          echo "prUrl=$prUrl" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
