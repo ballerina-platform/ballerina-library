@@ -779,7 +779,7 @@
         },
         {
             "name": "module-ballerinax-confluent.cregistry",
-            "module_version": "0.4.2-SNAPSHOT",
+            "module_version": "0.4.3-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibConfluent.cregistryVersion",
