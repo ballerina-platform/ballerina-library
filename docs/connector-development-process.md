@@ -1,9 +1,9 @@
 # Connector Development Process
 
-_Authors_: @shafreenAnfar @ThisaruGuruge @NipunaRanasinghe @niveathika @TharmiganK    
-_Reviewers_: @daneshk @ThisaruGuruge @NipunaRanasinghe  
-_Created_: 2024/04/17   
-_Created_: 2024/04/17   
+_Authors_: @shafreenAnfar @ThisaruGuruge @NipunaRanasinghe @niveathika @TharmiganK \
+_Reviewers_: @daneshk @ThisaruGuruge @NipunaRanasinghe \
+_Created_: 2024/04/17 \
+_Created_: 2025/11/17
 
 ## Overview
 
@@ -13,48 +13,39 @@ This section discusses the connector development process from inception to reali
 
 This section introduces the naming conventions you need to be aware of before starting the development of connectors.
 
-### Package
+### Naming Packages
+
 The connector name should use lowercase letters and be descriptive of the service or API it interacts with.
 
-### Submodules
-Subpackages should be named in lowercase letters and should reflect the sub-functionality they contain.
+### Naming Submodules/Packages
+
+Submodules/Packages should be named in lowercase letters and should reflect the sub-functionality they contain.
 
 ### Hierarchical naming
 
 In Ballerina, the package name can be hierarchical, and the submodules can also be nested hierarchically to create a logical structure. Here are some examples of hierarchical packages and submodules:
 
 Hierarchical Packages:
-- ballerinax/azure.cosmosdb
-- ballerinax/openai.chat
+
+- `ballerinax/azure.cosmosdb`
+- `ballerinax/openai.chat`
 
 Hierarchical Submodules within a Package:
-- ballerinax/salesforce.commons
+
+- `ballerinax/salesforce.commons`
 
 ### Hierarchical Packages vs. Submodules
 
 #### Hierarchical Packages
+
 Hierarchical package names are preferred when there is a need to distinguish between connectors related to the same vendor/provider. For example, the separation between `azure.eventhub` and `azure.servicebus` can be achieved through hierarchical packages, making it clear that these two are related to the same provider, yet they represent distinct services. It's also recommended to have multiple packages with hierarchical naming when dealing with multiple APIs related to the same SaaS product having independent versioning and release cycles. For example, Salesforce supports multiple APIs having independent API versioning. Therefore, it is recommended to have multiple connectors, each in its separate hierarchical package:
 
-- ballerinax/salesforce.bulk
-- ballerinax/salesforce.soap
+- `ballerinax/salesforce.bulk`
+- `ballerinax/salesforce.soap`
 
 #### Submodules
+
 Submodules should primarily be used to organize the code structure within a single connector package. Avoid defining multiple sub-clients in each submodule within a single connector package, as this may lead to code ambiguity and complexity.
-
-### Vendor/Platform Prefixes
-
-#### Generic SaaS Product Names
-When dealing with SaaS product names that are more generic and not specific to a particular vendor, it is recommended to add a vendor/platform abbreviation as a prefix to the package name. This helps to distinguish the client usages and avoid ambiguity, especially when multiple vendors offer similar services. For example, Azure provides storage services. In this case, using a vendor/platform abbreviation as a prefix is advisable:
-
-- ballerinax/azure.azstorage
-
-#### Vendor-Specific Names
-If the SaaS product name is specific to a particular vendor and is unlikely to cause conflicts or confusion with other connector usages in the same program, there may be no need to prefix the package name with a vendor/platform abbreviation. For example, Azure provides CosmosDB. In this case, using the connector as ‘cosmosdb:Client’ is less likely to create conflicts or confusion with other connectors:
-
-- ballerinax/azure.cosmosdb
-
-#### Summary
-In summary, the decision to add a vendor/platform abbreviation as a prefix to the package name should be handled on a case-by-case basis, considering the specificity of the SaaS product name and its potential for conflicts or confusion.
 
 ### Best Practices
 
@@ -64,8 +55,8 @@ Package names should be clear and descriptive, making it easy for developers to 
 
 Despite being syntactically correct, some naming patterns that are typical in other languages might not be idiomatic in Ballerina. For example, consider the following package names, which may be recommended in other languages but do not fit well in Ballerina:
 
-- azureEventHub
-- azure_event_hub
+- `azureEventHub`
+- `azure_event_hub`
 
 It is acceptable to use abbreviations as the package name if the abbreviation is more familiar among the developer community. Most widely-used packages often have compressed names. However, using any cryptic abbreviations or overly generic names should be avoided.
 
@@ -75,7 +66,7 @@ Maintain consistency in naming throughout the connector. Consistency promotes a 
 
 #### Avoiding Overly Deep Hierarchies
 
-While nesting subpackages can be useful for organization, avoid creating overly deep hierarchies. Packages should provide a logical structure without becoming excessively complex.
+While nesting submodules can be useful for organization, avoid creating overly deep hierarchies. Packages should provide a logical structure without becoming excessively complex.
 
 #### Avoiding Split-Module Conditions
 
@@ -85,9 +76,7 @@ A “split-module condition” can occur when the latest versions of two differe
 
 The development process can be broken down into two main parts: REST API connectors and other types of connectors. The following sections explain each part in detail. Although there are two main parts, most steps in the development process remain the same.
 
-<p align="center">
-    <img src="_resources/ConnectorDevelopmentProcess.png" alt="drawing" />
-</p>
+![Development Process](_resources/ConnectorDevelopmentProcess.png)
 
 ### Create Github repository
 
@@ -97,7 +86,7 @@ For each connector, you must have a separate GitHub repository. The name of the 
 
 Below are some examples of connector repositories:
 
-- module-ballerinax-gmail
+- module-ballerinax-azure.cosmosdb
 - module-ballerinax-salesforce
 - module-ballerinax-zendesk
 
@@ -144,6 +133,7 @@ Also, it is not expected that one connector can map to multiple different APIs, 
 ## Connector Implementation
 
 ### REST API Connectors
+
 When developing REST API connectors, the first step is to define an OpenAPI Specification (OAS). Ideally, the OAS should be retrieved from the external system to which the connector is being developed. It is not recommended to obtain OAS specifications from third-party providers.
 
 Once the OpenAPI specification is retrieved, it needs to be validated for each operation because it is common for an OAS to be out of sync with the actual API. After the OAS is validated, it must be added to the GitHub repository. Adding the OpenAPI specification to the GitHub master repository signifies that you have validated the OAS and completed the required alterations.
@@ -151,9 +141,11 @@ Once the OpenAPI specification is retrieved, it needs to be validated for each o
 The OAS must include an example request and response for each resource action. This will be used to generate mock clients and servers.
 
 #### Generate Connector
+
 When generating the connector using the OAS tool, you have two options: you can generate with resource functions or remote functions. Resource functions are preferred over remote functions. If you decide to generate remote functions, you must explain the reasoning behind this choice.
 
 ### Handwritten Connector
+
 These types of connectors wrap some SDK with Ballerina code, such as the IBM MQ connector. For these connectors, it is not possible to generate code. Apart from that, there is no difference between handwritten connectors and generated connectors.
 
 ### Write Specification
@@ -199,4 +191,3 @@ For more information, follow the [GraalVM Compatibility in Ballerina Libraries](
 ## Observability
 
 Once the connector is developed, it is important to check if it includes the appropriate metrics for Grafana and works well with Jaeger tracing. For HTTP-based connectors, this should already be in place, as they utilize the http:Client underneath. However, this may not be the case for other types of connectors. In such instances, it is important to add any missing metrics and tracing information.
-
