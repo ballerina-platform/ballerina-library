@@ -1821,7 +1821,7 @@
         },
         {
             "name": "openapi-tools",
-            "module_version": "2.4.0-SNAPSHOT",
+            "module_version": "2.4.1-SNAPSHOT",
             "level": 10,
             "default_branch": "master",
             "version_key": "stdlibOpenapi-toolsVersion",
@@ -1831,7 +1831,7 @@
         },
         {
             "name": "persist-tools",
-            "module_version": "1.7.0-SNAPSHOT",
+            "module_version": "1.7.1-SNAPSHOT",
             "level": 14,
             "default_branch": "main",
             "version_key": "stdlibPersist-toolsVersion",
