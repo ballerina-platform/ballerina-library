@@ -471,7 +471,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "module_version": "2.15.1-SNAPSHOT",
+            "module_version": "2.15.2-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibHttpVersion",
@@ -491,7 +491,7 @@
         },
         {
             "name": "module-ballerina-ai",
-            "module_version": "1.8.0-SNAPSHOT",
+            "module_version": "1.8.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibAiVersion",
@@ -779,7 +779,7 @@
         },
         {
             "name": "module-ballerinax-confluent.cregistry",
-            "module_version": "0.4.2-SNAPSHOT",
+            "module_version": "0.4.3-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibConfluent.cregistryVersion",
@@ -1811,7 +1811,7 @@
         },
         {
             "name": "graphql-tools",
-            "module_version": "0.14.0-SNAPSHOT",
+            "module_version": "0.14.1-SNAPSHOT",
             "level": 10,
             "default_branch": "main",
             "version_key": "stdlibGraphql-toolsVersion",
@@ -1821,7 +1821,7 @@
         },
         {
             "name": "openapi-tools",
-            "module_version": "2.4.0-SNAPSHOT",
+            "module_version": "2.4.1-SNAPSHOT",
             "level": 10,
             "default_branch": "master",
             "version_key": "stdlibOpenapi-toolsVersion",
@@ -1831,7 +1831,7 @@
         },
         {
             "name": "persist-tools",
-            "module_version": "1.7.0-SNAPSHOT",
+            "module_version": "1.7.1-SNAPSHOT",
             "level": 14,
             "default_branch": "main",
             "version_key": "stdlibPersist-toolsVersion",
