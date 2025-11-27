@@ -585,7 +585,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "module_version": "1.17.0-SNAPSHOT",
+            "module_version": "1.17.1-SNAPSHOT",
             "level": 9,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
@@ -675,7 +675,7 @@
         },
         {
             "name": "module-ballerinax-persist.sql",
-            "module_version": "1.6.1-SNAPSHOT",
+            "module_version": "1.7.0-SNAPSHOT",
             "level": 13,
             "default_branch": "main",
             "version_key": "stdlibPersistSqlVersion",
@@ -1831,7 +1831,7 @@
         },
         {
             "name": "persist-tools",
-            "module_version": "1.7.1-SNAPSHOT",
+            "module_version": "1.8.0-SNAPSHOT",
             "level": 14,
             "default_branch": "main",
             "version_key": "stdlibPersist-toolsVersion",
