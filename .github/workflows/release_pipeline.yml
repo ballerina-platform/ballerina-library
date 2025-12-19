@@ -55,4 +55,4 @@ jobs:
                     RELEASE_DRIVER_MODULES: ${{ github.event.inputs.release_driver_modules }}
                     RELEASE_HANDWRITTEN_CONNECTORS: ${{ github.event.inputs.release_handwritten_connectors }}
                     RELEASE_GENERATED_CONNECTORS: ${{ github.event.inputs.release_generated_connectors }}
-                    BAL_CONFIG_VAR_WORKFLOW: "publish-release.yml"
+                    BAL_CONFIG_VAR_WORKFLOW: "release.yml"
