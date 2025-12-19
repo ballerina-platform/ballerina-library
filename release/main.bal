@@ -181,15 +181,15 @@ isolated function waitForLevelRelease(ProcessingModule[] processingModules, int 
 
 isolated function triggerModuleRelease(Module m) returns int|error {
     printInfo(string `Releasing module: ${m.name}`);
-    boolean|error versionAvailable = trap isVersionAlreadyAvailable(m);
-    if versionAvailable is error {
-        printError(versionAvailable);
-        return 0;
-    }
-    if versionAvailable {
-        printInfo(string `Version ${m.module_version} already available for module: ${m.name}`);
-        return 0;
-    }
+    // boolean|error versionAvailable = trap isVersionAlreadyAvailable(m);
+    // if versionAvailable is error {
+    //     printError(versionAvailable);
+    //     return 0;
+    // }
+    // if versionAvailable {
+    //     printInfo(string `Version ${m.module_version} already available for module: ${m.name}`);
+    //     return 0;
+    // }
     m.inProgress = true;
     github:Workflow_id_dispatches_body payload = {
         ref: m.default_branch
@@ -240,7 +240,7 @@ isolated function isVersionAlreadyAvailable(Module m) returns boolean {
     if release is error {
         return false;
     }
-    printInfo(string `Found release: ${release.id.toString()}`);
+    printInfo(string `Found release: ${release.tag_name} for module: ${m.name}`);
     return true;
 }
 
