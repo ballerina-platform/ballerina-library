@@ -4,16 +4,6 @@
     "handwritten_connectors": [],
     "generated_connectors": [
         {
-            "name": "module-ballerinax-docusign.dsclick",
-            "module_version": "2.0.1-SNAPSHOT\r",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibDocusign.dsclickVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
             "name": "module-ballerinax-googleapis.gmail",
             "module_version": "5.0.0-SNAPSHOT",
             "level": 100,
