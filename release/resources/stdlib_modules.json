@@ -4,121 +4,11 @@
     "handwritten_connectors": [],
     "generated_connectors": [
         {
-            "name": "module-ballerinax-googleapis.gmail",
-            "module_version": "5.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "master",
-            "version_key": "stdlibGoogleapis.gmailVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.automation.actions",
+            "name": "module-ballerinax-hubspot.crm.engagements.tasks",
             "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibHubspot.automation.actionsVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.associations",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.associationsVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.associations.schema",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.associations.schemaVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.commerce.carts",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.commerce.cartsVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.commerce.discounts",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.commerce.discountsVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.commerce.orders",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.commerce.ordersVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.commerce.quotes",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.commerce.quotesVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.commerce.taxes",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.commerce.taxesVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.engagement.meeting",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.engagement.meetingVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.engagement.notes",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.engagement.notesVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.engagements.calls",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.engagements.callsVersion",
+            "version_key": "stdlibHubspot.crm.engagements.tasksVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
@@ -134,31 +24,21 @@
             "is_multiple_connectors": false
         },
         {
+            "name": "module-ballerinax-hubspot.crm.engagements.calls",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.engagements.callsVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
             "name": "module-ballerinax-hubspot.crm.engagements.email",
             "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.engagements.emailVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.engagements.tasks",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.engagements.tasksVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.extensions.timelines",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.extensions.timelinesVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
@@ -174,31 +54,171 @@
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-hubspot.crm.import",
-            "module_version": "4.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.importVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.lists",
-            "module_version": "1.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.listsVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.object.companies",
+            "name": "module-ballerinax-hubspot.crm.extensions.timelines",
             "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.object.companiesVersion",
+            "version_key": "stdlibHubspot.crm.extensions.timelinesVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.owners",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.ownersVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.associations.schema",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.associations.schemaVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.associations",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.associationsVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.marketing.transactional",
+            "module_version": "1.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.marketing.transactionalVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.marketing.subscriptions",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.marketing.subscriptionsVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.marketing.forms",
+            "module_version": "1.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.marketing.formsVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.marketing.events",
+            "module_version": "1.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.marketing.eventsVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.pipelines",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.pipelinesVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.marketing.emails",
+            "module_version": "1.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.marketing.emailsVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.marketing.campaigns",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.marketing.campaignsVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.properties",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.propertiesVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.object.products",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.object.productsVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.object.tickets",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.object.ticketsVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.object.schemas",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.object.schemasVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.object.leads",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.object.leadsVersion",
+            "release": true,
+            "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerinax-hubspot.crm.object.lineitems",
+            "module_version": "2.0.0-SNAPSHOT",
+            "level": 100,
+            "default_branch": "main",
+            "version_key": "stdlibHubspot.crm.object.lineitemsVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
@@ -234,291 +254,111 @@
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-hubspot.crm.object.leads",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.object.leadsVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.object.lineitems",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.object.lineitemsVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.object.products",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.object.productsVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.object.schemas",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.object.schemasVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.object.tickets",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.object.ticketsVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.owners",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.ownersVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.pipelines",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.pipelinesVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.properties",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.crm.propertiesVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.marketing.campaigns",
-            "module_version": "2.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.marketing.campaignsVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.marketing.emails",
+            "name": "module-ballerinax-hubspot.crm.lists",
             "module_version": "1.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibHubspot.marketing.emailsVersion",
+            "version_key": "stdlibHubspot.crm.listsVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-hubspot.marketing.events",
-            "module_version": "1.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.marketing.eventsVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.marketing.forms",
-            "module_version": "1.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibHubspot.marketing.formsVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-hubspot.marketing.subscriptions",
+            "name": "module-ballerinax-hubspot.crm.engagement.notes",
             "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibHubspot.marketing.subscriptionsVersion",
+            "version_key": "stdlibHubspot.crm.engagement.notesVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-hubspot.marketing.transactional",
-            "module_version": "1.0.0-SNAPSHOT",
+            "name": "module-ballerinax-hubspot.crm.object.companies",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibHubspot.marketing.transactionalVersion",
+            "version_key": "stdlibHubspot.crm.object.companiesVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-jira",
-            "module_version": "2.0.1-SNAPSHOT",
+            "name": "module-ballerinax-hubspot.crm.engagement.meeting",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibJiraVersion",
+            "version_key": "stdlibHubspot.crm.engagement.meetingVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-mailchimp.marketing",
-            "module_version": "1.0.1-SNAPSHOT",
+            "name": "module-ballerinax-hubspot.crm.import",
+            "module_version": "4.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibMailchimp.marketingVersion",
+            "version_key": "stdlibHubspot.crm.importVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-mailchimp.transactional",
-            "module_version": "1.0.1-SNAPSHOT",
+            "name": "module-ballerinax-hubspot.crm.commerce.quotes",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibMailchimp.transactionalVersion",
+            "version_key": "stdlibHubspot.crm.commerce.quotesVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-microsoft.onedrive",
-            "module_version": "3.0.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "master",
-            "version_key": "stdlibMicrosoft.onedriveVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-openai",
-            "module_version": "1.0.1-SNAPSHOT",
+            "name": "module-ballerinax-hubspot.crm.commerce.taxes",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibOpenaiVersion",
+            "version_key": "stdlibHubspot.crm.commerce.taxesVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-paypal.invoices",
-            "module_version": "1.0.1-SNAPSHOT",
+            "name": "module-ballerinax-hubspot.crm.commerce.orders",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibPaypal.invoicesVersion",
+            "version_key": "stdlibHubspot.crm.commerce.ordersVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-paypal.orders",
-            "module_version": "2.0.1-SNAPSHOT",
+            "name": "module-ballerinax-hubspot.crm.commerce.discounts",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibPaypal.ordersVersion",
+            "version_key": "stdlibHubspot.crm.commerce.discountsVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-paypal.payments",
-            "module_version": "2.0.1-SNAPSHOT",
+            "name": "module-ballerinax-hubspot.crm.commerce.carts",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibPaypal.paymentsVersion",
+            "version_key": "stdlibHubspot.crm.commerce.cartsVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerinax-paypal.subscriptions",
-            "module_version": "1.0.1-SNAPSHOT",
+            "name": "module-ballerinax-hubspot.automation.actions",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
-            "version_key": "stdlibPaypal.subscriptionsVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-salesforce.marketingcloud",
-            "module_version": "1.0.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibSalesforce.marketingcloudVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-scim",
-            "module_version": "1.0.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibScimVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-slack",
-            "module_version": "5.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "master",
-            "version_key": "stdlibSlackVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-smartsheet",
-            "module_version": "1.0.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibSmartsheetVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-stripe",
-            "module_version": "2.0.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibStripeVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-trello",
-            "module_version": "2.0.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibTrelloVersion",
+            "version_key": "stdlibHubspot.automation.actionsVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
@@ -529,36 +369,6 @@
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibTwilioVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-twitter",
-            "module_version": "5.0.0-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibTwitterVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-zoom.meetings",
-            "module_version": "1.0.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibZoom.meetingsVersion",
-            "release": true,
-            "dependents": [],
-            "is_multiple_connectors": false
-        },
-        {
-            "name": "module-ballerinax-zoom.scheduler",
-            "module_version": "1.0.1-SNAPSHOT",
-            "level": 100,
-            "default_branch": "main",
-            "version_key": "stdlibZoom.schedulerVersion",
             "release": true,
             "dependents": [],
             "is_multiple_connectors": false
