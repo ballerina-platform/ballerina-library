@@ -234,6 +234,7 @@ isolated function isVersionAlreadyAvailable(Module m) returns boolean {
     if release is error {
         return false;
     }
+    printInfo(string `Found release: ${release.id}`);
     return true;
 }
 
