@@ -230,11 +230,12 @@ isolated function isModuleReleased(ProcessingModule processingModule) returns bo
 
 isolated function isVersionAlreadyAvailable(Module m) returns boolean {
     // Check if the version is already available in the central repository
-    github:Release|error release = github->/repos/[GITHUB_ORG]/[m.name]/releases/tags/[string `v${m.module_version}`];
+    printInfo(string `Checking the released version of the module: ${m.name}`);
+    record{}|error release = github->/repos/[GITHUB_ORG]/[m.name]/releases/tags/[string `v${m.module_version}`];
     if release is error {
         return false;
     }
-    printInfo(string `Found release: ${release.id}`);
+    printInfo(string `Found release: ${release["id"].toString()}`);
     return true;
 }
 
