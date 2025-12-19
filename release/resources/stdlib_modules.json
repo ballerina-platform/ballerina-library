@@ -1,6 +1,7 @@
 {
     "library_modules": [],
     "extended_modules": [],
+    "handwritten_connectors": [],
     "generated_connectors": [
         {
             "name": "module-ballerinax-docusign.dsclick",
