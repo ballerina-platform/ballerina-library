@@ -799,7 +799,7 @@
         },
         {
             "name": "module-ballerinax-java.jdbc",
-            "module_version": "1.14.1-SNAPSHOT",
+            "module_version": "1.14.2-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibJdbcVersion",
@@ -821,7 +821,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "module_version": "4.6.3-SNAPSHOT",
+            "module_version": "4.6.4-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
@@ -833,7 +833,7 @@
         },
         {
             "name": "module-ballerinax-mongodb",
-            "module_version": "5.2.3-SNAPSHOT",
+            "module_version": "5.2.4-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibMongodbVersion",
@@ -843,7 +843,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "module_version": "1.16.2-SNAPSHOT",
+            "module_version": "1.16.3-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
@@ -877,7 +877,7 @@
         },
         {
             "name": "module-ballerinax-oracledb",
-            "module_version": "1.14.1-SNAPSHOT",
+            "module_version": "1.14.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibOracledbVersion",
@@ -887,7 +887,7 @@
         },
         {
             "name": "module-ballerinax-postgresql",
-            "module_version": "1.16.2-SNAPSHOT",
+            "module_version": "1.16.3-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
@@ -899,7 +899,7 @@
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "module_version": "3.3.1-SNAPSHOT",
+            "module_version": "3.3.2-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibRabbitmqVersion",
@@ -941,7 +941,7 @@
         },
         {
             "name": "module-ballerinax-snowflake",
-            "module_version": "2.2.1-SNAPSHOT",
+            "module_version": "2.2.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibSnowflakeVersion",
@@ -1173,7 +1173,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.engagements.calls",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.engagements.callsVersion",
@@ -1183,7 +1183,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.engagements.communications",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.engagements.communicationsVersion",
@@ -1193,7 +1193,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.engagements.email",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.engagements.emailVersion",
@@ -1203,7 +1203,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.engagements.tasks",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.engagements.tasksVersion",
@@ -1433,7 +1433,7 @@
         },
         {
             "name": "module-ballerinax-jira",
-            "module_version": "2.0.1-SNAPSHOT",
+            "module_version": "2.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibJiraVersion",
@@ -1443,7 +1443,7 @@
         },
         {
             "name": "module-ballerinax-mailchimp.marketing",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibMailchimp.marketingVersion",
@@ -1453,7 +1453,7 @@
         },
         {
             "name": "module-ballerinax-mailchimp.transactional",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibMailchimp.transactionalVersion",
@@ -1463,7 +1463,7 @@
         },
         {
             "name": "module-ballerinax-microsoft.onedrive",
-            "module_version": "3.0.1-SNAPSHOT",
+            "module_version": "3.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibMicrosoft.onedriveVersion",
@@ -1473,7 +1473,7 @@
         },
         {
             "name": "module-ballerinax-openai",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibOpenaiVersion",
@@ -1493,7 +1493,7 @@
         },
         {
             "name": "module-ballerinax-paypal.orders",
-            "module_version": "2.0.1-SNAPSHOT",
+            "module_version": "2.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPaypal.ordersVersion",
@@ -1503,7 +1503,7 @@
         },
         {
             "name": "module-ballerinax-paypal.payments",
-            "module_version": "2.0.1-SNAPSHOT",
+            "module_version": "2.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPaypal.paymentsVersion",
@@ -1513,7 +1513,7 @@
         },
         {
             "name": "module-ballerinax-paypal.subscriptions",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPaypal.subscriptionsVersion",
@@ -1523,7 +1523,7 @@
         },
         {
             "name": "module-ballerinax-salesforce.marketingcloud",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibSalesforce.marketingcloudVersion",
@@ -1543,7 +1543,7 @@
         },
         {
             "name": "module-ballerinax-scim",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibScimVersion",
@@ -1563,7 +1563,7 @@
         },
         {
             "name": "module-ballerinax-smartsheet",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibSmartsheetVersion",
@@ -1583,7 +1583,7 @@
         },
         {
             "name": "module-ballerinax-trello",
-            "module_version": "2.0.1-SNAPSHOT",
+            "module_version": "2.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibTrelloVersion",
@@ -1623,7 +1623,7 @@
         },
         {
             "name": "module-ballerinax-zoom.meetings",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibZoom.meetingsVersion",
@@ -1633,7 +1633,7 @@
         },
         {
             "name": "module-ballerinax-zoom.scheduler",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibZoom.schedulerVersion",
@@ -1745,7 +1745,7 @@
         },
         {
             "name": "module-ballerinax-postgresql.driver",
-            "module_version": "1.6.2-SNAPSHOT",
+            "module_version": "1.6.3-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlDriverVersion",
