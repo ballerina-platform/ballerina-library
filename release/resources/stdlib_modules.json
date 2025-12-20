@@ -779,7 +779,7 @@
         },
         {
             "name": "module-ballerinax-confluent.cregistry",
-            "module_version": "0.4.3-SNAPSHOT",
+            "module_version": "0.4.4-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibConfluent.cregistryVersion",
@@ -953,7 +953,7 @@
     "generated_connectors": [
         {
             "name": "module-ballerinax-asana",
-            "module_version": "3.0.0-SNAPSHOT",
+            "module_version": "3.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAsanaVersion",
@@ -963,7 +963,7 @@
         },
         {
             "name": "module-ballerinax-candid",
-            "module_version": "0.2.0-SNAPSHOT",
+            "module_version": "0.2.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibCandidVersion",
@@ -983,7 +983,7 @@
         },
         {
             "name": "module-ballerinax-discord",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibDiscordVersion",
