@@ -471,7 +471,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "module_version": "2.15.3-SNAPSHOT",
+            "module_version": "2.15.4-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibHttpVersion",
@@ -491,7 +491,7 @@
         },
         {
             "name": "module-ballerina-ai",
-            "module_version": "1.8.1-SNAPSHOT",
+            "module_version": "1.9.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibAiVersion",
@@ -739,7 +739,7 @@
         },
         {
             "name": "module-ballerinax-aws.redshift",
-            "module_version": "1.2.1-SNAPSHOT",
+            "module_version": "1.2.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAws.redshiftVersion",
@@ -789,7 +789,7 @@
         },
         {
             "name": "module-ballerinax-ibm.ibmmq",
-            "module_version": "1.4.2-SNAPSHOT",
+            "module_version": "1.4.3-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibIbm.ibmmqVersion",
@@ -867,7 +867,7 @@
         },
         {
             "name": "module-ballerinax-nats",
-            "module_version": "3.3.0-SNAPSHOT",
+            "module_version": "3.3.1-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibNatsVersion",
@@ -1003,7 +1003,7 @@
         },
         {
             "name": "module-ballerinax-docusign.dsclick",
-            "module_version": "2.0.1-SNAPSHOT\r",
+            "module_version": "2.0.2-SNAPSHOT\r",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibDocusign.dsclickVersion",
@@ -1083,7 +1083,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.associations",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.associationsVersion",
@@ -1093,7 +1093,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.associations.schema",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.associations.schemaVersion",
@@ -1103,7 +1103,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.commerce.carts",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.commerce.cartsVersion",
@@ -1113,7 +1113,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.commerce.discounts",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.commerce.discountsVersion",
@@ -1123,7 +1123,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.commerce.orders",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.commerce.ordersVersion",
@@ -1133,7 +1133,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.commerce.quotes",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.commerce.quotesVersion",
@@ -1143,7 +1143,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.commerce.taxes",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.commerce.taxesVersion",
@@ -1163,7 +1163,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.engagement.notes",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.engagement.notesVersion",
@@ -1213,7 +1213,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.extensions.timelines",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.extensions.timelinesVersion",
@@ -1223,7 +1223,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.extensions.videoconferencing",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.extensions.videoconferencingVersion",
@@ -1233,7 +1233,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.import",
-            "module_version": "4.0.0-SNAPSHOT",
+            "module_version": "4.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.importVersion",
@@ -1243,7 +1243,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.lists",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.listsVersion",
@@ -1253,7 +1253,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.object.companies",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.object.companiesVersion",
@@ -1263,7 +1263,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.object.contacts",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.object.contactsVersion",
@@ -1283,7 +1283,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.object.feedback",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.object.feedbackVersion",
@@ -1293,7 +1293,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.object.leads",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.object.leadsVersion",
@@ -1303,7 +1303,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.object.lineitems",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.object.lineitemsVersion",
@@ -1313,7 +1313,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.object.products",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.object.productsVersion",
@@ -1323,7 +1323,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.object.schemas",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.object.schemasVersion",
@@ -1333,7 +1333,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.object.tickets",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.object.ticketsVersion",
@@ -1343,7 +1343,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.owners",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.ownersVersion",
@@ -1353,7 +1353,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.pipelines",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.pipelinesVersion",
@@ -1363,7 +1363,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.crm.properties",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.crm.propertiesVersion",
@@ -1373,7 +1373,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.campaigns",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.campaignsVersion",
@@ -1383,7 +1383,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.emails",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.emailsVersion",
@@ -1393,7 +1393,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.events",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.eventsVersion",
@@ -1403,7 +1403,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.forms",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.formsVersion",
@@ -1413,7 +1413,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.subscriptions",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.subscriptionsVersion",
@@ -1423,7 +1423,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.transactional",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.transactionalVersion",
@@ -1553,7 +1553,7 @@
         },
         {
             "name": "module-ballerinax-slack",
-            "module_version": "5.0.0-SNAPSHOT",
+            "module_version": "5.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibSlackVersion",
@@ -1573,7 +1573,7 @@
         },
         {
             "name": "module-ballerinax-stripe",
-            "module_version": "2.0.1-SNAPSHOT",
+            "module_version": "2.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibStripeVersion",
@@ -1593,7 +1593,7 @@
         },
         {
             "name": "module-ballerinax-twilio",
-            "module_version": "5.0.1-SNAPSHOT",
+            "module_version": "5.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibTwilioVersion",
@@ -1603,7 +1603,7 @@
         },
         {
             "name": "module-ballerinax-twitter",
-            "module_version": "5.0.0-SNAPSHOT",
+            "module_version": "5.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibTwitterVersion",
