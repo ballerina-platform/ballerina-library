@@ -145,7 +145,7 @@
         },
         {
             "name": "module-ballerina-log",
-            "module_version": "2.16.0-SNAPSHOT",
+            "module_version": "2.16.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibLogVersion",
