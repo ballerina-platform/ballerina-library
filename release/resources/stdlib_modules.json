@@ -154,6 +154,7 @@
                 "module-ballerina-auth",
                 "module-ballerina-file",
                 "module-ballerina-jwt",
+                "module-ballerina-messaging",
                 "module-ballerina-mime",
                 "module-ballerina-mqtt",
                 "module-ballerina-oauth2",
@@ -373,7 +374,8 @@
             "dependents": [
                 "module-ballerina-cache",
                 "module-ballerina-email",
-                "module-ballerina-ftp"
+                "module-ballerina-ftp",
+                "module-ballerina-messaging"
             ],
             "is_multiple_connectors": false
         },
@@ -431,6 +433,18 @@
             "version_key": "stdlibFtpVersion",
             "release": true,
             "dependents": [],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerina-messaging",
+            "module_version": "1.0.1-SNAPSHOT",
+            "level": 5,
+            "default_branch": "main",
+            "version_key": "stdlibMessagingVersion",
+            "release": true,
+            "dependents": [
+                "module-ballerinax-rabbitmq"
+            ],
             "is_multiple_connectors": false
         },
         {
@@ -1831,7 +1845,7 @@
         },
         {
             "name": "persist-tools",
-            "module_version": "1.8.0-SNAPSHOT",
+            "module_version": "1.8.1-SNAPSHOT",
             "level": 14,
             "default_branch": "main",
             "version_key": "stdlibPersist-toolsVersion",
