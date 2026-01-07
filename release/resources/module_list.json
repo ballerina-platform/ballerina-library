@@ -79,6 +79,9 @@
             "version_key": "stdlibMathVectorVersion"
         },
         {
+            "name": "module-ballerina-messaging"
+        },
+        {
             "name": "module-ballerina-mime"
         },
         {
