@@ -286,7 +286,7 @@
         },
         {
             "name": "module-ballerina-tcp",
-            "module_version": "1.13.3-SNAPSHOT",
+            "module_version": "1.13.4-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibTcpVersion",
@@ -296,7 +296,7 @@
         },
         {
             "name": "module-ballerina-udp",
-            "module_version": "1.13.3-SNAPSHOT",
+            "module_version": "1.13.4-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibUdpVersion",
@@ -485,7 +485,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "module_version": "2.15.4-SNAPSHOT",
+            "module_version": "2.15.5-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibHttpVersion",
@@ -517,7 +517,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "module_version": "1.14.3-SNAPSHOT",
+            "module_version": "1.14.4-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
@@ -554,7 +554,7 @@
         },
         {
             "name": "module-ballerina-websocket",
-            "module_version": "2.15.1-SNAPSHOT",
+            "module_version": "2.15.2-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibWebsocketVersion",
