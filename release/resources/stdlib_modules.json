@@ -505,7 +505,7 @@
         },
         {
             "name": "module-ballerina-ai",
-            "module_version": "1.9.0-SNAPSHOT",
+            "module_version": "1.9.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibAiVersion",
@@ -689,7 +689,7 @@
         },
         {
             "name": "module-ballerinax-persist.sql",
-            "module_version": "1.7.0-SNAPSHOT",
+            "module_version": "1.7.1-SNAPSHOT",
             "level": 13,
             "default_branch": "main",
             "version_key": "stdlibPersistSqlVersion",
