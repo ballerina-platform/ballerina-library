@@ -29,6 +29,7 @@ body:
         - Area/Security
         - Area/StaticCode
         - Area/Tooling
+        - Area/Workflow
     validations:
       required: false
   - type: textarea
