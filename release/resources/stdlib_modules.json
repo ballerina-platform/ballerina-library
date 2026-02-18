@@ -842,6 +842,8 @@
             "version_key": "stdlibKafkaVersion",
             "release": true,
             "dependents": [
+                "module-ballerinax-mssql",
+                "module-ballerinax-postgresql",
                 "asyncapi-tools"
             ],
             "is_multiple_connectors": false
@@ -914,7 +916,7 @@
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "module_version": "3.3.2-SNAPSHOT",
+            "module_version": "3.3.3-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibRabbitmqVersion",
@@ -936,7 +938,7 @@
         },
         {
             "name": "module-ballerinax-salesforce",
-            "module_version": "8.2.1-SNAPSHOT",
+            "module_version": "8.3.0-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibSalesforceVersion",
