@@ -43,7 +43,7 @@
         },
         {
             "name": "module-ballerina-persist",
-            "module_version": "1.6.1-SNAPSHOT",
+            "module_version": "1.7.0-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibPersistVersion",
@@ -630,7 +630,7 @@
     "extended_modules": [
         {
             "name": "module-ballerinax-cdc",
-            "module_version": "1.2.0-SNAPSHOT",
+            "module_version": "1.2.2-SNAPSHOT",
             "level": 11,
             "default_branch": "main",
             "version_key": "stdlibCdcVersion",
@@ -861,7 +861,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "module_version": "1.16.3-SNAPSHOT",
+            "module_version": "1.16.4-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
@@ -873,7 +873,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "module_version": "1.16.2-SNAPSHOT",
+            "module_version": "1.16.3-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
@@ -905,7 +905,7 @@
         },
         {
             "name": "module-ballerinax-postgresql",
-            "module_version": "1.16.3-SNAPSHOT",
+            "module_version": "1.16.4-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
@@ -1849,7 +1849,7 @@
         },
         {
             "name": "persist-tools",
-            "module_version": "1.8.1-SNAPSHOT",
+            "module_version": "1.9.0-SNAPSHOT",
             "level": 14,
             "default_branch": "main",
             "version_key": "stdlibPersist-toolsVersion",
