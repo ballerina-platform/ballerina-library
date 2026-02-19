@@ -843,6 +843,7 @@
             "release": true,
             "dependents": [
                 "module-ballerinax-mssql",
+                "module-ballerinax-mysql",
                 "module-ballerinax-postgresql",
                 "asyncapi-tools"
             ],
