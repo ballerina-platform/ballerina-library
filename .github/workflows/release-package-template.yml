@@ -92,7 +92,7 @@ jobs:
           publishPAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
           CENTRAL_VERBOSE_ENABLED: true
         run: |
-          ./gradlew clean release -Prelease.useAutomaticVersion=true
+          ./gradlew clean release -Prelease.useAutomaticVersion=true ${{ inputs.additional-publish-flags }}
           ./gradlew -Pversion=${VERSION} publish -x test -PpublishToCentral=true ${{ inputs.additional-publish-flags }}
 
       - name: GitHub Release and Release Sync PR
