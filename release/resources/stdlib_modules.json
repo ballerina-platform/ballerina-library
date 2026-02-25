@@ -308,7 +308,7 @@
         },
         {
             "name": "module-ballerina-data.csv",
-            "module_version": "0.10.1-SNAPSHOT",
+            "module_version": "0.8.3-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibDataCsvVersion",
@@ -428,7 +428,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "module_version": "2.17.0-SNAPSHOT",
+            "module_version": "2.17.1-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
@@ -927,7 +927,7 @@
         },
         {
             "name": "module-ballerinax-redis",
-            "module_version": "3.1.1-SNAPSHOT",
+            "module_version": "3.2.0-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibRedisVersion",
@@ -1849,7 +1849,7 @@
         },
         {
             "name": "persist-tools",
-            "module_version": "1.9.1-SNAPSHOT",
+            "module_version": "1.9.2-SNAPSHOT",
             "level": 14,
             "default_branch": "main",
             "version_key": "stdlibPersist-toolsVersion",
