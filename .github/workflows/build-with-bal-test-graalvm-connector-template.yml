@@ -24,7 +24,7 @@ jobs:
       - name: Resolve Ballerina version
         run: |
           BAL_VERSION="nightly"
-          if [[ "${{ github.event_name }}" != "pull_request" ]]; then
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             EXTRACTED="$(grep -E '^\s*ballerinaLangVersion\s*=' gradle.properties | head -n 1 | cut -d= -f2- | xargs || true)"
             if [[ -n "${EXTRACTED}" ]]; then
               BAL_VERSION="${EXTRACTED}"
