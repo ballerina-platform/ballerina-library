@@ -333,7 +333,7 @@
         },
         {
             "name": "module-ballerina-data.xmldata",
-            "module_version": "1.6.0-SNAPSHOT",
+            "module_version": "1.6.1-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibDataXmldataVersion",
@@ -1501,7 +1501,7 @@
         },
         {
             "name": "module-ballerinax-paypal.invoices",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPaypal.invoicesVersion",
@@ -1849,7 +1849,7 @@
         },
         {
             "name": "persist-tools",
-            "module_version": "1.9.0-SNAPSHOT",
+            "module_version": "1.9.1-SNAPSHOT",
             "level": 14,
             "default_branch": "main",
             "version_key": "stdlibPersist-toolsVersion",
