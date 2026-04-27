@@ -8,7 +8,7 @@ configurable string apiKey = ?;
 public function initAIService(boolean quietMode = false) returns error? {
     ai:ModelProvider|error modelProvider = new anthropic:ModelProvider(
         apiKey,
-        anthropic:CLAUDE_SONNET_4_20250514,
+        anthropic:CLAUDE_OPUS_4_5,
         maxTokens = 64000,
         timeout = 400
     );

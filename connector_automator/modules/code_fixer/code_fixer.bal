@@ -84,8 +84,157 @@ function prepareErrorContext(CompilationError[] errors) returns string {
     return string:'join("\n", ...errorStrings);
 }
 
+// Extract type names from error messages (e.g., "Type 'ReportCreationResponse'" -> "ReportCreationResponse")
+function extractTypeNamesFromErrors(CompilationError[] errors) returns string[] {
+    string[] typeNames = [];
+
+    foreach CompilationError err in errors {
+        string message = err.message;
+
+        // Pattern: 'TypeName' or "TypeName" in error messages
+        // Look for patterns like: type 'SomeType', record 'SomeType', etc.
+        regexp:RegExp typePattern = re `'([A-Z][a-zA-Z0-9]+)'`;
+        regexp:Span[] matches = typePattern.findAll(message);
+
+        foreach regexp:Span span in matches {
+            string matched = span.substring();
+            // Remove the quotes
+            string typeName = matched.substring(1, matched.length() - 1);
+            // Filter out common keywords that aren't types
+            if !isBalKeyword(typeName) && !containsTypeName(typeNames, typeName) {
+                typeNames.push(typeName);
+            }
+        }
+    }
+
+    return typeNames;
+}
+
+// Check if a string is a Ballerina keyword
+function isBalKeyword(string s) returns boolean {
+    string[] keywords = ["error", "nil", "string", "int", "boolean", "float", "decimal", "anydata", "json", "byte", "any"];
+    foreach string keyword in keywords {
+        if s.toLowerAscii() == keyword {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Check if type name already exists in array
+function containsTypeName(string[] arr, string typeName) returns boolean {
+    foreach string item in arr {
+        if item == typeName {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Get type context for fixing test/mock files
+function getTypeContextForFile(string projectPath, string filePath, CompilationError[] errors) returns string {
+    string typeContext = "";
+
+    // Extract type names mentioned in errors
+    string[] typeNames = extractTypeNamesFromErrors(errors);
+
+    // Try to read types.bal from the project
+    string typesFilePath = projectPath + "/types.bal";
+    string|io:Error typesContent = io:fileReadString(typesFilePath);
+
+    if typesContent is io:Error {
+        // Try mock.server types.bal if it's a mock file error
+        if filePath.includes("mock") {
+            typesFilePath = projectPath + "/modules/mock.server/types.bal";
+            typesContent = io:fileReadString(typesFilePath);
+        }
+    }
+
+    // Try to read client.bal for additional context on method signatures
+    string clientFilePath = projectPath + "/client.bal";
+    string|io:Error clientContent = io:fileReadString(clientFilePath);
+
+    // Build comprehensive context
+    string[] contextParts = [];
+
+    // Add full types.bal content for better type understanding
+    if typesContent is string {
+        contextParts.push("FULL TYPES DEFINITIONS (types.bal):\n" + typesContent);
+    }
+
+    // Add full client.bal content for method signatures and patterns
+    if clientContent is string {
+        contextParts.push("FULL CLIENT IMPLEMENTATION (client.bal):\n" + clientContent);
+    }
+
+    // Also extract specific types mentioned in errors for emphasis
+    if typeNames.length() > 0 && typesContent is string {
+        string[] relevantTypes = [];
+        foreach string typeName in typeNames {
+            string typeDefinition = extractTypeDefinition(typesContent, typeName);
+            if typeDefinition.length() > 0 {
+                relevantTypes.push(typeDefinition);
+            }
+        }
+
+        if relevantTypes.length() > 0 {
+            contextParts.push("TYPES REFERENCED IN ERRORS (pay special attention to these):\n" + string:'join("\n\n", ...relevantTypes));
+        }
+    }
+
+    if contextParts.length() > 0 {
+        typeContext = string:'join("\n\n---\n\n", ...contextParts);
+    }
+
+    return typeContext;
+}
+
+// Extract a single type definition from types.bal content
+function extractTypeDefinition(string typesContent, string typeName) returns string {
+    // Look for: public type TypeName record {
+    string pattern = "public type " + typeName;
+    int? startIdx = typesContent.indexOf(pattern);
+
+    if startIdx is () {
+        // Try without "public"
+        pattern = "type " + typeName;
+        startIdx = typesContent.indexOf(pattern);
+    }
+
+    if startIdx is int {
+        // Find the end of the type definition by counting braces
+        int braceCount = 0;
+        boolean foundOpenBrace = false;
+        int endIdx = startIdx;
+
+        foreach int i in startIdx ..< typesContent.length() {
+            string char = typesContent.substring(i, i + 1);
+            if char == "{" {
+                braceCount += 1;
+                foundOpenBrace = true;
+            } else if char == "}" {
+                braceCount -= 1;
+                if foundOpenBrace && braceCount == 0 {
+                    endIdx = i + 1;
+                    break;
+                }
+            }
+        }
+
+        if endIdx > startIdx {
+            // Include the semicolon if present
+            if endIdx < typesContent.length() && typesContent.substring(endIdx, endIdx + 1) == ";" {
+                endIdx += 1;
+            }
+            return typesContent.substring(startIdx, endIdx);
+        }
+    }
+
+    return "";
+}
+
 // Fix errors in a single file
-public function fixFileWithLLM(string projectPath, string filePath, CompilationError[] errors, boolean quietMode = false) returns FixResponse|error {
+public function fixFileWithLLM(string projectPath, string filePath, CompilationError[] errors, boolean quietMode = false, FixAttempt[] previousAttempts = []) returns FixResponse|error {
     if !quietMode {
         io:println(string `  Analyzing ${filePath} (${errors.length()} error${errors.length() == 1 ? "" : "s"})`);
     }
@@ -113,8 +262,17 @@ public function fixFileWithLLM(string projectPath, string filePath, CompilationE
         return fileContent;
     }
 
-    // Create fix prompt
-    string prompt = createFixPrompt(fileContent, errors, filePath);
+    // Try to read types.bal for additional context when fixing test/mock files
+    string typeContext = "";
+    if filePath.includes("test") || filePath.includes("mock") {
+        typeContext = getTypeContextForFile(projectPath, filePath, errors);
+    }
+
+    // Build fix history context
+    string fixHistoryContext = buildFixHistoryContext(previousAttempts);
+
+    // Create fix prompt with optional type context and fix history
+    string prompt = createFixPromptWithHistory(fileContent, errors, filePath, typeContext, fixHistoryContext);
 
     // Get fix from LLM using centralized service
     string|error llmResponse = utils:callAI(prompt);
@@ -134,6 +292,41 @@ public function fixFileWithLLM(string projectPath, string filePath, CompilationE
         fixedCode: llmResponse,
         explanation: "Fixed using AI"
     };
+}
+
+// Build a context string from previous fix attempts
+function buildFixHistoryContext(FixAttempt[] attempts) returns string {
+    if attempts.length() == 0 {
+        return "";
+    }
+
+    string[] historyLines = [];
+    historyLines.push("PREVIOUS FIX ATTEMPTS (DO NOT REPEAT THESE - THEY FAILED):");
+
+    foreach FixAttempt attempt in attempts {
+        historyLines.push(string `
+Iteration ${attempt.iteration}:
+  Errors at that time: ${string:'join("; ", ...attempt.errorMessages)}
+  What was tried: ${attempt.appliedFix}
+  Result: FAILED (caused new/same errors)`);
+    }
+
+    return string:'join("\n", ...historyLines);
+}
+
+// Extract a brief description of what changed between two code versions
+function describeCodeChange(CompilationError[] errors) returns string {
+    // Create a brief summary of the errors being addressed
+    string[] summaries = [];
+    foreach CompilationError err in errors {
+        string shortMsg = err.message;
+        // Truncate long messages
+        if shortMsg.length() > 80 {
+            shortMsg = shortMsg.substring(0, 77) + "...";
+        }
+        summaries.push(string `Line ${err.line}: ${shortMsg}`);
+    }
+    return string:'join("; ", ...summaries);
 }
 
 // Apply fix to file
@@ -198,6 +391,9 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
     CompilationError[] previousErrors = [];
     int initialErrorCount = 0;
     boolean initialErrorCountSet = false;
+
+    // Track fix history per file to prevent oscillation
+    map<FixAttempt[]> fileFixHistory = {};
 
     if !quietMode {
         io:println("Starting error fixing process...");
@@ -291,8 +487,11 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
         foreach string filePath in errorsByFile.keys() {
             CompilationError[] fileErrors = errorsByFile.get(filePath);
 
-            // Get fix from LLM
-            FixResponse|error fixResponse = fixFileWithLLM(projectPath, filePath, fileErrors, quietMode);
+            // Get previous fix attempts for this file
+            FixAttempt[] previousAttempts = fileFixHistory.hasKey(filePath) ? fileFixHistory.get(filePath) : [];
+
+            // Get fix from LLM with history context
+            FixResponse|error fixResponse = fixFileWithLLM(projectPath, filePath, fileErrors, quietMode, previousAttempts);
             if fixResponse is error {
                 if !quietMode {
                     io:println(string `  ⚠  Could not generate fix for ${filePath}: ${fixResponse.message()}`);
@@ -300,6 +499,20 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
                 result.remainingFixes.push(string `Iteration ${iteration}: Failed to fix ${filePath}: ${fixResponse.message()}`);
                 continue;
             }
+
+            // Record this fix attempt in history
+            string[] errorMsgs = fileErrors.'map(function(CompilationError err) returns string {
+                return err.message;
+            });
+            FixAttempt thisAttempt = {
+                iteration: iteration,
+                errorMessages: errorMsgs,
+                appliedFix: describeCodeChange(fileErrors)
+            };
+            if !fileFixHistory.hasKey(filePath) {
+                fileFixHistory[filePath] = [];
+            }
+            fileFixHistory.get(filePath).push(thisAttempt);
 
             // Show fix to user and ask for confirmation
             boolean shouldApplyFix = false;

@@ -1,0 +1,468 @@
+name: Orchestrate Connector Updates
+
+on:
+  repository_dispatch:
+    types: [orchestrate-connector-updates]
+  workflow_dispatch:
+    inputs:
+      connectors_json:
+        description: 'JSON array of connector updates (for manual testing)'
+        required: false
+        type: string
+        default: '[]'
+
+jobs:
+  orchestrate-updates:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+
+    steps:
+      - name: Checkout ballerina-library
+        uses: actions/checkout@v4
+
+      - name: Capture workflow start time
+        id: start_time
+        run: |
+          # Capture the exact start time of this workflow run
+          START_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          echo "workflow_start_time=$START_TIME" >> $GITHUB_OUTPUT
+          echo "Workflow started at: $START_TIME"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Parse connector updates
+        id: parse_connectors
+        run: |
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            CONNECTORS='${{ toJson(github.event.client_payload.connectors) }}'
+          else
+            CONNECTORS='${{ inputs.connectors_json }}'
+          fi
+
+          echo "Received connectors payload:"
+          echo "$CONNECTORS" | jq '.'
+
+          echo "$CONNECTORS" > connectors_to_update.json
+
+          CONNECTOR_COUNT=$(echo "$CONNECTORS" | jq 'length')
+          echo "Total connectors to update: $CONNECTOR_COUNT"
+          echo "connector_count=$CONNECTOR_COUNT" >> $GITHUB_OUTPUT
+
+          if [ "$CONNECTOR_COUNT" -eq 0 ]; then
+            echo "No connectors to update"
+            exit 1
+          fi
+
+      - name: Trigger all connector regenerations
+        id: trigger_connectors
+        run: |
+          echo "Triggering connector regeneration for all connectors..."
+          echo "Workflow start time: ${{ steps.start_time.outputs.workflow_start_time }}"
+
+          > triggered_connectors.txt
+
+          jq -c '.[]' connectors_to_update.json | while read -r connector; do
+            REPO=$(echo "$connector" | jq -r '.repository')
+            SPEC=$(echo "$connector" | jq -r '.specification')
+            VERSION=$(echo "$connector" | jq -r '.version')
+            OPENAPI_URL=$(echo "$connector" | jq -r '.openapi_url')
+
+            echo ""
+            echo "Triggering: $REPO"
+            echo "  Spec: $SPEC"
+            echo "  Version: $VERSION"
+            echo "  URL: $OPENAPI_URL"
+
+            if gh api \
+              repos/"$REPO"/dispatches \
+              -X POST \
+              -f event_type=openapi-update \
+              -f client_payload[sender]=orgBBalLib/ballerina-library \
+              -f client_payload[openapi_url]="$OPENAPI_URL" \
+              -f client_payload[spec_version]="$VERSION" \
+              -f client_payload[spec_path]="$SPEC"; then
+
+              echo "✅ Successfully triggered $REPO"
+              echo "${REPO}|${SPEC}|${VERSION}" >> triggered_connectors.txt
+            else
+              echo "❌ Failed to trigger $REPO"
+            fi
+          done
+
+          TRIGGERED_COUNT=$(wc -l < triggered_connectors.txt 2>/dev/null || echo "0")
+          echo "Successfully triggered $TRIGGERED_COUNT connectors"
+          echo "triggered_count=$TRIGGERED_COUNT" >> $GITHUB_OUTPUT
+
+      - name: Wait for connector updates to complete
+        if: steps.trigger_connectors.outputs.triggered_count > 0
+        env:
+          GH_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+        run: |
+          echo "Waiting for connector updates to process..."
+          echo "Looking for PRs created after: ${{ steps.start_time.outputs.workflow_start_time }}"
+
+          TOTAL_CONNECTORS=$(wc -l < triggered_connectors.txt)
+          echo "Monitoring $TOTAL_CONNECTORS connector repositories..."
+
+          INITIAL_WAIT=600
+          echo "⏳ Waiting ${INITIAL_WAIT} seconds (10 minutes) for connector generation workflows to process..."
+          sleep $INITIAL_WAIT
+
+          MAX_WAIT=1800
+          CHECK_INTERVAL=30
+          ELAPSED=0
+
+          echo ""
+          echo "Now checking for PR creation every ${CHECK_INTERVAL} seconds..."
+
+          while [ $ELAPSED -lt $MAX_WAIT ]; do
+            COMPLETED=0
+
+            echo ""
+            echo "=== Check at $((INITIAL_WAIT + ELAPSED)) seconds total elapsed ==="
+
+            while IFS='|' read -r REPO SPEC VERSION; do
+              # Check for PRs created after workflow start time
+              PR_COUNT=$(gh pr list \
+                --repo "$REPO" \
+                --state all \
+                --limit 20 \
+                --json createdAt,title \
+                --jq "[.[] | select(.title | contains(\"Auto-generated connector\")) | select(.createdAt > \"${{ steps.start_time.outputs.workflow_start_time }}\")] | length" 2>/dev/null || echo "0")
+
+              if [ "$PR_COUNT" -gt 0 ]; then
+                COMPLETED=$((COMPLETED + 1))
+                echo "  ✅ $REPO - PR found"
+              else
+                echo "  ⏳ $REPO - Waiting..."
+              fi
+            done < triggered_connectors.txt
+
+            echo ""
+            echo "Progress: $COMPLETED/$TOTAL_CONNECTORS connectors have created PRs"
+
+            if [ "$COMPLETED" -eq "$TOTAL_CONNECTORS" ]; then
+              echo ""
+              echo "🎉 All connectors have created PRs!"
+              break
+            fi
+
+            sleep $CHECK_INTERVAL
+            ELAPSED=$((ELAPSED + CHECK_INTERVAL))
+          done
+
+          if [ $ELAPSED -ge $MAX_WAIT ]; then
+            echo ""
+            echo "⏱️ Timeout reached after $((INITIAL_WAIT + MAX_WAIT)) total seconds."
+            echo "Proceeding with available data..."
+          else
+            echo ""
+            echo "✅ All connectors completed!"
+            echo "Waiting additional 30 seconds for PR metadata to stabilize..."
+            sleep 30
+          fi
+
+      - name: Collect all connector PR information
+        if: steps.trigger_connectors.outputs.triggered_count > 0
+        id: collect_prs
+        env:
+          GH_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+        run: |
+          echo "Collecting PR information from all triggered connectors..."
+          echo "Looking for PRs created after: ${{ steps.start_time.outputs.workflow_start_time }}"
+
+          echo "[]" > connector_prs.json
+
+          while IFS='|' read -r REPO SPEC VERSION; do
+            echo ""
+            echo "Checking repository: $REPO"
+
+            # Get PRs created after workflow start time
+            PR_DATA=$(gh pr list \
+              --repo "$REPO" \
+              --state all \
+              --limit 20 \
+              --json number,title,url,state,createdAt,body \
+              --jq "[.[] | select(.title | contains(\"Auto-generated connector\")) | select(.createdAt > \"${{ steps.start_time.outputs.workflow_start_time }}\")] | sort_by(.createdAt) | reverse | .[0]" 2>/dev/null || echo "null")
+
+            if [ -n "$PR_DATA" ] && [ "$PR_DATA" != "null" ] && [ "$PR_DATA" != "{}" ]; then
+              PR_NUMBER=$(echo "$PR_DATA" | jq -r '.number')
+              PR_CREATED_AT=$(echo "$PR_DATA" | jq -r '.createdAt')
+              echo "  ✅ Found PR #$PR_NUMBER for $REPO (created at $PR_CREATED_AT)"
+
+              # Extract change type from PR title
+              CHANGE_TYPE=$(echo "$PR_DATA" | jq -r '.title' | grep -oE '\[(MAJOR|MINOR|PATCH)\]' | tr -d '[]' || echo "UNKNOWN")
+              if [ -z "$CHANGE_TYPE" ]; then
+                CHANGE_TYPE="UNKNOWN"
+              fi
+
+              # Check for build failure in title
+              BUILD_STATUS="Success"
+              if echo "$PR_DATA" | jq -r '.title' | grep -q "BUILD FAILED"; then
+                BUILD_STATUS="FAILED"
+              fi
+
+              # Extract new version from PR body
+              PR_BODY=$(echo "$PR_DATA" | jq -r '.body // ""')
+              NEW_VERSION=$(echo "$PR_BODY" | grep -oP 'New Version.*?`\K[^`]+' || echo "")
+
+              # Extract code owners from PR body
+              CODE_OWNERS=$(echo "$PR_BODY" | grep -oP 'Code Owners:.*?\K@[\w-]+(,\s*@[\w-]+)*' | tr -d '@' | sed 's/,/, /g' || echo "")
+
+              # Extract connector name from repo
+              CONNECTOR_NAME=$(echo "$REPO" | sed 's|^orgBBalLib/module-ballerinax-||')
+
+              # Build connector info JSON
+              CONNECTOR_INFO=$(jq -n \
+                --arg repo "$REPO" \
+                --arg connectorName "$CONNECTOR_NAME" \
+                --arg spec "$SPEC" \
+                --arg version "$VERSION" \
+                --arg changeType "$CHANGE_TYPE" \
+                --arg buildStatus "$BUILD_STATUS" \
+                --arg newVersion "$NEW_VERSION" \
+                --arg codeOwners "$CODE_OWNERS" \
+                --argjson prData "$PR_DATA" \
+                '{
+                  repository: $repo,
+                  connectorName: $connectorName,
+                  specification: $spec,
+                  openapiVersion: $version,
+                  changeType: $changeType,
+                  buildStatus: $buildStatus,
+                  expectedVersion: $newVersion,
+                  codeOwners: $codeOwners,
+                  pr: $prData
+                }')
+
+              jq --argjson item "$CONNECTOR_INFO" '. += [$item]' connector_prs.json > tmp.json && mv tmp.json connector_prs.json
+              echo "  ✅ Added PR info for $REPO"
+            else
+              echo "  ⚠️ No PR found for $REPO created after ${{ steps.start_time.outputs.workflow_start_time }}"
+              echo "  The workflow may have failed before creating a PR"
+
+              CONNECTOR_NAME=$(echo "$REPO" | sed 's|^orgBBalLib/module-ballerinax-||')
+
+              CONNECTOR_INFO=$(jq -n \
+                --arg repo "$REPO" \
+                --arg connectorName "$CONNECTOR_NAME" \
+                --arg spec "$SPEC" \
+                --arg version "$VERSION" \
+                '{
+                  repository: $repo,
+                  connectorName: $connectorName,
+                  specification: $spec,
+                  openapiVersion: $version,
+                  changeType: "FAILED",
+                  buildStatus: "Workflow Failed",
+                  expectedVersion: "N/A",
+                  codeOwners: "N/A",
+                  pr: {number: 0, title: "Not Created", url: "", state: "failed"}
+                }')
+
+              jq --argjson item "$CONNECTOR_INFO" '. += [$item]' connector_prs.json > tmp.json && mv tmp.json connector_prs.json
+            fi
+
+          done < triggered_connectors.txt
+
+          echo ""
+          echo "📊 PR collection complete"
+          echo "Collected information for $(jq 'length' connector_prs.json) connectors:"
+          cat connector_prs.json | jq '.'
+
+      - name: Generate email HTML content
+        if: steps.trigger_connectors.outputs.triggered_count > 0
+        id: generate_email
+        run: |
+          # Write malformed specs payload to file to avoid shell interpolation limits
+          echo '${{ toJson(github.event.client_payload.malformed_specs) }}' > /tmp/malformed.json
+
+          # Build malformed specs HTML section
+          MALFORMED_SECTION=""
+          MALFORMED_COUNT=$(jq 'if . == null then 0 else length end' /tmp/malformed.json)
+          if [ "$MALFORMED_COUNT" -gt 0 ]; then
+            MALFORMED_ROWS=""
+            while IFS= read -r item; do
+              NAME=$(echo "$item" | jq -r '.name')
+              VERSION=$(echo "$item" | jq -r '.version')
+              REASON=$(echo "$item" | jq -r '.reason')
+              MALFORMED_ROWS="${MALFORMED_ROWS}<tr><td><strong>${NAME}</strong></td><td><code>${VERSION}</code></td><td>${REASON}</td></tr>"
+            done < <(jq -c '.[]' /tmp/malformed.json)
+
+            MALFORMED_SECTION='<div class="malformed-box">
+              <h3>⚠️ Malformed Specs Detected</h3>
+              <p>The following specs were found via heuristic fallback but were rejected by the Swagger parser — connectors were <strong>NOT</strong> generated for these:</p>
+              <table>
+                <thead><tr><th>Spec Name</th><th>Version</th><th>Rejection Reason</th></tr></thead>
+                <tbody>'"${MALFORMED_ROWS}"'</tbody>
+              </table>
+            </div>'
+          fi
+
+          # Generate HTML table rows from connector_prs.json
+          TABLE_ROWS=$(cat connector_prs.json | jq -r '.[] |
+            "<tr>" +
+            "<td>" + .connectorName + "</td>" +
+            "<td><code>" + .specification + "</code></td>" +
+            "<td><code>" + .openapiVersion + "</code></td>" +
+            "<td><code>" + (.expectedVersion // "N/A") + "</code></td>" +
+            "<td><span class=\"change-" + (.changeType | ascii_downcase) + "\">" + .changeType + "</span></td>" +
+            "<td>" + (if .buildStatus == "FAILED" or .buildStatus == "Workflow Failed" then "<span class=\"status-failed\">❌ FAILED</span>" elif .buildStatus == "In Progress" then "⏳ In Progress" else "<span class=\"status-success\">✅ Success</span>" end) + "</td>" +
+            "<td>" + (if .pr.number > 0 then "<a href=\"" + .pr.url + "\">#" + (.pr.number | tostring) + "</a>" else "Not Created" end) + "</td>" +
+            "<td>" + (.codeOwners // "N/A") + "</td>" +
+            "</tr>"
+          ')
+
+          echo "$TABLE_ROWS" > email_table_rows.html
+
+          CURRENT_DATE=$(date +%Y-%m-%d)
+          CURRENT_DATETIME=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          TOTAL_CONNECTORS=$(jq 'length' connector_prs.json)
+
+          echo "email_subject=Daily Connector Updates Summary - ${CURRENT_DATE}" >> $GITHUB_OUTPUT
+          echo "email_date=${CURRENT_DATETIME}" >> $GITHUB_OUTPUT
+          echo "total_connectors=${TOTAL_CONNECTORS}" >> $GITHUB_OUTPUT
+
+          # Generate complete HTML email
+          cat > email_body.html <<EOF
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #24292e; max-width: 1400px; margin: 0 auto; padding: 20px; }
+              .header { border-bottom: 3px solid #0366d6; padding-bottom: 20px; margin-bottom: 30px; }
+              .header h1 { margin: 0; color: #0366d6; font-size: 24px; }
+              .header .date { color: #586069; font-size: 14px; margin-top: 5px; }
+              table { width: 100%; border-collapse: collapse; margin: 20px 0; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 12px; }
+              th { background: #f6f8fa; border: 1px solid #d1d5da; padding: 10px 8px; text-align: left; font-weight: 600; color: #24292e; font-size: 13px; }
+              td { border: 1px solid #d1d5da; padding: 10px 8px; font-size: 12px; }
+              tr:hover { background: #f6f8fa; }
+              .status-success { color: #28a745; font-weight: 600; }
+              .status-failed { color: #d73a49; font-weight: 600; }
+              .change-major { background: #d73a49; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; }
+              .change-minor { background: #0366d6; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; }
+              .change-patch { background: #28a745; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; }
+              .change-failed, .change-pending, .change-unknown { background: #6c757d; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; }
+              a { color: #0366d6; text-decoration: none; }
+              a:hover { text-decoration: underline; }
+              .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #d1d5da; color: #586069; font-size: 12px; }
+              .summary-box { background: #f6f8fa; border: 1px solid #d1d5da; border-radius: 6px; padding: 15px; margin: 20px 0; }
+              .summary-box h3 { margin: 0 0 10px 0; font-size: 16px; }
+              .malformed-box { background: #fff8e1; border: 1px solid #f0ad4e; border-radius: 6px; padding: 15px; margin: 20px 0; }
+              .malformed-box h3 { margin: 0 0 10px 0; font-size: 16px; color: #856404; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>📦 Daily Connector Updates Summary</h1>
+              <div class="date">Generated: ${CURRENT_DATETIME}</div>
+            </div>
+            <div class="summary-box">
+              <h3>Summary</h3>
+              <p>Total connectors updated: <strong>${TOTAL_CONNECTORS}</strong></p>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Connector</th>
+                  <th>Specification</th>
+                  <th>OpenAPI Version</th>
+                  <th>Expected Connector Version</th>
+                  <th>Change Type</th>
+                  <th>Build Status</th>
+                  <th>Pull Request</th>
+                  <th>Code Owners</th>
+                </tr>
+              </thead>
+              <tbody>
+          ${TABLE_ROWS}
+              </tbody>
+            </table>
+          ${MALFORMED_SECTION}
+            <div class="footer">
+              <p>This is an automated message from the OpenAPI Dependabot system.</p>
+              <p>For questions or issues, please contact the Ballerina team.</p>
+            </div>
+          </body>
+          </html>
+          EOF
+
+          echo "Generated complete email body"
+
+      - name: Check email secrets
+        if: steps.trigger_connectors.outputs.triggered_count > 0
+        id: check_email_secrets
+        run: |
+          if [ -z "${{ secrets.GMAIL_USERNAME }}" ] || [ -z "${{ secrets.GMAIL_APP_PASSWORD }}" ]; then
+            echo "⚠️ WARNING: Email secrets (GMAIL_USERNAME or GMAIL_APP_PASSWORD) are not configured"
+            echo "email_configured=false" >> $GITHUB_OUTPUT
+          else
+            echo "✅ Email secrets are configured"
+            echo "email_configured=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send consolidated email
+        if: steps.trigger_connectors.outputs.triggered_count > 0 && steps.check_email_secrets.outputs.email_configured == 'true'
+        continue-on-error: true
+        id: send_email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USERNAME }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: ${{ steps.generate_email.outputs.email_subject }}
+          to: t37714687@gmail.com
+          from: ${{ secrets.GMAIL_USERNAME }}
+          html_body: file://email_body.html
+
+      - name: Log email status
+        if: steps.trigger_connectors.outputs.triggered_count > 0
+        run: |
+          if [ "${{ steps.send_email.outcome }}" == "success" ]; then
+            echo "✅ Email sent successfully to t37714687@gmail.com"
+          else
+            echo "⚠️ WARNING: Email sending failed"
+          fi
+
+      - name: Upload artifacts
+        if: steps.trigger_connectors.outputs.triggered_count > 0
+        uses: actions/upload-artifact@v4
+        with:
+          name: connector-update-summary-${{ github.run_id }}
+          path: |
+            connector_prs.json
+            triggered_connectors.txt
+            email_table_rows.html
+            email_body.html
+            connectors_to_update.json
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 📊 Connector Update Orchestration Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f "triggered_connectors.txt" ]; then
+            TRIGGERED=$(wc -l < triggered_connectors.txt)
+            echo "**Triggered:** $TRIGGERED connectors" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ -f "connector_prs.json" ]; then
+            COLLECTED=$(jq 'length' connector_prs.json)
+            COMPLETED=$(jq '[.[] | select(.pr.number > 0)] | length' connector_prs.json)
+            FAILED=$(jq '[.[] | select(.buildStatus == "FAILED" or .buildStatus == "Workflow Failed")] | length' connector_prs.json)
+
+            echo "**Collected:** $COLLECTED connector reports" >> $GITHUB_STEP_SUMMARY
+            echo "**Completed:** $COMPLETED with PRs created" >> $GITHUB_STEP_SUMMARY
+            echo "**Failed:** $FAILED build failures" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Email Status:** ${{ steps.send_email.outcome }}" >> $GITHUB_STEP_SUMMARY
+

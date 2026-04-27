@@ -1,3 +1,6 @@
+import connector_automator.utils;
+
+import ballerina/file;
 import ballerina/io;
 import ballerina/lang.runtime;
 
@@ -12,11 +15,14 @@ public function executeExampleGen(string... args) returns error? {
     // Parse options
     boolean quietMode = false;
     boolean autoYes = false;
+    boolean regenerate = false;
     foreach string arg in args {
         if arg == "quiet" {
             quietMode = true;
         } else if arg == "yes" {
             autoYes = true;
+        } else if arg == "regenerate" {
+            regenerate = true;
         }
     }
 
@@ -25,6 +31,9 @@ public function executeExampleGen(string... args) returns error? {
     }
     if quietMode {
         io:println("ℹ  Quiet mode enabled");
+    }
+    if regenerate && !quietMode {
+        io:println("ℹ  Regeneration mode: Smart example recovery enabled");
     }
 
     printExampleGenerationPlan(connectorPath, quietMode);
@@ -71,7 +80,40 @@ public function executeExampleGen(string... args) returns error? {
     }
     io:println("✓ Connector prepared successfully");
 
-    // 3. Determine the number of examples
+    // 3. In regeneration mode, first try to modify/fix existing examples
+    if regenerate {
+        ExistingExampleRecoveryResult|error recoveryResult = tryRecoverExistingExamples(connectorPath, quietMode);
+
+        if recoveryResult is ExistingExampleRecoveryResult {
+            if recoveryResult.existingCount > 0 && recoveryResult.success {
+                io:println("✓ Existing examples recovered successfully");
+                printExampleSummary(connectorPath, recoveryResult.existingCount, recoveryResult.existingCount, quietMode);
+                return;
+            }
+
+            if recoveryResult.existingCount > 0 {
+                io:println("⚠ Existing examples could not be fully recovered");
+                io:println("  Removing existing examples and regenerating from scratch...");
+                error? cleanupResult = cleanupExistingExamples(connectorPath);
+                if cleanupResult is error {
+                    io:println(string `✗ Failed to clean existing examples: ${cleanupResult.message()}`);
+                    return cleanupResult;
+                }
+                io:println("✓ Existing examples cleaned up");
+            }
+        } else {
+            io:println(string `⚠ Existing example recovery failed: ${recoveryResult.message()}`);
+            io:println("  Removing existing examples and regenerating from scratch...");
+            error? cleanupResult = cleanupExistingExamples(connectorPath);
+            if cleanupResult is error {
+                io:println(string `✗ Failed to clean existing examples: ${cleanupResult.message()}`);
+                return cleanupResult;
+            }
+            io:println("✓ Existing examples cleaned up");
+        }
+    }
+
+    // 4. Determine the number of examples
     int numExamples = numberOfExamples(details.apiCount);
 
     io:println("");
@@ -81,7 +123,7 @@ public function executeExampleGen(string... args) returns error? {
     string[] usedFunctionNames = [];
     int successCount = 0;
 
-    // 4. Generate each example
+    // 5. Generate each example
     foreach int i in 1 ... numExamples {
         if !quietMode {
             io:println("");
@@ -286,6 +328,7 @@ function printUsage() {
     io:println("OPTIONS");
     io:println("  yes      Auto-confirm all prompts");
     io:println("  quiet    Minimal logging output");
+    io:println("  regenerate   Try fixing existing examples first, then fallback to fresh generation");
     io:println("");
     io:println("EXAMPLES");
     io:println("  bal run -- generate-examples ./connector");
@@ -302,4 +345,101 @@ function printUsage() {
     io:println("  • Ballerina project structure creation");
     io:println("  • CI/CD friendly with auto-confirm mode");
     io:println("");
+}
+
+type ExistingExampleRecoveryResult record {|
+    int existingCount;
+    int recoveredCount;
+    boolean success;
+|};
+
+function tryRecoverExistingExamples(string connectorPath, boolean quietMode) returns ExistingExampleRecoveryResult|error {
+    string[] existingExamples = check getExistingExampleDirectories(connectorPath);
+
+    if existingExamples.length() == 0 {
+        if !quietMode {
+            io:println("No existing examples found. Proceeding with fresh generation...");
+        }
+        return {
+            existingCount: 0,
+            recoveredCount: 0,
+            success: false
+        };
+    }
+
+    io:println("");
+    io:println(string `Found ${existingExamples.length()} existing example${existingExamples.length() == 1 ? "" : "s"}`);
+    io:println("Attempting to fix/update existing examples first...");
+
+    int recoveredCount = 0;
+    foreach string exampleName in existingExamples {
+        string exampleDir = connectorPath + "/examples/" + exampleName;
+
+        if !quietMode {
+            io:println(string `  • Updating existing example: ${exampleName}`);
+        }
+
+        error? fixResult = fixExampleCode(exampleDir, exampleName);
+        if fixResult is error {
+            if !quietMode {
+                io:println(string `    ⚠ Fix attempt failed: ${fixResult.message()}`);
+            }
+            continue;
+        }
+
+        utils:CommandResult buildResult = utils:executeBalBuild(exampleDir, true);
+        if !utils:hasCompilationErrors(buildResult) {
+            recoveredCount += 1;
+            if !quietMode {
+                io:println("    ✓ Example compiles after update");
+            }
+        } else if !quietMode {
+            io:println("    ⚠ Example still has compilation errors");
+        }
+    }
+
+    return {
+        existingCount: existingExamples.length(),
+        recoveredCount,
+        success: recoveredCount == existingExamples.length()
+    };
+}
+
+function getExistingExampleDirectories(string connectorPath) returns string[]|error {
+    string examplesPath = connectorPath + "/examples";
+
+    boolean examplesExist = check file:test(examplesPath, file:EXISTS);
+    if !examplesExist {
+        return [];
+    }
+
+    file:MetaData[] exampleEntries = check file:readDir(examplesPath);
+    string[] exampleNames = [];
+
+    foreach file:MetaData entry in exampleEntries {
+        if entry.dir {
+            string exampleName = entry.absPath.substring(examplesPath.length());
+            if exampleName.startsWith("/") {
+                exampleName = exampleName.substring(1);
+            }
+
+            string mainBalPath = entry.absPath + "/main.bal";
+            boolean hasMain = check file:test(mainBalPath, file:EXISTS);
+            if hasMain {
+                exampleNames.push(exampleName);
+            }
+        }
+    }
+
+    return exampleNames;
+}
+
+function cleanupExistingExamples(string connectorPath) returns error? {
+    string examplesPath = connectorPath + "/examples";
+    boolean examplesExist = check file:test(examplesPath, file:EXISTS);
+
+    if examplesExist {
+        check file:remove(examplesPath, file:RECURSIVE);
+    }
+    return;
 }

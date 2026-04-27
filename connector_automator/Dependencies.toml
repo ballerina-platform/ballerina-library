@@ -5,12 +5,12 @@
 
 [ballerina]
 dependencies-toml-version = "2"
-distribution-version = "2201.13.0"
+distribution-version = "2201.13.1"
 
 [[package]]
 org = "ballerina"
 name = "ai"
-version = "1.7.0"
+version = "1.9.0"
 dependencies = [
 	{org = "ballerina", name = "constraint"},
 	{org = "ballerina", name = "data.jsondata"},
@@ -72,7 +72,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "crypto"
-version = "2.9.2"
+version = "2.10.1"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "time"}
@@ -93,7 +93,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "data.xmldata"
-version = "1.5.2"
+version = "1.6.1"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "lang.object"}
@@ -116,7 +116,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "http"
-version = "2.15.0"
+version = "2.15.4"
 dependencies = [
 	{org = "ballerina", name = "auth"},
 	{org = "ballerina", name = "cache"},
@@ -263,7 +263,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "log"
-version = "2.14.0"
+version = "2.16.1"
 dependencies = [
 	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "jballerina.java"},
@@ -282,7 +282,7 @@ version = "1.2.0"
 [[package]]
 org = "ballerina"
 name = "mcp"
-version = "1.0.2"
+version = "1.0.3"
 dependencies = [
 	{org = "ballerina", name = "http"},
 	{org = "ballerina", name = "jballerina.java"},
@@ -292,7 +292,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "mime"
-version = "2.12.0"
+version = "2.12.1"
 dependencies = [
 	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "jballerina.java"},
@@ -316,7 +316,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "observe"
-version = "1.6.0"
+version = "1.7.1"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
 ]
@@ -336,7 +336,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "regex"
-version = "1.3.2"
+version = "1.4.3"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "lang.string"}
@@ -348,7 +348,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "task"
-version = "2.11.0"
+version = "2.11.1"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "time"},
@@ -422,7 +422,7 @@ modules = [
 [[package]]
 org = "ballerinax"
 name = "ai.anthropic"
-version = "1.2.0"
+version = "1.3.1"
 dependencies = [
 	{org = "ballerina", name = "ai"},
 	{org = "ballerina", name = "constraint"},

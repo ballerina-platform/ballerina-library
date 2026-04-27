@@ -10,7 +10,7 @@ function analyzeConnectorForTests(string connectorPath, string[]? operationIds =
     // Read mock server content
     string mockServerContent = check io:fileReadString(connectorPath + "/ballerina/modules/mock.server/mock_server.bal");
 
-    // Read client.bal to extract the init method 
+    // Read client.bal to extract the init method
     string clientContent = check io:fileReadString(connectorPath + "/ballerina/client.bal");
     string initMethodSignature = extractInitMethodComplete(clientContent);
 
@@ -31,7 +31,7 @@ function analyzeConnectorForTests(string connectorPath, string[]? operationIds =
     string[] allDependentTypes = [];
     allDependentTypes.push(...referencedTypes);
 
-    // find nested types 
+    // find nested types
     findEssentialNestedTypes(referencedTypes, typesContent, allDependentTypes, maxDepth = 2);
 
     // Extract type definitions
@@ -51,7 +51,9 @@ function analyzeConnectorForTests(string connectorPath, string[]? operationIds =
         initMethodSignature,
         referencedTypeDefinitions,
         methodType,
-        remoteMethodSignatures
+        remoteMethodSignatures,
+        clientContent,
+        typesContent
     };
 }
 

@@ -118,8 +118,14 @@ This connector uses resource methods. Use the resource path syntax from the mock
       <REFERENCED_TYPE_DEFINITIONS>
         ${analysis.referencedTypeDefinitions}
       </REFERENCED_TYPE_DEFINITIONS>
+      <FULL_CLIENT_IMPLEMENTATION>
+        ${analysis.clientContent}
+      </FULL_CLIENT_IMPLEMENTATION>
+      <FULL_TYPES_DEFINITIONS>
+        ${analysis.typesContent}
+      </FULL_TYPES_DEFINITIONS>
 ${methodSignaturesSection}
-  
+
     </CONTEXT>
 
     **Requirements:**

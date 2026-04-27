@@ -459,10 +459,66 @@ function convertAlignedYamlToJson(string alignedSpecPath, boolean quietMode = fa
         return error("Failed to read YAML aligned spec file: " + yamlContent.message());
     }
 
-    // Parse YAML to JSON
-    json|yaml:Error jsonData = yaml:readString(yamlContent);
+    // Sanitize problematic characters that can break YAML parsing
+    string sanitizedYaml = yamlContent;
+    
+    // Replace backticks with single quotes
+    sanitizedYaml = regex:replaceAll(sanitizedYaml, "`", "'");
+    
+    // Try to parse sanitized YAML to JSON using Ballerina's yaml library
+    json|yaml:Error jsonData = yaml:readString(sanitizedYaml);
+    
     if jsonData is yaml:Error {
-        return error("Failed to parse YAML content: " + jsonData.message());
+        // If Ballerina's yaml parser fails, try using yq command-line tool as fallback
+        if !quietMode {
+            log:printWarn("Ballerina YAML parser failed, trying yq fallback", 
+                errorMsg = jsonData.message());
+        }
+        
+        // Try using yq to convert YAML to JSON
+        utils:CommandResult yqResult = utils:executeCommand(
+            string `yq -o=json '.' "${yamlAlignedSpec}"`,
+            "."
+        );
+        
+        if utils:isCommandSuccessfull(yqResult) && yqResult.stdout.length() > 0 {
+            // yq succeeded, write the JSON output directly
+            io:Error? writeResult = io:fileWriteString(jsonAlignedSpec, yqResult.stdout);
+            if writeResult is io:Error {
+                return error("Failed to write JSON aligned spec file: " + writeResult.message());
+            }
+            
+            if !quietMode {
+                log:printInfo("Successfully converted YAML to JSON using yq",
+                        yamlPath = yamlAlignedSpec,
+                        jsonPath = jsonAlignedSpec);
+            }
+            return;
+        }
+        
+        // Try python-based conversion as another fallback
+        utils:CommandResult pythonResult = utils:executeCommand(
+            string `python3 -c "import yaml, json, sys; print(json.dumps(yaml.safe_load(open('${yamlAlignedSpec}')), indent=2))"`,
+            "."
+        );
+        
+        if utils:isCommandSuccessfull(pythonResult) && pythonResult.stdout.length() > 0 {
+            io:Error? writeResult = io:fileWriteString(jsonAlignedSpec, pythonResult.stdout);
+            if writeResult is io:Error {
+                return error("Failed to write JSON aligned spec file: " + writeResult.message());
+            }
+            
+            if !quietMode {
+                log:printInfo("Successfully converted YAML to JSON using Python",
+                        yamlPath = yamlAlignedSpec,
+                        jsonPath = jsonAlignedSpec);
+            }
+            return;
+        }
+        
+        // All methods failed
+        return error("Failed to parse YAML content: " + jsonData.message() + 
+            ". Fallback tools (yq, python) also failed or not available.");
     }
 
     // Write JSON content
