@@ -200,7 +200,8 @@ def process_module(name, default_branch, repo_dir, dry_run):
             info(f"Written: {WORKFLOW_FILE}")
 
         # Commit and push only if there are actual changes
-        run(["git", "add", WORKFLOW_FILE], dry_run=dry_run)
+        # Use absolute path to avoid any cwd ambiguity
+        run(["git", "add", str(workflow_path)], dry_run=dry_run)
 
         staged = subprocess.run(["git", "diff", "--cached", "--quiet"])
         if staged.returncode == 0:
