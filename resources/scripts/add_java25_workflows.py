@@ -119,9 +119,9 @@ def load_modules():
     with open(STDLIB_MODULES_JSON) as f:
         data = json.load(f)
 
-    # Collect all categories except generated_connectors
+    # Collect all categories except generated_connectors and driver_modules
     modules = []
-    for category in ("library_modules", "extended_modules", "handwritten_connectors", "driver_modules", "tools"):
+    for category in ("library_modules", "extended_modules", "handwritten_connectors", "tools"):
         modules.extend(data.get(category, []))
     return modules
 
