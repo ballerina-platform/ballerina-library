@@ -198,10 +198,15 @@ def process_module(name, default_branch, repo_dir, dry_run):
             workflow_path.write_text(content)
             info(f"Written: {WORKFLOW_FILE}")
 
-        # Commit and push
+        # Commit and push only if there are actual changes
         run(["git", "add", WORKFLOW_FILE], dry_run=dry_run)
-        run(["git", "commit", "-m", "Add Java 25 compatibility test workflow"], dry_run=dry_run)
-        run(["git", "push", "origin", JAVA25_BRANCH], dry_run=dry_run)
+
+        staged = subprocess.run(["git", "diff", "--cached", "--quiet"])
+        if staged.returncode == 0:
+            info(f"Workflow already up to date on {JAVA25_BRANCH}, skipping commit: {name}")
+        else:
+            run(["git", "commit", "-m", "Add Java 25 compatibility test workflow"], dry_run=dry_run)
+            run(["git", "push", "origin", JAVA25_BRANCH], dry_run=dry_run)
 
         info(f"Done: {name}")
     finally:
