@@ -36,6 +36,7 @@ GITHUB_ORG = "ballerina-platform"
 STANDARD_TEMPLATE = "ballerina-platform/ballerina-library/.github/workflows/build-with-java25-template.yml@java-25"
 CONNECTOR_TEMPLATE = "ballerina-platform/ballerina-library/.github/workflows/build-with-java25-connector-template.yml@java-25"
 
+STANDARD_TEMPLATE_MARKER = "pull-request-build-template.yml"
 CONNECTOR_TEMPLATE_MARKER = "pr-build-connector-template.yml"
 
 WORKFLOW_FILE = ".github/workflows/build-with-java25.yml"
@@ -234,14 +235,19 @@ def pick_template(module_path):
         warn(f"No existing workflow files found in {module_path.name}, defaulting to standard template")
         return STANDARD_TEMPLATE
 
+    found_standard = False
     for wf_file in yml_files:
         try:
             content = wf_file.read_text()
             if CONNECTOR_TEMPLATE_MARKER in content:
                 return CONNECTOR_TEMPLATE
+            if STANDARD_TEMPLATE_MARKER in content:
+                found_standard = True
         except OSError:
             continue
 
+    if not found_standard:
+        warn(f"Neither PR build template reference found in {module_path.name}, defaulting to standard template")
     return STANDARD_TEMPLATE
 
 
