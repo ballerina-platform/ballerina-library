@@ -1,0 +1,68 @@
+name: Build with Java 25 (Connector)
+
+on:
+  workflow_call:
+    inputs:
+      additional-build-flags:
+        required: false
+        type: string
+        default: ""
+      additional-test-flags:
+        required: false
+        type: string
+        default: ""
+
+# The build and test commands are in separate steps to switch the JDK between compilation (JDK 21)
+# and test execution (JDK 25). Compilation must not use JDK 25.
+jobs:
+  build:
+    name: Build and Test on JDK 25
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Get Ballerina Version
+        run: |
+          BAL_VERSION=$(grep -w 'ballerinaLangVersion' gradle.properties | cut -d= -f2 | rev | cut --complement -d- -f1 | rev)
+          if [ -z "$BAL_VERSION" ]; then
+            BAL_VERSION="latest"
+          fi
+          echo "BAL_VERSION=$BAL_VERSION" >> $GITHUB_ENV
+          echo "Ballerina Version: $BAL_VERSION"
+
+      - name: Set Up Ballerina
+        uses: ballerina-platform/setup-ballerina@v1.1.3
+        with:
+          version: ${{ env.BAL_VERSION }}
+
+      # --- Phase 1: compile on JDK 21 ---
+      - name: Set up JDK 21 (compile)
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 21.0.3
+
+      - name: Set ENV Variables
+        run: |
+          echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
+          echo "CENTRAL_VERBOSE_ENABLED=true" >> $GITHUB_ENV
+
+      - name: Build (JDK 21)
+        env:
+          packageUser: ${{ github.actor }}
+          packagePAT: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew build -x test ${{ inputs.additional-build-flags }}
+
+      # --- Phase 2: run tests on JDK 25 ---
+      - name: Set up JDK 25 (test)
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+
+      - name: Test (JDK 25)
+        env:
+          packageUser: ${{ github.actor }}
+          packagePAT: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew test ${{ inputs.additional-test-flags }}
