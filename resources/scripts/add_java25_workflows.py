@@ -216,22 +216,32 @@ def process_module(name, default_branch, repo_dir, dry_run):
 def pick_template(module_path):
     """Return the centralized template URL to use.
 
-    Reads the existing pull-request.yml to check whether it calls the connector
-    template. Falls back to the standard template if the file is absent or
-    unrecognised.
+    Scans every workflow file under .github/workflows/ for a reference to
+    any centralized ballerina-library template. If any file calls the connector
+    template, the connector variant is returned. Returns the standard template
+    if no workflow files are found or none reference a connector template.
     """
-    for candidate in (
-        module_path / ".github" / "workflows" / "pull-request.yml",
-        module_path / ".github" / "workflows" / "pull_request.yml",
-    ):
-        if candidate.exists():
-            content = candidate.read_text()
+    workflows_dir = module_path / ".github" / "workflows"
+    if not workflows_dir.is_dir():
+        warn(f"No .github/workflows/ directory found in {module_path.name}, defaulting to standard template")
+        return STANDARD_TEMPLATE
+
+    yml_files = list(workflows_dir.glob("*.yml")) + list(workflows_dir.glob("*.yaml"))
+    # Exclude the file we are about to write
+    yml_files = [f for f in yml_files if f.name != Path(WORKFLOW_FILE).name]
+
+    if not yml_files:
+        warn(f"No existing workflow files found in {module_path.name}, defaulting to standard template")
+        return STANDARD_TEMPLATE
+
+    for wf_file in yml_files:
+        try:
+            content = wf_file.read_text()
             if CONNECTOR_TEMPLATE_MARKER in content:
                 return CONNECTOR_TEMPLATE
-            return STANDARD_TEMPLATE
+        except OSError:
+            continue
 
-    # No pull-request workflow found — default to standard
-    warn(f"No pull-request.yml found in {module_path.name}, defaulting to standard template")
     return STANDARD_TEMPLATE
 
 
