@@ -83,13 +83,7 @@ function generateSortKey(string methodType, string path) returns [string, string
 
 // Shared across client and type sort files within this module
 function countChar(string str, string char) returns int {
-    int count = 0;
-    foreach int i in 0 ..< str.length() {
-        if str.substring(i, i + 1) == char {
-            count += 1;
-        }
-    }
-    return count;
+    return re`${char}`.findAll(str).length();
 }
 
 function extractAllBlocks(string content) returns [ContentBlock[], int, int] {
