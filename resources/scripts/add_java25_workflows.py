@@ -31,6 +31,7 @@ SCRIPT_DIR = Path(__file__).parent
 STDLIB_MODULES_JSON = SCRIPT_DIR.parent.parent / "release" / "resources" / "stdlib_modules.json"
 
 JAVA25_BRANCH = "java-25"
+BASE_BRANCH = "2201.12.x"
 GITHUB_ORG = "ballerina-platform"
 
 STANDARD_TEMPLATE = "ballerina-platform/ballerina-library/.github/workflows/build-with-java25-template.yml@java-25"
@@ -45,7 +46,9 @@ STANDARD_WORKFLOW = """\
 name: Build with Java 25
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - java-25
 
 jobs:
   build:
@@ -57,7 +60,9 @@ CONNECTOR_WORKFLOW = """\
 name: Build with Java 25
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - java-25
 
 jobs:
   build:
@@ -74,11 +79,15 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="Print actions without executing git operations")
     parser.add_argument("--continue-on-error", action="store_true", help="Continue even if a repo fails")
     parser.add_argument("--skip-modules", help="Comma-separated list of module name substrings to skip")
+    parser.add_argument("--distribution-repo", help="Path to ballerina-distribution repo (default: <path>/ballerina-distribution)")
     args = parser.parse_args()
 
-    repo_dir = Path(args.path)
+    repo_dir = Path(args.path).resolve()
     if not repo_dir.exists():
         repo_dir.mkdir(parents=True)
+
+    dist_repo = Path(args.distribution_repo).resolve() if args.distribution_repo else repo_dir / "ballerina-distribution"
+    gradle_versions = load_gradle_properties(dist_repo)
 
     os.chdir(repo_dir)
 
@@ -97,8 +106,9 @@ def main():
     for module in modules:
         name = module["name"]
         default_branch = module.get("default_branch", "master")
+        version_key = module.get("version_key")
         try:
-            process_module(name, default_branch, repo_dir, args.dry_run)
+            process_module(name, default_branch, version_key, gradle_versions, repo_dir, args.dry_run)
         except Exception as e:
             error_msg = f"{name}: {e}"
             if args.continue_on_error:
@@ -127,6 +137,37 @@ def load_modules():
     return modules
 
 
+def load_gradle_properties(dist_repo_path):
+    props_file = dist_repo_path / "gradle.properties"
+    if not props_file.exists():
+        err(f"gradle.properties not found at {props_file}")
+    versions = {}
+    with open(props_file) as f:
+        for line in f:
+            line = line.strip()
+            if "=" in line and not line.startswith("#"):
+                key, _, value = line.partition("=")
+                versions[key.strip()] = value.strip()
+    return versions
+
+
+def get_version_tag(version_key, gradle_versions):
+    if not version_key:
+        return None
+    version = gradle_versions.get(version_key)
+    if not version:
+        return None
+    return f"v{version}"
+
+
+def tag_exists_on_origin(tag):
+    result = subprocess.run(
+        ["git", "ls-remote", "--tags", "origin", tag],
+        capture_output=True, text=True
+    )
+    return bool(result.stdout.strip())
+
+
 def filter_modules(modules, from_module, up_to_module, skip_patterns):
     result = []
     started = from_module is None
@@ -151,7 +192,7 @@ def filter_modules(modules, from_module, up_to_module, skip_patterns):
     return result
 
 
-def process_module(name, default_branch, repo_dir, dry_run):
+def process_module(name, default_branch, version_key, gradle_versions, repo_dir, dry_run):
     print()
     print("=" * 60)
     info(f"Processing: {name}")
@@ -162,53 +203,66 @@ def process_module(name, default_branch, repo_dir, dry_run):
     if not module_path.exists():
         info(f"Cloning {name}...")
         clone_url = f"https://github.com/{GITHUB_ORG}/{name}.git"
-        run(["git", "clone", clone_url], dry_run=False)  # always clone
+        run(["git", "clone", clone_url], dry_run=False)
 
     os.chdir(module_path)
 
     try:
-        # Fetch latest
         run(["git", "fetch", "origin"], dry_run=False)
 
-        # Check out the default branch and reset to origin
-        run(["git", "checkout", default_branch], dry_run=False)
-        run(["git", "reset", "--hard", f"origin/{default_branch}"], dry_run=False)
-
-        # Create or reset the java-25 branch
-        branch_exists = branch_exists_on_origin(JAVA25_BRANCH)
-        if branch_exists:
-            info(f"Branch {JAVA25_BRANCH} already exists on origin — checking out and resetting")
-            run(["git", "checkout", JAVA25_BRANCH], dry_run=False)
-            run(["git", "reset", "--hard", f"origin/{JAVA25_BRANCH}"], dry_run=False)
+        # Determine base: use 2201.12.x branch if it exists, otherwise create it from the
+        # module's release tag found in ballerina-distribution/gradle.properties, or fall
+        # back to the default branch if neither is available.
+        if branch_exists_on_origin(BASE_BRANCH):
+            info(f"Using existing {BASE_BRANCH} branch")
+            run(["git", "checkout", BASE_BRANCH], dry_run=False)
+            run(["git", "reset", "--hard", f"origin/{BASE_BRANCH}"], dry_run=False)
         else:
-            info(f"Creating branch {JAVA25_BRANCH} from {default_branch}")
-            run(["git", "checkout", "-b", JAVA25_BRANCH], dry_run=dry_run)
+            tag = get_version_tag(version_key, gradle_versions)
+            if tag and tag_exists_on_origin(tag):
+                base_ref = tag
+                info(f"Branch {BASE_BRANCH} not found — creating from tag {tag}")
+            else:
+                if tag:
+                    warn(f"Branch {BASE_BRANCH} not found and tag {tag} not found on origin — falling back to default branch")
+                else:
+                    warn(f"Branch {BASE_BRANCH} not found and no version tag available — falling back to default branch")
+                run(["git", "checkout", default_branch], dry_run=False)
+                run(["git", "reset", "--hard", f"origin/{default_branch}"], dry_run=False)
+                base_ref = default_branch
+            # Always do the local checkout so pick_template() can read the repo state.
+            run(["git", "checkout", "-b", BASE_BRANCH, base_ref], dry_run=False)
+            run(["git", "push", "origin", BASE_BRANCH], dry_run=dry_run)
 
-        # Determine which template to use
+        # Determine which template to use by inspecting the 2201.12.x state.
+        # 2201.12.x is read-only here — the workflow is never committed to it.
         template = pick_template(module_path)
         info(f"Using template: {template}")
 
-        # Write the workflow file
         workflow_path = module_path / WORKFLOW_FILE
-        workflow_path.parent.mkdir(parents=True, exist_ok=True)
-
         content = STANDARD_WORKFLOW.format(template=template)
+
+        # Create java-25 from 2201.12.x (clean, no workflow yet), then add the workflow there.
+        if branch_exists_on_origin(JAVA25_BRANCH):
+            info(f"Branch {JAVA25_BRANCH} already exists on origin — deleting and recreating from {BASE_BRANCH}")
+            run(["git", "push", "origin", "--delete", JAVA25_BRANCH], dry_run=dry_run)
+        info(f"Creating branch {JAVA25_BRANCH} from {BASE_BRANCH}")
+        run(["git", "checkout", "-b", JAVA25_BRANCH], dry_run=dry_run)
+
+        workflow_path.parent.mkdir(parents=True, exist_ok=True)
         if dry_run:
-            info(f"[DRY RUN] Would write {WORKFLOW_FILE}")
+            info(f"[DRY RUN] Would write {WORKFLOW_FILE} to {JAVA25_BRANCH}")
         else:
             workflow_path.write_text(content)
             info(f"Written: {WORKFLOW_FILE}")
 
-        # Commit and push only if there are actual changes
-        # Use absolute path to avoid any cwd ambiguity
         run(["git", "add", str(workflow_path)], dry_run=dry_run)
-
         staged = subprocess.run(["git", "diff", "--cached", "--quiet"])
         if staged.returncode == 0:
-            info(f"Workflow already up to date on {JAVA25_BRANCH}, skipping commit: {name}")
+            info(f"Workflow already up to date on {JAVA25_BRANCH}, skipping commit")
         else:
             run(["git", "commit", "-m", "Add Java 25 compatibility test workflow"], dry_run=dry_run)
-            run(["git", "push", "origin", JAVA25_BRANCH], dry_run=dry_run)
+        run(["git", "push", "origin", JAVA25_BRANCH], dry_run=dry_run)
 
         info(f"Done: {name}")
     finally:

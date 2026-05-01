@@ -2,6 +2,12 @@
 Trigger the `build-with-java25.yml` workflow on the `java-25` branch
 for every module in stdlib_modules.json (excluding generated_connectors and driver_modules).
 
+GitHub's workflow_dispatch event only works when the workflow file exists on the
+default branch. Because build-with-java25.yml lives exclusively on the java-25
+branch, we trigger it instead by creating an empty commit on that branch via the
+GitHub Git API. This fires the push event and starts the workflow without needing
+a local clone.
+
 Requires:
   - The java-25 branch to exist in each repo (run add_java25_workflows.py first)
   - `gh` CLI authenticated with write access to ballerina-platform
@@ -28,7 +34,6 @@ SCRIPT_DIR = Path(__file__).parent
 STDLIB_MODULES_JSON = SCRIPT_DIR.parent.parent / "release" / "resources" / "stdlib_modules.json"
 
 GITHUB_ORG = "ballerina-platform"
-WORKFLOW_FILE = "build-with-java25.yml"
 BRANCH = "java-25"
 
 # Pause between triggers to avoid hitting GitHub rate limits
@@ -60,25 +65,14 @@ def main():
     for module in modules:
         name = module["name"]
         repo = f"{GITHUB_ORG}/{name}"
-        cmd = ["gh", "workflow", "run", WORKFLOW_FILE, "--repo", repo, "--ref", BRANCH]
 
-        if args.dry_run:
-            info(f"[DRY RUN] {' '.join(cmd)}")
-            triggered.append(name)
-            continue
-
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        if result.returncode == 0:
-            info(f"Triggered: {name}")
+        ok, detail = push_empty_commit(repo, BRANCH, dry_run=args.dry_run)
+        if ok:
+            info(f"Triggered: {name}  ({detail})")
             triggered.append(name)
         else:
-            stderr = result.stderr.strip()
-            if "Could not find any workflows" in stderr or "does not have any workflow" in stderr:
-                warn(f"No workflow found (branch not pushed yet?): {name}")
-                skipped.append(name)
-            else:
-                warn(f"Failed to trigger {name}: {stderr}")
-                skipped.append(name)
+            warn(f"Failed to trigger {name}: {detail}")
+            skipped.append(name)
 
         time.sleep(TRIGGER_DELAY_SECONDS)
 
@@ -88,6 +82,62 @@ def main():
         warn(f"Skipped / failed: {len(skipped)}")
         for s in skipped:
             warn(f"  - {s}")
+
+
+def push_empty_commit(repo, branch, dry_run=False):
+    """Trigger push-event workflows by creating an empty commit on the branch.
+
+    Returns (success: bool, detail: str).
+    """
+    # Step 1: resolve current branch HEAD
+    r = subprocess.run(
+        ["gh", "api", f"/repos/{repo}/git/ref/heads/{branch}"],
+        capture_output=True, text=True,
+    )
+    if r.returncode != 0:
+        return False, f"branch not found: {r.stderr.strip()}"
+    current_sha = json.loads(r.stdout)["object"]["sha"]
+
+    # Step 2: get tree SHA from that commit
+    r = subprocess.run(
+        ["gh", "api", f"/repos/{repo}/git/commits/{current_sha}"],
+        capture_output=True, text=True,
+    )
+    if r.returncode != 0:
+        return False, f"commit lookup failed: {r.stderr.strip()}"
+    tree_sha = json.loads(r.stdout)["tree"]["sha"]
+
+    if dry_run:
+        return True, f"[DRY RUN] would push empty commit (tree={tree_sha[:7]}, parent={current_sha[:7]})"
+
+    # Step 3: create an empty commit (same tree, new message)
+    r = subprocess.run(
+        [
+            "gh", "api", "--method", "POST",
+            f"/repos/{repo}/git/commits",
+            "-f", "message=chore: trigger Java 25 build [ci]",
+            "-f", f"tree={tree_sha}",
+            "-f", f"parents[]={current_sha}",
+        ],
+        capture_output=True, text=True,
+    )
+    if r.returncode != 0:
+        return False, f"commit creation failed: {r.stderr.strip()}"
+    new_sha = json.loads(r.stdout)["sha"]
+
+    # Step 4: advance the branch ref
+    r = subprocess.run(
+        [
+            "gh", "api", "--method", "PATCH",
+            f"/repos/{repo}/git/refs/heads/{branch}",
+            "-f", f"sha={new_sha}",
+        ],
+        capture_output=True, text=True,
+    )
+    if r.returncode != 0:
+        return False, f"ref update failed: {r.stderr.strip()}"
+
+    return True, f"empty commit {new_sha[:7]}"
 
 
 def load_modules():
