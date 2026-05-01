@@ -21,6 +21,7 @@ Usage:
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -33,6 +34,7 @@ STDLIB_MODULES_JSON = SCRIPT_DIR.parent.parent / "release" / "resources" / "stdl
 JAVA25_BRANCH = "java-25"
 BASE_BRANCH = "2201.12.x"
 GITHUB_ORG = "ballerina-platform"
+BALLERINA_GRADLE_PLUGIN_VERSION = "2.3.1"
 
 STANDARD_TEMPLATE = "ballerina-platform/ballerina-library/.github/workflows/build-with-java25-template.yml@java-25"
 CONNECTOR_TEMPLATE = "ballerina-platform/ballerina-library/.github/workflows/build-with-java25-connector-template.yml@java-25"
@@ -257,9 +259,13 @@ def process_module(name, default_branch, version_key, gradle_versions, repo_dir,
             info(f"Written: {WORKFLOW_FILE}")
 
         run(["git", "add", str(workflow_path)], dry_run=dry_run)
+
+        patch_gradle_properties(module_path, dry_run)
+        run(["git", "add", str(module_path / "gradle.properties")], dry_run=dry_run)
+
         staged = subprocess.run(["git", "diff", "--cached", "--quiet"])
         if staged.returncode == 0:
-            info(f"Workflow already up to date on {JAVA25_BRANCH}, skipping commit")
+            info(f"Nothing changed on {JAVA25_BRANCH}, skipping commit")
         else:
             run(["git", "commit", "-m", "Add Java 25 compatibility test workflow"], dry_run=dry_run)
         run(["git", "push", "origin", JAVA25_BRANCH], dry_run=dry_run)
@@ -304,6 +310,42 @@ def pick_template(module_path):
     if not found_standard:
         warn(f"Neither PR build template reference found in {module_path.name}, defaulting to standard template")
     return STANDARD_TEMPLATE
+
+
+def patch_gradle_properties(module_path, dry_run):
+    """Ensure ballerinaGradlePluginVersion is set to BALLERINA_GRADLE_PLUGIN_VERSION.
+
+    Returns True if the file was (or would be) modified.
+    """
+    props_file = module_path / "gradle.properties"
+    if not props_file.exists():
+        warn("gradle.properties not found — skipping plugin version patch")
+        return False
+
+    content = props_file.read_text()
+    match = re.search(r"^ballerinaGradlePluginVersion\s*=\s*(.+)$", content, re.MULTILINE)
+    if not match:
+        warn("ballerinaGradlePluginVersion not found in gradle.properties — skipping")
+        return False
+
+    current = match.group(1).strip()
+    if current == BALLERINA_GRADLE_PLUGIN_VERSION:
+        info(f"ballerinaGradlePluginVersion already {BALLERINA_GRADLE_PLUGIN_VERSION}")
+        return False
+
+    info(f"Updating ballerinaGradlePluginVersion: {current} → {BALLERINA_GRADLE_PLUGIN_VERSION}")
+    if dry_run:
+        info(f"[DRY RUN] Would update ballerinaGradlePluginVersion in gradle.properties")
+        return True
+
+    new_content = re.sub(
+        r"^(ballerinaGradlePluginVersion\s*=\s*).*$",
+        rf"\g<1>{BALLERINA_GRADLE_PLUGIN_VERSION}",
+        content,
+        flags=re.MULTILINE,
+    )
+    props_file.write_text(new_content)
+    return True
 
 
 def branch_exists_on_origin(branch):

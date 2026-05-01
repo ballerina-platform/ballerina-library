@@ -65,7 +65,7 @@ jobs:
       # change (DefaultReportContainer: "Type T not present"). Fixed in Gradle 8.12.
       - name: Upgrade Gradle wrapper for Java 25 compatibility
         run: |
-          sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-8.12.1-bin.zip|' \
+          sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-9.1.0-bin.zip|' \
             gradle/wrapper/gradle-wrapper.properties
 
       - name: Test (JDK 25)
