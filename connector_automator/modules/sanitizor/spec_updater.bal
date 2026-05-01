@@ -59,14 +59,29 @@ function updateParameterDescriptionInSpec(map<json> paths, string location, stri
                         if operation is map<json> {
                             map<json> operationMap = <map<json>>operation;
 
+                            // Check operation-level parameters first
                             if operationMap.hasKey("parameters") {
                                 json|error parametersResult = operationMap.get("parameters");
                                 if parametersResult is json[] {
-                                    json[] parameters = parametersResult;
+                                    foreach int i in 0 ..< parametersResult.length() {
+                                        json param = parametersResult[i];
+                                        if param is map<json> {
+                                            map<json> paramMap = <map<json>>param;
+                                            if paramMap.hasKey("name") && paramMap.get("name") == paramName {
+                                                paramMap["description"] = description;
+                                                return ();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
 
-                                    // Find the parameter by name
-                                    foreach int i in 0 ..< parameters.length() {
-                                        json param = parameters[i];
+                            // Fall back to path-level parameters (shared across all operations)
+                            if pathItemMap.hasKey("parameters") {
+                                json|error pathParamsResult = pathItemMap.get("parameters");
+                                if pathParamsResult is json[] {
+                                    foreach int i in 0 ..< pathParamsResult.length() {
+                                        json param = pathParamsResult[i];
                                         if param is map<json> {
                                             map<json> paramMap = <map<json>>param;
                                             if paramMap.hasKey("name") && paramMap.get("name") == paramName {
