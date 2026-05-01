@@ -46,15 +46,33 @@ jobs:
           distribution: 'temurin'
           java-version: '25'
 
-      # Gradle 8.11.x fails to configure Checkstyle tasks on Java 25 due to a reflection
-      # change (DefaultReportContainer: "Type T not present"). Fixed in Gradle 8.12.
+      # Gradle 8.11.x fails to configure Checkstyle tasks on Java 25 (DefaultReportContainer
+      # reflection issue). Gradle 8.12 backported the fix while keeping APIs the Ballerina
+      # Gradle plugin depends on (project.exec, sourceCompatibility, ConfigureUtil, etc.)
+      # that were removed in Gradle 9.
       - name: Upgrade Gradle wrapper for Java 25 compatibility
         run: |
-          sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-9.1.0-bin.zip|' \
+          sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-8.12.1-bin.zip|' \
             gradle/wrapper/gradle-wrapper.properties
+
+          # Pin all Java compilation to JDK 21 via a toolchain. Without this, Gradle
+          # defaults compilation to whatever JDK runs the daemon (JDK 25 here), producing
+          # Java 25 bytecode for subprojects that have no explicit sourceCompatibility.
+          # The toolchain makes Gradle find and use the JDK 21 installed in phase 1.
+          # Ballerina tests are unaffected: bal test spawns its own JVM and picks up
+          # JAVA_HOME (JDK 25), so Ballerina code is tested on the target runtime.
+          cat > /tmp/gradle9-compat.init.gradle << 'INIT_EOF'
+          gradle.beforeProject { project ->
+              project.plugins.withType(org.gradle.api.plugins.JavaPlugin) {
+                  project.java.toolchain {
+                      languageVersion = org.gradle.jvm.toolchain.JavaLanguageVersion.of(21)
+                  }
+              }
+          }
+          INIT_EOF
 
       - name: Test (JDK 25)
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew test ${{ inputs.additional-test-flags }}
+        run: ./gradlew test --init-script /tmp/gradle9-compat.init.gradle ${{ inputs.additional-test-flags }}

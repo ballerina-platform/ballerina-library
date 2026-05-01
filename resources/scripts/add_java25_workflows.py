@@ -348,6 +348,7 @@ def patch_gradle_properties(module_path, dry_run):
     return True
 
 
+
 def branch_exists_on_origin(branch):
     result = subprocess.run(
         ["git", "ls-remote", "--heads", "origin", branch],
