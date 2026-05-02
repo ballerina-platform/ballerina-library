@@ -93,13 +93,31 @@ function extractAllTypes(string content) returns [TypeDefinition[], int, int] {
             int braceCount = countChar(line, "{") - countChar(line, "}");
             i += 1;
 
+            // If the declaration line has no net-open braces, finalize immediately
+            // to prevent the body loop from consuming the next type definition
+            if braceCount == 0 {
+                lastTypeLine = startLine;
+                string typeContent = line;
+                string typeKind = extractTypeKind(typeContent);
+                typeDefs.push({
+                    content: typeContent,
+                    name: typeName,
+                    typeKind: typeKind,
+                    startLine: startLine,
+                    endLine: startLine
+                });
+                continue;
+            }
+
+            // Use a separate mutable counter to avoid Ballerina's narrowing restriction
+            int openBraces = braceCount;
             while i < lines.length() {
                 string currentLine = lines[i];
                 typeLines.push(currentLine);
-                braceCount += countChar(currentLine, "{") - countChar(currentLine, "}");
+                openBraces += countChar(currentLine, "{") - countChar(currentLine, "}");
 
                 string currentStripped = currentLine.trim();
-                if braceCount == 0 && (currentStripped.endsWith("};") || currentStripped.endsWith("|};")) {
+                if openBraces == 0 && (currentStripped.endsWith("};") || currentStripped.endsWith("|};")) {
                     lastTypeLine = i;
                     string typeContent = string:'join("\n", ...typeLines);
                     string typeKind = extractTypeKind(typeContent);

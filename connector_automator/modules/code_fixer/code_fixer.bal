@@ -92,13 +92,13 @@ function extractTypeNamesFromErrors(CompilationError[] errors) returns string[] 
         string message = err.message;
 
         // Pattern: 'TypeName' or "TypeName" in error messages
-        // Look for patterns like: type 'SomeType', record 'SomeType', etc.
-        regexp:RegExp typePattern = re `'([A-Z][a-zA-Z0-9]+)'`;
+        // Look for patterns like: type 'SomeType', record "SomeType", etc.
+        regexp:RegExp typePattern = re `['"]([A-Z][a-zA-Z0-9]+)['"]`;
         regexp:Span[] matches = typePattern.findAll(message);
 
         foreach regexp:Span span in matches {
             string matched = span.substring();
-            // Remove the quotes
+            // Remove the surrounding quotes
             string typeName = matched.substring(1, matched.length() - 1);
             // Filter out common keywords that aren't types
             if !isBalKeyword(typeName) && !containsTypeName(typeNames, typeName) {

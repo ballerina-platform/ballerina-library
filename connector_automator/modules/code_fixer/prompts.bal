@@ -279,14 +279,9 @@ Pattern 2: "incompatible types: expected 'SomeType?', found 'anydata'"
   - This approach FAILED because member access returns anydata
 
 **THE CORRECT COMBINED SOLUTION**:
-When BOTH patterns appear in history, you MUST use:
-${tripleBacktick}ballerina
-// For rest fields that return anydata, ALWAYS combine member access WITH type cast:
-string? fieldValue = <string?>response["fieldName"];
-
-// Or use ensureType for non-optional:
-string fieldValue = check response["fieldName"].ensureType();
-${tripleBacktick}
+When BOTH patterns appear in history, you MUST combine member access with a type cast (write this directly in your code response, no fences):
+  string? fieldValue = <string?>response["fieldName"];
+  string fieldValue = check response["fieldName"].ensureType();
 
 DO NOT try ${backTick}response.field${backTick} again - it already failed.
 DO NOT try ${backTick}response["field"]${backTick} without cast - it already failed.

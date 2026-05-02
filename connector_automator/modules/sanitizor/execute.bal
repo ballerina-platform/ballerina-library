@@ -474,7 +474,8 @@ function convertAlignedYamlToJson(string alignedSpecPath, boolean quietMode = fa
 
         utils:CommandResult yqResult = utils:executeCommand(
             string `yq -o=json '.' ${escapedPath}`,
-            "."
+            ".",
+            quietMode
         );
 
         if utils:isCommandSuccessfull(yqResult) && yqResult.stdout.length() > 0 {
@@ -497,7 +498,8 @@ function convertAlignedYamlToJson(string alignedSpecPath, boolean quietMode = fa
             string escapedStdinFile = "'" + regex:replaceAll(stdinFile, "'", "'\\\\''") + "'";
             utils:CommandResult pythonResult = utils:executeCommand(
                 string `python3 -c 'import sys,yaml,json; print(json.dumps(yaml.safe_load(sys.stdin), indent=2))' < ${escapedStdinFile}`,
-                "."
+                ".",
+                quietMode
             );
             do { check file:remove(stdinFile); } on fail { }
 
