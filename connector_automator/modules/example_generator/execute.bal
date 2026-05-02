@@ -418,10 +418,9 @@ function getExistingExampleDirectories(string connectorPath) returns string[]|er
 
     foreach file:MetaData entry in exampleEntries {
         if entry.dir {
-            string exampleName = entry.absPath.substring(examplesPath.length());
-            if exampleName.startsWith("/") {
-                exampleName = exampleName.substring(1);
-            }
+            // Derive basename from the absolute path to avoid relative/absolute mismatch
+            int? lastSlash = entry.absPath.lastIndexOf("/");
+            string exampleName = lastSlash is int ? entry.absPath.substring(lastSlash + 1) : entry.absPath;
 
             string mainBalPath = entry.absPath + "/main.bal";
             boolean hasMain = check file:test(mainBalPath, file:EXISTS);

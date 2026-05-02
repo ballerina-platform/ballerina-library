@@ -136,7 +136,9 @@ File: ${filePath}
 ${errorContext}
 </COMPILATION_ERRORS>
 
-<${typeContext}>
+<TYPE_CONTEXT>
+${typeContext}
+</TYPE_CONTEXT>
 
 <CURRENT_CODE>
 ${code}
@@ -237,7 +239,9 @@ public function createFixPromptWithHistory(string code, CompilationError[] error
     string typeContextSection = "";
     if typeContext.length() > 0 {
         typeContextSection = string `
-<${typeContext}>
+<TYPE_CONTEXT>
+${typeContext}
+</TYPE_CONTEXT>
 `;
     }
 
