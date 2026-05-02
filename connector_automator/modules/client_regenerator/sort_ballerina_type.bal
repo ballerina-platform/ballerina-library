@@ -22,7 +22,13 @@ function extractTypeName(string line) returns string {
                 return name;
             }
         } else if tokens[i] == "const" {
-            if i + 2 < tokens.length() {
+            if i + 2 < tokens.length() && tokens[i + 2] == "=" {
+                // const NAME = value (no explicit type keyword)
+                string name = tokens[i + 1];
+                name = regex:replaceAll(name, "[=;].*$", "");
+                return name;
+            } else if i + 2 < tokens.length() {
+                // const TYPE NAME = value
                 string name = tokens[i + 2];
                 name = regex:replaceAll(name, "[=;].*$", "");
                 return name;
@@ -59,7 +65,7 @@ function extractAllTypes(string content) returns [TypeDefinition[], int, int] {
         string line = lines[i];
         string stripped = line.trim();
 
-        if regex:matches(stripped, "public\\s+(type|const)") {
+        if regex:matches(stripped, "public\\s+(type|const)\\b.*") {
             if firstTypeLine == -1 {
                 firstTypeLine = i;
             }

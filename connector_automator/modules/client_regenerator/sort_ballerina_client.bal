@@ -135,16 +135,27 @@ function extractAllBlocks(string content) returns [ContentBlock[], int, int] {
     while i < lines.length() {
         string line = lines[i];
 
-        if regex:matches(line, "\\s*(resource\\s+isolated|isolated\\s+resource|remote\\s+isolated|isolated\\s+remote)\\s+function\\s+") {
+        if regex:matches(line, "\\s*(resource\\s+isolated|isolated\\s+resource|remote\\s+isolated|isolated\\s+remote)\\s+function\\s+.*") {
             if firstMethodLine == -1 {
                 firstMethodLine = i;
             }
 
             string[] methodLines = [line];
             int startLine = i;
+
+            // Initialize braceCount from the first signature line
             int braceCount = countChar(line, "{") - countChar(line, "}");
             i += 1;
 
+            // If opening brace is not on the first line, advance through multi-line signatures
+            while i < lines.length() && braceCount == 0 {
+                string sigLine = lines[i];
+                methodLines.push(sigLine);
+                i += 1;
+                braceCount += countChar(sigLine, "{") - countChar(sigLine, "}");
+            }
+
+            // Track brace nesting until body is fully captured
             while i < lines.length() && braceCount > 0 {
                 string currentLine = lines[i];
                 methodLines.push(currentLine);

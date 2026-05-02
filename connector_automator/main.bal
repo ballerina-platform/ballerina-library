@@ -6,6 +6,7 @@ import connector_automator.sanitizor;
 import connector_automator.test_generator;
 import connector_automator.utils;
 
+import ballerina/file;
 import ballerina/io;
 import ballerina/os;
 
@@ -740,14 +741,15 @@ function runRegenerationPipeline(string openApiSpec, string outputDir, string[] 
             io:println("   Phase 1 could not fix all errors. Proceeding to Phase 2...");
             io:println("   Phase 2: Removing old test files and regenerating fresh...");
 
-            utils:CommandResult cleanupResult = utils:executeCommand(
-                string `rm -rf tests modules/mock.server`,
-                clientPath,
-                quietMode
-            );
-            if cleanupResult.exitCode == 0 {
-                io:println("   ✓ Old tests removed");
+            error? testsRemoveResult = file:remove(clientPath + "/tests", file:RECURSIVE);
+            if testsRemoveResult is error {
+                io:println(string `   Warning: Could not remove tests directory: ${testsRemoveResult.message()}`);
             }
+            error? mockRemoveResult = file:remove(clientPath + "/modules/mock.server", file:RECURSIVE);
+            if mockRemoveResult is error {
+                io:println(string `   Warning: Could not remove mock.server directory: ${mockRemoveResult.message()}`);
+            }
+            io:println("   ✓ Old tests removed");
 
             // Regenerate tests from scratch
             printStepHeader(4, "Regenerating Tests for New API Version", quietMode);
