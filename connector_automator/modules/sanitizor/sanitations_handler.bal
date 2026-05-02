@@ -70,18 +70,17 @@ public function generateSanitationsDoc(
 
     string sanitationsPath = outputDir + "/docs/spec/sanitations.md";
 
-    json originalSpec = {};
-    json alignedSpec = {};
-
     json|error originalResult = io:fileReadJson(originalSpecPath);
-    if originalResult is json {
-        originalSpec = originalResult;
+    if originalResult is error {
+        return originalResult;
     }
+    json originalSpec = originalResult;
 
     json|error alignedResult = io:fileReadJson(alignedSpecPath);
-    if alignedResult is json {
-        alignedSpec = alignedResult;
+    if alignedResult is error {
+        return alignedResult;
     }
+    json alignedSpec = alignedResult;
 
     boolean existsAlready = check file:test(sanitationsPath, file:EXISTS);
 
@@ -189,34 +188,39 @@ function buildSanitationsContent(json originalSpec, json alignedSpec, boolean qu
 // MARKDOWN GENERATION — merge with existing file
 // ─────────────────────────────────────────────────────────────
 
-// Preserve everything the human wrote; only append genuinely new sections.
+// Preserve human-authored sections; replace stale auto-generated sections with fresh detection.
 function mergeWithExistingSanitations(string existing, json originalSpec, json alignedSpec) returns string|error {
-    // Split into: header (before first numbered item), body sections, footer
     string header = extractFileHeader(existing);
     string[] existingSections = extractNumberedSections(existing);
     string footer = extractFileFooter(existing);
 
-    // Update _Updated_ date in header if the pattern exists
     string updatedHeader = updateDateInHeader(header);
 
-    // Detect what the spec diff tells us should be documented
-    string[] newSections = buildAutoDetectedSections(originalSpec, alignedSpec, existingSections.length() + 1);
-
-    // Only keep sections that aren't already covered by existing text
-    string existingLower = existing.toLowerAscii();
-    string[] trulyNewSections = [];
-    foreach string section in newSections {
-        if !isSectionAlreadyCovered(section, existingLower) {
-            trulyNewSections.push(section);
+    // Separate human-authored sections from previously auto-generated ones
+    string[] humanSections = [];
+    foreach string section in existingSections {
+        if !section.includes("<!-- auto-generated -->") {
+            humanSections.push(section);
         }
     }
 
-    // Reassemble: header + all existing sections + any new ones + footer
-    string[] allSections = [];
-    allSections.push(...existingSections);
-    allSections.push(...trulyNewSections);
+    // Fresh auto-detection always replaces stale auto sections
+    string[] freshSections = buildAutoDetectedSections(originalSpec, alignedSpec, 1);
 
-    // Renumber sequentially
+    // Only add auto-detected sections not already covered by human-authored content
+    string humanText = string:'join("\n", ...humanSections).toLowerAscii();
+    string[] filteredFreshSections = [];
+    foreach string section in freshSections {
+        if !isSectionAlreadyCovered(section, humanText) {
+            filteredFreshSections.push(section);
+        }
+    }
+
+    // Reassemble: human sections first, then fresh auto sections
+    string[] allSections = [];
+    allSections.push(...humanSections);
+    allSections.push(...filteredFreshSections);
+
     string[] renumbered = renumberSections(allSections);
 
     string[] parts = [updatedHeader, ""];
@@ -281,14 +285,20 @@ function buildAutoDetectedSections(json originalSpec, json alignedSpec, int star
     // Type changes
     TypeChange[] typeChanges = detectTypeChanges(originalSpec, alignedSpec);
     foreach TypeChange tc in typeChanges {
-        blocks.push(string `${idx}. Change ${bt}${tc.fieldName}${bt} from ${bt}${tc.originalType}${bt} to ${bt}${tc.updatedType}${bt}
+        string fieldIdentifier = tc.schemaName != "" ? string `${tc.schemaName}.${tc.fieldName}` : tc.fieldName;
+        blocks.push(string `${idx}. Change ${bt}${fieldIdentifier}${bt} from ${bt}${tc.originalType}${bt} to ${bt}${tc.updatedType}${bt}
 - **Original**: The ${bt}${tc.fieldName}${bt} field was defined as a ${bt}${tc.originalType}${bt}.
 - **Updated**: The ${bt}${tc.fieldName}${bt} field has been changed to ${bt}${tc.updatedType}${bt}.
 - **Reason**: ${tc.reason}`);
         idx += 1;
     }
 
-    return blocks;
+    // Mark every auto-detected block so mergeWithExistingSanitations can identify and replace them
+    string[] markedBlocks = [];
+    foreach string block in blocks {
+        markedBlocks.push(block + "\n<!-- auto-generated -->");
+    }
+    return markedBlocks;
 }
 
 function buildFooter() returns string {
@@ -826,16 +836,23 @@ function parseTypeChangeBlock(string[] lines) returns TypeChange? {
     string updatedType = "";
     string reason = "";
 
-    // Parse field from section title
+    // Parse field from section title: `SchemaName.fieldName` (dot) or legacy `SchemaName fieldName` (space)
     if lines.length() > 0 {
         string[] backtickVals = extractAllBacktickValues(lines[0]);
         if backtickVals.length() >= 1 {
-            string[] nameParts = regex:split(backtickVals[0], " ");
-            if nameParts.length() >= 2 {
-                schemaName = nameParts[0];
-                fieldName = nameParts[1];
-            } else if nameParts.length() == 1 {
-                fieldName = nameParts[0];
+            string token = backtickVals[0];
+            int? dotPos = token.indexOf(".");
+            if dotPos is int {
+                schemaName = token.substring(0, dotPos);
+                fieldName = token.substring(dotPos + 1);
+            } else {
+                string[] nameParts = regex:split(token, " ");
+                if nameParts.length() >= 2 {
+                    schemaName = nameParts[0];
+                    fieldName = nameParts[1];
+                } else {
+                    fieldName = token;
+                }
             }
         }
     }

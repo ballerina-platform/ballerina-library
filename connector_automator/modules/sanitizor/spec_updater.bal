@@ -46,9 +46,16 @@ function updateParameterDescriptionInSpec(map<json> paths, string location, stri
             string method = firstDotAfterMethod is int ? methodAndRest.substring(0, firstDotAfterMethod) : methodAndRest;
             string paramLocation = firstDotAfterMethod is int ? methodAndRest.substring(firstDotAfterMethod + 1) : "";
 
-            // Extract parameter name from parameters[name={paramName}]
+            // Extract parameter name and optional "in" location from parameters[name={paramName}] or parameters[name={paramName},in={paramIn}]
             if paramLocation.startsWith("parameters[name=") && paramLocation.endsWith("]") {
-                string paramName = paramLocation.substring(16, paramLocation.length() - 1); // Remove "parameters[name=" and "]"
+                string inner = paramLocation.substring(16, paramLocation.length() - 1);
+                string paramName = inner;
+                string paramIn = "";
+                int? commaPos = inner.indexOf(",in=");
+                if commaPos is int {
+                    paramName = inner.substring(0, commaPos);
+                    paramIn = inner.substring(commaPos + 4);
+                }
 
                 json|error pathItem = paths.get(path);
                 if pathItem is map<json> {
@@ -67,7 +74,9 @@ function updateParameterDescriptionInSpec(map<json> paths, string location, stri
                                         json param = parametersResult[i];
                                         if param is map<json> {
                                             map<json> paramMap = <map<json>>param;
-                                            if paramMap.hasKey("name") && paramMap.get("name") == paramName {
+                                            boolean nameMatches = paramMap.hasKey("name") && paramMap.get("name") == paramName;
+                                            boolean inMatches = paramIn == "" || (paramMap.hasKey("in") && paramMap.get("in") == paramIn);
+                                            if nameMatches && inMatches {
                                                 paramMap["description"] = description;
                                                 return ();
                                             }
@@ -84,7 +93,9 @@ function updateParameterDescriptionInSpec(map<json> paths, string location, stri
                                         json param = pathParamsResult[i];
                                         if param is map<json> {
                                             map<json> paramMap = <map<json>>param;
-                                            if paramMap.hasKey("name") && paramMap.get("name") == paramName {
+                                            boolean nameMatches = paramMap.hasKey("name") && paramMap.get("name") == paramName;
+                                            boolean inMatches = paramIn == "" || (paramMap.hasKey("in") && paramMap.get("in") == paramIn);
+                                            if nameMatches && inMatches {
                                                 paramMap["description"] = description;
                                                 return ();
                                             }
