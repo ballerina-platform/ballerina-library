@@ -27,11 +27,29 @@ function extractMethodType(string content) returns string {
     string firstLine = regex:replaceAll(lines[0].trim(), "\\s+", " ");
     string[] tokens = regex:split(firstLine, " ");
 
+    boolean isRemote = false;
+    foreach string token in tokens {
+        if token == "remote" {
+            isRemote = true;
+            break;
+        }
+    }
+
     foreach int i in 0 ..< tokens.length() {
         if tokens[i] == "function" && i + 1 < tokens.length() {
-            string method = tokens[i + 1];
-            if method == "get" || method == "post" || method == "put" || method == "delete" || method == "patch" {
-                return method;
+            string nameOrMethod = tokens[i + 1];
+            if nameOrMethod == "get" || nameOrMethod == "post" || nameOrMethod == "put" ||
+                    nameOrMethod == "delete" || nameOrMethod == "patch" {
+                return nameOrMethod;
+            }
+            if isRemote {
+                string lower = nameOrMethod.toLowerAscii();
+                if lower.startsWith("get") { return "get"; }
+                if lower.startsWith("post") { return "post"; }
+                if lower.startsWith("put") { return "put"; }
+                if lower.startsWith("delete") { return "delete"; }
+                if lower.startsWith("patch") { return "patch"; }
+                return "remote";
             }
         }
     }
@@ -48,9 +66,28 @@ function extractPath(string content) returns string {
     string firstLine = regex:replaceAll(lines[0].trim(), "\\s+", " ");
     string[] tokens = regex:split(firstLine, " ");
 
+    boolean isRemote = false;
+    foreach string token in tokens {
+        if token == "remote" {
+            isRemote = true;
+            break;
+        }
+    }
+
+    foreach int i in 0 ..< tokens.length() {
+        if tokens[i] == "function" && i + 1 < tokens.length() {
+            if isRemote {
+                string funcName = tokens[i + 1];
+                string[] nameParts = regex:split(funcName, "\\(");
+                return nameParts.length() > 0 ? nameParts[0] : funcName;
+            }
+            break;
+        }
+    }
+
     foreach int i in 0 ..< tokens.length() {
         if (tokens[i] == "get" || tokens[i] == "post" || tokens[i] == "put" || tokens[i] == "delete" ||
-            tokens[i] == "patch") && i + 1 < tokens.length() {
+                tokens[i] == "patch") && i + 1 < tokens.length() {
             string rawPath = tokens[i + 1];
             string[] pathParts = regex:split(rawPath, "\\(");
             string path = pathParts.length() > 0 ? pathParts[0] : rawPath;
@@ -72,6 +109,7 @@ function generateSortKey(string methodType, string path) returns [string, string
         "put": "3",
         "delete": "4",
         "patch": "5",
+        "remote": "6",
         "unknown": "9"
     };
 
@@ -97,7 +135,7 @@ function extractAllBlocks(string content) returns [ContentBlock[], int, int] {
     while i < lines.length() {
         string line = lines[i];
 
-        if regex:matches(line, "\\s*resource\\s+isolated\\s+function\\s+(get|post|put|delete|patch)") {
+        if regex:matches(line, "\\s*(resource\\s+isolated|isolated\\s+resource|remote\\s+isolated|isolated\\s+remote)\\s+function\\s+") {
             if firstMethodLine == -1 {
                 firstMethodLine = i;
             }
@@ -225,7 +263,7 @@ function sortAndWriteClient(string inputPath, string outputPath) returns error? 
 
     check io:fileWriteString(outputPath, string:'join("\n", ...outputLines));
 
-    io:println(string `Sorted ${methods.length()} resource methods`);
+    io:println(string `Sorted ${methods.length()} client methods (resource + remote)`);
     io:println(string `Written to: ${outputPath}`);
 }
 

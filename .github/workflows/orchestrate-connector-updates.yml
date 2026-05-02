@@ -1,3 +1,18 @@
+# Orchestrates automated OpenAPI connector update workflows across multiple
+# Ballerina connector repositories.
+#
+# Workflow overview:
+#   1. Receives a list of connector update requests via repository_dispatch
+#      or manual workflow_dispatch input.
+#   2. Triggers connector regeneration workflows in each target repository.
+#   3. Waits for generated Pull Requests to be created.
+#   4. Collects PR details, build status, version information, and code owners.
+#   5. Generates and sends a consolidated HTML email summary report.
+#   6. Uploads workflow artifacts and publishes a GitHub Actions summary.
+#
+# This workflow acts as the central orchestration layer for large-scale
+# automated connector dependency and OpenAPI specification updates.
+
 name: Orchestrate Connector Updates
 
 on:
