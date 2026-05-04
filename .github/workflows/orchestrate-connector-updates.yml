@@ -225,6 +225,12 @@ jobs:
                 BUILD_STATUS="FAILED"
               fi
 
+              DO_NOT_MERGE="false"
+              if echo "$PR_DATA" | jq -r '.title' | grep -q "\[DO NOT MERGE\]"; then
+                DO_NOT_MERGE="true"
+                BUILD_STATUS="Partial"
+              fi
+
               PR_BODY=$(echo "$PR_DATA" | jq -r '.body // ""')
               NEW_VERSION=$(echo "$PR_BODY" | grep -oP 'New Version.*?`\K[^`]+' || echo "")
               CODE_OWNERS=$(echo "$PR_BODY" | grep -oP 'Code Owners:.*?\K@[\w-]+(,\s*@[\w-]+)*' | tr -d '@' | sed 's/,/, /g' || echo "")
@@ -237,6 +243,7 @@ jobs:
                 --arg version "$VERSION" \
                 --arg changeType "$CHANGE_TYPE" \
                 --arg buildStatus "$BUILD_STATUS" \
+                --arg doNotMerge "$DO_NOT_MERGE" \
                 --arg newVersion "$NEW_VERSION" \
                 --arg codeOwners "$CODE_OWNERS" \
                 --argjson prData "$PR_DATA" \
@@ -247,6 +254,7 @@ jobs:
                   openapiVersion: $version,
                   changeType: $changeType,
                   buildStatus: $buildStatus,
+                  doNotMerge: $doNotMerge,
                   expectedVersion: $newVersion,
                   codeOwners: $codeOwners,
                   pr: $prData
@@ -322,8 +330,8 @@ jobs:
             "<td><code>" + .openapiVersion + "</code></td>" +
             "<td><code>" + (.expectedVersion // "N/A") + "</code></td>" +
             "<td><span class=\"change-" + (.changeType | ascii_downcase) + "\">" + .changeType + "</span></td>" +
-            "<td>" + (if .buildStatus == "FAILED" or .buildStatus == "Workflow Failed" then "<span class=\"status-failed\">FAILED</span>" elif .buildStatus == "In Progress" then "In Progress" else "<span class=\"status-success\">Success</span>" end) + "</td>" +
-            "<td>" + (if .pr.number > 0 then "<a href=\"" + .pr.url + "\">#" + (.pr.number | tostring) + "</a>" else "Not Created" end) + "</td>" +
+            "<td>" + (if .buildStatus == "FAILED" or .buildStatus == "Workflow Failed" then "<span class=\"status-failed\">FAILED</span>" elif .buildStatus == "Partial" then "<span class=\"status-partial\">Partial</span>" elif .buildStatus == "In Progress" then "In Progress" else "<span class=\"status-success\">Success</span>" end) + "</td>" +
+            "<td>" + (if .pr.number > 0 then (if .doNotMerge == "true" then "<span class=\"do-not-merge\">DO NOT MERGE</span>" else "" end) + "<a href=\"" + .pr.url + "\">#" + (.pr.number | tostring) + "</a>" else "Not Created" end) + "</td>" +
             "<td>" + (.codeOwners // "N/A") + "</td>" +
             "</tr>"
           ')
@@ -353,6 +361,8 @@ jobs:
               tr:hover { background: #f6f8fa; }
               .status-success { color: #28a745; font-weight: 600; }
               .status-failed { color: #d73a49; font-weight: 600; }
+              .status-partial { color: #e36209; font-weight: 600; }
+              .do-not-merge { background: #d73a49; color: white; padding: 1px 5px; border-radius: 3px; font-size: 10px; font-weight: 600; margin-right: 4px; }
               .change-major { background: #d73a49; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; }
               .change-minor { background: #0366d6; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; }
               .change-patch { background: #28a745; color: white; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; }

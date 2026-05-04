@@ -155,7 +155,7 @@ public function executeSanitizor(string... args) returns error? {
         }
     }
 
-    // Step 3: Apply operationId fix on aligned spec
+    // Step 3: Apply operationId fix on aligned spec 
     string alignedSpec = alignedSpecPath + "/aligned_ballerina_openapi.json";
 
     printStepHeader(3, "AI-Powered OperationId Generation", quietMode);
