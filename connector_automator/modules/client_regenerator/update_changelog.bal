@@ -1,3 +1,19 @@
+// Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
+//
+// WSO2 LLC. licenses this file to you under the Apache License,
+// Version 2.0 (the "License"); you may not use this file except
+// in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 import ballerina/file;
 import ballerina/io;
 import ballerina/regex;
@@ -203,19 +219,19 @@ function updateChangelog(string prDescription) returns error? {
         }
     } else {
         io:println("Creating new CHANGELOG.md");
-        string changelogTemplate = string `# Change Log
-
-This file contains all the notable changes done to the Ballerina connector through the releases.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-${newUnreleasedSection}`;
-
-        check io:fileWriteString(changelogPath, changelogTemplate);
+        check io:fileWriteString(changelogPath, buildNewChangelog(newUnreleasedSection));
         io:println("Created new CHANGELOG.md");
     }
 
     io:println(string `Added ${totalChanges} changelog entries`);
+}
+
+function buildNewChangelog(string unreleasedSection) returns string {
+    return "# Change Log\n\n" +
+        "This file contains all the notable changes done to the Ballerina connector through the releases.\n\n" +
+        "The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), " +
+        "and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).\n\n" +
+        unreleasedSection;
 }
 
 public function runUpdateChangelog(string prDescription) returns error? {

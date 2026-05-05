@@ -8,18 +8,22 @@ on:
         required: false
         type: string
       ballerina-version:
+        description: "Ballerina version to use"
         required: false
         type: string
         default: "2201.13.0"
       distribution-zip:
+        description: "Distribution URL of the Ballerina version to be used"
         required: false
         type: string
         default: ""
       license-file:
+        description: "Path to license file relative to docs directory"
         required: false
         type: string
         default: "license.txt"
       quiet-mode:
+        description: "Enable quiet mode"
         required: false
         type: boolean
         default: true

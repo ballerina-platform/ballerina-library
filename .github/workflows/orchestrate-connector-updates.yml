@@ -2,8 +2,7 @@
 # Ballerina connector repositories.
 #
 # Workflow overview:
-#   1. Receives a list of connector update requests via repository_dispatch
-#      or manual workflow_dispatch input.
+#   1. Receives a list of connector update requests via repository_dispatch.
 #   2. Triggers connector regeneration workflows in each target repository.
 #   3. Waits for generated Pull Requests to be created.
 #   4. Collects PR details, build status, version information, and code owners.
@@ -18,19 +17,6 @@ name: Orchestrate Connector Updates
 on:
   repository_dispatch:
     types: [orchestrate-connector-updates]
-  workflow_dispatch:
-    inputs:
-      connectors_json:
-        description: |
-          JSON array of connector update objects. Each object must have:
-            - repository:  GitHub repo in "org/repo" format
-            - specification: OpenAPI spec name
-            - version:     API version string
-            - openapi_url: URL to the OpenAPI spec file (JSON or YAML)
-          Example: [{"repository":"orgBBalLib/module-ballerinax-foo","specification":"foo","version":"v1","openapi_url":"https://..."}]
-        required: false
-        type: string
-        default: '[]'
 
 jobs:
   orchestrate-updates:
@@ -61,13 +47,8 @@ jobs:
         id: parse_connectors
         env:
           CONNECTORS_DISPATCH: ${{ toJson(github.event.client_payload.connectors) }}
-          CONNECTORS_INPUT: ${{ inputs.connectors_json }}
         run: |
-          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
-            CONNECTORS="$CONNECTORS_DISPATCH"
-          else
-            CONNECTORS="$CONNECTORS_INPUT"
-          fi
+          CONNECTORS="$CONNECTORS_DISPATCH"
 
           echo "Received connectors payload:"
           echo "$CONNECTORS" | jq '.'
