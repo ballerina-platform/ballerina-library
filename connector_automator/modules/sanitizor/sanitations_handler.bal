@@ -16,10 +16,20 @@
 
 import connector_automator.utils;
 
+import ballerina/ai;
 import ballerina/file;
 import ballerina/io;
 import ballerina/regex;
 import ballerina/time;
+
+// ─────────────────────────────────────────────────────────────
+// CONSTANTS
+// ─────────────────────────────────────────────────────────────
+
+// Specs smaller than this are sent to the LLM in a single prompt.
+// Larger specs are chunked across multiple conversation turns.
+const int SPEC_SINGLE_TURN_THRESHOLD = 100000;
+const int SPEC_CHUNK_SIZE = 60000;
 
 // ─────────────────────────────────────────────────────────────
 // INTERNAL TYPES (private to this file)
@@ -122,11 +132,19 @@ public function generateSanitationsDoc(
     }
 }
 
-# Read sanitations.md and apply recorded changes to the new spec before sanitization.
+# Read sanitations.md and apply all recorded changes to the new spec.
 # Call this before sanitizor:executeSanitizor in the regeneration pipeline.
 #
+# PRIMARY path: sends both the spec and sanitations.md to the LLM; the LLM
+# applies every natural-language rule and returns the fully modified spec.
+# For specs that are too large for a single prompt the conversation is split
+# across multiple turns (same chunking strategy as analyze_version_change.bal).
+#
+# FALLBACK (when LLM is unavailable): the programmatic parser extracts typed
+# rules and applies them mechanically.
+#
 # + sanitationsPath - path to the existing sanitations.md
-# + newSpecPath     - path to the newly downloaded OpenAPI spec (will be modified in-place)
+# + newSpecPath     - path to the newly downloaded OpenAPI spec (modified in-place)
 # + quietMode       - suppress verbose output
 # + return          - error if reading/writing fails
 public function applySanitations(
@@ -146,23 +164,38 @@ public function applySanitations(
         io:println(string `Reading sanitations from: ${sanitationsPath}`);
     }
 
-    string content = check io:fileReadString(sanitationsPath);
+    string sanitationsContent = check io:fileReadString(sanitationsPath);
 
-    // Try LLM-based parsing first — handles multi-field entries, typos, Ballerina-specific skips
-    SanitationRules rules;
-    SanitationRules|error llmRules = parseSanitationsWithLLM(content, quietMode);
-    if llmRules is SanitationRules {
-        rules = llmRules;
+    json|error specReadResult = io:fileReadJson(newSpecPath);
+    if specReadResult is error {
+        return error(string `Failed to read spec JSON at ${newSpecPath}: ${specReadResult.message()}`);
+    }
+    json specJson = specReadResult;
+    string specStr = specJson.toJsonString();
+
+    if utils:isAIServiceInitialized() {
         if !quietMode {
-            io:println("  (parsed using AI)");
+            io:println("  Applying sanitations via AI...");
+            io:println(string `  Spec size: ${specStr.length()} chars`);
         }
-    } else {
+
+        json|error modifiedSpec = applySanitationsViaLLM(sanitationsContent, specStr, quietMode);
+        if modifiedSpec is json {
+            check io:fileWriteString(newSpecPath, modifiedSpec.toJsonString());
+            if !quietMode {
+                io:println("✓ Sanitations applied to new spec (AI-powered)");
+            }
+            return;
+        }
+
         if !quietMode {
-            io:println(string `  ⚠  AI parsing unavailable (${llmRules.message()}), using programmatic parser`);
+            io:println(string `  ⚠  AI rewrite failed (${(<error>modifiedSpec).message()})`);
+            io:println("  Falling back to programmatic parser...");
         }
-        rules = parseSanitationsMarkdown(content);
     }
 
+    // Fallback: rule-based programmatic application
+    SanitationRules rules = parseSanitationsMarkdown(sanitationsContent);
     if !quietMode {
         io:println(string `  Server URL rules   : ${rules.serverUrlChanges.length()}`);
         io:println(string `  Path prefix rules  : ${rules.pathPrefixRules.length()}`);
@@ -170,12 +203,148 @@ public function applySanitations(
         io:println(string `  Nullability rules  : ${rules.nullabilityChanges.length()}`);
         io:println(string `  Format rules       : ${rules.formatChanges.length()}`);
     }
-
     check applyRulesToSpec(newSpecPath, rules, quietMode);
 
     if !quietMode {
-        io:println("✓ Sanitations applied to new spec");
+        io:println("✓ Sanitations applied to new spec (rule-based)");
     }
+}
+
+// ─────────────────────────────────────────────────────────────
+// LLM-BASED SPEC REWRITING
+// ─────────────────────────────────────────────────────────────
+
+// Entry point: chooses single-turn or multi-turn depending on spec size.
+function applySanitationsViaLLM(
+        string sanitationsContent,
+        string specStr,
+        boolean quietMode) returns json|error {
+
+    if specStr.length() <= SPEC_SINGLE_TURN_THRESHOLD {
+        if !quietMode {
+            io:println("  Single-pass AI rewrite...");
+        }
+        return rewriteSpecSingleTurn(sanitationsContent, specStr);
+    }
+
+    if !quietMode {
+        int chunks = (specStr.length() + SPEC_CHUNK_SIZE - 1) / SPEC_CHUNK_SIZE;
+        io:println(string `  Large spec — splitting into ${chunks} chunks for AI rewrite...`);
+    }
+    return rewriteSpecChunked(sanitationsContent, specStr, quietMode);
+}
+
+function rewriteSpecSingleTurn(string sanitationsContent, string specStr) returns json|error {
+    string prompt = buildApplySanitationsPrompt(sanitationsContent, specStr);
+    string|error response = utils:callAI(prompt);
+    if response is error {
+        return error("AI spec rewrite failed: " + response.message());
+    }
+    return parseModifiedSpec(response);
+}
+
+// Multi-turn chunked rewrite for large specs.
+// Works identically to the chunked diff analysis in analyze_version_change.bal:
+// 1. Tell the model it will receive the spec in N parts + the sanitations doc.
+// 2. Send each chunk, collect acknowledgments.
+// 3. In the final turn, ask for the fully rewritten spec.
+function rewriteSpecChunked(
+        string sanitationsContent,
+        string specStr,
+        boolean quietMode) returns json|error {
+
+    int totalChunks = (specStr.length() + SPEC_CHUNK_SIZE - 1) / SPEC_CHUNK_SIZE;
+
+    ai:ChatMessage[] messages = [];
+
+    string intro = string `I will send you a large OpenAPI spec in ${totalChunks} parts. After receiving all parts I will ask you to apply the changes described in a sanitations document. Please wait and after each part simply acknowledge with "Received part X/${totalChunks}." and nothing else.
+
+Here is the sanitations document listing every change that must be applied to the spec:
+
+${sanitationsContent}`;
+
+    messages.push({role: "user", content: intro});
+    string|error introReply = utils:callAIWithMessages(messages);
+    if introReply is error {
+        return error("AI conversation init failed: " + introReply.message());
+    }
+    messages.push({role: "assistant", content: introReply});
+
+    foreach int i in 0 ..< totalChunks {
+        int startIdx = i * SPEC_CHUNK_SIZE;
+        int endIdx = startIdx + SPEC_CHUNK_SIZE;
+        int safeEnd = endIdx < specStr.length() ? endIdx : specStr.length();
+        string chunk = specStr.substring(startIdx, safeEnd);
+
+        if !quietMode {
+            io:println(string `  Sending spec chunk ${i + 1}/${totalChunks} (${chunk.length()} chars)...`);
+        }
+
+        messages.push({role: "user", content: string `OpenAPI spec part ${i + 1}/${totalChunks}:\n\n${chunk}`});
+        string|error chunkReply = utils:callAIWithMessages(messages);
+        if chunkReply is error {
+            return error(string `AI failed on chunk ${i + 1}: ${chunkReply.message()}`);
+        }
+        messages.push({role: "assistant", content: chunkReply});
+    }
+
+    // Final turn: request the rewritten spec
+    string finalRequest = string `You have now received all ${totalChunks} parts of the OpenAPI spec and the sanitations document at the start of our conversation.
+
+Apply ALL the changes described in the sanitations document to the complete spec and return the fully modified OpenAPI spec as valid JSON. No markdown code blocks, no explanation — only the JSON.`;
+
+    messages.push({role: "user", content: finalRequest});
+    string|error finalReply = utils:callAIWithMessages(messages);
+    if finalReply is error {
+        return error("AI failed on final rewrite request: " + finalReply.message());
+    }
+
+    return parseModifiedSpec(finalReply);
+}
+
+function buildApplySanitationsPrompt(string sanitationsContent, string specStr) returns string {
+    return string `You are applying documented sanitation changes to an OpenAPI specification.
+
+SANITATIONS DOCUMENT:
+${sanitationsContent}
+
+OPENAPI SPEC (JSON):
+${specStr}
+
+TASK: Apply ALL changes described in the sanitations document to the OpenAPI spec.
+
+Common change types to look for and apply:
+- **Server URL changes**: update the "url" field inside the "servers" array
+- **Path prefix removal**: remove the specified prefix from all keys in the "paths" object
+- **Format changes**: replace format values (e.g. "date-time" → "datetime") everywhere in the spec
+- **Nullable fields**: add "nullable": true to the specified property inside components/schemas
+- **Type changes**: change the "type" of a specified schema property (e.g. "string" → "integer")
+
+Do NOT apply:
+- Changes about Ballerina code constructs (int:signed32, record fields in generated code)
+- Summary or description text enhancements (those are handled by a separate AI step)
+- The OpenAPI CLI command at the bottom of the document
+
+Return ONLY the complete modified OpenAPI spec as valid JSON. No markdown code fences, no explanation text.`;
+}
+
+function parseModifiedSpec(string raw) returns json|error {
+    string cleaned = raw.trim();
+    // Strip markdown code fences if the model added them
+    if cleaned.startsWith("```") {
+        int? firstNewline = cleaned.indexOf("\n");
+        if firstNewline is int {
+            cleaned = cleaned.substring(firstNewline + 1);
+        }
+        if cleaned.endsWith("```") {
+            cleaned = cleaned.substring(0, cleaned.length() - 3).trim();
+        }
+    }
+    json|error result = cleaned.fromJsonString();
+    if result is error {
+        return error("Failed to parse AI-modified spec as JSON: " + result.message());
+    }
+    return result;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -489,180 +658,7 @@ function isSectionAlreadyCovered(string newSection, string existingLower) return
 }
 
 // ─────────────────────────────────────────────────────────────
-// LLM-BASED MARKDOWN PARSING
-// ─────────────────────────────────────────────────────────────
-
-function parseSanitationsWithLLM(string content, boolean quietMode) returns SanitationRules|error {
-    if !utils:isAIServiceInitialized() {
-        return error("LLM service not initialized");
-    }
-
-    string prompt = string `You are analyzing a Ballerina connector sanitations.md document.
-Extract ALL sanitation rules that apply to an OpenAPI JSON spec as structured JSON.
-
-SANITATIONS.MD CONTENT:
-${content}
-
-RULES TO EXTRACT:
-1. serverUrlChanges: Changes to the server URL (original → updated)
-2. pathPrefixRules: Path prefix removals (just the prefix string, e.g. "/crm/v4")
-3. formatChanges: OpenAPI format value changes (extract only the value, e.g. "date-time" not '"format":"date-time"')
-4. nullabilityChanges: Fields made nullable in schemas (schemaName, fieldName, nullable true/false)
-5. typeChanges: Field type changes in schemas (schemaName, fieldName, originalType, updatedType)
-
-IMPORTANT RULES:
-- For typeChanges where one section mentions MULTIPLE fields, produce one separate entry per field
-- For typeChanges without a specific schema mentioned, use empty string "" for schemaName
-- SKIP sections about Ballerina-level code changes (e.g. int:signed32, record fields in generated code)
-- SKIP sections about summary/description/documentation enhancements (those are handled by AI separately)
-- Only include changes that modify the raw OpenAPI spec JSON structure
-- Return ONLY valid JSON with no markdown fences
-
-REQUIRED RESPONSE FORMAT:
-{
-  "serverUrlChanges": [{"original": "...", "updated": "...", "reason": "..."}],
-  "pathPrefixRules": [{"prefixRemoved": "...", "reason": "..."}],
-  "formatChanges": [{"originalFormat": "...", "updatedFormat": "...", "reason": "..."}],
-  "nullabilityChanges": [{"schemaName": "...", "fieldName": "...", "nullable": true, "reason": "..."}],
-  "typeChanges": [{"schemaName": "...", "fieldName": "...", "originalType": "...", "updatedType": "...", "reason": "..."}]
-}`;
-
-    string|error response = utils:callAI(prompt);
-    if response is error {
-        return error("LLM call failed: " + response.message());
-    }
-
-    // Strip markdown fences if the model added them anyway
-    string cleaned = response.trim();
-    if cleaned.startsWith("```") {
-        int? firstNewline = cleaned.indexOf("\n");
-        if firstNewline is int {
-            cleaned = cleaned.substring(firstNewline + 1);
-        }
-        if cleaned.endsWith("```") {
-            cleaned = cleaned.substring(0, cleaned.length() - 3).trim();
-        }
-    }
-
-    json|error jsonResult = cleaned.fromJsonString();
-    if jsonResult is error {
-        return error("Failed to parse LLM response as JSON: " + jsonResult.message());
-    }
-
-    return jsonToSanitationRules(jsonResult);
-}
-
-function jsonToSanitationRules(json data) returns SanitationRules|error {
-    if !(data is map<json>) {
-        return error("LLM response is not a JSON object");
-    }
-    map<json> root = <map<json>>data;
-    SanitationRules rules = {};
-
-    // serverUrlChanges
-    json|error suArr = root.get("serverUrlChanges");
-    if suArr is json[] {
-        foreach json item in suArr {
-            if item is map<json> {
-                json|error orig = item.get("original");
-                json|error upd = item.get("updated");
-                json|error rsn = item.get("reason");
-                if orig is string && upd is string {
-                    rules.serverUrlChanges.push({
-                        original: orig,
-                        updated: upd,
-                        reason: rsn is string ? rsn : ""
-                    });
-                }
-            }
-        }
-    }
-
-    // pathPrefixRules
-    json|error ppArr = root.get("pathPrefixRules");
-    if ppArr is json[] {
-        foreach json item in ppArr {
-            if item is map<json> {
-                json|error pfx = item.get("prefixRemoved");
-                json|error rsn = item.get("reason");
-                if pfx is string {
-                    rules.pathPrefixRules.push({
-                        prefixRemoved: pfx,
-                        reason: rsn is string ? rsn : ""
-                    });
-                }
-            }
-        }
-    }
-
-    // formatChanges
-    json|error fcArr = root.get("formatChanges");
-    if fcArr is json[] {
-        foreach json item in fcArr {
-            if item is map<json> {
-                json|error orig = item.get("originalFormat");
-                json|error upd = item.get("updatedFormat");
-                json|error rsn = item.get("reason");
-                if orig is string && upd is string {
-                    rules.formatChanges.push({
-                        originalFormat: orig,
-                        updatedFormat: upd,
-                        reason: rsn is string ? rsn : ""
-                    });
-                }
-            }
-        }
-    }
-
-    // nullabilityChanges
-    json|error ncArr = root.get("nullabilityChanges");
-    if ncArr is json[] {
-        foreach json item in ncArr {
-            if item is map<json> {
-                json|error sn = item.get("schemaName");
-                json|error fn = item.get("fieldName");
-                json|error nl = item.get("nullable");
-                json|error rsn = item.get("reason");
-                if sn is string && fn is string && nl is boolean {
-                    rules.nullabilityChanges.push({
-                        schemaName: sn,
-                        fieldName: fn,
-                        nullable: nl,
-                        reason: rsn is string ? rsn : ""
-                    });
-                }
-            }
-        }
-    }
-
-    // typeChanges
-    json|error tcArr = root.get("typeChanges");
-    if tcArr is json[] {
-        foreach json item in tcArr {
-            if item is map<json> {
-                json|error sn = item.get("schemaName");
-                json|error fn = item.get("fieldName");
-                json|error ot = item.get("originalType");
-                json|error ut = item.get("updatedType");
-                json|error rsn = item.get("reason");
-                if fn is string && ot is string && ut is string {
-                    rules.typeChanges.push({
-                        schemaName: sn is string ? sn : "",
-                        fieldName: fn,
-                        originalType: ot,
-                        updatedType: ut,
-                        reason: rsn is string ? rsn : ""
-                    });
-                }
-            }
-        }
-    }
-
-    return rules;
-}
-
-// ─────────────────────────────────────────────────────────────
-// MARKDOWN PARSING
+// MARKDOWN PARSING (fallback — used when LLM unavailable)
 // ─────────────────────────────────────────────────────────────
 
 function parseSanitationsMarkdown(string content) returns SanitationRules {
@@ -678,14 +674,14 @@ function parseSanitationsMarkdown(string content) returns SanitationRules {
             string sectionTitle = line.toLowerAscii();
 
             // Collect the whole block until the next numbered item
-            string[] blockLines = [line];
+            string[] blockLines = [lines[i]];
             int j = i + 1;
             while j < lines.length() {
                 string nextLine = lines[j].trim();
                 if regex:matches(nextLine, "[0-9]+\\..*") {
                     break;
                 }
-                blockLines.push(nextLine);
+                blockLines.push(lines[j]);
                 j += 1;
             }
             string block = string:'join("\n", ...blockLines);
@@ -731,17 +727,50 @@ function parseSanitationsMarkdown(string content) returns SanitationRules {
     return rules;
 }
 
+// Extract the value for an "- **Original**:" or "- **Updated**:" line,
+// handling two formats:
+//   (a) inline: `- **Original**: `https://api.example.com``
+//   (b) multi-line: `- **Original**:\n`https://api.example.com``
+function extractValueAllowingNextLine(string[] lines, int labelIdx) returns string {
+    string labelLine = lines[labelIdx].trim();
+    // Try same-line backtick first
+    string inlineVal = extractFirstBacktickValue(labelLine);
+    if inlineVal != "" {
+        return inlineVal;
+    }
+    // Value may be on the immediately following non-empty line
+    int j = labelIdx + 1;
+    while j < lines.length() {
+        string nextLine = lines[j].trim();
+        if nextLine == "" {
+            j += 1;
+            continue;
+        }
+        // Could be a bare URL, a backtick-wrapped value, or a new label → stop
+        if nextLine.startsWith("- **") {
+            break;
+        }
+        // Strip surrounding backticks if present
+        if nextLine.startsWith("`") && nextLine.endsWith("`") && nextLine.length() > 2 {
+            return nextLine.substring(1, nextLine.length() - 1);
+        }
+        // Plain value (no backticks)
+        return nextLine;
+    }
+    return "";
+}
+
 function parseServerUrlBlock(string[] lines) returns ServerUrlChange? {
     string original = "";
     string updated = "";
     string reason = "";
 
-    foreach string line in lines {
-        string t = line.trim();
+    foreach int idx in 0 ..< lines.length() {
+        string t = lines[idx].trim();
         if t.startsWith("- **Original**") {
-            original = extractFirstBacktickValue(t);
+            original = extractValueAllowingNextLine(lines, idx);
         } else if t.startsWith("- **Updated**") {
-            updated = extractFirstBacktickValue(t);
+            updated = extractValueAllowingNextLine(lines, idx);
         } else if t.startsWith("- **Reason**") {
             int? colon = t.indexOf(":");
             if colon is int {
@@ -760,17 +789,30 @@ function parsePathPrefixBlock(string[] lines) returns PathPrefixRule? {
     string prefixRemoved = "";
     string reason = "";
 
-    foreach string line in lines {
-        string t = line.trim();
+    foreach int idx in 0 ..< lines.length() {
+        string t = lines[idx].trim();
         if t.startsWith("- **Original**") {
-            string val = extractFirstBacktickValue(t);
-            if val != "" {
+            string val = extractValueAllowingNextLine(lines, idx);
+            // For path prefix blocks the "original" contains the path that had the prefix,
+            // e.g. "/crm/v4/associations/...". Extract the common prefix from it.
+            if val != "" && prefixRemoved == "" {
                 prefixRemoved = val;
             }
         } else if t.startsWith("- **Reason**") {
             int? colon = t.indexOf(":");
             if colon is int {
                 reason = t.substring(colon + 1).trim();
+            }
+        }
+    }
+
+    // If the "Original" line mentions a prefix explicitly in backticks in the heading, prefer that
+    if lines.length() > 0 {
+        string heading = lines[0].trim().toLowerAscii();
+        if heading.includes("prefix") || heading.includes("common") {
+            string[] allBt = extractAllBacktickValues(lines[0]);
+            if allBt.length() > 0 {
+                prefixRemoved = allBt[0];
             }
         }
     }
@@ -786,12 +828,12 @@ function parseFormatBlock(string[] lines) returns FormatChange? {
     string updatedFormat = "";
     string reason = "";
 
-    foreach string line in lines {
-        string t = line.trim();
+    foreach int idx in 0 ..< lines.length() {
+        string t = lines[idx].trim();
         if t.startsWith("- **Original**") {
-            originalFormat = cleanFormatValue(extractFirstBacktickValue(t));
+            originalFormat = cleanFormatValue(extractValueAllowingNextLine(lines, idx));
         } else if t.startsWith("- **Updated**") {
-            updatedFormat = cleanFormatValue(extractFirstBacktickValue(t));
+            updatedFormat = cleanFormatValue(extractValueAllowingNextLine(lines, idx));
         } else if t.startsWith("- **Reason**") {
             int? colon = t.indexOf(":");
             if colon is int {
@@ -873,16 +915,23 @@ function parseTypeChangeBlock(string[] lines) returns TypeChange? {
         }
     }
 
-    foreach string line in lines {
-        string t = line.trim();
+    foreach int idx in 0 ..< lines.length() {
+        string t = lines[idx].trim();
         if t.startsWith("- **Original**") {
-            // Hand-written format: "The `fieldName` field was defined as a `type`." → 2nd backtick
-            // Generated format: same pattern — always take the last backtick value as the type
+            // Hand-written format: "The `fieldName` field was defined as a `type`." → last backtick value
             string[] vals = extractAllBacktickValues(t);
-            originalType = vals.length() >= 2 ? vals[vals.length() - 1] : (vals.length() >= 1 ? vals[0] : "");
+            if vals.length() == 0 {
+                originalType = extractValueAllowingNextLine(lines, idx);
+            } else {
+                originalType = vals[vals.length() - 1];
+            }
         } else if t.startsWith("- **Updated**") {
             string[] vals = extractAllBacktickValues(t);
-            updatedType = vals.length() >= 2 ? vals[vals.length() - 1] : (vals.length() >= 1 ? vals[0] : "");
+            if vals.length() == 0 {
+                updatedType = extractValueAllowingNextLine(lines, idx);
+            } else {
+                updatedType = vals[vals.length() - 1];
+            }
         } else if t.startsWith("- **Reason**") {
             int? colon = t.indexOf(":");
             if colon is int {
@@ -898,7 +947,7 @@ function parseTypeChangeBlock(string[] lines) returns TypeChange? {
 }
 
 // ─────────────────────────────────────────────────────────────
-// APPLY RULES TO SPEC
+// APPLY RULES TO SPEC (fallback — used when LLM unavailable)
 // ─────────────────────────────────────────────────────────────
 
 function applyRulesToSpec(string specPath, SanitationRules rules, boolean quietMode) returns error? {
@@ -934,7 +983,6 @@ function applyRulesToSpec(string specPath, SanitationRules rules, boolean quietM
         applyTypeChange(spec, tc, quietMode);
     }
 
-    // Write back using toJsonString — no extra import needed
     string updatedContent = spec.toJsonString();
     check io:fileWriteString(specPath, updatedContent);
 }
@@ -1055,7 +1103,6 @@ function applyNullabilityChange(map<json> spec, NullabilityChange nc, boolean qu
     }
 }
 
-// NEW - safe
 function applyNullabilityToSchema(map<json> schemaMap, string fieldName, boolean nullable) returns boolean {
     json|error propertiesResult = schemaMap.get("properties");
     if propertiesResult is map<json> {
@@ -1072,6 +1119,7 @@ function applyNullabilityToSchema(map<json> schemaMap, string fieldName, boolean
     }
     return false;
 }
+
 function applyTypeChange(map<json> spec, TypeChange tc, boolean quietMode) {
     map<json> schemas = extractSchemas(spec);
     string[] targets = tc.schemaName != "" ? [tc.schemaName] : schemas.keys();
@@ -1087,7 +1135,6 @@ function applyTypeChange(map<json> spec, TypeChange tc, boolean quietMode) {
     }
 }
 
-// NEW - safe, uses hasKey before get
 function applyTypeChangeToSchema(map<json> schemaMap, string fieldName, string originalType, string updatedType) returns boolean {
     json|error propertiesResult = schemaMap.get("properties");
     if propertiesResult is map<json> {
@@ -1110,6 +1157,7 @@ function applyTypeChangeToSchema(map<json> schemaMap, string fieldName, string o
     }
     return false;
 }
+
 // ─────────────────────────────────────────────────────────────
 // DIFF HELPERS — used during sanitations.md generation
 // ─────────────────────────────────────────────────────────────

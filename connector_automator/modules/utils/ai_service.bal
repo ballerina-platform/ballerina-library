@@ -43,6 +43,26 @@ public function callAI(string prompt) returns string|error {
     }
 }
 
+// Multi-turn version: caller builds up the full conversation history and passes it.
+// Returns the assistant reply content for the final turn.
+public function callAIWithMessages(ai:ChatMessage[] messages) returns string|error {
+    ai:ModelProvider? model = anthropicModel;
+    if model is () {
+        return error("AI model not initialized. Please call initAIService() first.");
+    }
+
+    ai:ChatAssistantMessage|error response = model->chat(messages);
+    if response is error {
+        return error("AI generation failed: " + response.message());
+    }
+
+    string? content = response.content;
+    if content is string {
+        return content;
+    }
+    return error("AI response content is empty.");
+}
+
 public function isAIServiceInitialized() returns boolean {
     return anthropicModel !is ();
 }
