@@ -988,13 +988,13 @@ function applyRulesToSpec(string specPath, SanitationRules rules, boolean quietM
 }
 
 function applyServerUrlChange(map<json> spec, ServerUrlChange sc, boolean quietMode) {
-    json|error serversResult = spec.get("servers");
+    json serversResult = spec["servers"];
     if serversResult is json[] {
         json[] servers = <json[]>serversResult;
         foreach json server in servers {
             if server is map<json> {
                 map<json> serverMap = <map<json>>server;
-                json|error urlResult = serverMap.get("url");
+                json urlResult = serverMap["url"];
                 if urlResult is string && <string>urlResult == sc.original {
                     serverMap["url"] = sc.updated;
                     if !quietMode {
@@ -1007,15 +1007,15 @@ function applyServerUrlChange(map<json> spec, ServerUrlChange sc, boolean quietM
 }
 
 function applyPathPrefixRemoval(map<json> spec, PathPrefixRule pr, boolean quietMode) {
-    json|error pathsResult = spec.get("paths");
+    json pathsResult = spec["paths"];
     if pathsResult is map<json> {
         map<json> paths = <map<json>>pathsResult;
         map<json> newPaths = {};
         int modified = 0;
 
         foreach string path in paths.keys() {
-            json|error pathValue = paths.get(path);
-            if pathValue is json {
+            json pathValue = paths[path];
+            if pathValue !is () {
                 if path.startsWith(pr.prefixRemoved) {
                     string newPath = path.substring(pr.prefixRemoved.length());
                     if newPath == "" || newPath == "/" {
@@ -1048,13 +1048,11 @@ function replaceFormatValues(json data, string originalFormat, string updatedFor
     if data is map<json> {
         map<json> dataMap = <map<json>>data;
         foreach string key in dataMap.keys() {
-            json|error val = dataMap.get(key);
-            if val is json {
-                if key == "format" && val is string && <string>val == originalFormat {
-                    dataMap[key] = updatedFormat;
-                } else {
-                    replaceFormatValues(val, originalFormat, updatedFormat);
-                }
+            json val = dataMap[key];
+            if key == "format" && val is string && <string>val == originalFormat {
+                dataMap[key] = updatedFormat;
+            } else {
+                replaceFormatValues(val, originalFormat, updatedFormat);
             }
         }
     } else if data is json[] {
@@ -1070,13 +1068,11 @@ function countFormatOccurrences(json data, string formatValue) returns int {
     if data is map<json> {
         map<json> dataMap = <map<json>>data;
         foreach string key in dataMap.keys() {
-            json|error val = dataMap.get(key);
-            if val is json {
-                if key == "format" && val is string && <string>val == formatValue {
-                    count += 1;
-                } else {
-                    count += countFormatOccurrences(val, formatValue);
-                }
+            json val = dataMap[key];
+            if key == "format" && val is string && <string>val == formatValue {
+                count += 1;
+            } else {
+                count += countFormatOccurrences(val, formatValue);
             }
         }
     } else if data is json[] {
@@ -1093,7 +1089,7 @@ function applyNullabilityChange(map<json> spec, NullabilityChange nc, boolean qu
     string[] targets = nc.schemaName != "" ? [nc.schemaName] : schemas.keys();
 
     foreach string schemaName in targets {
-        json|error schemaResult = schemas.get(schemaName);
+        json schemaResult = schemas[schemaName];
         if schemaResult is map<json> {
             boolean changed = applyNullabilityToSchema(<map<json>>schemaResult, nc.fieldName, nc.nullable);
             if changed && !quietMode {
@@ -1104,13 +1100,13 @@ function applyNullabilityChange(map<json> spec, NullabilityChange nc, boolean qu
 }
 
 function applyNullabilityToSchema(map<json> schemaMap, string fieldName, boolean nullable) returns boolean {
-    json|error propertiesResult = schemaMap.get("properties");
+    json propertiesResult = schemaMap["properties"];
     if propertiesResult is map<json> {
         map<json> properties = <map<json>>propertiesResult;
         if !properties.hasKey(fieldName) {
             return false;
         }
-        json|error fieldResult = properties.get(fieldName);
+        json fieldResult = properties[fieldName];
         if fieldResult is map<json> {
             map<json> fieldMap = <map<json>>fieldResult;
             fieldMap["nullable"] = nullable;
@@ -1125,7 +1121,7 @@ function applyTypeChange(map<json> spec, TypeChange tc, boolean quietMode) {
     string[] targets = tc.schemaName != "" ? [tc.schemaName] : schemas.keys();
 
     foreach string schemaName in targets {
-        json|error schemaResult = schemas.get(schemaName);
+        json schemaResult = schemas[schemaName];
         if schemaResult is map<json> {
             boolean changed = applyTypeChangeToSchema(<map<json>>schemaResult, tc.fieldName, tc.originalType, tc.updatedType);
             if changed && !quietMode {
@@ -1136,19 +1132,19 @@ function applyTypeChange(map<json> spec, TypeChange tc, boolean quietMode) {
 }
 
 function applyTypeChangeToSchema(map<json> schemaMap, string fieldName, string originalType, string updatedType) returns boolean {
-    json|error propertiesResult = schemaMap.get("properties");
+    json propertiesResult = schemaMap["properties"];
     if propertiesResult is map<json> {
         map<json> properties = <map<json>>propertiesResult;
         if !properties.hasKey(fieldName) {
             return false;
         }
-        json|error fieldResult = properties.get(fieldName);
+        json fieldResult = properties[fieldName];
         if fieldResult is map<json> {
             map<json> fieldMap = <map<json>>fieldResult;
             if !fieldMap.hasKey("type") {
                 return false;
             }
-            json|error currentType = fieldMap.get("type");
+            json currentType = fieldMap["type"];
             if currentType is string && <string>currentType == originalType {
                 fieldMap["type"] = updatedType;
                 return true;
@@ -1164,13 +1160,13 @@ function applyTypeChangeToSchema(map<json> schemaMap, string fieldName, string o
 
 function extractServerUrl(json spec) returns string {
     if spec is map<json> {
-        json|error serversResult = spec.get("servers");
+        json serversResult = spec["servers"];
         if serversResult is json[] {
             json[] servers = <json[]>serversResult;
             if servers.length() > 0 {
                 json firstServer = servers[0];
                 if firstServer is map<json> {
-                    json|error urlResult = firstServer.get("url");
+                    json urlResult = firstServer["url"];
                     if urlResult is string {
                         return <string>urlResult;
                     }
@@ -1207,7 +1203,7 @@ function detectRemovedPathPrefix(json originalSpec, json alignedSpec) returns st
 function extractPathKeys(json spec) returns string[] {
     string[] keys = [];
     if spec is map<json> {
-        json|error pathsResult = spec.get("paths");
+        json pathsResult = spec["paths"];
         if pathsResult is map<json> {
             map<json> paths = <map<json>>pathsResult;
             foreach string key in paths.keys() {
@@ -1239,14 +1235,12 @@ function specContainsFormat(json spec, string formatValue) returns boolean {
     if spec is map<json> {
         map<json> specMap = <map<json>>spec;
         foreach string key in specMap.keys() {
-            json|error val = specMap.get(key);
-            if val is json {
-                if key == "format" && val is string && <string>val == formatValue {
-                    return true;
-                }
-                if specContainsFormat(val, formatValue) {
-                    return true;
-                }
+            json val = specMap[key];
+            if key == "format" && val is string && <string>val == formatValue {
+                return true;
+            }
+            if specContainsFormat(val, formatValue) {
+                return true;
             }
         }
     } else if spec is json[] {
@@ -1267,34 +1261,34 @@ function detectNullabilityChanges(json originalSpec, json alignedSpec) returns N
     map<json> alignedSchemas = extractSchemas(alignedSpec);
 
     foreach string schemaName in alignedSchemas.keys() {
-        json|error alignedSchemaResult = alignedSchemas.get(schemaName);
-        json|error originalSchemaResult = originalSchemas.get(schemaName);
+        json alignedSchemaResult = alignedSchemas[schemaName];
+        json originalSchemaResult = originalSchemas[schemaName];
 
         if alignedSchemaResult is map<json> {
             map<json> alignedSchema = <map<json>>alignedSchemaResult;
             map<json> originalSchema = originalSchemaResult is map<json> ? <map<json>>originalSchemaResult : {};
 
-            json|error aPropsResult = alignedSchema.get("properties");
-            json|error oPropsResult = originalSchema.get("properties");
+            json aPropsResult = alignedSchema["properties"];
+            json oPropsResult = originalSchema["properties"];
 
             if aPropsResult is map<json> {
                 map<json> aProps = <map<json>>aPropsResult;
                 map<json> oProps = oPropsResult is map<json> ? <map<json>>oPropsResult : {};
 
                 foreach string fieldName in aProps.keys() {
-                    json|error aFieldResult = aProps.get(fieldName);
-                    json|error oFieldResult = oProps.get(fieldName);
+                    json aFieldResult = aProps[fieldName];
+                    json oFieldResult = oProps[fieldName];
 
                     if aFieldResult is map<json> {
                         map<json> aField = <map<json>>aFieldResult;
                         boolean isNullableInAligned = aField.hasKey("nullable") &&
-                                aField.get("nullable") == true;
+                                aField["nullable"] == true;
 
                         boolean isNullableInOriginal = false;
                         if oFieldResult is map<json> {
                             map<json> oField = <map<json>>oFieldResult;
                             isNullableInOriginal = oField.hasKey("nullable") &&
-                                    oField.get("nullable") == true;
+                                    oField["nullable"] == true;
                         }
 
                         if isNullableInAligned && !isNullableInOriginal {
@@ -1321,23 +1315,23 @@ function detectTypeChanges(json originalSpec, json alignedSpec) returns TypeChan
     map<json> alignedSchemas = extractSchemas(alignedSpec);
 
     foreach string schemaName in alignedSchemas.keys() {
-        json|error alignedSchemaResult = alignedSchemas.get(schemaName);
-        json|error originalSchemaResult = originalSchemas.get(schemaName);
+        json alignedSchemaResult = alignedSchemas[schemaName];
+        json originalSchemaResult = originalSchemas[schemaName];
 
         if alignedSchemaResult is map<json> && originalSchemaResult is map<json> {
             map<json> alignedSchema = <map<json>>alignedSchemaResult;
             map<json> originalSchema = <map<json>>originalSchemaResult;
 
-            json|error aPropsResult = alignedSchema.get("properties");
-            json|error oPropsResult = originalSchema.get("properties");
+            json aPropsResult = alignedSchema["properties"];
+            json oPropsResult = originalSchema["properties"];
 
             if aPropsResult is map<json> && oPropsResult is map<json> {
                 map<json> aProps = <map<json>>aPropsResult;
                 map<json> oProps = <map<json>>oPropsResult;
 
                 foreach string fieldName in aProps.keys() {
-                    json|error aFieldResult = aProps.get(fieldName);
-                    json|error oFieldResult = oProps.get(fieldName);
+                    json aFieldResult = aProps[fieldName];
+                    json oFieldResult = oProps[fieldName];
 
                     if aFieldResult is map<json> && oFieldResult is map<json> {
                         map<json> aField = <map<json>>aFieldResult;
@@ -1348,8 +1342,8 @@ function detectTypeChanges(json originalSpec, json alignedSpec) returns TypeChan
                             continue;
                         }
 
-                        json|error aTypeResult = aField.get("type");
-                        json|error oTypeResult = oField.get("type");
+                        json aTypeResult = aField["type"];
+                        json oTypeResult = oField["type"];
 
                         if aTypeResult is string && oTypeResult is string {
                             string aType = <string>aTypeResult;
@@ -1375,10 +1369,10 @@ function detectTypeChanges(json originalSpec, json alignedSpec) returns TypeChan
 
 function extractSchemas(json spec) returns map<json> {
     if spec is map<json> {
-        json|error componentsResult = spec.get("components");
+        json componentsResult = spec["components"];
         if componentsResult is map<json> {
             map<json> components = <map<json>>componentsResult;
-            json|error schemasResult = components.get("schemas");
+            json schemasResult = components["schemas"];
             if schemasResult is map<json> {
                 return <map<json>>schemasResult;
             }
