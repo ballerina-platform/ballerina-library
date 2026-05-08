@@ -110,7 +110,10 @@ function extractTypeNamesFromErrors(CompilationError[] errors) returns string[] 
     return typeNames;
 }
 
-// Check if a string is a Ballerina keyword
+// Filters out built-in Ballerina primitive names that appear in error messages but are
+// not user-defined types worth searching for in types.bal. The list is intentionally
+// minimal — only primitives and common built-ins — because a false positive just causes
+// a wasted types.bal search, not a functional failure. Missing a keyword is harmless.
 function isBalKeyword(string s) returns boolean {
     string[] keywords = ["error", "nil", "string", "int", "boolean", "float", "decimal", "anydata", "json", "byte", "any"];
     foreach string keyword in keywords {
@@ -150,7 +153,8 @@ function getTypeContextForFile(string projectPath, string filePath, CompilationE
         }
     }
 
-    // Try to read client.bal for additional context on method signatures
+    // client.bal is optional context — if it doesn't exist or can't be read we
+    // proceed with types.bal context only. The error is intentionally ignored.
     string clientFilePath = projectPath + "/client.bal";
     string|io:Error clientContent = io:fileReadString(clientFilePath);
 

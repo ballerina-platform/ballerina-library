@@ -19,38 +19,15 @@ import ballerina/io;
 import ballerina/lang.value;
 import ballerina/os;
 import ballerina/regex;
-import ballerina/lang.runtime;
 import ballerinax/ai.anthropic;
 
 const string SEPARATOR = "============================================================";
 const string ANTHROPIC_API_KEY_ENV = "ANTHROPIC_API_KEY";
 
 const int MAX_RETRIES = 4;
-const decimal RETRY_INITIAL_DELAY = 10.0; // seconds; doubles on each attempt
-
-// Wraps model->chat with exponential-backoff retries for transient API errors
-// (rate limits, 529 overload) which the anthropic library surfaces as errors
-// with message "Unexpected response format from Anthropic API".
-function chatWithRetry(ai:ModelProvider model, ai:ChatMessage[] messages) returns ai:ChatAssistantMessage|error {
-    decimal delay = RETRY_INITIAL_DELAY;
-    error? lastErr = ();
-    foreach int attempt in 1 ..< MAX_RETRIES + 1 {
-        ai:ChatAssistantMessage|error response = model->chat(messages);
-        if response is ai:ChatAssistantMessage {
-            return response;
-        }
-        lastErr = response;
-        if attempt < MAX_RETRIES {
-            io:println(string `API call failed (attempt ${attempt}/${MAX_RETRIES}): ${response.message()}. Retrying in ${delay}s...`);
-            error? sleepErr = runtime:sleep(delay);
-            if sleepErr is error {
-                io:println(string `Sleep interrupted: ${sleepErr.message()}`);
-            }
-            delay *= 2.0d;
-        }
-    }
-    return lastErr ?: error("Max retries exceeded");
-}
+const decimal RETRY_INITIAL_DELAY = 10.0d; // seconds
+const float BACK_OFF_FACTOR = 2.0;
+const decimal MAX_WAIT_INTERVAL = 80.0d; // 10 → 20 → 40 → 80
 
 // Diffs larger than this threshold are sent in multiple turns to stay within
 // the OS argument-length limit and the model's single-message context budget.
@@ -91,7 +68,13 @@ function buildModel() returns ai:ModelProvider|error {
     return check new anthropic:ModelProvider(
         apiKey,
         anthropic:CLAUDE_SONNET_4_6,
-        maxTokens = 4096
+        maxTokens = 4096,
+        retryConfig = {
+            count: MAX_RETRIES,
+            interval: RETRY_INITIAL_DELAY,
+            backOffFactor: BACK_OFF_FACTOR,
+            maxWaitInterval: MAX_WAIT_INTERVAL
+        }
     );
 }
 
@@ -112,7 +95,7 @@ Analyze the diff and respond with ONLY a JSON object (no markdown, no explanatio
 ${JSON_SCHEMA}`;
 
     ai:ChatMessage[] messages = [{role: "user", content: prompt}];
-    ai:ChatAssistantMessage response = check chatWithRetry(model, messages);
+    ai:ChatAssistantMessage response = check model->chat(messages);
 
     string? content = response.content;
     if content is () {
@@ -141,7 +124,7 @@ function analyzeInChunks(ai:ModelProvider model, string gitDiff) returns Analysi
     string intro = string `I will send you a large git diff for a Ballerina connector in ${chunksToSend} parts because of its size.${truncationNote} Please wait until you have received all parts before analysing. After each part simply acknowledge with "Received part X/${chunksToSend}." and nothing else.`;
     messages.push({role: "user", content: intro});
 
-    ai:ChatAssistantMessage introAck = check chatWithRetry(model, messages);
+    ai:ChatAssistantMessage introAck = check model->chat(messages);
     messages.push({role: "assistant", content: introAck.content ?: ""});
 
     // Send only up to MAX_CHUNKS chunks
@@ -154,7 +137,7 @@ function analyzeInChunks(ai:ModelProvider model, string gitDiff) returns Analysi
         io:println(string `Sending chunk ${i + 1}/${chunksToSend} (${chunk.length()} chars)`);
 
         messages.push({role: "user", content: string `Part ${i + 1}/${chunksToSend}:\n\n${chunk}`});
-        ai:ChatAssistantMessage chunkAck = check chatWithRetry(model, messages);
+        ai:ChatAssistantMessage chunkAck = check model->chat(messages);
         messages.push({role: "assistant", content: chunkAck.content ?: ""});
     }
 
@@ -170,7 +153,7 @@ Analyze the complete diff and respond with ONLY a JSON object (no markdown, no e
 ${JSON_SCHEMA}`;
 
     messages.push({role: "user", content: analysisRequest});
-    ai:ChatAssistantMessage response = check chatWithRetry(model, messages);
+    ai:ChatAssistantMessage response = check model->chat(messages);
 
     string? content = response.content;
     if content is () {

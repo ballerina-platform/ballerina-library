@@ -129,7 +129,7 @@ The pipeline accepts the following arguments:
 |----------|----------|-------------|
 | 0 | `specPath` | Path to the OpenAPI specification file |
 | 1 | `outputPath` | Root directory for generated output |
-| 2 | `autoYes` | `"yes"` to skip confirmation prompts |
+| 2 | `skipConfirmation` | `"yes"` to skip confirmation prompts |
 | 3+ | flags | Optional flags: `quiet`, `regenerate`, `license=<path>` |
 
 The `regenerate` flag notifies the system that is a regeneration of an existing connector. In this pipeline during sanitization we read the sanitations.md in the connector repository and sanitize acoordingly. If the initial build fails we try to modify the exsiting tests using AI,if still fails we completely remove the tests and start from scratch.In example generation also first we try to recover the old examples, only if that fails we start from the beginning.
@@ -331,7 +331,7 @@ public type OpenAPIToolOptions record {|
 |};
 
 public type ClientGeneratorConfig record {|
-    boolean autoYes = false;
+    boolean skipConfirmation = false;
     boolean quietMode = false;
     OpenAPIToolOptions? toolOptions = ();
 |};
@@ -388,7 +388,7 @@ Parses and sorts all function definitions in a Ballerina client file. Supports `
 | 3 | `put` |
 | 4 | `patch` |
 | 5 | `delete` |
-| 6 | `remote` (non-resource remote functions) |
+| 6 | `remote` |
 | 7 | other |
 
 Within the same method type, functions are sorted lexicographically by path.
@@ -677,7 +677,7 @@ AI-powered automatic resolution of Ballerina compilation errors.
    d. Generate fix prompt (with type context + fix history)
    e. Call AI for fix
    f. Record this attempt in fileFixHistory[filePath]
-   g. If user confirms (or autoYes):
+   g. If user confirms (or skipConfirmation):
       - Create backup
       - Apply fix
 6. If no fixes applied → Stop
@@ -935,7 +935,7 @@ Interactive operations display user-friendly error messages:
 if result is error {
     io:println(string `✗ Operation failed: ${result.message()}`);
 
-    if !getUserConfirmation("Continue despite failure?", autoYes) {
+    if !getUserConfirmation("Continue despite failure?", skipConfirmation) {
         return result;
     }
 }

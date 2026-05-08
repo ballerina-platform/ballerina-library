@@ -205,11 +205,11 @@ function handleSanitizeOperation() returns error? {
         return error("Failed to read output directory");
     }
 
-    boolean autoYes = getUserConfirmation("Auto-confirm all prompts?");
+    boolean skipConfirmation = getUserConfirmation("Auto-confirm all prompts?");
     boolean quietMode = getUserConfirmation("Enable quiet mode?");
 
     string[] args = [inputSpec.trim(), outputDir.trim()];
-    if autoYes {
+    if skipConfirmation {
         args.push("yes");
     }
     if quietMode {
@@ -232,7 +232,7 @@ function handleClientGeneration() returns error? {
         return error("Failed to read output directory");
     }
 
-    boolean autoYes = getUserConfirmation("Auto-confirm all prompts?");
+    boolean skipConfirmation = getUserConfirmation("Auto-confirm all prompts?");
     boolean quietMode = getUserConfirmation("Enable quiet mode?");
 
     // Ask for client method type
@@ -248,7 +248,7 @@ function handleClientGeneration() returns error? {
     boolean wantAdvanced = getUserConfirmation("Configure advanced options?");
 
     string[] args = [specPath.trim(), outputDir.trim()];
-    if autoYes {
+    if skipConfirmation {
         args.push("yes");
     }
     if quietMode {
@@ -287,11 +287,11 @@ function handleExampleGeneration() returns error? {
         return error("Failed to read connector path");
     }
 
-    boolean autoYes = getUserConfirmation("Auto-confirm all prompts?");
+    boolean skipConfirmation = getUserConfirmation("Auto-confirm all prompts?");
     boolean quietMode = getUserConfirmation("Enable quiet mode?");
 
     string[] args = [connectorPath.trim()];
-    if autoYes {
+    if skipConfirmation {
         args.push("yes");
     }
     if quietMode {
@@ -314,11 +314,11 @@ function handleTestGeneration() returns error? {
         return error("Failed to read OpenAPI specification path");
     }
 
-    boolean autoYes = getUserConfirmation("Auto-confirm all prompts?");
+    boolean skipConfirmation = getUserConfirmation("Auto-confirm all prompts?");
     boolean quietMode = getUserConfirmation("Enable quiet mode?");
 
     string[] args = [connectorPath.trim(), specPath.trim()];
-    if autoYes {
+    if skipConfirmation {
         args.push("yes");
     }
     if quietMode {
@@ -375,11 +375,11 @@ function handleDocGeneration() returns error? {
         return error("Failed to read connector path");
     }
 
-    boolean autoYes = getUserConfirmation("Auto-confirm all prompts?");
+    boolean skipConfirmation = getUserConfirmation("Auto-confirm all prompts?");
     boolean quietMode = getUserConfirmation("Enable quiet mode?");
 
     string[] args = [command, connectorPath.trim()];
-    if autoYes {
+    if skipConfirmation {
         args.push("yes");
     }
     if quietMode {
@@ -397,11 +397,11 @@ function handleCodeFixer() returns error? {
         return error("Failed to read project path");
     }
 
-    boolean autoYes = getUserConfirmation("Auto-confirm all fixes?");
+    boolean skipConfirmation = getUserConfirmation("Auto-confirm all fixes?");
     boolean quietMode = getUserConfirmation("Enable quiet mode?");
 
     string[] args = [projectPath.trim()];
-    if autoYes {
+    if skipConfirmation {
         args.push("yes");
     }
     if quietMode {
@@ -433,12 +433,12 @@ function handleFullPipeline() returns error? {
         return error("Failed to read output directory path");
     }
 
-    boolean autoYes = getUserConfirmation("Auto-confirm all prompts?");
+    boolean skipConfirmation = getUserConfirmation("Auto-confirm all prompts?");
     boolean quietMode = getUserConfirmation("Enable quiet mode?");
     boolean regenerate = getUserConfirmation("Is this regenerating an existing connector?");
 
     string[] args = [openApiSpec.trim(), outputDir.trim()];
-    if autoYes {
+    if skipConfirmation {
         args.push("yes");
     }
     if quietMode {
@@ -486,7 +486,7 @@ function runFullPipeline(string... args) returns error? {
     string[] pipelineOptions = args.slice(2);
 
     boolean quietMode = false;
-    boolean autoYes = false;
+    boolean skipConfirmation = false;
     boolean regenerate = false;
     string licenseFile = "";
 
@@ -495,7 +495,7 @@ function runFullPipeline(string... args) returns error? {
         if option == "quiet" {
             quietMode = true;
         } else if option == "yes" {
-            autoYes = true;
+            skipConfirmation = true;
         } else if option == "regenerate" {
             regenerate = true;
         } else if option.startsWith("license=") {
@@ -506,7 +506,7 @@ function runFullPipeline(string... args) returns error? {
         }
     }
 
-    if autoYes && !quietMode {
+    if skipConfirmation && !quietMode {
         io:println("ℹ  Auto-confirm mode enabled");
     }
     if quietMode {
@@ -523,13 +523,13 @@ function runFullPipeline(string... args) returns error? {
     }
 
     if regenerate {
-        return runRegenerationPipeline(openApiSpec, outputDir, pipelineOptions, quietMode, autoYes);
+        return runRegenerationPipeline(openApiSpec, outputDir, pipelineOptions, quietMode, skipConfirmation);
     } else {
-        return runStandardPipeline(openApiSpec, outputDir, pipelineOptions, quietMode, autoYes);
+        return runStandardPipeline(openApiSpec, outputDir, pipelineOptions, quietMode, skipConfirmation);
     }
 }
 
-function runStandardPipeline(string openApiSpec, string outputDir, string[] pipelineOptions, boolean quietMode, boolean autoYes) returns error? {
+function runStandardPipeline(string openApiSpec, string outputDir, string[] pipelineOptions, boolean quietMode, boolean skipConfirmation) returns error? {
     printPipelineHeader(openApiSpec, outputDir, quietMode, false);
 
     // Step 1: Sanitize OpenAPI spec
@@ -637,7 +637,7 @@ function runStandardPipeline(string openApiSpec, string outputDir, string[] pipe
     return;
 }
 
-function runRegenerationPipeline(string openApiSpec, string outputDir, string[] pipelineOptions, boolean quietMode, boolean autoYes) returns error? {
+function runRegenerationPipeline(string openApiSpec, string outputDir, string[] pipelineOptions, boolean quietMode, boolean skipConfirmation) returns error? {
     printPipelineHeader(openApiSpec, outputDir, quietMode, true);
 
     // Initialize LLM early so applySanitations can use AI-based parsing
@@ -715,7 +715,7 @@ function runRegenerationPipeline(string openApiSpec, string outputDir, string[] 
         io:println("   (This preserves existing test logic when possible)");
 
         string[] fixerArgs = [clientPath];
-        if autoYes {
+        if skipConfirmation {
             fixerArgs.push("yes");
         }
         if quietMode {
@@ -731,115 +731,9 @@ function runRegenerationPipeline(string openApiSpec, string outputDir, string[] 
         utils:CommandResult phase1BuildResult = utils:executeBalBuild(clientPath, quietMode);
 
         if !utils:hasCompilationErrors(phase1BuildResult) {
-            // Phase 1 succeeded - existing files were fixed
-            if phase1BuildResult.stderr.length() > 0 && !quietMode {
-                io:println("   ⚠  Build completed with warnings:");
-                io:println(phase1BuildResult.stderr);
-            }
-            io:println("   ✓ Phase 1 successful - existing test files fixed!");
-            io:println("✓ Client built and validated successfully after fixing existing tests");
-
-            // Continue to examples since tests are already working
-            printStepHeader(4, "Generating Examples", quietMode);
-            string[] exampleArgs = [outputDir];
-            exampleArgs.push(...pipelineOptions);
-            error? exampleResult = example_generator:executeExampleGen(...exampleArgs);
-            if exampleResult is error {
-                io:println(string `⚠  Example generation failed: ${exampleResult.message()}`);
-                io:println("   Continuing pipeline...");
-            } else {
-                io:println("✓ Example generation completed successfully");
-            }
-
+            check handlePhase1Success(phase1BuildResult, outputDir, pipelineOptions, quietMode);
         } else {
-            // PHASE 2: Phase 1 failed - remove old files and regenerate fresh
-            io:println("");
-            io:println("   Phase 1 could not fix all errors. Proceeding to Phase 2...");
-            io:println("   Phase 2: Removing old test files and regenerating fresh...");
-
-            error? testsRemoveResult = file:remove(clientPath + "/tests", file:RECURSIVE);
-            if testsRemoveResult is error {
-                io:println(string `   Warning: Could not remove tests directory: ${testsRemoveResult.message()}`);
-            }
-            error? mockRemoveResult = file:remove(clientPath + "/modules/mock.server", file:RECURSIVE);
-            if mockRemoveResult is error {
-                io:println(string `   Warning: Could not remove mock.server directory: ${mockRemoveResult.message()}`);
-            }
-            io:println("   ✓ Old tests removed");
-
-            // Regenerate tests from scratch
-            printStepHeader(4, "Regenerating Tests for New API Version", quietMode);
-            string[] testArgs = [outputDir, sanitizedSpec];
-            testArgs.push(...pipelineOptions);
-            error? testResult = test_generator:executeTestGen(...testArgs);
-            if testResult is error {
-                io:println(string `✗ Test regeneration failed: ${testResult.message()}`);
-                io:println("   Cannot continue without valid tests");
-                return testResult;
-            }
-            io:println("✓ Test regeneration completed successfully");
-
-            // Step 3 RETRY: Build and validate client again
-            printStepHeader(3, "Building and Validating Client (Retry)", quietMode);
-            utils:CommandResult retryBuildResult = utils:executeBalBuild(clientPath, quietMode);
-
-            if utils:hasCompilationErrors(retryBuildResult) {
-                io:println(string `✗ Build validation failed even after test regeneration`);
-                io:println("   Attempting additional code fixes...");
-
-                // Try code fixer one more time on regenerated files
-                error? fixResult = code_fixer:executeCodeFixer(...fixerArgs);
-                if fixResult is error {
-                    io:println(string `⚠  Code fixer attempt failed: ${fixResult.message()}`);
-                }
-
-                // Final build attempt after code fixing
-                utils:CommandResult finalBuildResult = utils:executeBalBuild(clientPath, quietMode);
-
-                if utils:hasCompilationErrors(finalBuildResult) {
-                    io:println(string `✗ Build still failing - manual intervention required`);
-
-                    if !quietMode && finalBuildResult.stderr.length() > 0 {
-                        io:println("   Remaining build errors:");
-                        io:println(finalBuildResult.stderr);
-                    }
-
-                    io:println("");
-                    io:println("⚠  REGENERATION COMPLETED WITH ERRORS");
-                    io:println("   The connector has been partially regenerated but has compilation errors.");
-                    io:println("   Common issues to check:");
-                    io:println("   • Redeclared symbols in test files - remove duplicate type definitions");
-                    io:println("   • Type mismatches - verify test data matches new schema");
-                    io:println("   • Missing required fields - check new required fields in types");
-                    io:println(string `   • Review errors in: ${clientPath}/tests/`);
-                    io:println("");
-                    io:println("   Continuing with documentation generation...");
-                } else {
-                    if finalBuildResult.stderr.length() > 0 && !quietMode {
-                        io:println("⚠  Build completed with warnings:");
-                        io:println(finalBuildResult.stderr);
-                    }
-                    io:println("✓ Client built successfully after code fixing");
-                }
-            } else {
-                if retryBuildResult.stderr.length() > 0 && !quietMode {
-                    io:println("⚠  Build completed with warnings:");
-                    io:println(retryBuildResult.stderr);
-                }
-                io:println("✓ Client built and validated successfully after test regeneration");
-            }
-
-            // Step 5: Generate examples (after tests are fixed)
-            printStepHeader(5, "Regenerating Examples for New API Version", quietMode);
-            string[] exampleArgs = [outputDir];
-            exampleArgs.push(...pipelineOptions);
-            error? exampleResult = example_generator:executeExampleGen(...exampleArgs);
-            if exampleResult is error {
-                io:println(string `⚠  Example regeneration failed: ${exampleResult.message()}`);
-                io:println("   Continuing pipeline...");
-            } else {
-                io:println("✓ Example regeneration completed successfully");
-            }
+            check handlePhase2(clientPath, outputDir, sanitizedSpec, pipelineOptions, fixerArgs, quietMode);
         }
 
     } else {
@@ -890,6 +784,109 @@ function runRegenerationPipeline(string openApiSpec, string outputDir, string[] 
     // Final completion summary
     printRegenerationCompletion(outputDir, quietMode);
     return;
+}
+
+function handlePhase1Success(utils:CommandResult buildResult, string outputDir, string[] pipelineOptions, boolean quietMode) returns error? {
+    if buildResult.stderr.length() > 0 && !quietMode {
+        io:println("   ⚠  Build completed with warnings:");
+        io:println(buildResult.stderr);
+    }
+    io:println("   ✓ Phase 1 successful - existing test files fixed!");
+    io:println("✓ Client built and validated successfully after fixing existing tests");
+
+    printStepHeader(4, "Generating Examples", quietMode);
+    string[] exampleArgs = [outputDir];
+    exampleArgs.push(...pipelineOptions);
+    error? exampleResult = example_generator:executeExampleGen(...exampleArgs);
+    if exampleResult is error {
+        io:println(string `⚠  Example generation failed: ${exampleResult.message()}`);
+        io:println("   Continuing pipeline...");
+    } else {
+        io:println("✓ Example generation completed successfully");
+    }
+}
+
+function handlePhase2(string clientPath, string outputDir, string sanitizedSpec, string[] pipelineOptions, string[] fixerArgs, boolean quietMode) returns error? {
+    io:println("");
+    io:println("   Phase 1 could not fix all errors. Proceeding to Phase 2...");
+    io:println("   Phase 2: Removing old test files and regenerating fresh...");
+
+    error? testsRemoveResult = file:remove(clientPath + "/tests", file:RECURSIVE);
+    if testsRemoveResult is error {
+        io:println(string `   Warning: Could not remove tests directory: ${testsRemoveResult.message()}`);
+    }
+    error? mockRemoveResult = file:remove(clientPath + "/modules/mock.server", file:RECURSIVE);
+    if mockRemoveResult is error {
+        io:println(string `   Warning: Could not remove mock.server directory: ${mockRemoveResult.message()}`);
+    }
+    io:println("   ✓ Old tests removed");
+
+    printStepHeader(4, "Regenerating Tests for New API Version", quietMode);
+    string[] testArgs = [outputDir, sanitizedSpec];
+    testArgs.push(...pipelineOptions);
+    error? testResult = test_generator:executeTestGen(...testArgs);
+    if testResult is error {
+        io:println(string `✗ Test regeneration failed: ${testResult.message()}`);
+        io:println("   Cannot continue without valid tests");
+        return testResult;
+    }
+    io:println("✓ Test regeneration completed successfully");
+
+    printStepHeader(3, "Building and Validating Client (Retry)", quietMode);
+    check handleRetryBuild(clientPath, fixerArgs, quietMode);
+
+    printStepHeader(5, "Regenerating Examples for New API Version", quietMode);
+    string[] exampleArgs = [outputDir];
+    exampleArgs.push(...pipelineOptions);
+    error? exampleResult = example_generator:executeExampleGen(...exampleArgs);
+    if exampleResult is error {
+        io:println(string `⚠  Example regeneration failed: ${exampleResult.message()}`);
+        io:println("   Continuing pipeline...");
+    } else {
+        io:println("✓ Example regeneration completed successfully");
+    }
+}
+
+function handleRetryBuild(string clientPath, string[] fixerArgs, boolean quietMode) returns error? {
+    utils:CommandResult retryBuildResult = utils:executeBalBuild(clientPath, quietMode);
+    if !utils:hasCompilationErrors(retryBuildResult) {
+        if retryBuildResult.stderr.length() > 0 && !quietMode {
+            io:println("⚠  Build completed with warnings:");
+            io:println(retryBuildResult.stderr);
+        }
+        io:println("✓ Client built and validated successfully after test regeneration");
+        return;
+    }
+
+    io:println("✗ Build validation failed even after test regeneration — attempting additional code fixes...");
+    error? fixResult = code_fixer:executeCodeFixer(...fixerArgs);
+    if fixResult is error {
+        io:println(string `⚠  Code fixer attempt failed: ${fixResult.message()}`);
+    }
+
+    utils:CommandResult finalBuildResult = utils:executeBalBuild(clientPath, quietMode);
+    if utils:hasCompilationErrors(finalBuildResult) {
+        if !quietMode && finalBuildResult.stderr.length() > 0 {
+            io:println("   Remaining build errors:");
+            io:println(finalBuildResult.stderr);
+        }
+        io:println("");
+        io:println("⚠  REGENERATION COMPLETED WITH ERRORS");
+        io:println("   The connector has been partially regenerated but has compilation errors.");
+        io:println("   Common issues to check:");
+        io:println("   • Redeclared symbols in test files - remove duplicate type definitions");
+        io:println("   • Type mismatches - verify test data matches new schema");
+        io:println("   • Missing required fields - check new required fields in types");
+        io:println(string `   • Review errors in: ${clientPath}/tests/`);
+        io:println("");
+        io:println("   Continuing with documentation generation...");
+    } else {
+        if finalBuildResult.stderr.length() > 0 && !quietMode {
+            io:println("⚠  Build completed with warnings:");
+            io:println(finalBuildResult.stderr);
+        }
+        io:println("✓ Client built successfully after code fixing");
+    }
 }
 
 function printPipelineHeader(string openApiSpec, string outputDir, boolean quietMode, boolean regenerate) {

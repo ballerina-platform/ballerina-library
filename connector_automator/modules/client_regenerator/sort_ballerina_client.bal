@@ -18,11 +18,14 @@ import ballerina/io;
 import ballerina/file;
 import ballerina/regex;
 
-const string METHOD_GET = "get";
-const string METHOD_POST = "post";
-const string METHOD_PUT = "put";
-const string METHOD_DELETE = "delete";
-const string METHOD_PATCH = "patch";
+enum HttpMethod {
+    METHOD_GET = "get",
+    METHOD_POST = "post",
+    METHOD_PUT = "put",
+    METHOD_DELETE = "delete",
+    METHOD_PATCH = "patch"
+}
+
 const string METHOD_REMOTE = "remote";
 const string METHOD_UNKNOWN = "unknown";
 
@@ -64,8 +67,7 @@ function extractMethodType(string content) returns string {
     foreach int i in 0 ..< tokens.length() {
         if tokens[i] == "function" && i + 1 < tokens.length() {
             string nameOrMethod = tokens[i + 1];
-            if nameOrMethod == METHOD_GET || nameOrMethod == METHOD_POST || nameOrMethod == METHOD_PUT ||
-                    nameOrMethod == METHOD_DELETE || nameOrMethod == METHOD_PATCH {
+            if nameOrMethod is HttpMethod {
                 return nameOrMethod;
             }
             break;
@@ -83,12 +85,19 @@ function extractMethodType(string content) returns string {
 }
 
 function extractHttpMethodFromBody(string content) returns string {
+    map<string> methodMap = {
+        "->get(": METHOD_GET,
+        "->post(": METHOD_POST,
+        "->put(": METHOD_PUT,
+        "->delete(": METHOD_DELETE,
+        "->patch(": METHOD_PATCH
+    };
     string lower = content.toLowerAscii();
-    if lower.includes("->get(") { return METHOD_GET; }
-    if lower.includes("->post(") { return METHOD_POST; }
-    if lower.includes("->put(") { return METHOD_PUT; }
-    if lower.includes("->delete(") { return METHOD_DELETE; }
-    if lower.includes("->patch(") { return METHOD_PATCH; }
+    foreach string key in methodMap.keys() {
+        if lower.includes(key) {
+            return methodMap[key] ?: METHOD_REMOTE;
+        }
+    }
     return METHOD_REMOTE;
 }
 
@@ -121,8 +130,7 @@ function extractPath(string content) returns string {
     }
 
     foreach int i in 0 ..< tokens.length() {
-        if (tokens[i] == METHOD_GET || tokens[i] == METHOD_POST || tokens[i] == METHOD_PUT ||
-                tokens[i] == METHOD_DELETE || tokens[i] == METHOD_PATCH) && i + 1 < tokens.length() {
+        if tokens[i] is HttpMethod && i + 1 < tokens.length() {
             string rawPath = tokens[i + 1];
             string[] pathParts = regex:split(rawPath, "\\(");
             string path = pathParts.length() > 0 ? pathParts[0] : rawPath;
@@ -280,9 +288,9 @@ function sortAndWriteClient(string inputPath, string outputPath) returns error? 
             content: block.content,
             startLine: block.startLine,
             endLine: block.endLine,
-            methodType: methodType,
-            path: path,
-            sortKey: sortKey
+            methodType,
+            path,
+            sortKey
         });
     }
 

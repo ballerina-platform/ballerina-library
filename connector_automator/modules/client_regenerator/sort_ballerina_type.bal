@@ -69,6 +69,46 @@ function extractTypeKind(string content) returns string {
 
 // countChar is defined in sort_ballerina_client.bal and shared within this module
 
+const string OPEN_BRACE = "{";
+const string CLOSE_BRACE = "}";
+
+function buildSingleLineType(string line, string typeName, int lineIndex) returns TypeDefinition {
+    string typeKind = extractTypeKind(line);
+    return {content: line, name: typeName, typeKind, startLine: lineIndex, endLine: lineIndex};
+}
+
+// Reads lines starting at startIndex until the matching closing brace is found.
+// Returns the completed TypeDefinition and the index of the last consumed line.
+function buildMultiLineType(string[] lines, string firstLine, string typeName, int startLine, int initialBraceCount) returns [TypeDefinition, int] {
+    string[] typeLines = [firstLine];
+    int openBraces = initialBraceCount;
+    int i = startLine + 1;
+
+    while i < lines.length() {
+        string currentLine = lines[i];
+        typeLines.push(currentLine);
+        openBraces += countChar(currentLine, OPEN_BRACE) - countChar(currentLine, CLOSE_BRACE);
+
+        string currentStripped = currentLine.trim();
+        if openBraces == 0 && (currentStripped.endsWith("};") || currentStripped.endsWith("|};")) {
+            string typeContent = string:'join("\n", ...typeLines);
+            TypeDefinition typeDef = {
+                content: typeContent,
+                name: typeName,
+                typeKind: extractTypeKind(typeContent),
+                startLine,
+                endLine: i
+            };
+            return [typeDef, i];
+        }
+        i += 1;
+    }
+
+    // Unclosed block — return whatever was collected
+    string typeContent = string:'join("\n", ...typeLines);
+    return [{content: typeContent, name: typeName, typeKind: extractTypeKind(typeContent), startLine, endLine: i - 1}, i - 1];
+}
+
 function extractAllTypes(string content) returns [TypeDefinition[], int, int] {
     string[] lines = regex:split(content, "\n");
     TypeDefinition[] typeDefs = [];
@@ -81,78 +121,42 @@ function extractAllTypes(string content) returns [TypeDefinition[], int, int] {
         string line = lines[i];
         string stripped = line.trim();
 
-        if regex:matches(stripped, "public\\s+(type|const)\\b.*") {
-            if firstTypeLine == -1 {
-                firstTypeLine = i;
-            }
-
-            string typeName = extractTypeName(stripped);
-            string[] typeLines = [line];
-            int startLine = i;
-
-            if stripped.includes(";") && !stripped.includes("record") {
-                lastTypeLine = i;
-                string typeContent = line;
-                string typeKind = extractTypeKind(typeContent);
-
-                typeDefs.push({
-                    content: typeContent,
-                    name: typeName,
-                    typeKind: typeKind,
-                    startLine: startLine,
-                    endLine: i
-                });
-                i += 1;
-                continue;
-            }
-
-            int braceCount = countChar(line, "{") - countChar(line, "}");
+        if !regex:matches(stripped, "public\\s+(type|const)\\b.*") {
             i += 1;
-
-            // If the declaration line has no net-open braces, finalize immediately
-            // to prevent the body loop from consuming the next type definition
-            if braceCount == 0 {
-                lastTypeLine = startLine;
-                string typeContent = line;
-                string typeKind = extractTypeKind(typeContent);
-                typeDefs.push({
-                    content: typeContent,
-                    name: typeName,
-                    typeKind: typeKind,
-                    startLine: startLine,
-                    endLine: startLine
-                });
-                continue;
-            }
-
-            // Use a separate mutable counter to avoid Ballerina's narrowing restriction
-            int openBraces = braceCount;
-            while i < lines.length() {
-                string currentLine = lines[i];
-                typeLines.push(currentLine);
-                openBraces += countChar(currentLine, "{") - countChar(currentLine, "}");
-
-                string currentStripped = currentLine.trim();
-                if openBraces == 0 && (currentStripped.endsWith("};") || currentStripped.endsWith("|};")) {
-                    lastTypeLine = i;
-                    string typeContent = string:'join("\n", ...typeLines);
-                    string typeKind = extractTypeKind(typeContent);
-
-                    typeDefs.push({
-                        content: typeContent,
-                        name: typeName,
-                        typeKind: typeKind,
-                        startLine: startLine,
-                        endLine: i
-                    });
-                    i += 1;
-                    break;
-                }
-                i += 1;
-            }
-        } else {
-            i += 1;
+            continue;
         }
+
+        if firstTypeLine == -1 {
+            firstTypeLine = i;
+        }
+
+        string typeName = extractTypeName(stripped);
+        int startLine = i;
+
+        // Single-line declaration: has a semicolon and is not a multi-line record
+        if stripped.includes(";") && !stripped.includes("record") {
+            lastTypeLine = i;
+            typeDefs.push(buildSingleLineType(line, typeName, startLine));
+            i += 1;
+            continue;
+        }
+
+        int braceCount = countChar(line, OPEN_BRACE) - countChar(line, CLOSE_BRACE);
+
+        // Declaration header has no net-open braces — treat as single line
+        // (e.g. a type alias whose body is on a later line but not yet parsed)
+        if braceCount == 0 {
+            lastTypeLine = startLine;
+            // start == end because this is a single declaration line with no open block
+            typeDefs.push(buildSingleLineType(line, typeName, startLine));
+            i += 1;
+            continue;
+        }
+
+        [TypeDefinition, int] result = buildMultiLineType(lines, line, typeName, startLine, braceCount);
+        typeDefs.push(result[0]);
+        lastTypeLine = result[1];
+        i = result[1] + 1;
     }
 
     return [typeDefs, firstTypeLine, lastTypeLine];
