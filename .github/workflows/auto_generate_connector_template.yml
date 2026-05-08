@@ -154,7 +154,7 @@ jobs:
       - name: Clone Connector Automator
         run: |
           echo "Cloning connector automator tool from ballerina-library..."
-          git clone -b main https://github.com/orgBBalLib/ballerina-library.git $RUNNER_TEMP/temp-library
+          git clone -b main https://github.com/ballerina-platform/ballerina-library.git $RUNNER_TEMP/temp-library
           cp -r $RUNNER_TEMP/temp-library/connector_automator ./
           echo "Connector automator cloned successfully"
 
