@@ -88,7 +88,7 @@ jobs:
               repos/"$REPO"/dispatches \
               -X POST \
               -f event_type=openapi-update \
-              -f client_payload[sender]=orgBBalLib/ballerina-library \
+              -f client_payload[sender]=ballerina-platform/ballerina-library \
               -f client_payload[openapi_url]="$OPENAPI_URL" \
               -f client_payload[spec_version]="$VERSION" \
               -f client_payload[spec_path]="$SPEC"; then
@@ -219,7 +219,7 @@ jobs:
               PR_BODY=$(echo "$PR_DATA" | jq -r '.body // ""')
               NEW_VERSION=$(echo "$PR_BODY" | grep -oP 'New Version.*?`\K[^`]+' || echo "")
               CODE_OWNERS=$(echo "$PR_BODY" | grep -oP 'Code Owners:.*?\K@[\w-]+(,\s*@[\w-]+)*' | tr -d '@' | sed 's/,/, /g' || echo "")
-              CONNECTOR_NAME=$(echo "$REPO" | sed 's|^orgBBalLib/module-ballerinax-||')
+              CONNECTOR_NAME=$(echo "$REPO" | sed 's|^ballerina-platform/module-ballerinax-||')
 
               CONNECTOR_INFO=$(jq -n \
                 --arg repo "$REPO" \
@@ -251,7 +251,7 @@ jobs:
               echo "  No PR found for $REPO created after ${{ steps.start_time.outputs.workflow_start_time }}"
               echo "  The workflow may have failed before creating a PR"
 
-              CONNECTOR_NAME=$(echo "$REPO" | sed 's|^orgBBalLib/module-ballerinax-||')
+              CONNECTOR_NAME=$(echo "$REPO" | sed 's|^ballerina-platform/module-ballerinax-||')
 
               CONNECTOR_INFO=$(jq -n \
                 --arg repo "$REPO" \
