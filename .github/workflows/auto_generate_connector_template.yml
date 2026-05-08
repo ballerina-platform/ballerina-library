@@ -32,6 +32,11 @@ on:
         required: false
         type: boolean
         default: false
+      max-iterations:
+        description: "Maximum fix iterations for the AI code fixer"
+        required: false
+        type: number
+        default: 5
 
     outputs:
       pipeline_succeeded:
@@ -149,9 +154,8 @@ jobs:
       - name: Clone Connector Automator
         run: |
           echo "Cloning connector automator tool from ballerina-library..."
-           git clone -b main https://github.com/ballerina-platform/ballerina-library.git temp-library
-          cp -r temp-library/connector_automator ./
-          rm -rf temp-library
+          git clone -b main https://github.com/orgBBalLib/ballerina-library.git $RUNNER_TEMP/temp-library
+          cp -r $RUNNER_TEMP/temp-library/connector_automator ./
           echo "Connector automator cloned successfully"
 
       - name: Download OpenAPI Specification
@@ -166,22 +170,27 @@ jobs:
           rm -f openapi.json openapi.yaml openapi.yml
           echo "Removed any existing OpenAPI spec files"
 
-          # Download new spec based on URL extension
+          # Download new spec based on URL extension and set env vars immediately
           if [[ "${{ inputs.openapi-url }}" == *.json ]]; then
             wget -O openapi.json "${{ inputs.openapi-url }}"
             echo "Downloaded openapi.json"
+            echo "EXTENSION=json" >> "$GITHUB_ENV"
+            echo "SPEC_FILE=openapi.json" >> "$GITHUB_ENV"
           elif [[ "${{ inputs.openapi-url }}" == *.yaml || "${{ inputs.openapi-url }}" == *.yml ]]; then
             wget -O openapi.yaml "${{ inputs.openapi-url }}"
             echo "Downloaded openapi.yaml"
+            echo "EXTENSION=yaml" >> "$GITHUB_ENV"
+            echo "SPEC_FILE=openapi.yaml" >> "$GITHUB_ENV"
           else
             echo "Unsupported file extension: ${{ inputs.openapi-url }}"
             exit 1
           fi
 
       - name: Read File Extension
+        if: inputs.openapi-url == ''
         working-directory: docs/spec
         run: |
-          # Count OpenAPI spec files
+          # Count OpenAPI spec files (only runs when no URL provided — spec is pre-committed)
           file_count=$(ls openapi.{json,yaml,yml} 2>/dev/null | wc -l)
 
           if [ "$file_count" -eq 0 ]; then
@@ -196,15 +205,7 @@ jobs:
             exit 1
           fi
 
-          # Get the single file
-          if [ -f "openapi.json" ]; then
-            file="openapi.json"
-          elif [ -f "openapi.yaml" ]; then
-            file="openapi.yaml"
-          elif [ -f "openapi.yml" ]; then
-            file="openapi.yml"
-          fi
-
+          file=$(ls openapi.{json,yaml,yml} 2>/dev/null | head -1)
           ext="${file##*.}"
           echo "EXTENSION=$ext" >> "$GITHUB_ENV"
           echo "SPEC_FILE=$file" >> "$GITHUB_ENV"
@@ -258,7 +259,7 @@ jobs:
 
           cat > Config.toml << EOF
           [connector_automator.code_fixer]
-          maxIterations = 5
+          maxIterations = ${{ inputs.max-iterations }}
 
           [connector_automator.utils]
           apiKey = "${{ secrets.ANTHROPIC_API_KEY }}"
