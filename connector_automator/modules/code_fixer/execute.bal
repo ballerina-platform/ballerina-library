@@ -1,5 +1,6 @@
 import ballerina/io;
 import ballerina/log;
+import wso2/connector_automator.utils;
 
 public function executeCodeFixer(string... args) returns error? {
     if args.length() < 1 {
@@ -54,7 +55,7 @@ function printOperationPlan(string projectPath, boolean quietMode) {
         return;
     }
 
-    string sep = createSeparator("=", 70);
+    string sep = utils:createSeparator("=", 70);
     io:println(sep);
     io:println("Code Error Fixing");
     io:println(sep);
@@ -69,7 +70,7 @@ function printOperationPlan(string projectPath, boolean quietMode) {
 }
 
 function printFixSummary(FixResult result, boolean quietMode) {
-    string sep = createSeparator("=", 70);
+    string sep = utils:createSeparator("=", 70);
 
     io:println("");
     io:println(sep);
@@ -136,16 +137,6 @@ function getUserConfirmation(string message, boolean autoYes = false) returns bo
         return false;
     }
     return userInput.trim().toLowerAscii() is "y"|"yes";
-}
-
-function createSeparator(string char, int length) returns string {
-    string[] chars = [];
-    int i = 0;
-    while i < length {
-        chars.push(char);
-        i += 1;
-    }
-    return string:'join("", ...chars);
 }
 
 function printUsage() {

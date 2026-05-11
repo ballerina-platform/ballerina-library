@@ -3,6 +3,10 @@ public type FixResult record {|
     boolean success;
     int errorsFixed;
     int errorsRemaining;
+    int ballerinaErrorsFixed = 0;
+    int javaErrorsFixed = 0;
+    int ballerinaErrorsRemaining = 0;
+    int javaErrorsRemaining = 0;
     string[] appliedFixes;
     string[] remainingFixes;
 |};
@@ -13,6 +17,8 @@ public type CompilationError record {|
     int column;
     string message;
     string severity;
+    string language = "ballerina";
+    string sourceTool = "bal";
     string code?;
 |};
 
@@ -21,6 +27,7 @@ public type FixRequest record {|
     string filePath;
     string code;
     CompilationError[] errors;
+    string language = "ballerina";
 |};
 
 public type FixResponse record {|
@@ -30,3 +37,9 @@ public type FixResponse record {|
 |};
 
 public type BallerinaFixerError error;
+
+type JavaEditOperation record {|
+    int startLine;
+    int endLine;
+    string[] replacement;
+|};

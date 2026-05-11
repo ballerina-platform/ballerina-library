@@ -34,4 +34,3 @@ public type CmdCompilationError record {|
 |};
 
 public type CommandExecutorError distinct error;
-

@@ -1,4 +1,4 @@
-import connector_automator.utils;
+import wso2/connector_automator.utils;
 
 public function generateDescriptionsBatch(DescriptionRequest[] requests, string apiContext) returns BatchDescriptionResponse[]|LLMServiceError {
     if !utils:isAIServiceInitialized() {

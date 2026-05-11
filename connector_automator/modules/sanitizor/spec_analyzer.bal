@@ -113,7 +113,7 @@ function collectPropertyDescriptionRequests(map<json> properties, string parentS
                 pathPrefix + ".properties." + propertyName :
                 parentSchemaName + ".properties." + propertyName;
 
-            // Check if property needs description (not $ref and no description)
+            // Check if property needs description
             if !propertyMap.hasKey("description") {
                 string requestId = generateRequestId(parentSchemaName, propertyPath, "property");
                 string context = string `Property '${propertyName}' in schema '${parentSchemaName}'. Property definition: ${propertyMap.toString()}`;

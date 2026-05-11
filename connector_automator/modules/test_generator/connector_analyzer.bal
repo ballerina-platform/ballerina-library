@@ -82,11 +82,10 @@ function findInitSignature(string clientContent) returns string? {
             // Count braces to find end of function signature
             if strings:includes(line, "{") {
                 braceCount += 1;
-                break; // Stop at opening brace of function body
+                break;
             }
         }
         else if foundStart && !inInitFunction {
-            // Reset if we didn't find the function properly
             initMethod = "";
             foundStart = false;
         }
@@ -121,10 +120,8 @@ function findInitSignatureRegex(string clientContent) returns string? {
 
 // Combine both approaches
 function extractInitMethodComplete(string clientContent) returns string {
-    // Try the line-by-line approach first
     string? result = findInitSignature(clientContent);
 
-    // Fallback to regex approach
     if result is () {
         result = findInitSignatureRegex(clientContent);
     }
@@ -243,7 +240,6 @@ function extractFunctionDocumentation(string content, int functionStartIndex) re
     int currentIndex = functionStartIndex - 1;
     string docComment = "";
 
-    // Skip whitespace
     while currentIndex >= 0 && (content.substring(currentIndex, currentIndex + 1) == " " ||
             content.substring(currentIndex, currentIndex + 1) == "\n" ||
             content.substring(currentIndex, currentIndex + 1) == "\r" ||
@@ -298,7 +294,6 @@ function extractPackageName(string tomlContent) returns string {
 }
 
 function detectClientMethodType(string clientContent) returns "resource"|"remote"|error {
-    // check for resource methods in the client.bal
     regexp:RegExp resourcePattern = re `resource\s+isolated\sfunction\s(get|post|put|patch|delete|head|otions)\s+`;
     regexp:Span[] resourceMatches = resourcePattern.findAll(clientContent);
 
@@ -306,7 +301,6 @@ function detectClientMethodType(string clientContent) returns "resource"|"remote
         return "resource";
     }
 
-    // check for remote methods in the client.bal
     regexp:RegExp remotePattern = re `remote\s+isolated\s+function\s+`;
     regexp:Span[] remoteMatches = remotePattern.findAll(clientContent);
 
@@ -322,7 +316,6 @@ function extractRemoteMethodSignatures(string clientContent, string[] operationI
     string[] signatures = [];
 
     foreach string operationId in operationIds {
-        // Find the remote function with this operation ID as name
         string? signature = findRemoteFunctionSignature(clientContent, operationId);
         if signature is string {
             signatures.push(signature);
@@ -353,33 +346,26 @@ function findRemoteFunctionSignature(string clientContent, string functionName) 
             inDocComment = false;
         }
         else if foundFunction {
-            // Continue adding lines until we hit the opening brace
             if strings:includes(line, "{") {
-                // Found the end of the signature
-                // Remove the opening brace and everything after
                 int? braceIndex = line.indexOf("{");
                 if braceIndex is int {
                     if braceIndex > 0 {
                         string beforeBrace = line.substring(0, braceIndex).trim();
-                        // Reconstruct last line without the function body
                         signature = signature.substring(0, signature.length() - line.length() - 1);
                         if beforeBrace.length() > 0 {
                             signature += beforeBrace;
                         }
                     } else {
-                        // Opening brace is at the start, remove last line
                         signature = signature.substring(0, signature.length() - line.length() - 1);
                     }
                     signature += ";";
                 }
                 break;
             } else {
-                // Still part of the signature
                 signature += line + "\n";
             }
         }
         else if inDocComment && !strings:startsWith(trimmedLine, "#") && trimmedLine.length() > 0 {
-            // Reset if we found doc comments but not the function
             signature = "";
             inDocComment = false;
         }
@@ -389,4 +375,147 @@ function findRemoteFunctionSignature(string clientContent, string functionName) 
         return signature.trim();
     }
     return ();
+}
+
+function analyzeConnectorForSdkTests(string connectorPath, string[]? operationIds = ()) returns ConnectorAnalysis|error {
+    string tomlContent = check io:fileReadString(connectorPath + "/ballerina/Ballerina.toml");
+    string packageName = extractPackageName(tomlContent);
+
+    string clientContent = check io:fileReadString(connectorPath + "/ballerina/client.bal");
+    string initMethodSignature = extractInitMethodComplete(clientContent);
+
+    "resource"|"remote" methodType = check detectClientMethodType(clientContent);
+
+    string remoteMethodSignatures = "";
+    if methodType == "remote" {
+        if operationIds is string[] && operationIds.length() > 0 {
+            remoteMethodSignatures = extractRemoteMethodSignatures(clientContent, operationIds);
+        } else {
+            remoteMethodSignatures = extractAllRemoteMethodSignatures(clientContent);
+        }
+    }
+
+    string typesContent = check io:fileReadString(connectorPath + "/ballerina/types.bal");
+    string connectionConfigDefinition = extractCompactTypeDefinition(typesContent, "ConnectionConfig");
+    string enumDefinitions = extractEnumDefinitions(typesContent);
+
+    string[] referencedTypes = findTypesInSignatures(initMethodSignature);
+    string[] allDependentTypes = [];
+    allDependentTypes.push(...referencedTypes);
+    findEssentialNestedTypes(referencedTypes, typesContent, allDependentTypes, maxDepth = 2);
+
+    string referencedTypeDefinitions = "";
+    if allDependentTypes.length() > 0 {
+        foreach string typeName in allDependentTypes {
+            string typeDef = extractCompactTypeDefinition(typesContent, typeName);
+            if typeDef != "" {
+                referencedTypeDefinitions += typeDef + "\n\n";
+            }
+        }
+    }
+
+    return {
+        packageName,
+        initMethodSignature,
+        referencedTypeDefinitions,
+        connectionConfigDefinition,
+        enumDefinitions,
+        methodType,
+        remoteMethodSignatures
+    };
+}
+
+// Extract all public enum definitions from types.bal.
+function extractEnumDefinitions(string typesContent) returns string {
+    string[] lines = regexp:split(re `\n`, typesContent);
+    string[] enumBlocks = [];
+    boolean inEnum = false;
+    int depth = 0;
+    string currentBlock = "";
+
+    foreach string line in lines {
+        string trimmed = line.trim();
+        if !inEnum && (trimmed.startsWith("public enum ") || trimmed.startsWith("enum ")) {
+            inEnum = true;
+            depth = 0;
+            currentBlock = line + "\n";
+            if line.includes("{") {
+                depth += 1;
+            }
+            if line.includes("}") {
+                depth -= 1;
+            }
+            if depth <= 0 {
+                enumBlocks.push(currentBlock.trim());
+                inEnum = false;
+                currentBlock = "";
+            }
+            continue;
+        }
+        if inEnum {
+            currentBlock += line + "\n";
+            if line.includes("{") {
+                depth += 1;
+            }
+            if line.includes("}") {
+                depth -= 1;
+            }
+            if depth <= 0 {
+                enumBlocks.push(currentBlock.trim());
+                inEnum = false;
+                currentBlock = "";
+            }
+        }
+    }
+    return string:'join("\n\n", ...enumBlocks);
+}
+
+// Extract all remote method signatures from client.bal (used when no specific operationIds are given).
+function extractAllRemoteMethodSignatures(string clientContent) returns string {
+    string[] lines = regexp:split(re `\n`, clientContent);
+    string[] signatures = [];
+    string current = "";
+    boolean inDoc = false;
+    boolean inMethod = false;
+
+    foreach string line in lines {
+        string trimmed = strings:trim(line);
+        if strings:startsWith(trimmed, "#") && !inMethod {
+            current += line + "\n";
+            inDoc = true;
+            continue;
+        }
+
+        if strings:includes(trimmed, "remote isolated function ") {
+            inMethod = true;
+            current += line + "\n";
+            continue;
+        }
+
+        if inMethod {
+            if strings:includes(line, "{") {
+                int? braceIndex = line.indexOf("{");
+                if braceIndex is int {
+                    string beforeBrace = line.substring(0, braceIndex).trim();
+                    if beforeBrace.length() > 0 {
+                        current += beforeBrace;
+                    }
+                }
+                signatures.push(current.trim() + ";");
+                current = "";
+                inDoc = false;
+                inMethod = false;
+            } else {
+                current += line + "\n";
+            }
+            continue;
+        }
+
+        if inDoc && trimmed.length() > 0 && !strings:startsWith(trimmed, "#") {
+            current = "";
+            inDoc = false;
+        }
+    }
+
+    return string:'join("\n\n", ...signatures);
 }

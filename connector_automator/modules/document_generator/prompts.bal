@@ -22,6 +22,8 @@ The ${backtick}ballerinax/smartsheet${backtick} package offers APIs to connect a
 
 Now, generate a new overview for the following connector. DONT include any follow up questions or your opinions or any thing other than the given format. Follow these rules meticulously:
 
+0.  Return only the body text for the section. Do NOT include a Markdown heading such as ${backtick}## Overview${backtick}.
+
 1.  **Research:** You MUST perform a web search to find the official homepage and the developer API documentation for the service.
 2.  **Paragraph 1 (The Service):**
     * Write a single, compelling sentence describing what the service is and its primary value.
@@ -73,6 +75,8 @@ To use the Smartsheet connector, you must have access to the Smartsheet API thro
 **TASK INSTRUCTIONS:**
 
 Now, generate a new "Setup guide" section for the ${connectorName} connector specified below. You must adhere to these rules strictly:
+
+0.  Return only the setup content body. Do NOT include the ${backtick}## Setup guide${backtick} heading in your output.
 
 1.  **Perform Web Research:** You MUST search the web to find the following for the service:
     * The main website / sign-up page.
@@ -312,6 +316,8 @@ ${tripleBacktick}
 ---
 
 Generate the complete and final ${backtick}## Quickstart${backtick} section now.
+
+IMPORTANT: Return only the quickstart body content. Do NOT include the ${backtick}## Quickstart${backtick} heading in your output.
 `;
 }
 
@@ -352,6 +358,8 @@ Now, generate a new "Examples" section for the connector specified below. You mu
 **CONNECTOR INFORMATION TO USE:**
 ${getConnectorSummary(metadata)}
 Available Examples: ${metadata.examples.toString()}
+
+IMPORTANT: Return only the list/introduction body content. Do NOT include the ${backtick}## Examples${backtick} heading in your output.
 `;
 }
 
@@ -363,105 +371,26 @@ function createTestReadmePrompt(ConnectorMetadata metadata) returns string {
     string lowerCaseConnectorName = conectorName.toLowerAscii();
 
     return string `
-    You are a senior Ballerina developer creating the README.md file for the tests directory of a Ballerina connector.
+You are a senior Ballerina developer creating the README.md for the tests directory of a Ballerina connector.
 
-Your goal is to generate a complete "Running Tests" guide that is **structurally and textually identical** to the perfect example provided below, only replacing the service-specific placeholders.
+Generate a complete **live-only** test README for connector **${conectorName}**.
 
----
-**PERFECT OUTPUT EXAMPLE (for Smartsheet):**
+STRICT REQUIREMENTS:
+1. Include the title ${backtick}# Running Tests${backtick}.
+2. Include a ${backtick}## Prerequisites${backtick} section with a link to ${backtick}https://github.com/ballerina-platform/module-ballerinax-${lowerCaseConnectorName}/blob/main/ballerina/README.md${backtick}.
+3. Include a ${backtick}## Running Tests${backtick} section that only describes live testing using ${backtick}bal test${backtick}.
+4. Include a ${backtick}Config.toml${backtick} example using these placeholders for this connector:
+    ${tripleBacktick}toml
+    accessKeyId = "<your-access-key-id>"
+    secretAccessKey = "<your-secret-access-key>"
+    region = "<your-region>"
+    ${tripleBacktick}
+5. Include an environment variable example for Linux/macOS and Windows for those three values.
+6. Optionally mention ${backtick}LIVE_TEST_DISABLED${backtick} only as a way to skip live tests; do not introduce mock tests.
+7. Do NOT include any mock server content, ${backtick}mock_tests${backtick}, ${backtick}IS_LIVE_SERVER${backtick}, or Gradle test commands.
+8. Keep the content concise and practical.
 
-# Running Tests
-
-## Prerequisites
-You need an API Access token from Smartsheet developer account.
-
-To do this, refer to [Ballerina Smartsheet Connector](${backtick}https://github.com/ballerina-platform/module-ballerinax-smartsheet/blob/main/ballerina/README.md${backtick}).
-
-## Running Tests
-
-There are two test environments for running the Smartsheet connector tests. The default test environment is the mock server for Smartsheet API. The other test environment is the actual Smartsheet API.
-
-You can run the tests in either of these environments and each has its own compatible set of tests.
-
- Test Groups | Environment
--------------|---------------------------------------------------
- mock_tests  | Mock server for Smartsheet API (Default Environment)
- live_tests  | Smartsheet API
-
-## Running Tests in the Mock Server
-
-To execute the tests on the mock server, ensure that the ${backtick}IS_LIVE_SERVER${backtick} environment variable is either set to ${backtick}false${backtick} or unset before initiating the tests.
-
-This environment variable can be configured within the ${backtick}Config.toml${backtick} file located in the tests directory or specified as an environmental variable.
-
-#### Using a Config.toml File
-
-Create a ${backtick}Config.toml${backtick} file in the tests directory and the following content:
-
-${tripleBacktick}toml
-isLiveServer = false
-${tripleBacktick}
-
-#### Using Environment Variables
-
-Alternatively, you can set your authentication credentials as environment variables:
-If you are using linux or mac, you can use following method:
-${tripleBacktick}bash
-   export IS_LIVE_SERVER=false
-${tripleBacktick}
-If you are using Windows you can use following method:
-${tripleBacktick}bash
-   setx IS_LIVE_SERVER false
-${tripleBacktick}
-Then, run the following command to run the tests:
-
-${tripleBacktick}bash
-   ./gradlew clean test
-${tripleBacktick}
-
-## Running Tests Against Smartsheet Live API
-
-#### Using a Config.toml File
-
-Create a ${backtick}Config.toml${backtick} file in the tests directory and add your authentication credentials:
-
-${tripleBacktick}toml
-   isLiveServer = true
-   token = "<your-smartsheet-access-token>"
-${tripleBacktick}
-
-#### Using Environment Variables
-
-Alternatively, you can set your authentication credentials as environment variables:
-If you are using linux or mac, you can use following method:
-${tripleBacktick}bash
-   export IS_LIVE_SERVER=true
-   export SMARTSHEET_TOKEN="<your-smartsheet-access-token>"
-${tripleBacktick}
-
-If you are using Windows you can use following method:
-${tripleBacktick}bash
-   setx IS_LIVE_SERVER true
-   setx SMARTSHEET_TOKEN <your-smartsheet-access-token>
-${tripleBacktick}
-Then, run the following command to run the tests:
-
-${tripleBacktick}bash
-   ./gradlew clean test
-${tripleBacktick}
----
-
-**TASK INSTRUCTIONS:**
-
-Now, generate a new "Running Tests" README for the connector specified below. You must use the example above as a strict template and replace the placeholders as follows:
-
-1.  Replace every instance of **"Smartsheet"** with **"${conectorName}"**.
-2.  Replace every instance of **"smartsheet"** (in lowercase) with **"${lowerCaseConnectorName}"**. This applies to URLs and token placeholders like ${backtick}<your-smartsheet-access-token>${backtick}.
-3.  Replace the link to the main README with the link matching the provided GitHub Repo URL, specifically pointing to ${backtick}/ballerina/README.md${backtick}.
-4.  In the final "Environment Variables" section for the live API, replace **"SMARTSHEET_TOKEN"** with **"[CONNECTOR_UPPERCASE_NAME]_TOKEN"**.
-5.  All other text, formatting, code blocks, and commands must be kept exactly the same.
-
-Generate the complete "Running Tests" README now.
+Generate the complete README content now.
 `;
 
 }
@@ -475,8 +404,6 @@ function createHeaderAndBadges(ConnectorMetadata metadata) returns string {
     string githubOrgAndRepo = string `ballerina-platform/module-ballerinax-${lowercaseConnectorName}`;
 
     return string `
-# Ballerina ${metadata.connectorName} connector
-
 [![Build](${githubRepoUrl}/actions/workflows/ci.yml/badge.svg)](${githubRepoUrl}/actions/workflows/ci.yml)
 [![Trivy](${githubRepoUrl}/actions/workflows/trivy-scan.yml/badge.svg)](${githubRepoUrl}/actions/workflows/trivy-scan.yml)
 [![GraalVM Check](${githubRepoUrl}/actions/workflows/build-with-bal-test-graalvm.yml/badge.svg)](${githubRepoUrl}/actions/workflows/build-with-bal-test-graalvm.yml)
@@ -489,8 +416,6 @@ function createUsefulLinksSection(ConnectorMetadata metadata) returns string {
 
     string lowercaseName = metadata.connectorName.toLowerAscii();
     return string `
-## Useful links
-
 * For more information go to the [${backtick}${lowercaseName}${backtick} package](https://central.ballerina.io/ballerinax/${lowercaseName}/latest).
 * For example demonstrations of the usage, go to [Ballerina By Examples](https://ballerina.io/learn/by-example/).
 * Chat live with us via our [Discord server](https://discord.gg/ballerinalang).

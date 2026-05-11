@@ -1,0 +1,86 @@
+apply plugin: 'java'
+
+group = 'io.ballerina.connector.automator'
+version = '0.1.0'
+
+sourceCompatibility = 17
+targetCompatibility = 17
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://maven.pkg.github.com/ballerina-platform/ballerina-lang'
+    }
+    maven {
+        url 'https://maven.wso2.org/nexus/content/repositories/releases/'
+    }
+}
+
+dependencies {
+    // Ballerina 2201.12.0 runtime
+    // Use local Ballerina distribution jars for compileOnly to avoid GitHub Packages auth
+    // Resolve Ballerina home at runtime instead of hardcoding a path.
+    def ballerinaHome = System.getenv("BALLERINA_HOME") ?:
+            System.getenv("BAL_HOME") ?:
+            System.getProperty("ballerina.home")
+    def ballerinaLibDir = null
+    if (ballerinaHome != null) {
+        def candidate = file("${ballerinaHome}/bre/lib")
+        if (candidate.exists()) {
+            ballerinaLibDir = candidate
+        } else {
+            logger.warn("Ballerina lib dir not found at ${candidate}. Falling back to system distributions.")
+        }
+    }
+
+    if (ballerinaLibDir == null) {
+        def distRoot = file("/usr/lib/ballerina/distributions")
+        if (distRoot.exists()) {
+            def distDirs = distRoot.listFiles().findAll { it.isDirectory() && it.name.startsWith("ballerina-") }
+            if (!distDirs.isEmpty()) {
+                distDirs.sort { a, b -> a.name <=> b.name }
+                def latest = distDirs.last()
+                def candidate = file("${latest}/bre/lib")
+                if (candidate.exists()) {
+                    ballerinaLibDir = candidate
+                }
+            }
+        }
+    }
+
+    if (ballerinaLibDir != null && ballerinaLibDir.exists()) {
+        compileOnly fileTree(dir: ballerinaLibDir, include: ['*.jar'])
+        logger.lifecycle("Using Ballerina libs from ${ballerinaLibDir}")
+    } else {
+        logger.warn("Ballerina lib dir not found. Set BALLERINA_HOME or BAL_HOME to compile native sources.")
+    }
+    
+    testImplementation 'org.testng:testng:7.10.2'
+    // ASM for parsing .class files without loading classes
+    implementation 'org.ow2.asm:asm:9.5'
+    implementation 'org.ow2.asm:asm-tree:9.5'
+    // JavaParser for parsing source .java files to extract javadoc/parameter names
+    implementation 'com.github.javaparser:javaparser-core:3.25.4'
+    implementation 'com.github.javaparser:javaparser-symbol-solver-core:3.25.4'
+    // HTML parser for extracting javadoc descriptions
+    implementation 'org.jsoup:jsoup:1.16.1'
+}
+
+compileJava {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-parameters'
+    // Enable deprecation linting to surface deprecated API usage locations
+    options.compilerArgs << '-Xlint:deprecation'
+}
+
+test {
+    useTestNG()
+}
+
+// Create fat JAR with all dependencies
+jar {
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

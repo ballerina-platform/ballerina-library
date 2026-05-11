@@ -1,5 +1,6 @@
 import ballerina/io;
 import ballerina/lang.runtime;
+import ballerina/time;
 
 public function executeExampleGen(string... args) returns error? {
     if args.length() < 1 {
@@ -33,6 +34,8 @@ public function executeExampleGen(string... args) returns error? {
         io:println("✗ Operation cancelled");
         return;
     }
+
+    time:Utc startTime = time:utcNow();
 
     io:println("");
     io:println("Analyzing connector...");
@@ -156,7 +159,8 @@ public function executeExampleGen(string... args) returns error? {
         }
 
         // Write example to file
-        error? writeResult = writeExampleToFile(connectorPath, exampleName, useCase, generatedCode, details.connectorName);
+        error? writeResult = writeExampleToFile(connectorPath, exampleName, useCase, generatedCode,
+            details.connectorOrg, details.connectorName, details.connectorVersion, details.connectorDistribution);
         if writeResult is error {
             io:println(string `  ✗ Failed to write example: ${writeResult.message()}`);
             continue;
@@ -174,6 +178,7 @@ public function executeExampleGen(string... args) returns error? {
         if fixResult is error {
             io:println(string `  ⚠  Failed to fix compilation errors: ${fixResult.message()}`);
             io:println("     Example may require manual intervention");
+            continue;
         } else if !quietMode {
             io:println("  ✓ Fixed compilation issues");
         }
@@ -183,7 +188,9 @@ public function executeExampleGen(string... args) returns error? {
     }
 
     // Print final summary
-    printExampleSummary(connectorPath, numExamples, successCount, quietMode);
+    time:Utc endTime = time:utcNow();
+    decimal duration = time:utcDiffSeconds(endTime, startTime);
+    printExampleSummary(connectorPath, numExamples, successCount, duration, quietMode);
 }
 
 function printExampleGenerationPlan(string connectorPath, boolean quietMode) {
@@ -206,7 +213,7 @@ function printExampleGenerationPlan(string connectorPath, boolean quietMode) {
     io:println(sep);
 }
 
-function printExampleSummary(string connectorPath, int totalExamples, int successCount, boolean quietMode) {
+function printExampleSummary(string connectorPath, int totalExamples, int successCount, decimal duration, boolean quietMode) {
     string sep = createSeparator("=", 70);
 
     io:println("");
@@ -221,6 +228,7 @@ function printExampleSummary(string connectorPath, int totalExamples, int succes
     io:println(sep);
     io:println("");
     io:println(string `Generated: ${successCount}/${totalExamples} example${totalExamples == 1 ? "" : "s"}`);
+    io:println(string `Duration : ${duration}s`);
 
     if successCount > 0 {
         io:println(string `Output   : ${connectorPath}/examples/`);

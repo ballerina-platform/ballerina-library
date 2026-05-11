@@ -1,4 +1,4 @@
-import connector_automator.code_fixer;
+import wso2/connector_automator.code_fixer;
 
 import ballerina/file;
 import ballerina/io;
@@ -27,14 +27,40 @@ public function analyzeConnector(string connectorPath) returns ConnectorDetails|
 
     int apiCount = countApiOperations(clientContent);
     // get the connector name from Ballerina.toml
-    string connectorName = "";
+    string connectorOrg = "generated";
+    string connectorName = "connector";
+    string connectorVersion = "0.1.0";
+    string connectorDistribution = "2201.13.1";
+    boolean inPackageSection = false;
     string[] tomlLines = regexp:split(re `\n`, balTomlContent);
     foreach string line in tomlLines {
         string trimmedLine = strings:trim(line);
-        if strings:startsWith(trimmedLine, "name") {
-            string[] parts = regexp:split(re `=`, trimmedLine);
-            if parts.length() > 1 {
-                connectorName = strings:trim(regexp:replaceAll(re `"`, parts[1], ""));
+        if trimmedLine == "[package]" {
+            inPackageSection = true;
+            continue;
+        }
+        if strings:startsWith(trimmedLine, "[") && trimmedLine != "[package]" {
+            inPackageSection = false;
+            continue;
+        }
+        if !inPackageSection {
+            continue;
+        }
+
+        int? equalIndex = trimmedLine.indexOf("=");
+        if equalIndex is int {
+            string key = strings:trim(trimmedLine.substring(0, <int>equalIndex));
+            string rawValue = strings:trim(trimmedLine.substring(<int>equalIndex + 1));
+            string value = strings:trim(regexp:replaceAll(re `"`, rawValue, ""));
+
+            if key == "org" {
+                connectorOrg = value;
+            } else if key == "name" {
+                connectorName = value;
+            } else if key == "version" {
+                connectorVersion = value;
+            } else if key == "distribution" {
+                connectorDistribution = value;
             }
         }
     }
@@ -43,7 +69,10 @@ public function analyzeConnector(string connectorPath) returns ConnectorDetails|
     string functionSignatures = extractFunctionSignatures(clientContent);
 
     return {
+        connectorOrg: connectorOrg,
         connectorName: connectorName,
+        connectorVersion: connectorVersion,
+        connectorDistribution: connectorDistribution,
         apiCount: apiCount,
         clientBalContent: clientContent,
         typesBalContent: typesContent,
@@ -94,8 +123,6 @@ public function findMatchingFunction(string clientContent, string llmFunctionNam
         string functionDef = clientContent.substring(span.startIndex, span.endIndex);
 
         // Check if this function could match the LLM-provided name
-        // For resource functions like "get advisories" -> look for "get" method in path with "advisories"
-        // For remote functions, match by function name more directly
         if isMatchingFunction(functionDef, llmFunctionName) {
             return functionDef;
         }
@@ -106,16 +133,11 @@ public function findMatchingFunction(string clientContent, string llmFunctionNam
 
 // Helper to determine if a function definition matches the LLM-provided name
 public function isMatchingFunction(string functionDef, string llmFunctionName) returns boolean {
-    // Clean the function definition by removing Ballerina's path escapes `\.` -> `.`
-    // and convert to lowercase for case-insensitive comparison.
     string cleanFuncDef = regexp:replaceAll(re `\\\.`, functionDef, ".").toLowerAscii();
 
     // Convert the LLM function name to lowercase as well.
     string lowerLLMName = llmFunctionName.toLowerAscii();
 
-    // For resource functions, check if the cleaned function definition contains the LLM name
-    // For example: "get admin\.apps\.requests\.list" becomes "get admin.apps.requests.list"  
-    // and should match "get admin.apps.requests.list"
     if lowerLLMName.includes(" ") {
         // Resource function - check if the entire pattern matches
         return cleanFuncDef.includes(lowerLLMName);
@@ -137,7 +159,8 @@ public function numberOfExamples(int apiCount) returns int {
     }
 }
 
-public function writeExampleToFile(string connectorPath, string exampleName, string useCase, string exampleCode, string connectorName) returns error? {
+public function writeExampleToFile(string connectorPath, string exampleName, string useCase, string exampleCode,
+    string connectorOrg, string connectorName, string connectorVersion, string connectorDistribution) returns error? {
     // Create examples directory if it doesn't exist
     string examplesDir = connectorPath + "/examples";
     check file:createDir(examplesDir, file:RECURSIVE);
@@ -148,17 +171,14 @@ public function writeExampleToFile(string connectorPath, string exampleName, str
     // Create example directory
     check file:createDir(exampleDir, file:RECURSIVE);
 
-    // Create .github directory
-    string githubDir = exampleDir + "/.github";
-    check file:createDir(githubDir, file:RECURSIVE);
-
     // Write main.bal file
     string mainBalPath = exampleDir + "/main.bal";
     check io:fileWriteString(mainBalPath, exampleCode);
 
     // Write Ballerina.toml file
     string ballerinaTomlPath = exampleDir + "/Ballerina.toml";
-    string ballerinaTomlContent = generateBallerinaToml(exampleName, connectorName);
+    string ballerinaTomlContent = generateBallerinaToml(exampleName, connectorOrg, connectorName,
+        connectorVersion, connectorDistribution);
     check io:fileWriteString(ballerinaTomlPath, ballerinaTomlContent);
 }
 
@@ -175,22 +195,23 @@ function sanitizePackageName(string exampleName) returns string {
     return sanitized;
 }
 
-function generateBallerinaToml(string exampleName, string connectorName) returns string {
+function generateBallerinaToml(string exampleName, string connectorOrg, string connectorName,
+        string connectorVersion, string connectorDistribution) returns string {
     string packageName = sanitizePackageName(exampleName);
 
     return string `[package]
-org = "wso2"
+org = "generated_examples"
 name = "${packageName}"
 version = "0.1.0"
-distribution = "2201.10.0"
+distribution = "${connectorDistribution}"
 
 [build-options]
 observabilityIncluded = true
 
 [[dependency]]
-org = "ballerinax"
+org = "${connectorOrg}"
 name = "${connectorName}"
-version = "0.1.0"
+version = "${connectorVersion}"
 repository = "local"
 `;
 }
@@ -223,8 +244,8 @@ public function fixExampleCode(string exampleDir, string exampleName) returns er
                     io:println(string `    • ${fix}`);
                 }
             }
-            // Don't fail completely, but warn about remaining errors
             io:println("  Some errors may require manual intervention");
+            return error(string `Example '${exampleName}' still has ${fixResult.errorsRemaining} unresolved compilation errors`);
         }
     } else {
         io:println(string `✗ Failed to fix example '${exampleName}': ${fixResult.message()}`);
@@ -237,11 +258,6 @@ public function fixExampleCode(string exampleDir, string exampleName) returns er
 public function extractTargetedContext(ConnectorDetails details, string[] functionNames) returns string|error {
     string clientContent = details.clientBalContent;
     string typesContent = details.typesBalContent;
-
-    // io:println("=== EXTRACTING TARGETED CONTEXT ===");
-    // io:println("Original client.bal size: ", clientContent.length(), " chars");
-    // io:println("Original types.bal size: ", typesContent.length(), " chars");
-    // io:println("Function names to match: ", functionNames.toString());
 
     string context = "// CLIENT INITIALIZATION\n\n";
     string[] allDependentTypes = [];
@@ -267,14 +283,10 @@ public function extractTargetedContext(ConnectorDetails details, string[] functi
         if matchedSignature is string {
             context += matchedSignature + "\n\n";
             matchedFunctions += 1;
-            // io:println("✓ Matched function: '", funcName, "' -> signature length: ", matchedSignature.length(), " chars");
         } else {
-            // io:println("✗ No match found for: '", funcName, "'");
         }
     }
-    //  io:println("Total matched functions: ", matchedFunctions, "/", functionNames.length());
 
-    // Find all types used in the function signatures (parameters and return types)
     string[] directTypes = findTypesInSignatures(context);
     allDependentTypes.push(...directTypes);
 
@@ -292,11 +304,6 @@ public function extractTargetedContext(ConnectorDetails details, string[] functi
             }
         }
     }
-
-    // io:println("Final targeted context size: ", context.length(), " chars");
-    // int originalSize = clientContent.length() + typesContent.length();
-    // int reductionPercent = (originalSize - context.length()) * 100 / originalSize;
-    // io:println("Size reduction: ", reductionPercent, "%");
 
     return context;
 }
@@ -360,8 +367,6 @@ function findTypesInSignatures(string signatures) returns string[] {
 }
 
 function extractBlock(string content, string startPattern, string openChar, string closeChar) returns string {
-    // This is a simplified block extractor. It finds the start pattern and then balances
-    // the open/close characters to find the end of the block.
     int? startIndex = content.indexOf(startPattern);
     if startIndex is () {
         return "";
@@ -458,7 +463,7 @@ function extractFunctionDocumentation(string content, int functionStartIndex) re
                 }
             }
 
-            if docLines.length() > 0 && docLines.length() <= 5 { // Limit doc comment size
+            if docLines.length() > 0 && docLines.length() <= 5 { 
                 docComment = string:'join("\n", ...docLines);
             }
         }
@@ -470,7 +475,7 @@ function extractFunctionDocumentation(string content, int functionStartIndex) re
 // Limited depth nested type search to avoid infinite recursion
 function findEssentialNestedTypes(string[] typesToSearch, string typesContent, string[] foundTypes, int maxDepth) {
     if maxDepth <= 0 {
-        return; // Stop recursion at max depth
+        return;
     }
 
     string[] newTypesFound = [];
@@ -502,7 +507,6 @@ function findEssentialNestedTypes(string[] typesToSearch, string typesContent, s
 function isEssentialType(string typeName) returns boolean {
     string lowerType = typeName.toLowerAscii();
 
-    // Skip non-essential types
     if lowerType.endsWith("headers") || lowerType.endsWith("queries") ||
         lowerType.endsWith("header") || lowerType.endsWith("query") ||
         lowerType.startsWith("http") || lowerType.startsWith("internal") ||
@@ -522,16 +526,16 @@ function extractCompactTypeDefinition(string typesContent, string typeName) retu
         typeDef = extractBlock(typesContent, "public type " + typeName + " ", ";", ";");
     }
 
-    if typeDef != "" && typeDef.length() > 1000 { // Limit type definition size
+    if typeDef != "" && typeDef.length() > 1000 { 
         // If type is too large, create a simplified version
         string[] lines = regexp:split(re `\n`, typeDef);
-        if lines.length() > 15 { // If too many fields, show only first 10
+        if lines.length() > 15 {
             string[] limitedLines = [];
             int count = 0;
             foreach string line in lines {
                 limitedLines.push(line);
                 count += 1;
-                if count >= 12 { // Keep first few lines including opening
+                if count >= 12 {
                     limitedLines.push("    // ... (additional fields omitted for brevity)");
                     // Find and add the closing brace
                     foreach int i in (lines.length() - 3) ... (lines.length() - 1) {
@@ -559,52 +563,544 @@ function packAndPushConnector(string connectorPath) returns error? {
         return error("Ballerina directory not found at: " + ballerinaDir);
     }
 
-    // Execute bal pack with working directory specified
-    io:println("Running 'bal pack' in connector directory...");
-    string packCommand = "bal pack";
-    string redirectedPackCommand = string `cd "${ballerinaDir}" && ${packCommand}`;
+    check ensureConnectorReadme(ballerinaDir);
 
-    os:Command packCmd = {
-        value: "sh",
-        arguments: ["-c", redirectedPackCommand]
-    };
-
-    os:Process|error packProcess = os:exec(packCmd);
-    if packProcess is error {
-        return error("Failed to execute 'bal pack' command", packProcess);
+    error? prepareError = prepareNativeInteropForPack(connectorPath, ballerinaDir);
+    if prepareError is error {
+        return prepareError;
     }
 
-    int|error packExitCode = packProcess.waitForExit();
+    // Execute bal pack with working directory specified
+    io:println("Running 'bal pack' in connector directory...");
+    int|error packExitCode = runShellInDir(ballerinaDir, "bal pack");
     if packExitCode is error {
-        return error("Failed to wait for 'bal pack' process", packExitCode);
+        return error("Failed to execute 'bal pack' command", packExitCode);
     }
 
     if packExitCode != 0 {
-        return error("'bal pack' command failed with exit code: " + packExitCode.toString());
+        io:println("'bal pack' failed. Attempting automated connector fixes before retry...");
+
+        code_fixer:FixResult|code_fixer:BallerinaFixerError javaFixResult =
+            code_fixer:fixJavaNativeAdaptorErrors(connectorPath, quietMode = true, autoYes = true);
+        if javaFixResult is code_fixer:BallerinaFixerError {
+            return error("'bal pack' failed and Java native auto-fix failed", javaFixResult);
+        }
+
+        code_fixer:FixResult|code_fixer:BallerinaFixerError balFixResult =
+            code_fixer:fixAllErrors(ballerinaDir, quietMode = true, autoYes = true);
+        if balFixResult is code_fixer:BallerinaFixerError {
+            return error("'bal pack' failed and Ballerina auto-fix failed", balFixResult);
+        }
+
+        io:println("Retrying 'bal pack' after automated fixes...");
+        int|error retryPackExitCode = runShellInDir(ballerinaDir, "bal pack");
+        if retryPackExitCode is error {
+            return error("Failed to execute retry 'bal pack' command", retryPackExitCode);
+        }
+        if retryPackExitCode != 0 {
+            return error("'bal pack' command failed after retry with exit code: " + retryPackExitCode.toString());
+        }
     }
 
-    // Execute bal push --repository=local with working directory specified
     io:println("Running 'bal push --repository=local' in connector directory...");
-    string pushCommand = "bal push --repository=local";
-    string redirectedPushCommand = string `cd "${ballerinaDir}" && ${pushCommand}`;
-
-    os:Command pushCmd = {
-        value: "sh",
-        arguments: ["-c", redirectedPushCommand]
-    };
-
-    os:Process|error pushProcess = os:exec(pushCmd);
-    if pushProcess is error {
-        return error("Failed to execute 'bal push --repository=local' command", pushProcess);
-    }
-
-    int|error pushExitCode = pushProcess.waitForExit();
+    int|error pushExitCode = runShellInDir(ballerinaDir, "bal push --repository=local");
     if pushExitCode is error {
-        return error("Failed to wait for 'bal push' process", pushExitCode);
+        return error("Failed to execute 'bal push --repository=local' command", pushExitCode);
     }
 
     if pushExitCode != 0 {
         return error("'bal push --repository=local' command failed with exit code: " + pushExitCode.toString());
+    }
+
+    return;
+}
+
+function ensureConnectorReadme(string ballerinaDir) returns error? {
+    string readmePath = ballerinaDir + "/README.md";
+    boolean|error readmeExists = file:test(readmePath, file:EXISTS);
+    if readmeExists is error {
+        return readmeExists;
+    }
+    if !readmeExists {
+        string defaultReadme = "# Generated Connector\n\nThis package is auto-generated by connector automation.\n";
+        check io:fileWriteString(readmePath, defaultReadme);
+    }
+}
+
+function runShellInDir(string workingDir, string shellCommand) returns int|error {
+    string redirectedCommand = string `cd "${workingDir}" && ${shellCommand}`;
+
+    os:Command cmd = {
+        value: "sh",
+        arguments: ["-c", redirectedCommand]
+    };
+
+    os:Process|error process = os:exec(cmd);
+    if process is error {
+        return process;
+    }
+
+    int|error exitCode = process.waitForExit();
+    if exitCode is error {
+        return exitCode;
+    }
+
+    return exitCode;
+}
+
+function prepareNativeInteropForPack(string connectorPath, string ballerinaDir) returns error? {
+    boolean|error hasBuildGradle = file:test(connectorPath + "/build.gradle", file:EXISTS);
+    boolean|error hasNativeBuildGradle = file:test(connectorPath + "/native/build.gradle", file:EXISTS);
+    boolean nativeRequired = (hasBuildGradle is boolean && hasBuildGradle) ||
+                             (hasNativeBuildGradle is boolean && hasNativeBuildGradle);
+    if !nativeRequired {
+        return;
+    }
+
+    // A build.gradle alone does not mean native Java source exists (e.g. OpenAPI connectors
+    // may inherit one from a parent directory). Only proceed if Java source files are present.
+    boolean|error hasNativeSrc = file:test(connectorPath + "/native/src", file:EXISTS);
+    boolean|error hasTopLevelSrc = file:test(connectorPath + "/src/main/java", file:EXISTS);
+    boolean javaSourceExists = (hasNativeSrc is boolean && hasNativeSrc) ||
+                               (hasTopLevelSrc is boolean && hasTopLevelSrc);
+    if !javaSourceExists {
+        return;
+    }
+
+    string nativeDir = resolveNativeProjectDir(connectorPath);
+
+    check ensureBuildGradleCompatibility(nativeDir);
+    check ensureBuildGradleProducesFatJar(nativeDir);
+
+    io:println("Building native adaptor JAR...");
+    record {|int exitCode; string stdout; string stderr;|}|error gradleRun = runGradleJarInDir(nativeDir);
+    if gradleRun is error {
+        return error("Failed to execute 'gradle jar'", gradleRun);
+    }
+    int gradleExit = gradleRun.exitCode;
+    if gradleExit != 0 {
+        io:println("'gradle jar' failed; attempting Java native auto-fix...");
+        string firstGradleError = firstNonEmptyLine(gradleRun.stderr);
+        if firstGradleError.length() > 0 {
+            io:println(string `  Gradle error: ${firstGradleError}`);
+        }
+        code_fixer:FixResult|code_fixer:BallerinaFixerError javaFixResult =
+            code_fixer:fixJavaNativeAdaptorErrors(nativeDir, quietMode = true, autoYes = true);
+
+        if javaFixResult is code_fixer:BallerinaFixerError {
+            string? existingJarPath = findNativeJarRelativePath(nativeDir);
+            if existingJarPath is string {
+                io:println("Java native auto-fix failed; using existing native adaptor JAR...");
+            } else {
+                return error("'gradle jar' command failed and Java native auto-fix failed", javaFixResult);
+            }
+        } else {
+            record {|int exitCode; string stdout; string stderr;|}|error retryGradleRun = runGradleJarInDir(nativeDir);
+            if retryGradleRun is error {
+                return error("Failed to execute retry 'gradle jar'", retryGradleRun);
+            }
+            int retryGradleExit = retryGradleRun.exitCode;
+            if retryGradleExit != 0 {
+                string retryGradleError = firstNonEmptyLine(retryGradleRun.stderr);
+                if retryGradleError.length() > 0 {
+                    io:println(string `  Retry gradle error: ${retryGradleError}`);
+                }
+                boolean fallbackCopied = check tryUseExistingNativeJar(nativeDir);
+                if fallbackCopied {
+                    io:println("Retry 'gradle jar' failed; reused existing native adaptor JAR for this dataset...");
+                }
+                string? existingJarPath = findNativeJarRelativePath(nativeDir);
+                if existingJarPath is string {
+                    io:println("Retry 'gradle jar' failed; using existing native adaptor JAR...");
+                } else {
+                    return error("'gradle jar' command failed after Java native auto-fix with exit code: " +
+                        retryGradleExit.toString());
+                }
+            }
+        }
+    }
+
+    string? jarRelativePath = findNativeJarRelativePath(nativeDir);
+    if jarRelativePath is () {
+        return error("Native adaptor JAR not found under build/libs after gradle build");
+    }
+
+    check ensureClientInteropClassBinding(nativeDir, ballerinaDir);
+
+    string tomlPath = ballerinaDir + "/Ballerina.toml";
+    string tomlContent = check io:fileReadString(tomlPath);
+    string dependencyBlock = string `[[platform.java21.dependency]]
+path = "${<string>jarRelativePath}"`;
+
+    if tomlContent.includes("[[platform.java21.dependency]]") && tomlContent.includes(<string>jarRelativePath) {
+        return;
+    }
+
+    string updatedToml = tomlContent.trim();
+    if !updatedToml.includes("\"ballerina/jballerina.java\"") {
+        if !updatedToml.includes("[dependencies]") {
+            updatedToml += "\n\n[dependencies]\n";
+        }
+        updatedToml += "\n\"ballerina/jballerina.java\" = \"0.0.0\"\n";
+    }
+
+    if updatedToml.includes("[[platform.java21.dependency]]") {
+        if !updatedToml.includes(<string>jarRelativePath) {
+            updatedToml += "\n\n" + dependencyBlock + "\n";
+        }
+    } else {
+        updatedToml += "\n\n" + dependencyBlock + "\n";
+    }
+
+    check io:fileWriteString(tomlPath, updatedToml + "\n");
+}
+
+function ensureClientInteropClassBinding(string connectorPath, string ballerinaDir) returns error? {
+    string? nativeClassFqcn = detectNativeAdaptorClassFromJar(connectorPath);
+    if nativeClassFqcn is () {
+        nativeClassFqcn = detectNativeAdaptorClass(connectorPath);
+    }
+    if nativeClassFqcn is () {
+        return;
+    }
+
+    string clientPath = ballerinaDir + "/client.bal";
+    boolean|error clientExists = file:test(clientPath, file:EXISTS);
+    if clientExists is error {
+        return clientExists;
+    }
+    if !clientExists {
+        return;
+    }
+
+    string clientContent = check io:fileReadString(clientPath);
+    if clientContent.includes(string `'class: "${<string>nativeClassFqcn}"`) {
+        return;
+    }
+
+    string updatedClient = regexp:replaceAll(re `'class:\s*"[^"]+"`, clientContent,
+        string `'class: "${<string>nativeClassFqcn}"`);
+    check io:fileWriteString(clientPath, updatedClient);
+}
+
+function detectNativeAdaptorClassFromJar(string connectorPath) returns string? {
+    record {|int exitCode; string stdout; string stderr;|}|error jarResult = executeShellInDir(connectorPath,
+        "jar tf build/libs/generated-native-adaptor.jar | grep -E 'Adaptor\\.class$' | head -n 1");
+    if jarResult is error || jarResult.exitCode != 0 {
+        return;
+    }
+
+    string classEntry = jarResult.stdout.trim();
+    if classEntry.length() == 0 || !classEntry.endsWith(".class") {
+        return;
+    }
+
+    string fqcnPath = classEntry.substring(0, classEntry.length() - 6);
+    return regexp:replaceAll(re `/`, fqcnPath, ".");
+}
+
+function detectNativeAdaptorClass(string connectorPath) returns string? {
+    record {|int exitCode; string stdout; string stderr;|}|error findResult = executeShellInDir(connectorPath,
+        "find src/main/java -type f -name '*Adaptor.java' | head -n 1");
+    if findResult is error || findResult.exitCode != 0 {
+        return;
+    }
+
+    string relPath = findResult.stdout.trim();
+    if relPath.length() == 0 {
+        return;
+    }
+
+    string sourcePath = connectorPath + "/" + relPath;
+    string|io:Error sourceRead = io:fileReadString(sourcePath);
+    if sourceRead is io:Error {
+        return;
+    }
+    string sourceContent = sourceRead;
+    string packageName = "";
+    string className = "";
+
+    string[] lines = regexp:split(re `\n`, sourceContent);
+    foreach string line in lines {
+        string trimmed = line.trim();
+        if packageName == "" && trimmed.startsWith("package ") && trimmed.endsWith(";") {
+            packageName = trimmed.substring(8, trimmed.length() - 1).trim();
+        }
+        if className == "" && trimmed.includes(" class ") {
+            int? classIndex = trimmed.indexOf(" class ");
+            if classIndex is int {
+                string afterClass = trimmed.substring(<int>classIndex + 7, trimmed.length());
+                string[] classTokens = regexp:split(re `\s|\{`, afterClass);
+                if classTokens.length() > 0 {
+                    className = classTokens[0].trim();
+                }
+            }
+        }
+        if packageName != "" && className != "" {
+            break;
+        }
+    }
+
+    if className == "" {
+        return;
+    }
+    if packageName == "" {
+        return className;
+    }
+
+    return packageName + "." + className;
+}
+
+function executeShellInDir(string workingDir, string shellCommand) returns record {|int exitCode; string stdout; string stderr;|}|error {
+    string stdoutFile = ".example_generator.stdout.log";
+    string stderrFile = ".example_generator.stderr.log";
+    string stdoutPath = workingDir + "/" + stdoutFile;
+    string stderrPath = workingDir + "/" + stderrFile;
+    string command = string `cd "${workingDir}" && ${shellCommand} > "${stdoutFile}" 2> "${stderrFile}"`;
+
+    os:Process process = check os:exec({
+        value: "bash",
+        arguments: ["-c", command]
+    });
+    int exitCode = check process.waitForExit();
+
+    string stdout = "";
+    string|io:Error stdoutRead = io:fileReadString(stdoutPath);
+    if stdoutRead is string {
+        stdout = stdoutRead;
+    }
+
+    string stderr = "";
+    string|io:Error stderrRead = io:fileReadString(stderrPath);
+    if stderrRead is string {
+        stderr = stderrRead;
+    }
+
+    boolean|error stdoutExists = file:test(stdoutPath, file:EXISTS);
+    if stdoutExists is boolean && stdoutExists {
+        if file:remove(stdoutPath) is error {
+        }
+    }
+    boolean|error stderrExists = file:test(stderrPath, file:EXISTS);
+    if stderrExists is boolean && stderrExists {
+        if file:remove(stderrPath) is error {
+        }
+    }
+
+    return {
+        exitCode: exitCode,
+        stdout: stdout,
+        stderr: stderr
+    };
+}
+
+function resolveNativeProjectDir(string connectorPath) returns string {
+    string nativeSubdir = connectorPath + "/native";
+    boolean|error nativeExists = file:test(nativeSubdir + "/build.gradle", file:EXISTS);
+    if nativeExists is boolean && nativeExists {
+        return nativeSubdir;
+    }
+    return connectorPath;
+}
+
+function runGradleJarInDir(string workingDir) returns record {|int exitCode; string stdout; string stderr;|}|error {
+    string buildRoot = workingDir;
+    string gradlewInCurrent = workingDir + "/gradlew";
+    boolean hasLocalGradlew = check file:test(gradlewInCurrent, file:EXISTS);
+    if !hasLocalGradlew {
+        string parentDir = resolveParentDir(workingDir);
+        string gradlewInParent = parentDir + "/gradlew";
+        boolean hasParentGradlew = check file:test(gradlewInParent, file:EXISTS);
+        if hasParentGradlew {
+            buildRoot = parentDir;
+        }
+    }
+
+    string jdkEnvPrefix = "if [ -x /usr/lib/jvm/java-21-openjdk-amd64/bin/javac ]; then export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64; " +
+        "elif command -v javac >/dev/null 2>&1; then export JAVA_HOME=\"$(dirname $(dirname $(readlink -f $(command -v javac))))\"; fi; " +
+        "if [ -n \"$JAVA_HOME\" ]; then export PATH=\"$JAVA_HOME/bin:$PATH\"; fi; " +
+        "gradleJvmArg=\"\"; if [ -n \"$JAVA_HOME\" ]; then gradleJvmArg=\"-Dorg.gradle.java.home=$JAVA_HOME\"; fi; ";
+
+    string jarCommand = jdkEnvPrefix +
+        "if [ -x ./gradlew ]; then ./gradlew $gradleJvmArg jar --console=plain --no-daemon; " +
+        "elif [ -x ../../sdkanalyzer/native/gradlew ]; then ../../sdkanalyzer/native/gradlew -p . $gradleJvmArg jar --console=plain --no-daemon; " +
+        "elif [ -x /usr/bin/gradle ]; then /usr/bin/gradle $gradleJvmArg jar --console=plain --no-daemon; " +
+        "elif command -v gradle >/dev/null 2>&1; then gradle $gradleJvmArg jar --console=plain --no-daemon; " +
+        "else echo 'Gradle executable not found (checked ./gradlew, ../../sdkanalyzer/native/gradlew, gradle in PATH)' >&2; exit 127; fi";
+
+    return executeShellInDir(buildRoot, jarCommand);
+}
+
+function resolveParentDir(string dirPath) returns string {
+    string normalized = dirPath.endsWith("/") ? dirPath.substring(0, dirPath.length() - 1) : dirPath;
+    int? lastSlash = normalized.lastIndexOf("/");
+    if lastSlash is int && lastSlash > 0 {
+        return normalized.substring(0, lastSlash);
+    }
+    return dirPath;
+}
+
+function firstNonEmptyLine(string text) returns string {
+    string[] lines = regexp:split(re `\n`, text);
+    foreach string line in lines {
+        string trimmed = line.trim();
+        if trimmed.length() > 0 {
+            return trimmed;
+        }
+    }
+
+    return "";
+}
+
+function tryUseExistingNativeJar(string connectorPath) returns boolean|error {
+    string existingJar = check file:joinPath(connectorPath, "build", "libs", "generated-native-adaptor.jar");
+    boolean|error jarExists = file:test(existingJar, file:EXISTS);
+    if jarExists is error {
+        return jarExists;
+    }
+    return jarExists;
+}
+
+function ensureBuildGradleCompatibility(string connectorPath) returns error? {
+    string gradlePath = connectorPath + "/build.gradle";
+    boolean|error exists = file:test(gradlePath, file:EXISTS);
+    if exists is error {
+        return exists;
+    }
+    if !exists {
+        return;
+    }
+
+    string gradleContent = check io:fileReadString(gradlePath);
+    if !(gradleContent.includes("java {") && gradleContent.includes("toolchain")) {
+        return;
+    }
+
+    string updated = removeJavaToolchainBlock(gradleContent);
+    if !updated.includes("sourceCompatibility") {
+        updated = updated.trim() + "\n\nsourceCompatibility = '21'\n";
+    }
+    if !updated.includes("targetCompatibility") {
+        updated = updated.trim() + "\ntargetCompatibility = '21'\n";
+    }
+    if !updated.includes("tasks.withType(JavaCompile)") {
+        updated = updated.trim() + string `
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs = ['-source', '21', '-target', '21']
+}
+`;
+    }
+
+    check io:fileWriteString(gradlePath, updated.trim() + "\n");
+}
+
+function removeJavaToolchainBlock(string content) returns string {
+    int? javaIndex = content.indexOf("java {");
+    if javaIndex is () {
+        return content;
+    }
+
+    int? firstBrace = content.indexOf("{", <int>javaIndex);
+    if firstBrace is () {
+        return content;
+    }
+
+    int depth = 1;
+    int cursor = <int>firstBrace + 1;
+    while cursor < content.length() && depth > 0 {
+        string ch = content.substring(cursor, cursor + 1);
+        if ch == "{" {
+            depth += 1;
+        } else if ch == "}" {
+            depth -= 1;
+        }
+        cursor += 1;
+    }
+
+    if depth != 0 {
+        return content;
+    }
+
+    int startIndex = <int>javaIndex;
+    int endIndex = cursor;
+    while endIndex < content.length() {
+        string ch = content.substring(endIndex, endIndex + 1);
+        if ch == "\n" || ch == "\r" || ch == " " || ch == "\t" {
+            endIndex += 1;
+            continue;
+        }
+        break;
+    }
+
+    return content.substring(0, startIndex) + content.substring(endIndex, content.length());
+}
+
+function ensureBuildGradleProducesFatJar(string connectorPath) returns error? {
+    string gradlePath = connectorPath + "/build.gradle";
+    boolean|error exists = file:test(gradlePath, file:EXISTS);
+    if exists is error {
+        return exists;
+    }
+    if !exists {
+        return;
+    }
+
+    string gradleContent = check io:fileReadString(gradlePath);
+    if (gradleContent.includes("archiveFileName = 'generated-native-adaptor.jar'") ||
+        gradleContent.includes("archiveName = 'generated-native-adaptor.jar'")) &&
+        gradleContent.includes("configurations.runtimeClasspath") {
+        return;
+    }
+
+    string fatJarBlock = string `
+
+jar {
+    if (project.gradle.gradleVersion.tokenize('.')[0].toInteger() >= 5) {
+        archiveFileName = 'generated-native-adaptor.jar'
+    } else {
+        archiveName = 'generated-native-adaptor.jar'
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+`;
+
+    check io:fileWriteString(gradlePath, gradleContent.trim() + fatJarBlock + "\n");
+}
+
+function findNativeJarRelativePath(string connectorPath) returns string? {
+    string libsDir = connectorPath + "/build/libs";
+    boolean|error exists = file:test(libsDir, file:EXISTS);
+    if exists is error || !exists {
+        return;
+    }
+
+    string relativePrefix = connectorPath.endsWith("/native") ? "../native/build/libs/" : "../build/libs/";
+
+    file:MetaData[]|error entries = file:readDir(libsDir);
+    if entries is error {
+        return;
+    }
+
+    foreach file:MetaData entry in entries {
+        string absPath = entry.absPath;
+        if absPath.endsWith("/generated-native-adaptor.jar") {
+            return relativePrefix + "generated-native-adaptor.jar";
+        }
+    }
+
+    foreach file:MetaData entry in entries {
+        string absPath = entry.absPath;
+        if absPath.endsWith(".jar") {
+            int? idx = absPath.lastIndexOf("/");
+            if idx is int {
+                string fileName = absPath.substring(<int>idx + 1);
+                return relativePrefix + fileName;
+            }
+        }
     }
 
     return;

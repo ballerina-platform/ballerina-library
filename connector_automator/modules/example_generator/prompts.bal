@@ -1,15 +1,39 @@
 string backTick = "`";
 string tripleBackTick = "```";
 
+function moduleAlias(string connectorName) returns string {
+    int? lastDot = connectorName.lastIndexOf(".");
+    if lastDot is int {
+        return connectorName.substring(lastDot + 1);
+    }
+    return connectorName;
+}
+
 function getExampleCodegenerationPrompt(ConnectorDetails details, string useCase, string targetedContext) returns string {
+    string alias = moduleAlias(details.connectorName);
     return string `
 You are an expert Ballerina developer with deep knowledge of API connector patterns, client initialization, and example code best practices.
 
 <CONTEXT>
 Connector: ${details.connectorName}
+Connector Module: ${details.connectorOrg}/${details.connectorName}
 Task: Generate a complete, compilable Ballerina example demonstrating the following use case
 Use Case: ${useCase}
 </CONTEXT>
+
+<CRITICAL_REQUIREMENTS>
+**MANDATORY IMPORT — NO EXCEPTIONS**:
+The connector import line MUST be exactly:
+    import ${details.connectorOrg}/${details.connectorName};
+Do NOT change this to any other package name. Do NOT use your own knowledge of what the import should be.
+The auto-alias for this import is: ${backTick}${alias}${backTick}
+All connector types and the client MUST be prefixed with ${backTick}${alias}:${backTick}
+For example: ${backTick}${alias}:ConnectionConfig${backTick}, ${backTick}${alias}:Client${backTick}
+
+**EXACT NAME USAGE**: You MUST use the exact function and type names from "Relevant Code Definitions" below. Do NOT modify, shorten, or invent names. Auto-generated names may be long - use them verbatim.
+
+**FUNCTION SOURCE**: Your ONLY source for function signatures is the "Relevant Code Definitions" section. Every function call must exactly match these signatures.
+</CRITICAL_REQUIREMENTS>
 
 <REFLECTION_PHASE>
 Before writing the code, think through this systematically:
@@ -40,16 +64,10 @@ Before writing the code, think through this systematically:
    - Will a developer understand how to adapt this for their needs?
 </REFLECTION_PHASE>
 
-<CRITICAL_REQUIREMENTS>
-**EXACT NAME USAGE**: You MUST use the exact function and type names from "Relevant Code Definitions" below. Do NOT modify, shorten, or invent names. Auto-generated names may be long - use them verbatim.
-
-**FUNCTION SOURCE**: Your ONLY source for function signatures is the "Relevant Code Definitions" section. Every function call must exactly match these signatures.
-</CRITICAL_REQUIREMENTS>
-
 <BALLERINA_EXAMPLE_GUIDELINES>
 ### File Structure
 - Generate a single, complete ${backTick}main.bal${backTick} file
-- Include all necessary imports (${backTick}ballerina/io${backTick}, ${backTick}ballerinax/${details.connectorName}${backTick})
+- Imports: ${backTick}import ballerina/io;${backTick} and ${backTick}import ${details.connectorOrg}/${details.connectorName};${backTick} (exactly these — no others)
 - Use ${backTick}public function main() returns error?${backTick} as entry point
 
 ### Client Initialization
@@ -59,7 +77,7 @@ Before writing the code, think through this systematically:
 - Include proper error handling for client creation
 
 ### Data Types and Imports
-- Import connector types using: ${backTick}${details.connectorName}:relevantTypeName${backTick}
+- Import connector types using: ${backTick}${alias}:relevantTypeName${backTick}
 - Do NOT redefine types that exist in the connector
 - Use proper record types for structured data
 - Define custom records only when necessary for example clarity

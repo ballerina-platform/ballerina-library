@@ -9,3 +9,8 @@ generated/
 # Contains configuration values used during development time.
 # See https://ballerina.io/learn/provide-values-to-configurable-variables/ for more details.
 Config.toml
+
+# Gradle files
+.gradle/
+
+build/

@@ -100,7 +100,9 @@ function analyzeExamples(string connectorPath, ConnectorMetadata metadata) retur
         foreach file:MetaData example in examples {
             if example.dir {
                 string exampleName = example.absPath.substring(examplesPath.length());
-                metadata.examples.push(exampleName);
+                if !exampleName.startsWith("/.") && !exampleName.startsWith(".") {
+                    metadata.examples.push(exampleName);
+                }
             }
         }
     }
@@ -150,7 +152,6 @@ public function analyzeExampleDirectory(string examplePath, string exampleDirNam
 }
 
 public function formatExampleName(string dirName) returns string {
-    // Convert "automated-summary-report" to "Automated summary report"
     string[] parts = regexp:split(re `[-_]`, dirName);
     string[] capitalizedParts = [];
 
