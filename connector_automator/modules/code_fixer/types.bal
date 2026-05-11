@@ -29,4 +29,17 @@ public type FixResponse record {|
     string explanation;
 |};
 
+// Track fix attempts for a specific file to prevent oscillation
+public type FixAttempt record {|
+    int iteration;
+    string[] errorMessages;        // Errors that were present
+    string appliedFix;             // Brief description of what was attempted
+|};
+
+// History of fix attempts per file
+public type FileFixHistory record {|
+    string filePath;
+    FixAttempt[] attempts;
+|};
+
 public type BallerinaFixerError error;

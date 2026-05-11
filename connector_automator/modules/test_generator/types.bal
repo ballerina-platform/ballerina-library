@@ -5,5 +5,6 @@ public type ConnectorAnalysis record {
     string referencedTypeDefinitions;
     "resource"|"remote" methodType = "resource";
     string remoteMethodSignatures = "";
-
+    string clientContent = "";
+    string typesContent = "";
 };

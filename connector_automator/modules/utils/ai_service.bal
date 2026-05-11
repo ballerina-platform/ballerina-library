@@ -8,7 +8,7 @@ configurable string apiKey = ?;
 public function initAIService(boolean quietMode = false) returns error? {
     ai:ModelProvider|error modelProvider = new anthropic:ModelProvider(
         apiKey,
-        anthropic:CLAUDE_SONNET_4_20250514,
+        anthropic:CLAUDE_OPUS_4_5,
         maxTokens = 64000,
         timeout = 400
     );
@@ -41,6 +41,26 @@ public function callAI(string prompt) returns string|error {
     } else {
         return error("AI response content is empty.");
     }
+}
+
+// Multi-turn version: caller builds up the full conversation history and passes it.
+// Returns the assistant reply content for the final turn.
+public function callAIWithMessages(ai:ChatMessage[] messages) returns string|error {
+    ai:ModelProvider? model = anthropicModel;
+    if model is () {
+        return error("AI model not initialized. Please call initAIService() first.");
+    }
+
+    ai:ChatAssistantMessage|error response = model->chat(messages);
+    if response is error {
+        return error("AI generation failed: " + response.message());
+    }
+
+    string? content = response.content;
+    if content is string {
+        return content;
+    }
+    return error("AI response content is empty.");
 }
 
 public function isAIServiceInitialized() returns boolean {

@@ -8,12 +8,13 @@ The Connector Automator provides an end-to-end pipeline for generating productio
 
 ### Key Features
 
-- **OpenAPI Sanitization**: Flatten, align, and enhance OpenAPI specifications with AI-generated metadata
+- **OpenAPI Sanitization**: Flatten, align, and enhance OpenAPI specifications with AI-generated metadata. Auto-generates and maintains a `sanitations.md` to record all changes
 - **Ballerina Client Generation**: Create typed Ballerina clients from OpenAPI specs with proper conventions
 - **Example Generation**: AI-powered generation of realistic usage examples
 - **Test Generation**: Comprehensive test suites with mock servers
 - **Documentation Generation**: Complete README files for all components
-- **Code Fixing**: AI-powered automatic resolution of compilation errors
+- **Code Fixing**: AI-powered automatic resolution of compilation errors, with fix-history tracking to prevent oscillation
+- **Connector Regeneration**: Update an existing connector for a new OpenAPI spec version — re-applies recorded sanitations, recovers existing examples and tests, and updates the CHANGELOG
 - **Full Pipeline**: Execute the complete automation workflow with a single command
 
 ## Prerequisites
@@ -78,6 +79,7 @@ bal run -- sanitize ./openapi.yaml ./output yes
 - Generates missing operationIds using AI
 - Renames generic InlineResponse schemas to meaningful names
 - Adds missing field descriptions
+- Generates `docs/spec/sanitations.md` recording all changes applied to the spec
 
 #### 2. Generate Ballerina Client
 
@@ -175,35 +177,43 @@ bal run -- fix-code ./ballerina-project yes
 
 **What it does:**
 - Analyzes compilation errors
-- Generates AI-powered fixes
+- Generates AI-powered fixes with type context for test/mock files
+- Tracks fix history per file to prevent oscillation between error states
 - Applies fixes with confirmation
-- Iterates until resolved
+- Iterates until resolved (up to `maxIterations` from `Config.toml`)
 
 #### 7. Full Pipeline
 
 Execute the complete automation workflow:
 
 ```bash
-bal run -- pipeline <spec> <output-dir> [yes] [quiet]
+bal run -- pipeline <spec> <output-dir> [yes] [quiet] [regenerate] [license=<path>]
 ```
 
-**Example:**
+**Example — fresh generation:**
 ```bash
-bal run -- pipeline ./openapi.yaml ./output yes quiet
+bal run -- pipeline ./openapi.yaml ./output yes quiet license=./docs/license.txt
+```
+
+**Example — regeneration of an existing connector:**
+```bash
+bal run -- pipeline ./openapi.yaml ./output yes quiet regenerate
 ```
 
 **Pipeline Steps:**
-1. Sanitize OpenAPI specification
-2. Generate Ballerina client
-3. Build and validate client
-4. Generate examples
-5. Generate tests
+1. Sanitize OpenAPI specification (re-applies `sanitations.md` rules when `regenerate` is set)
+2. Generate Ballerina client (skipped when `regenerate` is set)
+3. Build and validate client (with AI-powered code fixer)
+4. Generate examples (attempts to recover existing examples when `regenerate` is set)
+5. Generate tests (attempts to recover existing tests when `regenerate` is set)
 6. Generate documentation
 
 ### Global Options
 
 - `yes` - Auto-confirm all prompts (CI/CD friendly)
 - `quiet` - Minimal logging output
+- `regenerate` - Regenerate an existing connector; skips initial client generation and recovers existing examples/tests
+- `license=<path>` - Path to the license file (absolute or relative to the workspace root)
 
 ## Module Architecture
 
@@ -211,12 +221,13 @@ The package is organized into the following modules:
 
 | Module | Description |
 |--------|-------------|
-| `sanitizor` | OpenAPI specification processing and AI enhancement |
-| `client_generator` | Ballerina client code generation |
+| `sanitizor` | OpenAPI specification processing, AI enhancement, and sanitations document management |
+| `client_generator` | Ballerina client code generation from OpenAPI specs |
+| `client_regenerator` | Client/type file sorting, semantic version analysis, and CHANGELOG updates |
 | `example_generator` | AI-powered usage example creation |
 | `test_generator` | Test suite and mock server generation |
 | `doc_generator` | README and documentation generation |
-| `code_fixer` | AI-powered compilation error resolution |
+| `code_fixer` | AI-powered compilation error resolution with oscillation prevention |
 | `utils` | Shared utilities, AI service, and command execution |
 
 ## Configuration
@@ -253,7 +264,7 @@ jitter = true
 | Variable | Description |
 |----------|-------------|
 | `ANTHROPIC_API_KEY` | Required for AI-powered features |
-| `IS_LIVE_SERVER` | Set to `true` for live API testing |
+| `IS_LIVE_SERVER` | Set to `true` for live API testing in generated tests |
 
 ## Output Structure
 
@@ -264,8 +275,9 @@ output/
 ├── README.md                    # Root documentation
 ├── docs/
 │   └── spec/
-│       ├── flattened_openapi.json
-│       └── aligned_ballerina_openapi.json
+│       ├── original_openapi.json
+│       ├── openapi.json         # Final aligned spec
+│       └── sanitations.md       # Recorded spec changes
 ├── ballerina/
 │   ├── Ballerina.toml
 │   ├── client.bal
@@ -296,6 +308,7 @@ output/
 3. **Use quiet mode for CI/CD**: Combine `yes` and `quiet` for automated pipelines
 4. **Check generated tests**: Verify mock data matches expected API responses
 5. **Customize examples**: AI-generated examples provide a starting point for customization
+6. **Commit `sanitations.md`**: This file is used during regeneration to re-apply your customisations to new spec versions
 
 ## Troubleshooting
 
