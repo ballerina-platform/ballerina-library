@@ -1,233 +1,321 @@
 # Example Doc Generator
 
-An AI-driven pipeline that automates WSO2 Integrator low-code connector documentation. It uses **Ballerina** to orchestrate prompt generation via the Claude API, then runs a **Python agent server** (Claude Agent SDK + Playwright MCP) that operates a **code-server** instance to capture screenshots and produce step-by-step workflow guides.
+This project generates WSO2 Integrator example documentation with screenshots.
+It can run one connector, run one trigger, or process a mixed batch queue.
 
+The pipeline is:
+
+```text
+CLI input -> Claude prompt generation -> Claude Agent + Playwright MCP -> Markdown guide + screenshots
 ```
-Goal → Claude generates execution prompt → Agent executes via Playwright MCP → Artifacts (docs + screenshots)
-```
+
+The Ballerina app orchestrates the pipeline. The Python agent server runs the
+Claude Agent SDK and Playwright MCP against code-server.
 
 ## Prerequisites
 
-| Tool | Version | Install |
-|------|---------|---------|
-| Ballerina | 2201.13.1 | [ballerina.io/downloads](https://ballerina.io/downloads/) |
-| Python | 3.11+ | [python.org](https://www.python.org/downloads/) |
-| uv | latest | [docs.astral.sh/uv](https://docs.astral.sh/uv/getting-started/installation/) |
-| Node.js | LTS+ | [nodejs.org](https://nodejs.org/) |
-| Claude Code CLI | latest | [claude.ai/code](https://claude.ai/code) |
-| code-server | latest | auto-installed by pipeline |
+Install these first:
+
+| Tool | Required |
+|------|----------|
+| Ballerina | `2201.13.x` |
+| Python | `3.11+` |
+| uv | latest |
+| Node.js | LTS+ |
+| Claude Code CLI | latest |
+| Anthropic API key | for Ballerina API calls and the Python agent server |
+
+`code-server` is installed by the pipeline if it is missing.
 
 ## Setup
 
-**1. Create Config.toml** (Ballerina pipeline config)
+Run all commands from `example-doc-generator/`.
+
+1. Create the Ballerina config:
 
 ```bash
 cp Config.toml.example Config.toml
-# Fill in llmApiKey and userGoal
 ```
 
-**2. Create .env** (Python scripts config)
+Set `llmApiKey` in `Config.toml`.
+
+2. Create the Python scripts config:
 
 ```bash
 cp .env.example .env
-# Fill in DOCS_INTEGRATOR_FORK and adjust any non-default values
 ```
 
-**3. Export Anthropic API key** (required by the Python agent server)
+At minimum, set `DOCS_INTEGRATOR_FORK` if you plan to publish connector output.
+
+3. Export the Anthropic key for the Python agent server:
 
 ```bash
 export ANTHROPIC_API_KEY="sk-ant-..."
 ```
 
-**4. Install dependencies**
+4. Install Python dependencies and build the Ballerina app:
 
 ```bash
-make setup
+cd python
+uv venv
+uv pip install -r requirements.txt
+.venv/bin/playwright install chromium
+cd ..
+bal build
 ```
 
-**5. Run the pipeline**
+## Optional Claude Code Local Settings
+
+`.claude/` is ignored because it contains local Claude Code preferences and
+permissions. Keep shared MCP setup in the tracked `.mcp.json`; recreate
+`.claude/settings.json` locally only if your Claude Code setup needs it.
+
+## Run One Connector
+
+Connector mode is the default.
 
 ```bash
-make run CONNECTOR=mysql
-# or directly:
 bal run -- mysql
 ```
 
-Artifacts are saved under `artifacts/` (git-ignored).
+With extra guidance:
 
-## Configuration
-
-Configuration is split between two files:
-
-### `Config.toml` — Ballerina pipeline
-
-Copy `Config.toml.example` to get started.
-
-| Key | Required | Default | Description |
-|-----|----------|---------|-------------|
-| `llmApiKey` | ✅ | — | Anthropic API key for Ballerina AI calls |
-| `codeServerPort` | No | `8080` | Port for the code-server instance |
-| `agentServerPort` | No | `8765` | Port for the Python agent server |
-
-> **Connector name** is passed as a CLI argument, not a configurable: `make run CONNECTOR=mysql` or `bal run -- mysql`.
-
-> **Never commit `Config.toml`** — it is git-ignored.
-
-### `.env` — Python scripts
-
-Copy `.env.example` to get started. Used by `publish_docs.py`, `publish_sample.py`, `agent_server.py`, and `crop_screenshots.py`.
-
-| Key | Required | Default | Description |
-|-----|----------|---------|-------------|
-| `CODE_SERVER_PORT` | No | `8080` | code-server port |
-| `AGENT_SERVER_PORT` | No | `8765` | Agent server port |
-| `INTEGRATION_SAMPLES_REPO` | No | `../integration-samples` | Local path to integration-samples fork |
-| `DOCS_INTEGRATOR_REPO` | No | `../docs-integrator` | Local path to docs-integrator fork |
-| `INTEGRATION_SAMPLES_UPSTREAM` | No | `wso2/integration-samples` | GitHub org/repo for samples PRs |
-| `INTEGRATION_SAMPLES_BASE_BRANCH` | No | `main` | Base branch for samples PRs |
-| `DOCS_INTEGRATOR_FORK` | ✅ | — | Your fork of docs-integrator (org/repo) |
-| `DOCS_INTEGRATOR_UPSTREAM` | No | `wso2/docs-integrator` | GitHub org/repo for docs PRs |
-| `DOCS_INTEGRATOR_BASE_BRANCH` | No | `dev` | Base branch for docs PRs |
-
-> **Never commit `.env`** — it is git-ignored.
-
-## Project Structure
-
-```
-example-doc-generator/
-├── main.bal                        # Pipeline entry point (17-step orchestration)
-├── config.bal                      # All configurable fields
-├── Ballerina.toml                  # Package manifest
-├── Config.toml.example             # Configuration template
-├── Makefile                        # Common commands
-│
-├── modules/
-│   ├── ai_client/ai_client.bal     # Anthropic API calls (generate, slug, enforce)
-│   ├── agent_client/agent_client.bal  # REST client for the Python agent server
-│   ├── prompts/
-│   │   ├── system_prompt.bal       # XML-tagged execution prompt template
-│   │   ├── user_prompt.bal         # User message builder
-│   │   └── doc_enforcement_prompt.bal  # Doc structure enforcement prompt
-│   └── utils/                      # Logger, file I/O, code-server & agent server utils
-│
-├── python/
-│   ├── agent_server.py             # aiohttp server wrapping Claude Agent SDK
-│   ├── crop_screenshots.py         # Crops UI chrome from screenshots
-│   ├── publish_sample.py           # Publishes integration sample PR + cleans workspace
-│   ├── publish_docs.py             # Publishes docs to docs-integrator fork + creates PR
-│   └── requirements.txt
-│
-├── .mcp.json                       # Playwright MCP config for Claude Code subagent
-├── .claude/settings.json           # Permissions + model for Claude Code subagent
-│
-└── artifacts/                      # All generated output (git-ignored)
-    ├── execution-prompt/           # Generated execution prompts
-    ├── workflow-docs/              # Step-by-step connector guides (Markdown)
-    ├── screenshots/                # Captured browser screenshots (cropped)
-    └── run-log/                    # JSON run logs (cost, tokens, timing)
+```bash
+bal run -- zoom.meetings "Use BearerTokenConfig for authentication."
 ```
 
-## Makefile Reference
+## Run One Trigger
 
-```
-Setup
-  make setup                Install all deps (Python venv + Playwright + Ballerina build)
-  make setup-python         Create python/.venv and install Python deps
-  make setup-bal            Build the Ballerina project
+Use `trigger` as the first argument. The pipeline derives the Ballerina Central
+package path as `ballerinax/<trigger-name>`.
 
-Run
-  make run CONNECTOR=mysql  Run the full pipeline for a connector
-  make start-agent          Start the Python agent server in the foreground
-  make stop-agent           Send shutdown to the agent server
-
-Publish
-  make publish-docs         Publish docs + create PR to docs-integrator
-  make publish-docs-dry     Dry run — print planned actions, no changes
-  make cleanup              Publish integration sample PR + delete local project
-  make cleanup-dry          Dry run for cleanup
-
-Screenshots
-  make crop-screenshots     Crop UI chrome from all screenshots
-  make crop-screenshots-dry Preview what would be cropped (no changes)
-
-Artifacts
-  make clean                Remove artifacts/, target/, Dependencies.toml, python/.venv
-  make clean-artifacts      Remove only the artifacts/ directory
+```bash
+bal run -- trigger trigger.github
 ```
 
-Run `make help` for the full list with configurable variables.
+With extra guidance:
 
-## Pipeline Phases
+```bash
+bal run -- trigger trigger.github "Use IssuesService and the onOpened handler."
+```
 
-| Phase | Steps | Description |
-|-------|-------|-------------|
-| Pre-flight | 1–2 | Validate API key; check Claude Code CLI is installed |
-| Infrastructure | 3–5 | Install/start code-server; install/start Python agent server |
-| Prompt generation | 6–10 | Build prompts → call Claude → generate slug → save execution prompt |
-| Agent execution | 11 | POST prompt to agent server; stream logs until done |
-| Post-processing | 12–17 | Enforce doc structure; inject Devant button; append examples link; crop screenshots; write run log |
+Do not pass `--trigger` or `TRIGGER_PACKAGE`.
 
-## Python Agent Server
+## Batch Runs
 
-`python/agent_server.py` wraps the Claude Agent SDK as a lightweight HTTP server.
+Batch runs process items sequentially and archive each run under
+`artifacts_archive/`.
+
+1. Create a batch config:
+
+```bash
+cp batch_items.json.example batch_items.json
+```
+
+2. Add connector and trigger entries:
+
+```json
+{
+  "items": [
+    { "type": "connector", "name": "mysql" },
+    {
+      "type": "connector",
+      "name": "zoom.meetings",
+      "instructions": "Use BearerTokenConfig for authentication."
+    },
+    {
+      "type": "trigger",
+      "name": "trigger.github",
+      "instructions": "Use IssuesService and the onOpened handler."
+    }
+  ]
+}
+```
+
+Rules:
+
+- `type` is required and must be `connector` or `trigger`.
+- `name` is required.
+- `instructions` is optional.
+- Batch mode does not resume, does not dry-run, and does not create PRs.
+- Batch mode fails fast if `artifacts/` already exists to avoid archiving stale output.
+- Pressing `Ctrl+C` stops the active child pipeline before the batch exits.
+
+3. Make sure no current run artifacts are present:
+
+```bash
+rm -rf artifacts
+```
+
+4. Run the queue:
+
+```bash
+bal run -- batch config=batch_items.json
+```
+
+With a longer per-item timeout:
+
+```bash
+bal run -- batch config=batch_items.json timeout=7200
+```
+
+## What a Run Produces
+
+Single runs write to `artifacts/`:
+
+| Path | Contents |
+|------|----------|
+| `artifacts/execution-prompt/` | Generated execution prompt sent to the agent |
+| `artifacts/workflow-docs/` | Final Markdown guide |
+| `artifacts/screenshots/` | Captured and cropped screenshots |
+| `artifacts/run-log/` | Target name, project path, timing, costs, and output paths |
+
+Batch runs move each item's `artifacts/` directory to `artifacts_archive/<slug>`
+or `artifacts_archive/<slug>_FAILED`. If a run produces no artifacts, the batch
+runner creates a `<slug>_NO_ARTIFACTS/README.txt` placeholder.
+
+At the end of a single pipeline run, the Python agent server is stopped
+automatically.
+
+## Publishing Connector Output
+
+The publishing helpers are connector-focused Python scripts. Run them after
+reviewing generated output.
+
+```bash
+python/.venv/bin/python python/publish_docs.py
+python/.venv/bin/python python/publish_sample.py
+python/.venv/bin/python python/publish_all.py
+```
+
+Dry-run variants:
+
+```bash
+python/.venv/bin/python python/publish_docs.py --dry-run
+python/.venv/bin/python python/publish_sample.py --dry-run
+python/.venv/bin/python python/publish_all.py --dry-run
+```
+
+For batch output, review each archived item under `artifacts_archive/`.
+Connector publishing can still use the existing publish scripts after you
+choose the artifact or project to publish. Trigger publish helpers are not
+automated yet, so review and publish trigger artifacts manually.
+
+## Run In GitHub Actions
+
+Use the `Connector Documentation Automation` workflow from the Actions tab.
+The workflow file is:
+
+```text
+.github/workflows/connector-example-doc-generation.yml
+```
+
+Required repository/environment secrets:
+
+| Secret | Required for | Description |
+|--------|--------------|-------------|
+| `LLM_API_KEY` | generation | Anthropic API key used by Ballerina and Claude Code |
+| `DOCS_INTEGRATOR_TOKEN` | connector publishing only | Token with permission to push to the docs-integrator fork and create PRs |
+
+Workflow inputs:
+
+| Input | Value |
+|-------|-------|
+| `mode` | `connector` or `trigger` |
+| `name` | connector name like `mysql`, or trigger name like `trigger.twilio` |
+| `instructions` | optional extra guidance |
+| `publishConnector` | set to `true` only for connector runs that should publish docs |
+| `docsIntegratorFork` | required when `publishConnector` is `true` |
+| `docsIntegratorUpstream` | defaults to `wso2/docs-integrator` |
+| `docsIntegratorBaseBranch` | defaults to `main` |
+
+Examples:
+
+```text
+mode: connector
+name: mysql
+instructions:
+publishConnector: false
+```
+
+```text
+mode: trigger
+name: trigger.twilio
+instructions: Use the onReceived handler.
+publishConnector: false
+```
+
+```text
+mode: connector
+name: zoom.meetings
+instructions: Use BearerTokenConfig for authentication.
+publishConnector: true
+docsIntegratorFork: your-org/docs-integrator
+```
+
+After the workflow completes, open the workflow run summary and download the
+artifact named `example-doc-generator-<mode>-<name>`. It contains the generated
+Markdown guide, screenshots, run logs, and a README describing the output.
+
+GitHub Actions intentionally does not support batch mode. Run batch queues
+locally with `bal run -- batch config=batch_items.json`.
+
+## Agent Server
+
+The pipeline starts and stops the agent server automatically. For debugging:
+
+```bash
+cd python
+unset CLAUDECODE
+.venv/bin/python agent_server.py --port 8765
+```
+
+In another terminal:
+
+```bash
+curl http://localhost:8765/health
+curl -s -X POST http://localhost:8765/shutdown
+```
+
+The server API is:
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `POST` | `/run` | Submit job: `{ "prompt_path": "..." }` → `{ "job_id": "..." }` |
-| `GET` | `/jobs/<id>` | Poll: `{ "status": "queued\|running\|done\|error", "logs": [...], "cost": {...} }` |
-| `GET` | `/health` | `{ "status": "ok" }` |
-| `POST` | `/shutdown` | Graceful stop |
+| `POST` | `/run` | Submit `{ "prompt_path": "..." }` |
+| `GET` | `/jobs/<id>` | Poll logs, status, and cost |
+| `GET` | `/health` | Health check |
+| `POST` | `/shutdown` | Stop the server |
+
+## Optional Make Commands
+
+Make targets exist as shortcuts for setup, runs, publishing, screenshots, and
+cleanup. They are optional wrappers around the commands above. For the full list
+of targets and override variables, run:
 
 ```bash
-make start-agent                                    # start in foreground
-make stop-agent                                     # send shutdown
-cd python && .venv/bin/python agent_server.py --port 9000  # custom port
+make help
 ```
 
-## GitHub Actions
+Common shortcuts:
 
-Two workflows are included under `.github/workflows/`:
-
-| Workflow | Trigger | Description |
-|----------|---------|-------------|
-| `connector-docs-automation.yml` | `workflow_dispatch` | Runs the full pipeline and uploads artifacts |
-| `publish-connector-docs.yml` | `workflow_run` / `workflow_dispatch` | Places generated docs into docs-integrator and creates a PR |
-
-### Required Secrets
-
-Add these under **Settings → Environments → `docs-automation` → Secrets**:
-
-| Secret | Description |
-|--------|-------------|
-| `LLM_API_KEY` | Anthropic API key — used for all Claude calls |
-| `DOCS_INTEGRATOR_TOKEN` | GitHub PAT with `repo` scope — used to push branches to your docs-integrator fork and open PRs against the upstream |
-
-### Required Environment
-
-Create a GitHub environment named **`docs-automation`** at **Settings → Environments → New environment**.
-
-### Workflow Inputs (`connector-docs-automation.yml`)
-
-| Input | Required | Default | Description |
-|-------|----------|---------|-------------|
-| `userGoal` | ✅ | — | Integration to document |
-| `docsIntegratorFork` | ✅ | — | Your fork of docs-integrator (e.g. `your-org/docs-integrator`) |
-| `codeServerPort` | No | `8080` | code-server port |
-| `agentServerPort` | No | `8765` | Agent server port |
-| `docsIntegratorUpstream` | No | `wso2/docs-integrator` | Upstream repo for docs PRs |
-| `docsIntegratorBaseBranch` | No | `dev` | Base branch for docs PRs |
-| `integrationSamplesUpstream` | No | `wso2/integration-samples` | Upstream repo for samples PRs |
-| `integrationSamplesBaseBranch` | No | `main` | Base branch for samples PRs |
+```bash
+make setup
+make run CONNECTOR=mysql
+make run-trigger TRIGGER=trigger.github
+make batch-run
+make clean-artifacts
+```
 
 ## Troubleshooting
 
-| Error | Fix |
-|-------|-----|
-| API key validation failed | Set `llmApiKey` in `Config.toml` and `export ANTHROPIC_API_KEY=...` |
-| Claude Code CLI not found | Install from [claude.ai/code](https://claude.ai/code), verify with `claude --version` |
-| Agent server not ready | Run `make start-agent` to see Python errors; check `curl http://localhost:8765/health` |
-| `uv: command not found` | `curl -LsSf https://astral.sh/uv/install.sh \| sh && source ~/.zshrc` |
-| `claude_agent_sdk` import error | `make setup-python` |
-| code-server install failed | `curl -fsSL https://code-server.dev/install.sh \| sh` |
-| Ballerina build errors | `bal clean && make setup-bal` |
-| Playwright MCP missing | `npm install -g @playwright/mcp@latest` |
+| Problem | Fix |
+|---------|-----|
+| API key validation failed | Set `llmApiKey` in `Config.toml` and export `ANTHROPIC_API_KEY` |
+| `claude` not found | Install Claude Code CLI and verify with `claude --version` |
+| Batch fails because `artifacts/` exists | Move or delete `artifacts/` after reviewing it |
+| Agent server not ready | Start `python/agent_server.py` manually and inspect the Python error |
+| `uv` not found | Install uv from `https://docs.astral.sh/uv/` |
+| Python dependency error | Run `uv pip install -r python/requirements.txt` inside the venv |
+| Ballerina build error | Run `bal clean && bal build` |
+| Playwright MCP error | Run `python/.venv/bin/playwright install chromium` |
+| Need to clear generated output | Run `rm -rf artifacts` after reviewing the output |

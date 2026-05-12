@@ -50,6 +50,18 @@ from pathlib import Path
 from dotenv import load_dotenv
 from playwright.sync_api import sync_playwright
 
+from publish_helpers import (
+    DEFAULT_BASE_BRANCH,
+    DEFAULT_SAMPLES_REPO,
+    DEFAULT_UPSTREAM_REPO,
+    dry,
+    fail,
+    info,
+    infer_fork,
+    run,
+    warn,
+)
+
 load_dotenv(Path(__file__).parent.parent / ".env")
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
@@ -57,48 +69,7 @@ load_dotenv(Path(__file__).parent.parent / ".env")
 PROJECT_PATH_FILE = "artifacts/run-log/created-project.txt"
 PUBLISHED_SAMPLE_LOG = "artifacts/run-log/published-sample-path.txt"
 
-# Default integration-samples path: env var, then sibling of this workspace
-# Layout: <workspace>/connector-docs-automations/python/publish_sample.py
-#         <workspace>/integration-samples/
-_WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
-_env_samples_repo = os.environ.get("INTEGRATION_SAMPLES_REPO")
-DEFAULT_SAMPLES_REPO = (
-    Path(_env_samples_repo) if _env_samples_repo
-    else _WORKSPACE_ROOT / "integration-samples"
-)
-
 DEFAULT_CODE_SERVER_PORT = os.environ.get("CODE_SERVER_PORT", "8080")
-DEFAULT_UPSTREAM_REPO = os.environ.get("INTEGRATION_SAMPLES_UPSTREAM", "wso2/integration-samples")
-DEFAULT_BASE_BRANCH = os.environ.get("INTEGRATION_SAMPLES_BASE_BRANCH", "main")
-
-
-# ── Logging helpers ───────────────────────────────────────────────────────────
-
-def info(msg: str) -> None:
-    print(f"[INFO]  {msg}")
-
-def warn(msg: str) -> None:
-    print(f"[WARN]  {msg}", file=sys.stderr)
-
-def dry(msg: str) -> None:
-    print(f"[DRY]   {msg}")
-
-def fail(msg: str) -> None:
-    print(f"\n[ERROR] {msg}", file=sys.stderr)
-    sys.exit(1)
-
-
-# ── Subprocess helper ─────────────────────────────────────────────────────────
-
-def run(cmd: list[str], cwd: Path | None = None, check: bool = True) -> str:
-    result = subprocess.run(
-        cmd,
-        cwd=str(cwd) if cwd else None,
-        capture_output=True,
-        text=True,
-        check=check,
-    )
-    return result.stdout.strip()
 
 
 # ── Step 1: Read created project path ─────────────────────────────────────────
@@ -115,22 +86,6 @@ def read_project_path() -> Path:
         fail(f"Project directory not found: {project_path}")
     info(f"Project: {target}")
     return target
-
-
-# ── Step 2: Infer fork slug ───────────────────────────────────────────────────
-
-def infer_fork(samples_repo: Path) -> str:
-    try:
-        url = run(["git", "remote", "get-url", "origin"], cwd=samples_repo)
-        m = re.search(r"[:/]([^/:]+/[^/]+?)(?:\.git)?$", url)
-        if m:
-            return m.group(1)
-    except subprocess.CalledProcessError:
-        pass
-    fail(
-        "Could not infer fork slug from git remote 'origin'.\n"
-        "Pass --fork OWNER/REPO explicitly."
-    )
 
 
 # ── Step 3: Sync main + create branch ─────────────────────────────────────────
@@ -224,6 +179,8 @@ def copy_sample(
         dry(f"Copy {actual_project} → {dest}")
         return dest
     dest.parent.mkdir(parents=True, exist_ok=True)
+    if dest.exists():
+        shutil.rmtree(dest)
     shutil.copytree(str(actual_project), str(dest))
     info(f"Copied sample to: {dest}")
     return dest
@@ -238,6 +195,9 @@ def commit_and_push(
     dry_run: bool,
 ) -> None:
     staged_path = f"connectors/{project_name}"
+    def same_or_nested_path(path: str, base: str) -> bool:
+        return path == base or path.startswith(base + "/")
+
     if dry_run:
         dry(f"git add -- {staged_path}")
         dry(f"git commit -m 'samples: add {project_name} connector integration sample'")
@@ -251,9 +211,13 @@ def commit_and_push(
         text=True,
         check=True,
     )
+    # Only flag already-staged index changes outside the target path.
+    # Untracked files (??) are irrelevant — git add -- <path> never touches them.
     unrelated = [
         line for line in status.stdout.splitlines()
-        if line[3:] and not line[3:].startswith(staged_path)
+        if line[:2] != "??" and line[0] != " " and line[3:] and not (
+            same_or_nested_path(line[3:], staged_path) or same_or_nested_path(staged_path, line[3:])
+        )
     ]
     if unrelated:
         raise RuntimeError(
@@ -262,6 +226,15 @@ def commit_and_push(
         )
     info("Committing changes...")
     subprocess.run(["git", "add", "--", staged_path], cwd=str(samples_repo), check=True)
+    diff_index = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=str(samples_repo))
+    if diff_index.returncode == 0:
+        warn(f"Nothing new to commit for '{project_name}' — sample already up to date on branch '{branch_name}'.")
+        return
+    if diff_index.returncode > 1:
+        raise RuntimeError(
+            f"Could not inspect staged changes for '{project_name}' on branch '{branch_name}' "
+            f"(git diff --cached --quiet exited with {diff_index.returncode})."
+        )
     subprocess.run(
         ["git", "commit", "-m", f"samples: add {project_name} connector integration sample"],
         cwd=str(samples_repo),

@@ -63,6 +63,20 @@ CWD = str(Path(__file__).parent.parent)
 jobs: dict[str, dict] = {}
 running_tasks: set[asyncio.Task] = set()
 
+AGENT_SYSTEM_PROMPT = """
+You are a WSO2 Integrator documentation automation agent.
+
+Follow the provided execution prompt as the source of truth. It may describe a
+connector workflow or a trigger workflow; adapt your language, screenshots,
+artifact names, and documentation structure to the workflow type in that prompt.
+
+Use browser automation for WSO2 Integrator UI work, and use file tools only when
+the execution prompt explicitly asks you to inspect or edit generated project
+files. Keep generated artifacts under the paths given in the execution prompt.
+Do not introduce extra setup notes, environment details, or undocumented
+workflow sections beyond what the execution prompt requires.
+""".strip()
+
 
 def truncate_tool_input(tool_input: any, max_length: int = 500) -> str:
     """
@@ -99,7 +113,9 @@ async def run_agent(job_id: str, prompt_path: str) -> None:
         async for message in query(
             prompt=prompt,
             options=ClaudeAgentOptions(
+                model="claude-sonnet-4-6",
                 cwd=CWD,
+                system_prompt=AGENT_SYSTEM_PROMPT,
                 allowed_tools=[
                     "Bash",
                     "Read",
@@ -239,7 +255,15 @@ async def get_health(request: web.Request) -> web.Response:
 
 
 async def post_shutdown(request: web.Request) -> web.Response:
-    asyncio.get_event_loop().call_soon(asyncio.get_event_loop().stop)
+    for task in list(running_tasks):
+        task.cancel()
+
+    async def stop_later() -> None:
+        if running_tasks:
+            await asyncio.gather(*running_tasks, return_exceptions=True)
+        asyncio.get_event_loop().stop()
+
+    asyncio.create_task(stop_later())
     return web.json_response({"status": "shutting down"})
 
 

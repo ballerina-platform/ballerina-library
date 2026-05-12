@@ -1,0 +1,287 @@
+name: Connector Documentation Automation
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Run mode"
+        required: true
+        default: "connector"
+        type: choice
+        options:
+          - connector
+          - trigger
+      name:
+        description: "Connector or trigger name. Example: mysql or trigger.twilio"
+        required: true
+        type: string
+      instructions:
+        description: "Optional additional instructions for the generated workflow"
+        required: false
+        default: ""
+        type: string
+      codeServerPort:
+        description: "code-server port"
+        required: false
+        default: "8080"
+        type: string
+      agentServerPort:
+        description: "Python agent server port"
+        required: false
+        default: "8765"
+        type: string
+      publishConnector:
+        description: "Publish connector docs to docs-integrator after generation"
+        required: false
+        default: false
+        type: boolean
+      docsIntegratorFork:
+        description: "Fork to push docs-integrator branches to (org/repo). Required when publishConnector is true."
+        required: false
+        default: ""
+        type: string
+      docsIntegratorUpstream:
+        description: "Upstream docs-integrator repo to open PRs against (org/repo)"
+        required: false
+        default: "wso2/docs-integrator"
+        type: string
+      docsIntegratorBaseBranch:
+        description: "Base branch for docs-integrator PRs"
+        required: false
+        default: "main"
+        type: string
+
+jobs:
+  generate:
+    name: Generate example documentation
+    runs-on: ubuntu-latest
+    environment: docs-automation
+    timeout-minutes: 150
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Ballerina
+        uses: ballerina-platform/setup-ballerina@v1.1.3
+        with:
+          version: 2201.13.3
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+
+      - name: Install uv
+        run: python -m pip install uv
+
+      - name: Install Python dependencies
+        run: |
+          cd example-doc-generator/python
+          uv venv
+          uv pip install -r requirements.txt
+          .venv/bin/playwright install chromium --with-deps
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Install code-server
+        run: curl -fsSL https://code-server.dev/install.sh | sh
+
+      - name: Create Config.toml
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          CODE_SERVER_PORT: ${{ inputs.codeServerPort }}
+          AGENT_SERVER_PORT: ${{ inputs.agentServerPort }}
+        run: |
+          python3 - <<'PYEOF'
+          import os
+
+          def toml_escape(value: str) -> str:
+              return value.replace("\\", "\\\\").replace('"', '\\"')
+
+          config = (
+              f'llmApiKey = "{toml_escape(os.environ["LLM_API_KEY"])}"\n'
+              f'codeServerPort = {int(os.environ["CODE_SERVER_PORT"])}\n'
+              f'agentServerPort = {int(os.environ["AGENT_SERVER_PORT"])}\n'
+          )
+
+          with open("example-doc-generator/Config.toml", "w", encoding="utf-8") as f:
+              f.write(config)
+          PYEOF
+
+      - name: Create .env
+        env:
+          CODE_SERVER_PORT: ${{ inputs.codeServerPort }}
+          AGENT_SERVER_PORT: ${{ inputs.agentServerPort }}
+          DOCS_INTEGRATOR_FORK: ${{ inputs.docsIntegratorFork }}
+          DOCS_INTEGRATOR_UPSTREAM: ${{ inputs.docsIntegratorUpstream }}
+          DOCS_INTEGRATOR_BASE_BRANCH: ${{ inputs.docsIntegratorBaseBranch }}
+        run: |
+          cat > example-doc-generator/.env <<EOF
+          CODE_SERVER_PORT=${CODE_SERVER_PORT}
+          AGENT_SERVER_PORT=${AGENT_SERVER_PORT}
+          INTEGRATION_SAMPLES_REPO=${GITHUB_WORKSPACE}/integration-samples
+          DOCS_INTEGRATOR_REPO=${GITHUB_WORKSPACE}/docs-integrator
+          INTEGRATION_SAMPLES_UPSTREAM=wso2/integration-samples
+          INTEGRATION_SAMPLES_BASE_BRANCH=main
+          DOCS_INTEGRATOR_FORK=${DOCS_INTEGRATOR_FORK}
+          DOCS_INTEGRATOR_UPSTREAM=${DOCS_INTEGRATOR_UPSTREAM}
+          DOCS_INTEGRATOR_BASE_BRANCH=${DOCS_INTEGRATOR_BASE_BRANCH}
+          EOF
+
+      - name: Build generator
+        run: cd example-doc-generator && bal build
+
+      - name: Run generator
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.LLM_API_KEY }}
+          MODE: ${{ inputs.mode }}
+          TARGET_NAME: ${{ inputs.name }}
+          ADDITIONAL_INSTRUCTIONS: ${{ inputs.instructions }}
+        run: |
+          cd example-doc-generator
+          if [ "$MODE" = "trigger" ]; then
+            if [ -n "$ADDITIONAL_INSTRUCTIONS" ]; then
+              bal run -- trigger "$TARGET_NAME" "$ADDITIONAL_INSTRUCTIONS"
+            else
+              bal run -- trigger "$TARGET_NAME"
+            fi
+          else
+            if [ -n "$ADDITIONAL_INSTRUCTIONS" ]; then
+              bal run -- "$TARGET_NAME" "$ADDITIONAL_INSTRUCTIONS"
+            else
+              bal run -- "$TARGET_NAME"
+            fi
+          fi
+        timeout-minutes: 90
+
+      - name: Validate publish inputs
+        if: ${{ inputs.publishConnector && inputs.mode == 'connector' }}
+        env:
+          DOCS_INTEGRATOR_FORK: ${{ inputs.docsIntegratorFork }}
+          DOCS_INTEGRATOR_UPSTREAM: ${{ inputs.docsIntegratorUpstream }}
+          DOCS_INTEGRATOR_BASE_BRANCH: ${{ inputs.docsIntegratorBaseBranch }}
+          DOCS_INTEGRATOR_TOKEN: ${{ secrets.DOCS_INTEGRATOR_TOKEN }}
+        run: |
+          if [ -z "$DOCS_INTEGRATOR_FORK" ]; then
+            echo "[ERROR] docsIntegratorFork is required when publishConnector is true."
+            exit 1
+          fi
+          if ! printf '%s' "$DOCS_INTEGRATOR_FORK" | grep -Eq '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$'; then
+            echo "[ERROR] docsIntegratorFork must use org/repo format."
+            exit 1
+          fi
+          if [ -z "$DOCS_INTEGRATOR_UPSTREAM" ]; then
+            echo "[ERROR] docsIntegratorUpstream is required when publishConnector is true."
+            exit 1
+          fi
+          if ! printf '%s' "$DOCS_INTEGRATOR_UPSTREAM" | grep -Eq '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$'; then
+            echo "[ERROR] docsIntegratorUpstream must use org/repo format."
+            exit 1
+          fi
+          if [ -z "$DOCS_INTEGRATOR_BASE_BRANCH" ]; then
+            echo "[ERROR] docsIntegratorBaseBranch is required when publishConnector is true."
+            exit 1
+          fi
+          if [ -z "$DOCS_INTEGRATOR_TOKEN" ]; then
+            echo "[ERROR] DOCS_INTEGRATOR_TOKEN secret is required when publishConnector is true."
+            exit 1
+          fi
+
+      - name: Clone docs-integrator fork
+        if: ${{ inputs.publishConnector && inputs.mode == 'connector' }}
+        env:
+          DOCS_INTEGRATOR_TOKEN: ${{ secrets.DOCS_INTEGRATOR_TOKEN }}
+          DOCS_INTEGRATOR_FORK: ${{ inputs.docsIntegratorFork }}
+          DOCS_INTEGRATOR_UPSTREAM: ${{ inputs.docsIntegratorUpstream }}
+          DOCS_INTEGRATOR_BASE_BRANCH: ${{ inputs.docsIntegratorBaseBranch }}
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git clone \
+            --branch "$DOCS_INTEGRATOR_BASE_BRANCH" \
+            --depth 1 \
+            "https://x-access-token:${DOCS_INTEGRATOR_TOKEN}@github.com/${DOCS_INTEGRATOR_FORK}.git" \
+            docs-integrator
+          cd docs-integrator
+          git remote add upstream "https://github.com/${DOCS_INTEGRATOR_UPSTREAM}.git"
+
+      - name: Publish connector docs
+        if: ${{ inputs.publishConnector && inputs.mode == 'connector' }}
+        timeout-minutes: 30
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.LLM_API_KEY }}
+          GH_TOKEN: ${{ secrets.DOCS_INTEGRATOR_TOKEN }}
+          DOCS_INTEGRATOR_FORK: ${{ inputs.docsIntegratorFork }}
+          DOCS_INTEGRATOR_UPSTREAM: ${{ inputs.docsIntegratorUpstream }}
+          DOCS_INTEGRATOR_BASE_BRANCH: ${{ inputs.docsIntegratorBaseBranch }}
+        run: |
+          cd example-doc-generator
+          python/.venv/bin/python python/publish_docs.py \
+            --docs-repo "${GITHUB_WORKSPACE}/docs-integrator" \
+            --fork "$DOCS_INTEGRATOR_FORK" \
+            --upstream "$DOCS_INTEGRATOR_UPSTREAM" \
+            --base-branch "$DOCS_INTEGRATOR_BASE_BRANCH" \
+            --no-preview
+
+      - name: Skip connector publishing for trigger runs
+        if: ${{ inputs.publishConnector && inputs.mode == 'trigger' }}
+        run: |
+          echo "publishConnector was requested, but trigger publishing is not automated yet."
+          echo "Generated trigger artifacts will be uploaded for manual review."
+
+      - name: Prepare downloadable artifact
+        if: always()
+        id: download_artifact
+        env:
+          MODE: ${{ inputs.mode }}
+          TARGET_NAME: ${{ inputs.name }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          SAFE_TARGET=$(printf '%s' "$TARGET_NAME" | tr -c 'A-Za-z0-9._-' '-')
+          ARTIFACT_NAME="example-doc-generator-${MODE}-${SAFE_TARGET}"
+          echo "name=${ARTIFACT_NAME}" >> "$GITHUB_OUTPUT"
+
+          mkdir -p example-doc-generator/download
+          cat > example-doc-generator/download/README.md <<EOF
+          # Example Doc Generator Output
+
+          Mode: ${MODE}
+          Target: ${TARGET_NAME}
+          Workflow run: ${RUN_URL}
+
+          Download this artifact from the workflow run summary.
+
+          Useful paths:
+          - artifacts/workflow-docs/    Generated Markdown guide
+          - artifacts/screenshots/      Captured screenshots
+          - artifacts/run-log/          Cost, timing, and output metadata
+          - artifacts_archive/          Batch archives, if present
+
+          If generation failed before artifacts were produced, this README is
+          still uploaded so the workflow has a downloadable artifact.
+          EOF
+
+      - name: Upload generated artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.download_artifact.outputs.name }}
+          path: |
+            example-doc-generator/download/
+            example-doc-generator/artifacts/
+            example-doc-generator/artifacts_archive/
+          retention-days: 30
+          if-no-files-found: error

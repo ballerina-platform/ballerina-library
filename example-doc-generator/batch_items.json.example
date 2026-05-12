@@ -1,0 +1,20 @@
+{
+  "items": [
+    { "type": "connector", "name": "mysql" },
+    {
+      "type": "connector",
+      "name": "zoom.meetings",
+      "instructions": "Use BearerTokenConfig for authentication."
+    },
+    {
+      "type": "connector",
+      "name": "aws.sns",
+      "instructions": "Use StaticCredentialsConfig."
+    },
+    {
+      "type": "trigger",
+      "name": "trigger.twilio",
+      "instructions": "Use the onReceived handler."
+    }
+  ]
+}

@@ -218,9 +218,9 @@ def parse_args() -> argparse.Namespace:
     )
     docs.add_argument(
         "--docs-base-branch",
-        default=os.environ.get("DOCS_INTEGRATOR_BASE_BRANCH", "dev"),
+        default=os.environ.get("DOCS_INTEGRATOR_BASE_BRANCH", "main"),
         metavar="BRANCH",
-        help="Target branch in the docs upstream repo (default: dev)",
+        help="Target branch in the docs upstream repo (default: main)",
     )
     docs.add_argument(
         "--category",

@@ -1,0 +1,299 @@
+#!/usr/bin/env python3
+# Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
+#
+# WSO2 LLC. licenses this file to you under the Apache License,
+# Version 2.0 (the "License"); you may not use this file except
+# in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied. See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+"""
+batch_pr_samples.py
+
+Creates a single pull request from a shared batch branch that already has
+multiple connector samples committed to it by batch_commit_sample.py.
+
+Reads the git log of the branch to discover which samples were committed
+and builds a combined PR body listing all of them.
+
+Usage:
+    python python/batch_pr_samples.py --branch samples/batch-april-2026
+
+Required:
+    --branch BRANCH     The batch branch to open a PR from
+
+Optional:
+    --samples-repo PATH     Path to local integration-samples fork (default: from .env)
+    --upstream OWNER/REPO   Upstream repo to target (default: wso2/integration-samples)
+    --base-branch BRANCH    Target branch for the PR (default: main)
+    --dry-run               Print planned actions without making any changes
+"""
+
+import argparse
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+from publish_helpers import (
+    DEFAULT_BASE_BRANCH,
+    DEFAULT_SAMPLES_REPO,
+    DEFAULT_UPSTREAM_REPO,
+    dry,
+    fail,
+    info,
+    infer_fork,
+    run,
+    warn,
+)
+
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
+def checkout_branch(samples_repo: Path, branch: str, dry_run: bool) -> None:
+    """Fetch origin and check out the given remote branch locally."""
+    if dry_run:
+        dry(f"git fetch origin  (in {samples_repo})")
+        dry(f"git checkout -B {branch} origin/{branch}")
+        return
+    info("Fetching origin...")
+    subprocess.run(["git", "fetch", "origin"], cwd=str(samples_repo), check=True)
+    info(f"Checking out branch from origin/{branch}: {branch}")
+    subprocess.run(["git", "checkout", "-B", branch, f"origin/{branch}"], cwd=str(samples_repo), check=True)
+
+
+def read_samples_from_branch(samples_repo: Path, base_branch: str) -> list[str]:
+    """
+    Parse the git log of the current branch since its merge base with the
+    remote base branch and return the
+    list of project names found in commit messages of the form
+    "samples: add {project_name} connector integration sample".
+
+    If no merge base is found, falls back to commits since
+    origin/{base_branch}.
+    """
+    last_merge = ""
+    try:
+        last_merge = run(
+            ["git", "merge-base", "HEAD", f"origin/{base_branch}"],
+            cwd=samples_repo,
+        ).strip()
+    except subprocess.CalledProcessError:
+        pass
+
+    if last_merge:
+        info(f"Reading samples committed since merge base {last_merge[:8]}")
+        log_range = f"{last_merge}..HEAD"
+    else:
+        info(f"No merge base found on branch; using origin/{base_branch}..HEAD")
+        log_range = f"origin/{base_branch}..HEAD"
+
+    try:
+        log = run(
+            ["git", "log", log_range, "--pretty=format:%s"],
+            cwd=samples_repo,
+        )
+    except subprocess.CalledProcessError:
+        warn(f"Could not read git log for {log_range}. Trying HEAD~20...")
+        log = run(["git", "log", "HEAD~20..HEAD", "--pretty=format:%s"], cwd=samples_repo)
+
+    samples: list[str] = []
+    for subject in log.splitlines():
+        m = re.match(r"samples: add (.+) connector integration sample", subject, re.IGNORECASE)
+        if m:
+            samples.append(m.group(1))
+
+    if not samples:
+        warn(
+            "No sample commit messages found in branch log.\n"
+            "Expected format: 'samples: add <project_name> connector integration sample'"
+        )
+    return samples
+
+
+def build_batch_pr_body(sample_names: list[str]) -> str:
+    """Build a PR description that lists all samples included in the batch."""
+    if sample_names:
+        sample_list = "\n".join(f"- `connectors/{name}/`" for name in sample_names)
+        sample_summary = f"the following {len(sample_names)} connector(s)"
+    else:
+        sample_list = "- (could not detect sample names from git log)"
+        sample_summary = "multiple connectors"
+
+    return f"""\
+## Purpose
+
+Adds runnable Ballerina connector integration samples for {sample_summary}:
+
+{sample_list}
+
+Each sample demonstrates end-to-end connector usage in WSO2 Integrator.
+
+## Goals
+
+- Provide runnable samples demonstrating connector operations
+- Cover connection setup and primary remote function calls
+
+## Approach
+
+Samples generated by the connector-docs-automations pipeline and committed via
+`batch_commit_sample.py`.
+
+## Samples included
+
+{sample_list}
+
+## Release note
+
+Added Ballerina connector integration samples for: {", ".join(f"`{n}`" for n in sample_names) if sample_names else "multiple connectors"}.
+
+## Automation tests
+
+- Unit tests: N/A (sample projects)
+- Integration tests: N/A (sample projects)
+
+## Security checks
+
+- Ran FindSecurityBugs plugin: N/A (Ballerina projects)
+"""
+
+
+# ── CLI ───────────────────────────────────────────────────────────────────────
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Create a single PR from a batch branch that has multiple connector "
+            "samples committed to it by batch_commit_sample.py."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python python/batch_pr_samples.py --branch samples/batch-april-2026\n"
+            "  python python/batch_pr_samples.py --branch samples/batch-april-2026 --dry-run\n"
+        ),
+    )
+    parser.add_argument(
+        "--branch",
+        required=True,
+        metavar="BRANCH",
+        help="Batch branch to open a PR from (e.g. samples/batch-april-2026)",
+    )
+    parser.add_argument(
+        "--samples-repo",
+        default=str(DEFAULT_SAMPLES_REPO),
+        metavar="PATH",
+        help=f"Path to local integration-samples fork (default: {DEFAULT_SAMPLES_REPO})",
+    )
+    parser.add_argument(
+        "--upstream",
+        default=DEFAULT_UPSTREAM_REPO,
+        metavar="OWNER/REPO",
+        help=f"Upstream repo to target with the PR (default: {DEFAULT_UPSTREAM_REPO})",
+    )
+    parser.add_argument(
+        "--base-branch",
+        default=DEFAULT_BASE_BRANCH,
+        metavar="BRANCH",
+        help=f"Target branch in the upstream repo (default: {DEFAULT_BASE_BRANCH})",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print planned actions without making any changes",
+    )
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+    samples_repo = Path(args.samples_repo).resolve()
+
+    if args.dry_run:
+        print("=" * 79)
+        print("DRY RUN — no changes will be made")
+        print("=" * 79)
+
+    # ── 1. Validate samples repo and resolve fork ──────────────────────────────
+    if not (samples_repo / ".git").exists():
+        fail(f"{samples_repo} is not a git repository.")
+    fork = infer_fork(samples_repo)
+    info(f"Fork: {fork}  |  Upstream: {args.upstream}  |  Base branch: {args.base_branch}")
+
+    # ── 2. Check out the batch branch ─────────────────────────────────────────
+    checkout_branch(samples_repo, args.branch, args.dry_run)
+
+    # ── 3. Discover samples from git log ──────────────────────────────────────
+    sample_names: list[str] = []
+    if not args.dry_run:
+        sample_names = read_samples_from_branch(samples_repo, args.base_branch)
+        if sample_names:
+            info(f"Found {len(sample_names)} sample(s) in branch log:")
+            for name in sample_names:
+                info(f"  • {name}")
+        else:
+            warn("Proceeding with PR creation but sample list is empty.")
+    else:
+        dry(f"Read git log {args.branch} since origin/{args.base_branch} to find sample names")
+
+    # ── 4. Build PR body ───────────────────────────────────────────────────────
+    pr_body = build_batch_pr_body(sample_names)
+
+    # ── 5. Create PR ───────────────────────────────────────────────────────────
+    pr_title = f"samples: adding samples from {args.branch}"
+
+    fork_owner = fork.split("/")[0]
+    head = f"{fork_owner}:{args.branch}"
+
+    if args.dry_run:
+        dry(f"gh pr create --repo {args.upstream} --head {head} --base {args.base_branch}")
+        dry(f"  Title: {pr_title}")
+        print()
+        print("=" * 79)
+        print("Dry run complete. Remove --dry-run to execute.")
+        print("=" * 79)
+        return
+
+    info(f"Creating PR: {args.upstream} ← {head}")
+    try:
+        import subprocess as sp
+        result = sp.run(
+            [
+                "gh", "pr", "create",
+                "--repo", args.upstream,
+                "--head", head,
+                "--base", args.base_branch,
+                "--title", pr_title,
+                "--body", pr_body,
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        pr_url = result.stdout.strip()
+    except sp.CalledProcessError as e:
+        fail(f"Failed to create PR:\n{e.stderr.strip()}")
+
+    print()
+    print("=" * 79)
+    print(f"Done!  PR: {pr_url}")
+    print("=" * 79)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except SystemExit:
+        raise
+    except Exception as e:
+        print(f"\n[ERROR] Unexpected error: {e}", file=sys.stderr)
+        sys.exit(1)
