@@ -51,6 +51,8 @@ public type RunLogEntry record {
     string connectorName;
     # Filename-safe slug derived from the connector name
     string connectorSlug;
+    # Optional extra instructions passed to the agent (empty string if none)
+    string additionalInstructions;
     # Pipeline start time
     time:Utc startTime;
     # Pipeline end time
@@ -99,8 +101,9 @@ public function writeRunLog(RunLogEntry entry) {
     } : "not available";
 
     json logJson = {
-        "connectorName":    entry.connectorName,
-        "connectorSlug":    entry.connectorSlug,
+        "connectorName":            entry.connectorName,
+        "connectorSlug":            entry.connectorSlug,
+        "additionalInstructions":   entry.additionalInstructions == "" ? () : entry.additionalInstructions,
         "model":            "claude-sonnet-4-6",
         "startTime":        timestamp,
         "endTime":          time:utcToString(entry.endTime),

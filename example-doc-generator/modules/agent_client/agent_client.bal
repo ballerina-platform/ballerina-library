@@ -81,6 +81,11 @@ public function runClaudeAgent(string promptPath, string agentUrl) returns Agent
         runtime:sleep(1);
         attempts += 1;
         http:Response pollResp = check agentClient->get(string `/jobs/${jobId}`);
+        if pollResp.statusCode < 200 || pollResp.statusCode >= 300 {
+            string|error errBody = pollResp.getTextPayload();
+            string detail = errBody is string ? errBody : "(unable to read body)";
+            return error(string `Agent poll failed HTTP ${pollResp.statusCode}: ${detail}`);
+        }
         json pollBody = check pollResp.getJsonPayload();
         JobStatus jobStatus = check pollBody.cloneWithType(JobStatus);
 
@@ -100,4 +105,20 @@ public function runClaudeAgent(string promptPath, string agentUrl) returns Agent
         }
     }
     return error(string `Agent job ${jobId} did not complete within ${maxAttempts} seconds.`);
+}
+
+# Requests the Python agent server to shut down.
+# This is a best-effort cleanup step; callers can log the returned error without
+# failing the completed pipeline.
+#
+# + agentUrl - base URL of the Python agent server (e.g. http://localhost:8765)
+# + return   - an error if the shutdown request could not be sent or was rejected
+public function stopAgentServer(string agentUrl) returns error? {
+    http:Client agentClient = check new (agentUrl, timeout = 10);
+    http:Response shutdownResp = check agentClient->post("/shutdown", {});
+    if shutdownResp.statusCode < 200 || shutdownResp.statusCode >= 300 {
+        string|error errBody = shutdownResp.getTextPayload();
+        string detail = errBody is string ? errBody : "(unable to read body)";
+        return error(string `Agent server shutdown returned HTTP ${shutdownResp.statusCode}: ${detail}`);
+    }
 }

@@ -52,6 +52,11 @@ Thumbs.db
 
 # All generated run artifacts (screenshots, execution-prompt, workflow-docs)
 artifacts/
+artifacts_archive/
+
+# Batch run config (contains local/user-specific item lists)
+batch_items.json
+batch_connectors.json
 
 # Temporary files
 tmp/
@@ -70,3 +75,5 @@ Config.toml
 config.toml
 
 CLAUDE.md
+
+.claude/

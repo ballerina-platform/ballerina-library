@@ -85,7 +85,6 @@ CATEGORY_MAP: dict[str, str] = {
     # Messaging
     "kafka": "messaging",
     "rabbitmq": "messaging",
-    "mqtt": "messaging",
     "nats": "messaging",
     "activemq": "messaging",
     "ibmmq": "messaging", "ibm.ibmmq": "messaging",
@@ -160,20 +159,44 @@ CATEGORY_MAP: dict[str, str] = {
     "sap": "erp-business",
     "netsuite": "erp-business",
     "workday": "hrms",
+    # Security / Identity
+    "aws.secretmanager": "security-identity", "secretmanager": "security-identity",
+    "aws.secretsmanager": "security-identity", "secretsmanager": "security-identity",
+    "scim": "security-identity", "scim2": "security-identity",
     # HRMS
     "hrms": "hrms",
     # Connectivity
-    "http": "connectivity",
-    "ftp": "connectivity",
     "sftp": "connectivity",
     "smtp": "connectivity",
     "imap": "connectivity",
+    # Built-in (Ballerina standard library connectors)
+    "email": "built-in",
+    "ftp": "built-in",
+    "graphql": "built-in",
+    "grpc": "built-in",
+    "http": "built-in",
+    "mqtt": "built-in",
+    "tcp": "built-in",
+    "udp": "built-in",
+    "websocket": "built-in",
+    "websub": "built-in",
+    # Marketing & Social
+    "hubspot.marketing.campaigns": "marketing-social",
+    "hubspot.marketing.emails": "marketing-social",
+    "hubspot.marketing.events": "marketing-social",
+    "hubspot.marketing.forms": "marketing-social",
+    "hubspot.marketing.subscriptions": "marketing-social",
+    "hubspot.marketing.transactional": "marketing-social",
+    "mailchimp.marketing": "marketing-social",
+    "mailchimp.transactional": "marketing-social",
+    "salesforce.marketingcloud": "marketing-social",
+    "twitter": "marketing-social",
 }
 
 AVAILABLE_CATEGORIES = sorted(set(CATEGORY_MAP.values()))
 
 DEFAULT_UPSTREAM = os.environ.get("DOCS_INTEGRATOR_UPSTREAM", "wso2/docs-integrator")
-DEFAULT_BASE_BRANCH = os.environ.get("DOCS_INTEGRATOR_BASE_BRANCH", "dev")
+DEFAULT_BASE_BRANCH = os.environ.get("DOCS_INTEGRATOR_BASE_BRANCH", "main")
 PREVIEW_PORT = 3333
 VIEWPORT_WIDTH = 1440
 VIEWPORT_HEIGHT = 900
@@ -205,6 +228,10 @@ def fail(msg: str) -> None:
     sys.exit(1)
 
 
+class PreviewError(RuntimeError):
+    """Raised when optional preview screenshot generation cannot continue."""
+
+
 # ── Subprocess helper ─────────────────────────────────────────────────────────
 
 def run(cmd: list[str], cwd: Path | None = None, check: bool = True) -> str:
@@ -234,23 +261,28 @@ def find_latest_doc(artifacts_dir: Path) -> tuple[Path, str]:
     return path, path.read_text(encoding="utf-8")
 
 
-def extract_connector_info(content: str) -> tuple[str, str, str]:
+def extract_connector_info(content: str, artifacts_dir: Path | None = None) -> tuple[str, str, str]:
     """
     Extract connector display name, slug, and primary operation name from the doc.
     Returns (display_name, slug, operation_name).
 
     connector-name.txt written by the Ballerina pipeline is the authoritative source.
+    When *artifacts_dir* is provided, looks for the file there instead of the
+    default ``artifacts/run-log/`` path.
     """
     # connector-name.txt is required — written by the Ballerina pipeline at startup
-    if not CONNECTOR_NAME_FILE.exists():
+    name_file = (artifacts_dir / "run-log" / "connector-name.txt") if artifacts_dir else CONNECTOR_NAME_FILE
+    if not name_file.exists():
         fail(
-            "connector-name.txt not found in artifacts/run-log/. "
+            f"connector-name.txt not found in {name_file.parent}/. "
             "Run the Ballerina pipeline first."
         )
-    raw = CONNECTOR_NAME_FILE.read_text(encoding="utf-8").strip()
+    raw = name_file.read_text(encoding="utf-8").strip()
     if not raw:
         fail("connector-name.txt is empty. Run the Ballerina pipeline first.")
-    slug = re.sub(r"[^a-z0-9]+", "-", raw.lower()).strip("-")
+    slug = re.sub(r"[^a-z0-9.]+", "-", raw.lower()).strip("-.")
+    if not slug:
+        fail(f"Connector name from connector-name.txt does not produce a valid slug: {raw!r}")
     display_name = raw.replace("-", " ").title()
     info(f"Connector slug from file: {slug}")
 
@@ -347,7 +379,7 @@ def sync_and_branch(
     branch_name: str,
     dry_run: bool,
     upstream_slug: str = DEFAULT_UPSTREAM,
-    base_branch: str = "dev",
+    base_branch: str = "main",
 ) -> None:
     """Fast-forward fork's base branch from upstream, then create the feature branch."""
     remotes = run(["git", "remote"], cwd=docs_repo).split()
@@ -509,7 +541,7 @@ def take_preview_screenshots(
 
     en_dir = docs_repo / "en"
     if not (en_dir / "node_modules").exists():
-        fail(
+        raise PreviewError(
             f"node_modules not found in {en_dir}.\n"
             f"Run: cd {en_dir} && npm install"
         )
@@ -542,7 +574,7 @@ def take_preview_screenshots(
 
     if not ready:
         server_proc.kill()
-        fail(f"Docusaurus server did not start within 90s on port {PREVIEW_PORT}.")
+        raise PreviewError(f"Docusaurus server did not start within 90s on port {PREVIEW_PORT}.")
 
     info(f"Server ready. Navigating to: {page_url}")
 
@@ -572,7 +604,7 @@ def take_preview_screenshots(
             for i, scroll_y in enumerate(positions, start=1):
                 page.evaluate(f"window.scrollTo(0, {scroll_y})")
                 page.wait_for_timeout(400)  # let lazy-loaded images render
-                out = preview_dir / f"{connector_slug}_preview_{i:02d}.png"
+                out = preview_dir / f"{connector_slug.replace('.', '_')}_preview_{i:02d}.png"
                 page.screenshot(path=str(out))
                 screenshot_files.append(out)
                 info(f"  [{i:02d}] scroll={scroll_y}px → {out.name}")
@@ -608,7 +640,7 @@ def upload_preview_as_release(
         return []
 
     timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-    tag = f"docs-preview-{connector_slug}-{timestamp}"
+    tag = f"docs-preview-{connector_slug.replace('.', '_')}-{timestamp}"
     title = f"Doc preview: {connector_name} connector example"
     notes = (
         f"Preview screenshots of the rendered docs page for branch `{branch_name}`.\n\n"
@@ -860,7 +892,7 @@ def main() -> None:
 
     # ── 1. Read artifacts ─────────────────────────────────────────────────────
     source_doc_path, doc_content = find_latest_doc(artifacts_dir)
-    connector_name, connector_slug, operation_name = extract_connector_info(doc_content)
+    connector_name, connector_slug, operation_name = extract_connector_info(doc_content, artifacts_dir)
     screenshot_files = find_screenshots(artifacts_dir)
 
     # ── 2. Validate docs repo ─────────────────────────────────────────────────
