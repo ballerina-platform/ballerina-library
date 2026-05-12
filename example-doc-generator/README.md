@@ -64,6 +64,12 @@ cd ..
 bal build
 ```
 
+## Optional Claude Code Local Settings
+
+`.claude/` is ignored because it contains local Claude Code preferences and
+permissions. Keep shared MCP setup in the tracked `.mcp.json`; recreate
+`.claude/settings.json` locally only if your Claude Code setup needs it.
+
 ## Run One Connector
 
 Connector mode is the default.

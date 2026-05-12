@@ -195,6 +195,9 @@ def commit_and_push(
     dry_run: bool,
 ) -> None:
     staged_path = f"connectors/{project_name}"
+    def same_or_nested_path(path: str, base: str) -> bool:
+        return path == base or path.startswith(base + "/")
+
     if dry_run:
         dry(f"git add -- {staged_path}")
         dry(f"git commit -m 'samples: add {project_name} connector integration sample'")
@@ -213,7 +216,7 @@ def commit_and_push(
     unrelated = [
         line for line in status.stdout.splitlines()
         if line[:2] != "??" and line[0] != " " and line[3:] and not (
-            line[3:].startswith(staged_path) or staged_path.startswith(line[3:])
+            same_or_nested_path(line[3:], staged_path) or same_or_nested_path(staged_path, line[3:])
         )
     ]
     if unrelated:

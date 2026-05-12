@@ -135,17 +135,16 @@ setup-bal:
 
 AGENT_SERVER_PORT ?= 8765
 ADDITIONAL_INSTRUCTIONS ?=
-export ADDITIONAL_INSTRUCTIONS
 
 run:
 	@[ "$(CONNECTOR)" ] || { echo "Usage: make run CONNECTOR=mysql"; exit 1; }
 	@echo "→ Running full pipeline for connector: $(CONNECTOR)$(if $(ADDITIONAL_INSTRUCTIONS), (with additional instructions),)"
-	bal run -- "$(CONNECTOR)" $(if $(ADDITIONAL_INSTRUCTIONS),"$$ADDITIONAL_INSTRUCTIONS",)
+	bal run -- "$(CONNECTOR)" $(if $(ADDITIONAL_INSTRUCTIONS),"$(ADDITIONAL_INSTRUCTIONS)",)
 
 run-trigger:
 	@[ "$(TRIGGER)" ] || { echo "Usage: make run-trigger TRIGGER=trigger.github"; exit 1; }
 	@echo "→ Running full pipeline for trigger: $(TRIGGER)$(if $(ADDITIONAL_INSTRUCTIONS), (with additional instructions),)"
-	bal run -- trigger "$(TRIGGER)" $(if $(ADDITIONAL_INSTRUCTIONS),"$$ADDITIONAL_INSTRUCTIONS",)
+	bal run -- trigger "$(TRIGGER)" $(if $(ADDITIONAL_INSTRUCTIONS),"$(ADDITIONAL_INSTRUCTIONS)",)
 
 crop-screenshots: python/.venv/.installed
 	python/.venv/bin/python python/crop_screenshots.py

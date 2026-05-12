@@ -29,12 +29,11 @@ If the batch branch does not yet exist on origin it is created from
 upstream/{base_branch}. If it already exists the commit is appended to it.
 
 Usage:
+    python python/batch_commit_sample.py
     python python/batch_commit_sample.py --branch samples/batch-april-2026
 
-Required:
-    --branch BRANCH     Shared batch branch name (created from upstream if absent)
-
 Optional:
+    --branch BRANCH         Shared batch branch name (default: samples/connector-samples)
     --samples-repo PATH     Path to local integration-samples fork (default: from .env)
     --upstream OWNER/REPO   Upstream repo (default: wso2/integration-samples)
     --base-branch BRANCH    Upstream branch to seed the batch branch from (default: main)
@@ -81,11 +80,8 @@ from publish_sample import (
 
 def branch_exists_on_origin(samples_repo: Path, branch: str) -> bool:
     """Return True if the branch already exists on the origin remote."""
-    try:
-        result = run(["git", "ls-remote", "--heads", "origin", branch], cwd=samples_repo)
-        return bool(result.strip())
-    except subprocess.CalledProcessError:
-        return False
+    result = run(["git", "ls-remote", "--heads", "origin", branch], cwd=samples_repo)
+    return bool(result.strip())
 
 def checkout_or_create_batch_branch(
     samples_repo: Path,

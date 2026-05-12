@@ -70,28 +70,28 @@ from pr_preview import checkout_branch
 
 def read_connectors_from_branch(docs_repo: Path, base_branch: str) -> list[str]:
     """
-    Parse the git log of the current branch since the most recent merge commit
-    (i.e. since the last PR from this branch was merged back in) and return the
+    Parse the git log of the current branch since its merge base with the
+    remote base branch and return the
     list of connector names found in commit messages of the form
     "docs: add {ConnectorName} connector example guide".
 
-    If no merge commit is found on HEAD, falls back to commits since
+    If no merge base is found, falls back to commits since
     origin/{base_branch}.
     """
-    last_merge = ""
+    merge_base = ""
     try:
-        last_merge = run(
-            ["git", "log", "--merges", "-n", "1", "--pretty=format:%H", "HEAD"],
+        merge_base = run(
+            ["git", "merge-base", f"origin/{base_branch}", "HEAD"],
             cwd=docs_repo,
         ).strip()
     except subprocess.CalledProcessError:
         pass
 
-    if last_merge:
-        info(f"Reading connectors committed since last merge commit {last_merge[:8]}")
-        log_range = f"{last_merge}..HEAD"
+    if merge_base:
+        info(f"Reading connectors committed since merge base {merge_base[:8]}")
+        log_range = f"{merge_base}..HEAD"
     else:
-        info(f"No merge commit found on branch; using origin/{base_branch}..HEAD")
+        info(f"No merge base found on branch; using origin/{base_branch}..HEAD")
         log_range = f"origin/{base_branch}..HEAD"
 
     try:

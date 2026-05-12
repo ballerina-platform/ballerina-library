@@ -56,7 +56,6 @@ artifacts_archive/
 
 # Batch run config (contains local/user-specific item lists)
 batch_items.json
-batch_connectors.json
 
 # Temporary files
 tmp/

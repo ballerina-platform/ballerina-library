@@ -171,10 +171,28 @@ jobs:
         if: ${{ inputs.publishConnector && inputs.mode == 'connector' }}
         env:
           DOCS_INTEGRATOR_FORK: ${{ inputs.docsIntegratorFork }}
+          DOCS_INTEGRATOR_UPSTREAM: ${{ inputs.docsIntegratorUpstream }}
+          DOCS_INTEGRATOR_BASE_BRANCH: ${{ inputs.docsIntegratorBaseBranch }}
           DOCS_INTEGRATOR_TOKEN: ${{ secrets.DOCS_INTEGRATOR_TOKEN }}
         run: |
           if [ -z "$DOCS_INTEGRATOR_FORK" ]; then
             echo "[ERROR] docsIntegratorFork is required when publishConnector is true."
+            exit 1
+          fi
+          if ! printf '%s' "$DOCS_INTEGRATOR_FORK" | grep -Eq '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$'; then
+            echo "[ERROR] docsIntegratorFork must use org/repo format."
+            exit 1
+          fi
+          if [ -z "$DOCS_INTEGRATOR_UPSTREAM" ]; then
+            echo "[ERROR] docsIntegratorUpstream is required when publishConnector is true."
+            exit 1
+          fi
+          if ! printf '%s' "$DOCS_INTEGRATOR_UPSTREAM" | grep -Eq '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$'; then
+            echo "[ERROR] docsIntegratorUpstream must use org/repo format."
+            exit 1
+          fi
+          if [ -z "$DOCS_INTEGRATOR_BASE_BRANCH" ]; then
+            echo "[ERROR] docsIntegratorBaseBranch is required when publishConnector is true."
             exit 1
           fi
           if [ -z "$DOCS_INTEGRATOR_TOKEN" ]; then

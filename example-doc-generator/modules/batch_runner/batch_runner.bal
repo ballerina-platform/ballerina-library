@@ -346,7 +346,10 @@ function readCreatedProjectPath() returns string? {
 
 function archiveArtifacts(string slug, string status) returns string|error {
     boolean|file:Error artifactsExists = file:test(ARTIFACTS_DIR, file:EXISTS);
-    if artifactsExists is file:Error || !artifactsExists {
+    if artifactsExists is file:Error {
+        return error("Could not check artifacts directory: " + artifactsExists.message());
+    }
+    if !artifactsExists {
         return check createNoArtifactsArchive(slug);
     }
 
