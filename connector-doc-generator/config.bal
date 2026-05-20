@@ -33,3 +33,4 @@ configurable boolean force = false;
 // Derived paths
 final string docsRoot = docsRepoRoot + "/en/docs/connectors";
 final string sidebarPath = docsRepoRoot + "/en/sidebars.ts";
+final string staticImgRoot = docsRepoRoot + "/en/static/img/connectors/catalog";

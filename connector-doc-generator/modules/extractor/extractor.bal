@@ -24,12 +24,22 @@ public type ClientInfo record {|
     string packageName;
 |};
 
+# Represents a single image that must be downloaded and stored in the static assets folder.
+public type ImageDownload record {|
+    # Original source URL (GitHub raw URL from the source README)
+    string url;
+    # File name only, e.g. "step1-create-app.png" — no path prefix
+    string filename;
+|};
+
 # Represents the files and metadata extracted from Claude's response.
 public type ExtractionResult record {|
     # Map of filename → markdown content (e.g. "overview.md" → "...")
     map<string> files;
     # Category entry metadata for index.md patching; nil if not present in response
     CategoryEntry? categoryEntry;
+    # Images to download into the static assets folder; empty if no images
+    ImageDownload[] images;
 |};
 
 # Structured data for the catalog category index table row.
@@ -50,7 +60,8 @@ public type CategoryEntry record {|
 public function extractAll(string response) returns ExtractionResult {
     map<string> files = extractFiles(response);
     CategoryEntry? categoryEntry = extractCategoryEntry(response);
-    return {files, categoryEntry};
+    ImageDownload[] images = extractImages(response);
+    return {files, categoryEntry, images};
 }
 
 function extractFiles(string response) returns map<string> {
@@ -164,6 +175,35 @@ public function extractClientSection(string response) returns string {
     int? endPos = response.indexOf(closeTag);
     int end = endPos is int ? endPos : response.length();
     return response.substring(startPos + openTag.length(), end).trim();
+}
+
+# Extract the `<images>[...]</images>` JSON array from a phase 1 response.
+# + response - Raw text output from Claude
+# + return   - Array of ImageDownload records, or empty array if not present
+public function extractImages(string response) returns ImageDownload[] {
+    string openTag = "<images>";
+    string closeTag = "</images>";
+    int? startPos = response.indexOf(openTag);
+    int? endPos = response.indexOf(closeTag);
+    if startPos is () || endPos is () {
+        return [];
+    }
+    string jsonText = response.substring(startPos + openTag.length(), endPos).trim();
+    json|error parsed = jsonText.fromJsonString();
+    if parsed is error || !(parsed is json[]) {
+        return [];
+    }
+    ImageDownload[] images = [];
+    foreach json item in <json[]>parsed {
+        if item is map<json> {
+            json u = item["url"];
+            json f = item["filename"];
+            if u is string && f is string {
+                images.push({url: u, filename: f});
+            }
+        }
+    }
+    return images;
 }
 
 function extractCategoryEntry(string response) returns CategoryEntry? {

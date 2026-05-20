@@ -69,11 +69,6 @@ public function insertConnectorEntry(
     }
     string text = <string>fileResult;
 
-    // Guard: already present
-    if text.includes(string `/${module}/overview`) {
-        return error(string `Connector '${name}' already exists in ${indexPath}`);
-    }
-
     // Build the new entry line
     string catalogCategory = CATALOG_CATEGORIES[categorySlug] ?: categorySlug;
     string link = string `${categorySlug}/${module}/overview`;
@@ -84,6 +79,30 @@ public function insertConnectorEntry(
         newEntry += string `, icon: "${iconUrl}"`;
     }
     newEntry += " },";
+
+    // If entry already exists, replace the existing line in-place
+    string existingMarker = string `/${module}/overview`;
+    if text.includes(existingMarker) {
+        int? markerPos = text.indexOf(existingMarker);
+        if markerPos is int {
+            // Walk back to find the start of the line
+            int lineStart = markerPos;
+            while lineStart > 0 && text.substring(lineStart - 1, lineStart) != "\n" {
+                lineStart -= 1;
+            }
+            // Walk forward to find the end of the line (include the newline)
+            int lineEnd = markerPos;
+            while lineEnd < text.length() && text.substring(lineEnd, lineEnd + 1) != "\n" {
+                lineEnd += 1;
+            }
+            string newText = text.substring(0, lineStart) + newEntry + text.substring(lineEnd);
+            io:Error? writeErr = io:fileWriteString(indexPath, newText);
+            if writeErr is io:Error {
+                return error("Failed to write catalog index: " + writeErr.message());
+            }
+            return;
+        }
+    }
 
     // Locate the connectors array opening
     string arrOpen = "connectors={[";

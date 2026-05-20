@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/file;
+import ballerina/http;
 import ballerina/io;
 import ballerina/os;
 import ballerina/time;
@@ -149,6 +150,22 @@ public function main() returns error? {
     extractor:ExtractionResult phase1Extracted = extractor:extractAll(phase1Result.text);
     string phase1Overview = phase1Extracted.files["overview.md"] ?: "";
 
+    // ── Download setup-guide images into static assets ───────────────────────
+    if phase1Extracted.images.length() > 0 {
+        log(string `      Downloading ${phase1Extracted.images.length()} image(s) to static assets...`);
+        string imgDir = staticImgRoot + "/" + category + "/" + moduleSlug;
+        check file:createDir(imgDir, file:RECURSIVE);
+        foreach extractor:ImageDownload img in phase1Extracted.images {
+            string targetPath = imgDir + "/" + img.filename;
+            error? dlErr = downloadFile(img.url, targetPath);
+            if dlErr is error {
+                log(string `      WARN  Failed to download ${img.url}: ${dlErr.message()}`);
+            } else {
+                log(string `      DOWNLOAD ${img.url} → ${targetPath}`);
+            }
+        }
+    }
+
     // ── Phase 2a: action-reference header + client discovery ─────────────────
     log("[4b/6] Phase 2a — discovering packages and clients...");
 
@@ -253,7 +270,8 @@ public function main() returns error? {
 
     extractor:ExtractionResult extracted = {
         files: allFiles,
-        categoryEntry: phase1Extracted.categoryEntry
+        categoryEntry: phase1Extracted.categoryEntry,
+        images: []
     };
 
     log("");
@@ -406,6 +424,36 @@ function logClaudeStats(claude:ClaudeResult result) {
     }
     log("      ──────────────────────────────────────");
     log("");
+}
+
+function downloadFile(string url, string targetPath) returns error? {
+    string httpsPrefix = "https://";
+    string httpPrefix = "http://";
+    string withoutProtocol;
+    string baseUrl;
+    if url.startsWith(httpsPrefix) {
+        withoutProtocol = url.substring(httpsPrefix.length());
+        baseUrl = httpsPrefix;
+    } else if url.startsWith(httpPrefix) {
+        withoutProtocol = url.substring(httpPrefix.length());
+        baseUrl = httpPrefix;
+    } else {
+        return error("Unsupported URL scheme: " + url);
+    }
+    int? slashIdx = withoutProtocol.indexOf("/");
+    if slashIdx is () {
+        return error("Invalid URL (no path component): " + url);
+    }
+    string host = baseUrl + withoutProtocol.substring(0, slashIdx);
+    string path = withoutProtocol.substring(slashIdx);
+
+    http:Client httpClient = check new (host, timeout = 30);
+    http:Response resp = check httpClient->get(path);
+    if resp.statusCode < 200 || resp.statusCode >= 300 {
+        return error(string `HTTP ${resp.statusCode} downloading ${url}`);
+    }
+    byte[] bytes = check resp.getBinaryPayload();
+    check io:fileWriteBytes(targetPath, bytes);
 }
 
 function log(string message) {

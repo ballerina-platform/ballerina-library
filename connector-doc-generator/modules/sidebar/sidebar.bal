@@ -64,8 +64,8 @@ public function injectConnector(
 ${items}          ],
         },`;
 
-    // Find "Connector catalog" label
-    string searchLabel = "Connector catalog";
+    // Find "Connector Catalog" label
+    string searchLabel = "Connector Catalog";
     int? labelPos = text.indexOf(string `label: '${searchLabel}'`);
     if labelPos is () {
         // Try with double quotes

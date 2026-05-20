@@ -28,6 +28,7 @@ The connector source code is cloned at `{{localRepoPath}}`. Use the `Read`, `Glo
    - **Exclude Caller types** — these are only used inside listener/service callbacks and must NOT appear in the clients list
    - Check whether the connector exposes a **Listener** type and/or a **Service** type (set `has_triggers = true` if it does, `false` otherwise)
    - Read the **`examples/`** folder for real-world usage patterns
+   - Read **`{{localRepoPath}}/ballerina/README.md`**, **`{{localRepoPath}}/ballerina/module.md`**, or **`{{localRepoPath}}/ballerina/Package.md`** (whichever exists) — note every image reference (`![alt](url)`) associated with each setup step so they can be included verbatim in `setup-guide.md`
 2. If the connector ships as multiple Ballerina packages (subdirectories under `{{localRepoPath}}`), document all of them; otherwise treat it as a single package
 
 ---
@@ -123,6 +124,8 @@ description: "How to set up and configure the {{packageName}} connector."
 
 {service-side steps only — no Ballerina code or bal commands}
 
+![{alt text}](/img/connectors/catalog/{{category}}/{{module}}/{filename})   {INCLUDE ONLY IF the source README has an image for this step}
+
 :::note
 {Optional admonition — plain prose content; type can be note, tip, or warning}
 :::
@@ -130,6 +133,8 @@ description: "How to set up and configure the {{packageName}} connector."
 ## {Step Title 2}
 
 {Body}
+
+![{alt text}](/img/connectors/catalog/{{category}}/{{module}}/{filename})   {INCLUDE ONLY IF the source README has an image for this step}
 
 ## Next steps
 
@@ -239,6 +244,7 @@ The listener supports the following connection strategies:
 | Optional config field defaults | Wrap in `<code>defaultValue</code>` |
 | Pipe chars in table cells | Use `&#124;` instead of `\|` |
 | Curly braces in table cells | Use `&#123;` and `&#125;` |
+| Images in setup-guide.md | Reference images as `/img/connectors/catalog/{category}/{module}/{filename}` — do NOT use the GitHub URL in the markdown; it will be downloaded and stored locally |
 
 ---
 
@@ -250,6 +256,7 @@ Before returning, verify that your response contains all required elements:
 - [ ] `<file name="setup-guide.md">` *(only if there are service-side setup steps)*
 - [ ] `<file name="trigger-reference.md">` *(only if `has_triggers` is true)*
 - [ ] `<category_entry>` JSON block
+- [ ] `<images>` JSON array *(only if setup-guide.md uses images — list every image with its source URL and filename)*
 - [ ] No Caller types in the overview clients table
 - [ ] **No** `<file name="action-reference.md">` — that is generated in Phase 2
 
@@ -257,7 +264,7 @@ Before returning, verify that your response contains all required elements:
 
 ## Output Format
 
-Return **only** the XML-tagged file blocks and the category entry — no prose outside the tags.
+Return **only** the XML-tagged file blocks and the JSON blocks — no prose outside the tags.
 
 ```
 <file name="overview.md">
@@ -275,6 +282,13 @@ Return **only** the XML-tagged file blocks and the category entry — no prose o
 <category_entry>
 {"description": "one-line connector description for the catalog index table", "operations": "Create, Read, Update, Delete", "auth": "OAuth 2.0"}
 </category_entry>
+
+<images>
+[
+  {"url": "https://raw.githubusercontent.com/...", "filename": "step1-create-app.png"},
+  {"url": "https://raw.githubusercontent.com/...", "filename": "step2-get-token.png"}
+]
+</images>
 ```
 
 Rules:
@@ -283,6 +297,9 @@ Rules:
 - The `category_entry` JSON must have exactly three keys: `description`, `operations`, `auth`
 - `operations` — short comma-separated list, e.g. `"Create, Read, Update"`
 - `auth` — e.g. `"OAuth 2.0"`, `"API Key"`, or `"None"` for built-in connectors
+- Include `<images>` only if `setup-guide.md` references images; omit it entirely if there are no images
+- Each entry in `<images>` must have `url` (the original GitHub raw URL from the source README) and `filename` (just the file name, e.g. `step1.png` — no path prefix)
+- In `setup-guide.md`, image paths must be `/img/connectors/catalog/{{category}}/{{module}}/{filename}` — never the raw GitHub URL
 - Do NOT include `action-reference.md` — it will be generated in Phase 2
 - Do NOT include any markdown fences around the outer XML block
 - Start immediately with `<file name="overview.md">`
