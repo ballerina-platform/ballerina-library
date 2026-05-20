@@ -123,12 +123,13 @@ public function extractActionHeader(string response) returns string {
     string openTag = "<action_header>";
     string closeTag = "</action_header>";
     int? startPos = response.indexOf(openTag);
-    int? endPos = response.indexOf(closeTag);
     if startPos is () {
         return "";
     }
+    int contentStart = startPos + openTag.length();
+    int? endPos = response.indexOf(closeTag, contentStart);
     int end = endPos is int ? endPos : response.length();
-    return response.substring(startPos + openTag.length(), end).trim();
+    return response.substring(contentStart, end).trim();
 }
 
 # Extract the `<clients>[...]</clients>` JSON array from a phase 2a response.
@@ -138,11 +139,15 @@ public function extractClients(string response) returns ClientInfo[] {
     string openTag = "<clients>";
     string closeTag = "</clients>";
     int? startPos = response.indexOf(openTag);
-    int? endPos = response.indexOf(closeTag);
-    if startPos is () || endPos is () {
+    if startPos is () {
         return [];
     }
-    string jsonText = response.substring(startPos + openTag.length(), endPos).trim();
+    int contentStart = startPos + openTag.length();
+    int? endPos = response.indexOf(closeTag, contentStart);
+    if endPos is () {
+        return [];
+    }
+    string jsonText = response.substring(contentStart, endPos).trim();
     json|error parsed = jsonText.fromJsonString();
     if parsed is error || !(parsed is json[]) {
         return [];
@@ -172,9 +177,10 @@ public function extractClientSection(string response) returns string {
     if startPos is () {
         return "";
     }
-    int? endPos = response.indexOf(closeTag);
+    int contentStart = startPos + openTag.length();
+    int? endPos = response.indexOf(closeTag, contentStart);
     int end = endPos is int ? endPos : response.length();
-    return response.substring(startPos + openTag.length(), end).trim();
+    return response.substring(contentStart, end).trim();
 }
 
 # Extract the `<images>[...]</images>` JSON array from a phase 1 response.
@@ -184,11 +190,15 @@ public function extractImages(string response) returns ImageDownload[] {
     string openTag = "<images>";
     string closeTag = "</images>";
     int? startPos = response.indexOf(openTag);
-    int? endPos = response.indexOf(closeTag);
-    if startPos is () || endPos is () {
+    if startPos is () {
         return [];
     }
-    string jsonText = response.substring(startPos + openTag.length(), endPos).trim();
+    int contentStart = startPos + openTag.length();
+    int? endPos = response.indexOf(closeTag, contentStart);
+    if endPos is () {
+        return [];
+    }
+    string jsonText = response.substring(contentStart, endPos).trim();
     json|error parsed = jsonText.fromJsonString();
     if parsed is error || !(parsed is json[]) {
         return [];
@@ -211,12 +221,16 @@ function extractCategoryEntry(string response) returns CategoryEntry? {
     string closeTag = "</category_entry>";
 
     int? startPos = response.indexOf(openTag);
-    int? endPos = response.indexOf(closeTag);
-    if startPos is () || endPos is () {
+    if startPos is () {
+        return ();
+    }
+    int contentStart = startPos + openTag.length();
+    int? endPos = response.indexOf(closeTag, contentStart);
+    if endPos is () {
         return ();
     }
 
-    string jsonText = response.substring(startPos + openTag.length(), endPos).trim();
+    string jsonText = response.substring(contentStart, endPos).trim();
     json|error parsed = jsonText.fromJsonString();
     if parsed is error || !(parsed is map<json>) {
         return ();

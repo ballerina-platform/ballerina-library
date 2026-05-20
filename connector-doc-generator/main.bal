@@ -156,7 +156,24 @@ public function main() returns error? {
         string imgDir = staticImgRoot + "/" + category + "/" + moduleSlug;
         check file:createDir(imgDir, file:RECURSIVE);
         foreach extractor:ImageDownload img in phase1Extracted.images {
-            string targetPath = imgDir + "/" + img.filename;
+            // Sanitize: take only the basename (strip any directory components)
+            // then validate it contains only safe characters.
+            string basename = img.filename;
+            int? lastSlash = basename.lastIndexOf("/");
+            if lastSlash is int {
+                basename = basename.substring(lastSlash + 1);
+            }
+            int? lastBackslash = basename.lastIndexOf("\\");
+            if lastBackslash is int {
+                basename = basename.substring(lastBackslash + 1);
+            }
+            // Allow only alphanumerics, hyphens, underscores, and dots; reject everything else.
+            boolean safe = re `^[A-Za-z0-9._-]+$`.isFullMatch(basename) && !basename.startsWith(".");
+            if !safe || basename.length() == 0 {
+                log(string `      WARN  Skipping image with unsafe filename '${img.filename}'`);
+                continue;
+            }
+            string targetPath = imgDir + "/" + basename;
             error? dlErr = downloadFile(img.url, targetPath);
             if dlErr is error {
                 log(string `      WARN  Failed to download ${img.url}: ${dlErr.message()}`);
@@ -426,27 +443,55 @@ function logClaudeStats(claude:ClaudeResult result) {
     log("");
 }
 
-function downloadFile(string url, string targetPath) returns error? {
-    string httpsPrefix = "https://";
-    string httpPrefix = "http://";
-    string withoutProtocol;
-    string baseUrl;
-    if url.startsWith(httpsPrefix) {
-        withoutProtocol = url.substring(httpsPrefix.length());
-        baseUrl = httpsPrefix;
-    } else if url.startsWith(httpPrefix) {
-        withoutProtocol = url.substring(httpPrefix.length());
-        baseUrl = httpPrefix;
-    } else {
-        return error("Unsupported URL scheme: " + url);
+// Permitted hostnames for image downloads. Images are sourced from GitHub only.
+final string[] ALLOWED_IMAGE_HOSTS = [
+    "raw.githubusercontent.com",
+    "github.com",
+    "user-images.githubusercontent.com"
+];
+
+function validateImageHost(string hostname) returns error? {
+    // Reject literal IPv4 addresses (e.g. 192.168.1.1)
+    if re `^\d{1,3}(\.\d{1,3}){3}$`.isFullMatch(hostname) {
+        return error("Rejected literal IPv4 address in image URL: " + hostname);
     }
+    // Reject literal IPv6 addresses (contain colons, e.g. [::1])
+    if hostname.includes(":") || hostname.includes("[") {
+        return error("Rejected literal IPv6 address in image URL: " + hostname);
+    }
+    // Enforce allowlist
+    foreach string allowed in ALLOWED_IMAGE_HOSTS {
+        if hostname == allowed || hostname.endsWith("." + allowed) {
+            return;
+        }
+    }
+    return error(string `Image host '${hostname}' is not in the allowed list`);
+}
+
+function downloadFile(string url, string targetPath) returns error? {
+    // Only HTTPS is permitted — reject plain HTTP
+    string httpsPrefix = "https://";
+    if !url.startsWith(httpsPrefix) {
+        return error("Only HTTPS image URLs are allowed: " + url);
+    }
+    string withoutProtocol = url.substring(httpsPrefix.length());
+
     int? slashIdx = withoutProtocol.indexOf("/");
     if slashIdx is () {
         return error("Invalid URL (no path component): " + url);
     }
-    string host = baseUrl + withoutProtocol.substring(0, slashIdx);
+    string hostWithPort = withoutProtocol.substring(0, slashIdx);
     string path = withoutProtocol.substring(slashIdx);
 
+    // Strip port for hostname validation
+    string hostname = hostWithPort;
+    int? colonIdx = hostWithPort.indexOf(":");
+    if colonIdx is int {
+        hostname = hostWithPort.substring(0, colonIdx);
+    }
+    check validateImageHost(hostname);
+
+    string host = httpsPrefix + hostWithPort;
     http:Client httpClient = check new (host, timeout = 30);
     http:Response resp = check httpClient->get(path);
     if resp.statusCode < 200 || resp.statusCode >= 300 {
