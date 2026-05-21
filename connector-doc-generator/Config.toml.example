@@ -1,0 +1,23 @@
+# ============================================================
+# connector-doc-generator-bal — Config.toml
+# Copy this file to Config.toml and fill in the required fields.
+# ============================================================
+
+# === Required ===
+connectorName = "HubSpot"           # Display name, e.g. "HubSpot"
+moduleSlug    = "hubspot"           # Module/folder slug, e.g. "hubspot"
+packageName   = "ballerinax/hubspot" # Ballerina package, e.g. "ballerinax/hubspot"
+githubRepo    = "module-ballerinax-hubspot" # GitHub repo name
+
+# Category slug — choose from:
+# ai-ml, built-in, cloud-infrastructure, communication, crm-sales,
+# database, developer-tools, ecommerce, erp-business, finance-accounting,
+# healthcare, hrms, marketing-social, messaging, productivity-collaboration,
+# security-identity, storage-file
+category = "crm-sales"
+
+# === Optional ===
+# connectorVersion = "3.0.0"  # Auto-fetched from Ballerina Central if omitted
+# docsRepoRoot = "/path/to/docs-integrator"
+# dryRun = false      # Build prompt only — skip Claude call and file writes
+# force = false       # Overwrite existing doc files
