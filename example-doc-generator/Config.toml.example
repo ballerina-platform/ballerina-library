@@ -1,0 +1,28 @@
+# =============================================================================
+# Configuration — Execution Prompt Generator
+# =============================================================================
+# Copy this file to Config.toml and fill in the values:
+#   cp Config.toml.example Config.toml
+# =============================================================================
+
+# Anthropic API Key (required — get yours at https://console.anthropic.com/settings/api-keys)
+llmApiKey = ""
+
+# Code-Server port (code-server runs locally on this port)
+# The pipeline will verify code-server is running and start it if needed.
+# Start manually with: code-server --auth none --bind-addr 0.0.0.0:8080
+codeServerPort = 8080
+
+# Python agent server port (python/agent_server.py listens on this port)
+# The pipeline will start the agent server automatically if not running.
+# Start manually with: make start-agent
+agentServerPort = 8765
+
+# Additional instructions for the agent (optional)
+# Use this to provide connector-specific guidance that the agent must follow,
+# e.g. which authentication type to use, which operation to call, or any
+# special configuration steps required for this connector.
+# Leave empty or omit to use defaults.
+# Example: additionalInstructions = "Use BearerTokenConfig for authentication. The token field maps to the Zoom API Bearer token."
+# additionalInstructions = ""
+

@@ -1,0 +1,78 @@
+# Generated content
+.generated/
+.playground/
+*.log
+
+# Ballerina build artifacts
+target/
+Dependencies.toml
+*.bala
+*.jar
+
+# IDE & editor
+.vscode/
+.idea/
+.gemini/
+*.swp
+*.swo
+*~
+
+# Node & npm
+node_modules/
+package-lock.json
+npm-debug.log
+pnpm-lock.yaml
+yarn.lock
+
+# Python
+python/.venv/
+python/__pycache__/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+.python-version
+python/uv.lock
+
+# OS specific
+Thumbs.db
+.DS_Store
+.AppleDouble
+
+# Large binary files
+*.deb
+*.rpm
+*.msi
+.LSOverride
+
+# Playwright
+.playwright-mcp/
+.playwright/
+
+# All generated run artifacts (screenshots, execution-prompt, workflow-docs)
+artifacts/
+artifacts_archive/
+
+# Batch run config (contains local/user-specific item lists)
+batch_items.json
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+.cache/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Ballerina config (contains secrets)
+Config.toml
+
+config.toml
+
+CLAUDE.md
+
+.claude/

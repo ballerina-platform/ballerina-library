@@ -1300,6 +1300,9 @@ function executeSdkCommand(string[] args) returns error? {
         "generate-all" => {
             return executeSdkGenerateAll(subArgs);
         }
+        "help" => {
+            printSdkUsage();
+        }
         _ => {
             printSdkUsage();
             return error(string `Unknown SDK command: ${subCommand}`);
@@ -1425,6 +1428,9 @@ function executeOpenApiCommand(string[] args) returns error? {
         "pipeline" => {
             return runOpenApiPipeline(subArgs);
         }
+        "help" => {
+            printOpenApiUsage();
+        }
         _ => {
             printOpenApiUsage();
             return error(string `Unknown OpenAPI command: ${subCommand}`);
@@ -1444,16 +1450,23 @@ function runOpenApiPipeline(string[] args) returns error? {
 
     boolean quietMode = false;
     boolean autoYes = false;
+    boolean regenerate = false;
 
     foreach string option in pipelineOptions {
         if option == "quiet" {
             quietMode = true;
         } else if option == "yes" {
             autoYes = true;
+        } else if option == "regenerate" {
+            regenerate = true;
         }
     }
 
-    printOpenApiPipelineHeader(openApiSpec, outputDir, quietMode);
+    if regenerate {
+        return runOpenApiRegenerationPipeline(openApiSpec, outputDir, pipelineOptions, quietMode, autoYes);
+    }
+
+    printOpenApiPipelineHeader(openApiSpec, outputDir, quietMode, false);
 
     printOpenApiStepHeader(1, "Sanitizing OpenAPI Specification", quietMode);
     string[] sanitizeArgs = [openApiSpec, outputDir, ...pipelineOptions];
@@ -1464,6 +1477,11 @@ function runOpenApiPipeline(string[] args) returns error? {
     }
     if !quietMode {
         io:println("Sanitization completed successfully");
+    }
+    error? sanitationsDocResult = sanitizor:generateSanitationsDoc(
+        openApiSpec, string `${outputDir}/docs/spec/aligned_ballerina_openapi.json`, outputDir, quietMode);
+    if sanitationsDocResult is error && !quietMode {
+        io:println(string `Could not generate sanitations.md: ${sanitationsDocResult.message()}`);
     }
 
     printOpenApiStepHeader(2, "Generating Ballerina Client", quietMode);
@@ -1521,14 +1539,117 @@ function runOpenApiPipeline(string[] args) returns error? {
     printOpenApiPipelineCompletion(outputDir, quietMode);
 }
 
-function printOpenApiPipelineHeader(string openApiSpec, string outputDir, boolean quietMode) {
+function runOpenApiRegenerationPipeline(string openApiSpec, string outputDir, string[] pipelineOptions,
+        boolean quietMode, boolean autoYes) returns error? {
+    printOpenApiPipelineHeader(openApiSpec, outputDir, quietMode, true);
+
+    error? initResult = oautils:initAIService(quietMode);
+    if initResult is error && !quietMode {
+        io:println("AI service unavailable before sanitations; continuing with available parsing.");
+    }
+
+    string sanitationsPath = string `${outputDir}/docs/spec/sanitations.md`;
+    error? applyResult = sanitizor:applySanitations(sanitationsPath, openApiSpec, quietMode);
+    if applyResult is error {
+        io:println(string `Could not apply recorded sanitations: ${applyResult.message()}`);
+        io:println("Continuing without pre-applied sanitations...");
+    } else if !quietMode {
+        io:println("Recorded sanitations applied to the new specification");
+    }
+
+    printOpenApiStepHeader(1, "Sanitizing OpenAPI Specification", quietMode);
+    error? sanitizeResult = sanitizor:executeSanitizor(openApiSpec, outputDir, ...pipelineOptions);
+    if sanitizeResult is error {
+        return sanitizeResult;
+    }
+
+    string sanitizedSpec = string `${outputDir}/docs/spec/aligned_ballerina_openapi.json`;
+    error? sanitationsDocResult = sanitizor:generateSanitationsDoc(
+        openApiSpec, sanitizedSpec, outputDir, quietMode);
+    if sanitationsDocResult is error && !quietMode {
+        io:println(string `Could not refresh sanitations.md: ${sanitationsDocResult.message()}`);
+    }
+
+    printOpenApiStepHeader(2, "Regenerating Ballerina Client", quietMode);
+    string clientPath = string `${outputDir}/ballerina`;
+    error? clientResult = client_generator:executeClientGen(sanitizedSpec, clientPath, ...pipelineOptions);
+    if clientResult is error {
+        io:println(string `Client regeneration failed: ${clientResult.message()}`);
+        io:println("Continuing pipeline...");
+    }
+
+    printOpenApiStepHeader(3, "Building and Validating Client", quietMode);
+    oautils:CommandResult buildResult = oautils:executeBalBuild(clientPath, quietMode);
+    if oautils:hasCompilationErrors(buildResult) {
+        string[] fixerArgs = [clientPath];
+        if autoYes {
+            fixerArgs.push("yes");
+        }
+        if quietMode {
+            fixerArgs.push("quiet");
+        }
+        error? fixResult = fixer:executeCodeFixer(...fixerArgs);
+        if fixResult is error && !quietMode {
+            io:println(string `Initial recovery fix failed: ${fixResult.message()}`);
+        }
+
+        oautils:CommandResult retryBuild = oautils:executeBalBuild(clientPath, quietMode);
+        if oautils:hasCompilationErrors(retryBuild) {
+            error? removeTests = file:remove(clientPath + "/tests", file:RECURSIVE);
+            error? removeMock = file:remove(clientPath + "/modules/mock.server", file:RECURSIVE);
+            if removeTests is error && !quietMode {
+                io:println(string `Could not remove old tests: ${removeTests.message()}`);
+            }
+            if removeMock is error && !quietMode {
+                io:println(string `Could not remove old mock module: ${removeMock.message()}`);
+            }
+
+            printOpenApiStepHeader(4, "Regenerating Tests for New API Version", quietMode);
+            error? testResult = test_generator:executeTestGen("openapi", outputDir, sanitizedSpec,
+                ...pipelineOptions);
+            if testResult is error {
+                return testResult;
+            }
+            retryBuild = oautils:executeBalBuild(clientPath, quietMode);
+            if oautils:hasCompilationErrors(retryBuild) {
+                error? finalFix = fixer:executeCodeFixer(...fixerArgs);
+                if finalFix is error {
+                    return finalFix;
+                }
+            }
+        }
+    } else {
+        printOpenApiStepHeader(4, "Regenerating Tests", quietMode);
+        error? testResult = test_generator:executeTestGen("openapi", outputDir, sanitizedSpec,
+            ...pipelineOptions);
+        if testResult is error {
+            io:println(string `Test regeneration failed: ${testResult.message()}`);
+        }
+    }
+
+    printOpenApiStepHeader(5, "Regenerating Examples", quietMode);
+    error? exampleResult = example_generator:executeExampleGen(outputDir, ...pipelineOptions);
+    if exampleResult is error {
+        io:println(string `Example regeneration failed: ${exampleResult.message()}`);
+    }
+
+    printOpenApiStepHeader(6, "Generating Documentation", quietMode);
+    error? docResult = document_generator:executeDocGen("generate-all", outputDir, ...pipelineOptions);
+    if docResult is error {
+        io:println(string `Documentation generation failed: ${docResult.message()}`);
+    }
+
+    printOpenApiRegenerationCompletion(outputDir, quietMode);
+}
+
+function printOpenApiPipelineHeader(string openApiSpec, string outputDir, boolean quietMode, boolean regenerate) {
     if quietMode {
         return;
     }
     string sep = createMainSeparator("=", 70);
     io:println("");
     io:println(sep);
-    io:println("OpenAPI Connector Automation Pipeline");
+    io:println(regenerate ? "OpenAPI Connector Regeneration Pipeline" : "OpenAPI Connector Automation Pipeline");
     io:println(sep);
     io:println(string `Input : ${openApiSpec}`);
     io:println(string `Output: ${outputDir}`);
@@ -1569,6 +1690,21 @@ function printOpenApiPipelineCompletion(string outputDir, boolean quietMode) {
     }
 }
 
+function printOpenApiRegenerationCompletion(string outputDir, boolean quietMode) {
+    string sep = createMainSeparator("=", 70);
+    io:println("");
+    io:println(sep);
+    io:println("OpenAPI Regeneration Pipeline Completed");
+    io:println(sep);
+    io:println(string `  Updated specification : ${outputDir}/docs/spec/`);
+    io:println(string `  Regenerated client    : ${outputDir}/ballerina/`);
+    io:println(string `  Refreshed examples    : ${outputDir}/examples/`);
+    io:println(string `  Updated documentation : ${outputDir}`);
+    if !quietMode {
+        io:println(sep);
+    }
+}
+
 function printOpenApiUsage() {
     io:println();
     io:println("OpenAPI Workflow - OpenAPI Spec → Ballerina Connector");
@@ -1602,9 +1738,11 @@ function printOpenApiUsage() {
     io:println("OPTIONS:");
     io:println("  yes      Auto-confirm all prompts");
     io:println("  quiet    Minimal logging output");
+    io:println("  regenerate  Reapply recorded sanitations and recover tests/examples for an updated spec");
     io:println();
     io:println("EXAMPLES:");
     io:println("  bal run -- openapi pipeline /home/user/spec.yaml /home/user/my-connector");
+    io:println("  bal run -- openapi pipeline /home/user/spec.yaml /home/user/my-connector yes regenerate");
     io:println("  bal run -- openapi sanitize /home/user/spec.yaml /home/user/my-connector");
     io:println("  bal run -- openapi generate-client /home/user/spec.yaml /home/user/my-connector");
     io:println("  bal run -- openapi fix-code /home/user/my-connector/ballerina");

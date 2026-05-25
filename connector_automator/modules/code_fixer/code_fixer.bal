@@ -548,6 +548,43 @@ function prepareErrorContext(CompilationError[] errors) returns string {
     return string:'join("\n", ...errorStrings);
 }
 
+function getTypeContextForFile(string projectPath, string filePath) returns string {
+    string[] contextParts = [];
+    string|io:Error typesContent = io:fileReadString(projectPath + "/types.bal");
+    if typesContent is string {
+        contextParts.push("FULL TYPES DEFINITIONS (types.bal):\n" + typesContent);
+    }
+    if filePath.includes("mock") {
+        string|io:Error mockTypes = io:fileReadString(projectPath + "/modules/mock.server/types.bal");
+        if mockTypes is string {
+            contextParts.push("MOCK TYPES DEFINITIONS:\n" + mockTypes);
+        }
+    }
+    string|io:Error clientContent = io:fileReadString(projectPath + "/client.bal");
+    if clientContent is string {
+        contextParts.push("FULL CLIENT IMPLEMENTATION (client.bal):\n" + clientContent);
+    }
+    return string:'join("\n\n---\n\n", ...contextParts);
+}
+
+function buildFixHistoryContext(FixAttempt[] attempts) returns string {
+    string[] historyLines = [];
+    foreach FixAttempt attempt in attempts {
+        historyLines.push(string `Iteration ${attempt.iteration}: ${attempt.appliedFix}`);
+    }
+    return string:'join("\n", ...historyLines);
+}
+
+function describeCodeChange(CompilationError[] errors) returns string {
+    string[] summaries = [];
+    foreach CompilationError err in errors {
+        string shortMessage = err.message.length() > 80 ?
+            err.message.substring(0, 77) + "..." : err.message;
+        summaries.push(string `Line ${err.line}: ${shortMessage}`);
+    }
+    return string:'join("; ", ...summaries);
+}
+
 function inferErrorLanguage(CompilationError[] errors) returns string {
     if errors.length() == 0 {
         return "ballerina";
@@ -561,7 +598,8 @@ function inferErrorLanguage(CompilationError[] errors) returns string {
 }
 
 // Fix errors in a single file
-public function fixFileWithLLM(string projectPath, string filePath, CompilationError[] errors, boolean quietMode = false) returns FixResponse|error {
+public function fixFileWithLLM(string projectPath, string filePath, CompilationError[] errors,
+        boolean quietMode = false, FixAttempt[] previousAttempts = []) returns FixResponse|error {
     if !quietMode {
         io:println(string `  Analyzing ${filePath} (${errors.length()} error${errors.length() == 1 ? "" : "s"})`);
     }
@@ -777,7 +815,10 @@ public function fixFileWithLLM(string projectPath, string filePath, CompilationE
     }
 
     log:printInfo("Attempting LLM-based Ballerina fix", filePath = filePath, errorCount = errors.length());
-    string prompt = createFixPrompt(fileContent, errors, filePath);
+    string typeContext = (filePath.includes("test") || filePath.includes("mock")) ?
+        getTypeContextForFile(projectPath, filePath) : "";
+    string prompt = createFixPromptWithHistory(fileContent, errors, filePath, typeContext,
+        buildFixHistoryContext(previousAttempts));
 
     string|error llmResponse = utils:callAI(prompt);
     if llmResponse is error {
@@ -1597,6 +1638,7 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
     CompilationError[] previousErrors = [];
     int initialErrorCount = 0;
     boolean initialErrorCountSet = false;
+    map<FixAttempt[]> fileFixHistory = {};
 
     if !quietMode {
         io:println("Starting error fixing process...");
@@ -1729,8 +1771,9 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
         foreach string filePath in errorsByFile.keys() {
             CompilationError[] fileErrors = errorsByFile.get(filePath);
 
-            // Get fix from LLM
-            FixResponse|error fixResponse = fixFileWithLLM(projectPath, filePath, fileErrors, quietMode);
+            FixAttempt[] previousAttempts = fileFixHistory.hasKey(filePath) ? fileFixHistory.get(filePath) : [];
+            FixResponse|error fixResponse = fixFileWithLLM(projectPath, filePath, fileErrors, quietMode,
+                previousAttempts);
             if fixResponse is error {
                 if !quietMode {
                     io:println(string `  ⚠  Could not generate fix for ${filePath}: ${fixResponse.message()}`);
@@ -1738,6 +1781,19 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
                 result.remainingFixes.push(string `Iteration ${iteration}: Failed to fix ${filePath}: ${fixResponse.message()}`);
                 continue;
             }
+
+            string[] errorMessages = fileErrors.'map(function(CompilationError err) returns string {
+                return err.message;
+            });
+            FixAttempt fixAttempt = {
+                iteration: iteration,
+                errorMessages,
+                appliedFix: describeCodeChange(fileErrors)
+            };
+            if !fileFixHistory.hasKey(filePath) {
+                fileFixHistory[filePath] = [];
+            }
+            fileFixHistory.get(filePath).push(fixAttempt);
 
             // Show fix to user and ask for confirmation
             boolean shouldApplyFix = false;

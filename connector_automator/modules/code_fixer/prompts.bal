@@ -114,6 +114,36 @@ Now provide the complete corrected code following all rules above:
 `;
 }
 
+public function createFixPromptWithContext(string code, CompilationError[] errors, string filePath,
+        string typeContext) returns string {
+    if typeContext.length() == 0 {
+        return createFixPrompt(code, errors, filePath);
+    }
+    string contextualCode = string `${code}
+
+<AUTHORITATIVE_TYPE_CONTEXT>
+${typeContext}
+</AUTHORITATIVE_TYPE_CONTEXT>
+
+Use required field access only for required record fields. For optional or rest fields, use member access with the required type conversion.`;
+    return createFixPrompt(contextualCode, errors, filePath);
+}
+
+public function createFixPromptWithHistory(string code, CompilationError[] errors, string filePath,
+        string typeContext, string fixHistory) returns string {
+    string contextualCode = code;
+    if fixHistory.length() > 0 {
+        contextualCode = string `${contextualCode}
+
+<PREVIOUS_FAILED_FIXES>
+${fixHistory}
+</PREVIOUS_FAILED_FIXES>
+
+Do not repeat a previous failed change.`;
+    }
+    return createFixPromptWithContext(contextualCode, errors, filePath, typeContext);
+}
+
 // Build a targeted Java fix prompt that sends only the error-region context
 // and asks for a JSON patch response (not the whole file).
 public function createJavaFixPrompt(string code, CompilationError[] errors, string filePath,

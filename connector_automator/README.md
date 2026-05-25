@@ -15,7 +15,7 @@ Both workflows produce production-ready Ballerina connectors with typed clients,
 
 ### Key Features
 
-- **OpenAPI Sanitization**: Flatten, align, and enhance OpenAPI specifications with AI-generated metadata
+- **OpenAPI Sanitization**: Flatten, align, and enhance OpenAPI specifications with AI-generated metadata. Records changes in `sanitations.md` for later regeneration
 - **Ballerina Client Generation**: Create typed Ballerina clients from OpenAPI specs with proper conventions
 - **Java SDK Analysis**: Parse Java SDK JARs and extract method/type metadata via Javadoc + bytecode analysis
 - **IR Generation**: Convert Java SDK metadata into a structured Intermediate Representation (IR) for connector code generation
@@ -24,6 +24,7 @@ Both workflows produce production-ready Ballerina connectors with typed clients,
 - **Example Generation**: AI-powered generation of realistic usage examples
 - **Test Generation**: Comprehensive test suites — mock server tests (OpenAPI) or live integration tests (SDK)
 - **Documentation Generation**: Complete README files for all components
+- **Connector Regeneration**: Update an OpenAPI connector from a newer spec while replaying sanitations and recovering tests/examples
 - **Full Pipeline**: Execute the complete automation workflow end-to-end with a single command
 
 ## Prerequisites
@@ -304,11 +305,13 @@ bal run -- openapi pipeline <spec> <output-dir> [options]
 |--------|-------------|
 | `yes` | Auto-confirm all prompts |
 | `quiet` | Minimal logging output |
+| `regenerate` | Reapply recorded sanitations and recover existing tests/examples for a new API spec version |
 
 **Example:**
 ```bash
 bal run -- openapi pipeline ./openapi.yaml ./my-connector yes
 bal run -- openapi pipeline ./openapi.yaml ./my-connector yes quiet
+bal run -- openapi pipeline ./openapi.yaml ./my-connector yes quiet regenerate
 ```
 
 **Pipeline Steps:**
@@ -318,6 +321,8 @@ bal run -- openapi pipeline ./openapi.yaml ./my-connector yes quiet
 4. Generate usage examples
 5. Generate mock server + live tests
 6. Generate documentation
+
+When `regenerate` is supplied, the pipeline applies `docs/spec/sanitations.md` to the new specification before sanitizing, attempts to repair existing generated code, and regenerates incompatible tests and examples when recovery is not possible.
 
 ### OpenAPI Step-by-Step Commands
 
@@ -335,10 +340,12 @@ bal run -- openapi sanitize <spec> <output-dir> [options]
 - Generates missing `operationId` values using AI
 - Renames generic `InlineResponse` schemas to meaningful names
 - Adds missing field descriptions
+- Generates `docs/spec/sanitations.md` to record transformations for future regeneration
 
 **Output:**
 - `<output-dir>/docs/spec/flattened_openapi.json`
 - `<output-dir>/docs/spec/aligned_ballerina_openapi.json`
+- `<output-dir>/docs/spec/sanitations.md`
 
 #### 2. Generate Ballerina Client
 

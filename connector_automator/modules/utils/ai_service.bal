@@ -76,6 +76,20 @@ public function callAIAdvanced(string userPrompt, string systemPrompt = "", int 
     return extractResponseContent(response);
 }
 
+// Multi-turn version: caller builds up the full conversation history and passes it.
+public function callAIWithMessages(ai:ChatMessage[] messages) returns string|error {
+    ai:ModelProvider? model = defaultModel;
+    if model is () {
+        return error("AI model not initialized. Please call initAIService() first.");
+    }
+
+    ai:ChatAssistantMessage|error response = model->chat(messages);
+    if response is error {
+        return error("AI generation failed: " + response.message());
+    }
+    return extractResponseContent(response);
+}
+
 public function isAIServiceInitialized() returns boolean {
     return defaultModel !is ();
 }
@@ -128,4 +142,3 @@ isolated function extractResponseContent(ai:ChatAssistantMessage response) retur
     }
     return error("AI response content is empty.");
 }
-

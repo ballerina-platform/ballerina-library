@@ -1,0 +1,12 @@
+[project]
+name = "example-docs-generator"
+version = "0.1.0"
+description = "Claude Agent SDK server for WSO2 connector documentation automation"
+requires-python = ">=3.11"
+dependencies = [
+    "aiohttp>=3.9.2",
+    "claude-agent-sdk>=0.1",
+    "Pillow>=10.3.0",
+    "playwright>=1.40",
+    "python-dotenv>=1.0",
+]

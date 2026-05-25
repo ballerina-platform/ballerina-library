@@ -29,59 +29,80 @@ function updateDescriptionInSpec(map<json> schemas, string location, string desc
     return ();
 }
 
+// Searches a parameter array for a matching entry and updates its description.
+// Returns true if a match was found and updated.
+function findAndUpdateParam(json[] params, string paramName, string paramIn, string description) returns boolean {
+    foreach json param in params {
+        if !(param is map<json>) {
+            continue;
+        }
+        map<json> paramMap = <map<json>>param;
+        boolean nameMatches = paramMap.hasKey("name") && paramMap.get("name") == paramName;
+        boolean inMatches = paramIn == "" || (paramMap.hasKey("in") && paramMap.get("in") == paramIn);
+        if nameMatches && inMatches {
+            paramMap["description"] = description;
+            return true;
+        }
+    }
+    return false;
+}
+
 // Helper function to update parameter description in spec
 function updateParameterDescriptionInSpec(map<json> paths, string location, string description) returns error? {
-    // Parse location: paths.{path}.{method}.parameters[name={paramName}]
-    if location.startsWith("paths.") {
-        string locationWithoutPrefix = location.substring(6); // Remove "paths."
+    // Parse location: paths.{path}.{method}.parameters[name={paramName}] or parameters[name={paramName},in={paramIn}]
+    if !location.startsWith("paths.") {
+        return error("Could not find parameter at location: " + location);
+    }
 
-        // Use last dot to separate path from method+rest (handles dots in path)
-        int? lastDot = locationWithoutPrefix.lastIndexOf(".");
-        if lastDot is int {
-            string path = locationWithoutPrefix.substring(0, lastDot);
-            string methodAndRest = locationWithoutPrefix.substring(lastDot + 1);
+    string locationWithoutPrefix = location.substring(6); // Remove "paths."
+    int? lastDot = locationWithoutPrefix.lastIndexOf(".");
+    if !(lastDot is int) {
+        return error("Could not find parameter at location: " + location);
+    }
 
-            // Separate method from any trailing part (like parameters[...] )
-            int? firstDotAfterMethod = methodAndRest.indexOf(".");
-            string method = firstDotAfterMethod is int ? methodAndRest.substring(0, firstDotAfterMethod) : methodAndRest;
-            string paramLocation = firstDotAfterMethod is int ? methodAndRest.substring(firstDotAfterMethod + 1) : "";
+    string path = locationWithoutPrefix.substring(0, lastDot);
+    string methodAndRest = locationWithoutPrefix.substring(lastDot + 1);
+    int? firstDotAfterMethod = methodAndRest.indexOf(".");
+    string method = firstDotAfterMethod is int ? methodAndRest.substring(0, firstDotAfterMethod) : methodAndRest;
+    string paramLocation = firstDotAfterMethod is int ? methodAndRest.substring(firstDotAfterMethod + 1) : "";
 
-            // Extract parameter name from parameters[name={paramName}]
-            if paramLocation.startsWith("parameters[name=") && paramLocation.endsWith("]") {
-                string paramName = paramLocation.substring(16, paramLocation.length() - 1); // Remove "parameters[name=" and "]"
+    if !paramLocation.startsWith("parameters[name=") || !paramLocation.endsWith("]") {
+        return error("Could not find parameter at location: " + location);
+    }
 
-                json|error pathItem = paths.get(path);
-                if pathItem is map<json> {
-                    map<json> pathItemMap = <map<json>>pathItem;
+    string inner = paramLocation.substring(16, paramLocation.length() - 1);
+    string paramName = inner;
+    string paramIn = "";
+    int? commaPos = inner.indexOf(",in=");
+    if commaPos is int {
+        paramName = inner.substring(0, commaPos);
+        paramIn = inner.substring(commaPos + 4);
+    }
 
-                    if pathItemMap.hasKey(method) {
-                        json|error operation = pathItemMap.get(method);
-                        if operation is map<json> {
-                            map<json> operationMap = <map<json>>operation;
+    json|error pathItem = paths.get(path);
+    if !(pathItem is map<json>) {
+        return error("Could not find parameter at location: " + location);
+    }
+    map<json> pathItemMap = <map<json>>pathItem;
 
-                            if operationMap.hasKey("parameters") {
-                                json|error parametersResult = operationMap.get("parameters");
-                                if parametersResult is json[] {
-                                    json[] parameters = parametersResult;
+    if !pathItemMap.hasKey(method) {
+        return error("Could not find parameter at location: " + location);
+    }
+    json|error operation = pathItemMap.get(method);
+    if !(operation is map<json>) {
+        return error("Could not find parameter at location: " + location);
+    }
+    map<json> operationMap = <map<json>>operation;
 
-                                    // Find the parameter by name
-                                    foreach int i in 0 ..< parameters.length() {
-                                        json param = parameters[i];
-                                        if param is map<json> {
-                                            map<json> paramMap = <map<json>>param;
-                                            if paramMap.hasKey("name") && paramMap.get("name") == paramName {
-                                                paramMap["description"] = description;
-                                                return ();
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    // Check operation-level parameters first, then fall back to path-level
+    json|error opParams = operationMap.get("parameters");
+    if opParams is json[] && findAndUpdateParam(opParams, paramName, paramIn, description) {
+        return ();
+    }
+
+    json|error pathParams = pathItemMap.get("parameters");
+    if pathParams is json[] && findAndUpdateParam(pathParams, paramName, paramIn, description) {
+        return ();
     }
 
     return error("Could not find parameter at location: " + location);

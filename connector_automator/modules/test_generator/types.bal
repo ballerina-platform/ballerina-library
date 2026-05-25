@@ -8,4 +8,6 @@ public type ConnectorAnalysis record {
     string enumDefinitions = "";
     "resource"|"remote" methodType = "resource";
     string remoteMethodSignatures = "";
+    string clientContent = "";
+    string typesContent = "";
 };

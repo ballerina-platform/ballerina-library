@@ -9,6 +9,7 @@ This document provides comprehensive implementation details for the Connector Au
    - [Main Entry Point](#main-entry-point)
    - [Sanitizor Module](#sanitizor-module)
    - [Client Generator Module](#client-generator-module)
+   - [Client Regenerator Module](#client-regenerator-module)
    - [Example Generator Module](#example-generator-module)
    - [Test Generator Module](#test-generator-module)
    - [Doc Generator Module](#doc-generator-module)
@@ -17,7 +18,8 @@ This document provides comprehensive implementation details for the Connector Au
 3. [AI Integration](#ai-integration)
 4. [Error Handling](#error-handling)
 5. [Configuration Management](#configuration-management)
-6. [Data Types](#data-types)
+6. [CI/CD Integration](#cicd-integration)
+7. [Data Types](#data-types)
 
 ---
 
@@ -114,12 +116,23 @@ The `runFullPipeline` function orchestrates all modules:
 function runFullPipeline(string... args) returns error? {
     // Step 1: Sanitize OpenAPI spec
     // Step 2: Generate Ballerina client
-    // Step 3: Build and validate client
+    // Step 3: Build and validate client (with code fixer)
     // Step 4: Generate examples
     // Step 5: Generate tests
     // Step 6: Generate documentation
 }
 ```
+
+The pipeline accepts the following arguments:
+
+| Position | Argument | Description |
+|----------|----------|-------------|
+| 0 | `specPath` | Path to the OpenAPI specification file |
+| 1 | `outputPath` | Root directory for generated output |
+| 2 | `skipConfirmation` | `"yes"` to skip confirmation prompts |
+| 3+ | flags | Optional flags: `quiet`, `regenerate`, `license=<path>` |
+
+The `regenerate` flag notifies the system that is a regeneration of an existing connector. In this pipeline during sanitization we read the sanitations.md in the connector repository and sanitize acoordingly. If the initial build fails we try to modify the exsiting tests using AI,if still fails we completely remove the tests and start from scratch.In example generation also first we try to recover the old examples, only if that fails we start from the beginning.
 
 The pipeline continues on non-critical failures and reports a comprehensive summary at completion.
 
@@ -144,6 +157,7 @@ The sanitizor module processes OpenAPI specifications to prepare them for Baller
 | `retry_manager.bal` | Exponential backoff implementation |
 | `validation_utils.bal` | Input validation helpers |
 | `llm_service.bal` | LLM service initialization |
+| `sanitations_handler.bal` | Sanitations document generation, merging, and rule application |
 
 #### Processing Pipeline
 
@@ -210,6 +224,54 @@ public type RetryConfig record {
 };
 ```
 
+#### Sanitations Document System
+
+`sanitations_handler.bal` manages a `docs/spec/sanitations.md` file that records all changes applied to the raw OpenAPI spec before Ballerina client generation. This serves as a human-readable audit trail and an executable rules file for connector regeneration.
+
+**Public API**
+
+| Function | Called when | Purpose |
+|----------|-------------|---------|
+| `generateSanitationsDoc(originalSpecPath, alignedSpecPath, outputDir, quietMode)` | After fresh generation | Diffs the original vs aligned spec and writes auto-detected sections to `sanitations.md` |
+| `applySanitations(sanitationsPath, newSpecPath, quietMode)` | Before re-sanitization on regeneration | Reads `sanitations.md`, parses rules, applies them to the newly downloaded spec |
+
+**Auto-detected change categories**
+
+| Category | Detection Method |
+|----------|-----------------|
+| Server URL change | Compares `servers[0].url` between original and aligned spec |
+| Path prefix removal | Compares first path key — if original is longer, the difference is the removed prefix |
+| Format changes | Scans for `date-time` → `datetime` conversion (Ballerina compatibility requirement) |
+| Nullability changes | Compares `nullable` flags on matching fields across schemas |
+| Type changes | Compares `type` values on matching fields across schemas |
+
+**Merge Strategy**
+
+When `sanitations.md` already exists (regeneration run), `mergeWithExistingSanitations` applies this logic:
+1. Splits sections into **human-authored** (no `<!-- auto-generated -->` marker) and **auto-generated** (has the marker)
+2. Discards stale auto-generated sections
+3. Re-runs auto-detection against the new spec pair to produce fresh sections
+4. Filters out fresh sections whose topic is already covered by a human-authored section (using `isSectionAlreadyCovered`)
+5. Reassembles: human sections first, then fresh auto sections; renumbers sequentially
+
+**Rule Parsing**
+
+When `applySanitations` reads the file it uses a two-tier parser:
+
+1. **AI-based parser** (`parseSanitationsWithLLM`): Sends the full markdown to the AI model to extract a structured `SanitationRules` JSON. Handles multi-field entries, typos, and Ballerina-level notes that should be skipped.
+2. **Programmatic fallback** (`parseSanitationsMarkdown`): Regex-based line-by-line parser used when the AI service is unavailable. Routes each numbered section to a specific block parser (`parseServerUrlBlock`, `parsePathPrefixBlock`, `parseFormatBlock`, `parseNullabilityBlock`, `parseTypeChangeBlock`).
+
+**Internal types** (private to `sanitations_handler.bal`)
+
+```ballerina
+type ServerUrlChange   record {| string original; string updated; string reason; |};
+type PathPrefixRule    record {| string prefixRemoved; string reason; |};
+type TypeChange        record {| string schemaName; string fieldName; string originalType; string updatedType; string reason; |};
+type NullabilityChange record {| string schemaName; string fieldName; boolean nullable; string reason; |};
+type FormatChange      record {| string originalFormat; string updatedFormat; string reason; |};
+type SanitationRules   record {| ServerUrlChange[] serverUrlChanges = []; PathPrefixRule[] pathPrefixRules = []; TypeChange[] typeChanges = []; NullabilityChange[] nullabilityChanges = []; FormatChange[] formatChanges = []; string[] rawEntries = []; |};
+```
+
 #### Retry Logic
 
 The retry manager implements exponential backoff with jitter:
@@ -217,19 +279,19 @@ The retry manager implements exponential backoff with jitter:
 ```ballerina
 public function calculateBackoffDelay(int attempt, RetryConfig config) returns decimal {
     decimal delay = config.initialDelaySeconds;
-    
+
     // Exponential backoff
     int i = 0;
     while i < attempt {
         delay = delay * config.backoffMultiplier;
         i += 1;
     }
-    
+
     // Cap at maximum
     if delay > config.maxDelaySeconds {
         delay = config.maxDelaySeconds;
     }
-    
+
     // Add jitter to prevent thundering herd
     if config.jitter {
         decimal jitterRange = delay * 0.25d;
@@ -237,7 +299,7 @@ public function calculateBackoffDelay(int attempt, RetryConfig config) returns d
         decimal randomJitter = (randomValue * jitterRange * 2.0d) - jitterRange;
         delay = delay + randomJitter;
     }
-    
+
     return delay;
 }
 ```
@@ -269,7 +331,7 @@ public type OpenAPIToolOptions record {|
 |};
 
 public type ClientGeneratorConfig record {|
-    boolean autoYes = false;
+    boolean skipConfirmation = false;
     boolean quietMode = false;
     OpenAPIToolOptions? toolOptions = ();
 |};
@@ -295,6 +357,69 @@ bal openapi -i <spec> --mode client -o <output> \
 ├── types.bal       # Type definitions from schemas
 └── utils.bal       # Utility functions
 ```
+
+---
+
+### Client Regenerator Module
+
+**Location**: `modules/client_regenerator/`
+
+Handles post-generation tasks for connector updates: sorting generated Ballerina files for deterministic diffs, analyzing semantic version changes from git diffs using AI, and updating CHANGELOG.md.
+
+#### Files
+
+| File | Purpose |
+|------|---------|
+| `sort_ballerina_client.bal` | Sorts functions within `client.bal` by HTTP method and path |
+| `sort_ballerina_type.bal` | Sorts type and const definitions alphabetically within `types.bal` |
+| `analyze_version_change.bal` | AI-powered semantic version analysis from git diffs |
+| `update_changelog.bal` | Generates and updates `CHANGELOG.md` from analysis results |
+
+#### sort_ballerina_client.bal
+
+Parses and sorts all function definitions in a Ballerina client file. Supports `resource function`, `isolated resource function`, `remote function`, `remote isolated function`, and regular `function` declarations, including multi-line signatures.
+
+**Sort order** (by `methodPriority` map):
+
+| Priority | HTTP Method / Type |
+|----------|--------------------|
+| 1 | `get` |
+| 2 | `post` |
+| 3 | `put` |
+| 4 | `patch` |
+| 5 | `delete` |
+| 6 | `remote` |
+| 7 | other |
+
+Within the same method type, functions are sorted lexicographically by path.
+
+#### sort_ballerina_type.bal
+
+Parses all `public type` and `public const` definitions and sorts them alphabetically (case-insensitive) by name. Handles single-line types, multi-line record types (`record {| ... |};`), and enum types. Uses brace counting to correctly detect multi-line type boundaries.
+
+#### analyze_version_change.bal
+
+Accepts a git diff string, sends it to the AI model, and writes `analysis_result.json` with:
+
+```json
+{
+  "changeType": "MAJOR|MINOR|PATCH",
+  "confidence": "HIGH|MEDIUM|LOW",
+  "summary": "...",
+  "breakingChanges": ["..."],
+  "newFeatures": ["..."],
+  "bugFixes": ["..."]
+}
+```
+
+The analysis follows semantic versioning rules:
+- **MAJOR**: breaking changes (removed functions, changed signatures, removed types)
+- **MINOR**: new functions, new optional parameters, new types
+- **PATCH**: bug fixes, documentation changes, internal refactors
+
+#### update_changelog.bal
+
+Reads the PR description string and prepends a new release entry at the top of `CHANGELOG.md`. Preserves all existing changelog content. If `CHANGELOG.md` does not exist, creates it with the standard Ballerina changelog header.
 
 ---
 
@@ -547,15 +672,59 @@ AI-powered automatic resolution of Ballerina compilation errors.
 4. Group errors by file
 5. For each file with errors:
    a. Read file content
-   b. Generate fix prompt
-   c. Call AI for fix
-   d. If user confirms (or autoYes):
+   b. Extract type context (types.bal + client.bal) for test/mock files
+   c. Load per-file fix history from fileFixHistory map
+   d. Generate fix prompt (with type context + fix history)
+   e. Call AI for fix
+   f. Record this attempt in fileFixHistory[filePath]
+   g. If user confirms (or skipConfirmation):
       - Create backup
       - Apply fix
 6. If no fixes applied → Stop
 7. Repeat from step 1 (max iterations)
 8. Final build check and summary
 ```
+
+**Configurable**: `maxIterations` is read from `Config.toml` (`[connector_automator.code_fixer] maxIterations = 5`).
+
+#### Oscillation Prevention
+
+A key challenge in iterative AI fixing is oscillation — where fixing error A introduces error B and vice versa, causing the fixer to loop indefinitely.
+
+The fixer tracks per-file fix history across iterations in a `map<FixAttempt[]>` keyed by file path. Before each AI call, `buildFixHistoryContext` compiles the history into a structured block that is injected into the prompt:
+
+```
+PREVIOUS FIX ATTEMPTS (DO NOT REPEAT THESE - THEY FAILED):
+Iteration 2:
+  Errors at that time: not a required field 'reportId'
+  What was tried: Line 15: not a required field 'reportId'
+  Result: FAILED (caused new/same errors)
+Iteration 3:
+  Errors at that time: incompatible types: expected 'string?', found 'anydata'
+  What was tried: Line 15: incompatible types
+  Result: FAILED (caused new/same errors)
+```
+
+Three prompt variants are used depending on available context:
+
+| Function | Used when |
+|----------|-----------|
+| `createFixPrompt` | No type context, no history |
+| `createFixPromptWithContext` | Type context available (test/mock files), no history |
+| `createFixPromptWithHistory` | Both type context and fix history available |
+
+`createFixPromptWithHistory` includes a `<CRITICAL_FIX_HISTORY>` section that explicitly instructs the AI not to repeat failed patterns. It also detects the common oscillation pattern between "not a required field" and "incompatible types: anydata" errors and prescribes the combined solution: `<ExpectedType?>response["fieldName"]`.
+
+#### Type Context Extraction
+
+For test and mock server files, the fixer provides additional context to the AI via `getTypeContextForFile`:
+
+1. Reads the full `types.bal` from the project (or `modules/mock.server/types.bal` for mock files)
+2. Reads the full `client.bal` for method signature context
+3. Extracts the specific type definitions referenced in the current error messages (via `extractTypeNamesFromErrors` + `extractTypeDefinition`)
+4. Assembles all three into a `<TYPE_CONTEXT>` block in the prompt
+
+This ensures the AI knows whether a field is a required record field, an optional (`?`) field, or a rest field (not explicitly defined), which is critical for choosing between `.field`, `?.field`, and `["field"]` access patterns.
 
 #### Key Types
 
@@ -581,6 +750,12 @@ public type FixResponse record {|
     boolean success;
     string fixedCode;
     string explanation;
+|};
+
+public type FixAttempt record {|
+    int iteration;
+    string[] errorMessages;
+    string appliedFix;
 |};
 ```
 
@@ -643,7 +818,7 @@ public function isAIServiceInitialized() returns boolean {
 Executes shell commands with output capture:
 
 ```ballerina
-public function executeCommand(string command, string workingDir, boolean quietMode = false) 
+public function executeCommand(string command, string workingDir, boolean quietMode = false)
     returns CommandResult {
     // Creates temp files for stdout/stderr
     // Executes via sh -c
@@ -759,8 +934,8 @@ Interactive operations display user-friendly error messages:
 ```ballerina
 if result is error {
     io:println(string `✗ Operation failed: ${result.message()}`);
-    
-    if !getUserConfirmation("Continue despite failure?", autoYes) {
+
+    if !getUserConfirmation("Continue despite failure?", skipConfirmation) {
         return result;
     }
 }
@@ -989,8 +1164,63 @@ public type FixResponse record {|
     string explanation;
 |};
 
+public type FixAttempt record {|
+    int iteration;
+    string[] errorMessages;
+    string appliedFix;
+|};
+
 public type BallerinaFixerError error;
 ```
+
+---
+
+## CI/CD Integration
+
+The connector automator is designed to run inside a GitHub Actions reusable workflow (`auto_generate_connector_template.yml`). This section describes the workflow inputs, outputs, and partial-failure behavior.
+
+### Workflow Inputs
+
+| Input | Type | Default | Description |
+|-------|------|---------|-------------|
+| `openapi-url` | string | — | URL to download the OpenAPI spec (JSON/YAML) |
+| `ballerina-version` | string | `2201.13.0` | Ballerina version to use |
+| `distribution-zip` | string | `""` | Distribution URL of a custom Ballerina build |
+| `license-file` | string | `license.txt` | Path to license file relative to `docs/` |
+| `quiet-mode` | boolean | `true` | Suppress verbose pipeline output |
+| `regenerate-existing` | boolean | `false` | Regeneration of an existing connector |
+
+### Workflow Outputs
+
+| Output | Description |
+|--------|-------------|
+| `pipeline_succeeded` | `"true"` if the full pipeline completed without errors; `"false"` if the pipeline failed mid-run but partial files were committed |
+
+### Partial Failure Behavior
+
+The pipeline step uses `continue-on-error: true`. If the pipeline exits with a non-zero code (e.g., compilation errors that the code fixer could not resolve), the workflow:
+
+1. Captures the failure via `id: capturePipelineOutcome` and sets `pipeline_succeeded=false`
+2. Runs all remaining steps with `if: always()` — cleanup, commit, and push still execute
+3. Prefixes the commit message with `[DO NOT MERGE]`
+4. Exposes `pipeline_succeeded=false` as a `workflow_call` output
+
+The calling connector repo workflow reads `needs.generate.outputs.pipeline_succeeded` and prefixes the PR title with `[DO NOT MERGE]` when the value is not `"true"`. The `orchestrate-connector-updates.yml` email report marks such PRs with a **Partial** build status and a **DO NOT MERGE** badge in the PR link column.
+
+### Orchestration Workflow
+
+The `orchestrate-connector-updates.yml` workflow receives a `repository_dispatch` event of type `orchestrate-connector-updates` with a `client_payload.connectors` array. Each element must have:
+
+```json
+{
+  "repository": "org/module-ballerinax-foo",
+  "specification": "foo",
+  "version": "v2.1",
+  "openapi_url": "https://example.com/openapi.json"
+}
+```
+
+The orchestration workflow triggers each connector repo, waits up to 40 minutes for PRs to appear, collects PR metadata, and sends a consolidated HTML email report.
 
 ---
 
@@ -1022,3 +1252,4 @@ The package depends on the following Ballerina modules:
 | Version | Changes |
 |---------|---------|
 | 0.1.0 | Initial release with full pipeline support |
+| 0.1.1 | Added `client_regenerator` module: sort functions/types, AI-powered version analysis, changelog updates; `regenerate-existing` pipeline flag; partial-failure `[DO NOT MERGE]` PR support; AI field-access type context in code fixer |

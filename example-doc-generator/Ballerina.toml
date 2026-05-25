@@ -1,0 +1,8 @@
+[package]
+org = "wso2"
+name = "example_doc_generator"
+version = "0.1.0"
+distribution = "2201.13.1"
+
+[build-options]
+observabilityIncluded = true
