@@ -12,28 +12,35 @@ on:
       target_repo:
         description: 'The repository where the selected template will be applied.'
         required: true
+        type: string
       module_name:
         description: 'The module name as defined in the Ballerina.toml file.'
         required: true
+        type: string
       ballerina_version:
         description: 'The Ballerina version that the library should be compatible with.'
         required: true
+        type: string
       module_version:
         description: 'The version number of the library module.'
         required: true
         default: '0.1.0'
+        type: string
       target_branch:
         description: 'The branch in the target repository where changes will be applied.'
         required: false
         default: 'main'
+        type: string
       library_name:
         description: 'A descriptive name for the library, used in the documentation. If not provided, the module name will be used instead.'
         required: false
         default: ''
+        type: string
       code_owners:
         description: 'The CODEOWNERS of the repository'
         required: true
         default: ''
+        type: string
 
 jobs:
   apply_templates:
@@ -67,7 +74,7 @@ jobs:
           version: latest
 
       - name: Apply templates and replace placeholders
-        if: ${{ github.event.inputs.template_type }} == 'Generated Connector Template (Standard)'
+        if: github.event.inputs.template_type == 'Generated Connector Template (Standard)'
         run: |
           cp -r template-repo/library-templates/generated-connector-template/files/. target-repo/
           cd template-repo/library-templates/generated-connector-template/scripts/
