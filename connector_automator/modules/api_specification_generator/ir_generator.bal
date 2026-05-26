@@ -15,6 +15,7 @@
 
 import ballerina/io;
 import ballerina/regex;
+
 import wso2/connector_automator.utils;
 
 # Generate an IntermediateRepresentation by sending the raw metadata JSON
@@ -50,10 +51,12 @@ public function generateIRFromMetadata(string metadataPath, GeneratorConfig conf
     if !isCompleteJson(irJsonStr) {
         // Save the incomplete JSON for debugging
         string debugPath = string `${config.outputDir}/incomplete-ir-response.json`;
+        error? writeErr = io:fileWriteString(debugPath, irJsonStr);
+        string writeNote = writeErr is error ? string ` Failed to save incomplete JSON: ${writeErr.message()}.` : "";
         return error(string `IR JSON is incomplete or truncated (${irJsonStr.length()} chars). ` +
                     string `The LLM response may have exceeded token limits. ` +
                     string `Try increasing maxTokens in GeneratorConfig or reducing the SDK complexity. ` +
-                    string `Incomplete JSON saved to: ${debugPath}`);
+                    string `Incomplete JSON saved to: ${debugPath}.${writeNote}`);
     }
 
     // Parse JSON string to IR – provide a useful snippet on failure
@@ -65,9 +68,11 @@ public function generateIRFromMetadata(string metadataPath, GeneratorConfig conf
         string tail = irJsonStr.substring(tailStart);
         // Save the malformed JSON for debugging
         string debugPath = string `${config.outputDir}/malformed-ir-response.json`;
+        error? writeErr = io:fileWriteString(debugPath, irJsonStr);
+        string writeNote = writeErr is error ? string ` Failed to save malformed JSON: ${writeErr.message()}.` : "";
         return error(string `IR JSON parse failed (total ${irJsonStr.length()} chars). ` +
                     string `HEAD: ${head} ... TAIL: ${tail}. ` +
-                    string `Malformed JSON saved to: ${debugPath}`, irJsonResult);
+                    string `Malformed JSON saved to: ${debugPath}.${writeNote}`, irJsonResult);
     }
     json irJson = irJsonResult;
     IntermediateRepresentation|error irResult = irJson.cloneWithType(IntermediateRepresentation);
@@ -365,7 +370,6 @@ function isCompleteJson(string jsonStr) returns boolean {
     return braceCount == 0 && bracketCount == 0 && !inString;
 }
 
-
 # Derive a SCREAMING_SNAKE_CASE Ballerina enum member name from a raw value string.
 #
 # + rawValue - The cleaned enum value string (with " - default" already stripped)
@@ -537,13 +541,23 @@ function deduplicateEnumMemberNames(IREnum[] enums) returns IREnum[] {
     IREnum[] result = [];
     foreach IREnum e in enums {
         string enumPrefix = deriveMemberName(e.name);
+        map<int> seenInEnum = {};
         IREnumValue[] newValues = [];
         foreach IREnumValue v in e.values {
             int count = memberCount[v.member] ?: 0;
+            string candidate = count > 1 ? enumPrefix + "_" + v.member : v.member;
+            string uniqueMember = candidate;
+            int suffix = seenInEnum[candidate] ?: 0;
+            while seenInEnum.hasKey(uniqueMember) {
+                suffix += 1;
+                uniqueMember = string `${candidate}_${suffix}`;
+            }
+            seenInEnum[candidate] = suffix;
+            seenInEnum[uniqueMember] = 0;
             if count > 1 {
-                newValues.push({member: enumPrefix + "_" + v.member, value: v.value});
+                newValues.push({member: uniqueMember, value: v.value});
             } else {
-                newValues.push(v);
+                newValues.push({member: uniqueMember, value: v.value});
             }
         }
         result.push({name: e.name, kind: "ENUM", nativeType: "string", values: newValues});

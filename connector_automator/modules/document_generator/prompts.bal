@@ -83,7 +83,7 @@ Now, generate a new "Setup guide" section for the ${connectorName} connector spe
     * The developer portal or API documentation homepage.
     * An official guide or help article on how to generate API keys/access tokens.
 
-2.  **Follow the Exact Structure:** Use the ${backtick}## Setup guide${backtick}, ${backtick}### Step 1${backtick}, and ${backtick}### Step 2${backtick} headers precisely as shown in the example.
+2.  **Follow the Exact Structure:** Use the ${backtick}### Step 1${backtick} and ${backtick}### Step 2${backtick} headers precisely as shown in the example.
 
 3.  **Introductory Paragraph:** Write a paragraph explaining the need for an account and API token. It must include a Markdown link to the developer portal and the main sign-up page you found.
 
@@ -315,9 +315,9 @@ ${tripleBacktick}
 
 ---
 
-Generate the complete and final ${backtick}## Quickstart${backtick} section now.
+Generate the complete and final Quickstart section body now.
 
-IMPORTANT: Return only the quickstart body content. Do NOT include the ${backtick}## Quickstart${backtick} heading in your output.
+IMPORTANT: Return only the Quickstart body. Do NOT include the ${backtick}## Quickstart${backtick} heading in your output.
 `;
 }
 
@@ -345,7 +345,7 @@ The ${backtick}Smartsheet${backtick} connector provides practical examples illus
 
 Now, generate a new "Examples" section for the connector specified below. You must follow these rules precisely:
 
-1.  **Replicate the Header and Intro:** Start with the ${backtick}## Examples${backtick} header. Use the exact introductory paragraph from the example, replacing the connector name and the main examples URL with the information provided. The main examples URL is the GitHub Repo URL followed by ${backtick}/tree/main/examples${backtick}.
+1.  **Replicate the Intro:** Use the exact introductory paragraph from the example, replacing the connector name and the main examples URL with the information provided. The main examples URL is the GitHub Repo URL followed by ${backtick}/tree/main/examples${backtick}.
 
 2.  **Create an Ordered List:** For each example directory name provided in the "Connector Information", create one item in an ordered list (1., 2., 3., etc.).
 
@@ -359,7 +359,7 @@ Now, generate a new "Examples" section for the connector specified below. You mu
 ${getConnectorSummary(metadata)}
 Available Examples: ${metadata.examples.toString()}
 
-IMPORTANT: Return only the list/introduction body content. Do NOT include the ${backtick}## Examples${backtick} heading in your output.
+IMPORTANT: Return only the Examples body. Do NOT include the ${backtick}## Examples${backtick} heading in your output.
 `;
 }
 

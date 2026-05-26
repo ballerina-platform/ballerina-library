@@ -5,7 +5,7 @@
 ## Overview
 {{AI_GENERATED_OVERVIEW}}
 
-## Setup
+## Setup guide
 {{AI_GENERATED_SETUP}}
 
 ## Quickstart

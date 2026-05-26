@@ -29,8 +29,8 @@ Both workflows produce production-ready Ballerina connectors with typed clients,
 
 ## Prerequisites
 
-- **Ballerina**: Version 2201.13.0 or later
-- **Java**: JDK 17 or later (required for SDK workflow native compilation)
+- **Ballerina**: Version 2201.13.1 (matches `connector_automator/Ballerina.toml`)
+- **Java**: JDK 17 is required to build native adaptors (`sourceCompatibility`/`targetCompatibility = 17`). JDK 21 may be required for workflows that build or run the declared `platform.java21.dependency`.
 - **Gradle**: For building native Java adaptors (SDK workflow)
 - **Anthropic API Key**: Required for all AI-powered features:
   ```bash
@@ -252,7 +252,7 @@ bal run -- sdk generate-all <output-dir> [options]    # shortcut for generate-al
 
 ### SDK Output Structure
 
-```
+```text
 <output-dir>/
 ├── docs/
 │   └── spec/
@@ -437,7 +437,7 @@ bal run -- openapi generate-docs generate-all ./my-connector yes
 
 ### OpenAPI Output Structure
 
-```
+```text
 <output-dir>/
 ├── README.md
 ├── docs/
@@ -527,7 +527,7 @@ Both `sdk` and `openapi` workflows support these options on all commands:
 ## Troubleshooting
 
 **API Key not configured**
-```
+```text
 ✗ ANTHROPIC_API_KEY not configured
 ```
 Set the `ANTHROPIC_API_KEY` environment variable before running.
@@ -546,7 +546,7 @@ bal run -- openapi fix-code <connector-path>/ballerina
 
 **SDK JAR not found**
 Ensure both files exist before running `analyze` or `pipeline`:
-```
+```text
 test-jars/<dataset-key>.jar
 test-jars/<dataset-key>-javadoc.jar
 ```

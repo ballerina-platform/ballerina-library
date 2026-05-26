@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/regex;
+
 import wso2/connector_automator.utils;
 
 # Calculate LLM-based client score for a class using LLM's own knowledge.
@@ -54,35 +55,47 @@ function callLLMForClientScoring(ClassInfo cls, ClassInfo[] allClasses, string? 
     string responseText = responseResult;
 
     string[] matches = regex:split(responseText, "\\|");
-    if matches.length() > 0 {
-        string scoreStr = matches[0];
-        if scoreStr.includes("SCORE:") {
-            string[] parts = regex:split(scoreStr, ":");
-            if parts.length() > 1 {
-                int|error parsedScore = int:fromString(parts[1].trim());
-                if parsedScore is int {
-                    decimal score = <decimal>parsedScore;
-                    if score > 100.0d {
-                        score = 100.0d;
-                    } else if score < 0.0d {
-                        score = 0.0d;
-                    }
-
-                    string reason = matches.length() > 1 ? matches[1] : "LLM analysis";
-
-                    return {
-                        publicApiScore: score * 0.3d,
-                        operationCoverage: score * 0.25d,
-                        hasRequestResponseTypes: score * 0.20d,
-                        stabilityScore: score * 0.15d,
-                        exampleUsageScore: score * 0.10d,
-                        totalScore: score,
-                        breakdown: string `LLM Analysis:\n${reason}`
-                    };
+    int? scoreStart = responseText.indexOf("SCORE:");
+    if scoreStart is int {
+        string scoreRemainder = responseText.substring(scoreStart + 6).trim();
+        string scoreStr = readLeadingDigits(scoreRemainder);
+        if scoreStr.length() > 0 {
+            int|error parsedScore = int:fromString(scoreStr);
+            if parsedScore is int {
+                decimal score = <decimal>parsedScore;
+                if score > 100.0d {
+                    score = 100.0d;
+                } else if score < 0.0d {
+                    score = 0.0d;
                 }
+
+                string reason = matches.length() > 1 ? matches[1] : "LLM analysis";
+
+                return {
+                    publicApiScore: score * 0.3d,
+                    operationCoverage: score * 0.25d,
+                    hasRequestResponseTypes: score * 0.20d,
+                    stabilityScore: score * 0.15d,
+                    exampleUsageScore: score * 0.10d,
+                    totalScore: score,
+                    breakdown: string `LLM Analysis:\n${reason}`
+                };
             }
         }
     }
 
     return error("Failed to parse LLM response for client scoring");
+}
+
+function readLeadingDigits(string text) returns string {
+    string digits = "";
+    foreach int i in 0 ..< text.length() {
+        string ch = text.substring(i, i + 1);
+        if ch >= "0" && ch <= "9" {
+            digits += ch;
+        } else {
+            break;
+        }
+    }
+    return digits;
 }

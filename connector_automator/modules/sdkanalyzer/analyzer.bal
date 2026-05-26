@@ -18,6 +18,7 @@ import ballerina/file;
 import ballerina/io;
 import ballerina/regex;
 import ballerina/time;
+
 import wso2/connector_automator.utils;
 
 # Main function that analyzes a Java SDK JAR file using JavaParser approach.
@@ -101,13 +102,16 @@ public function analyzeJavaSDK(string jarPath, string outputDir, AnalyzerConfig 
     printAnalyzerStep(2, "Identifying root client", config.quietMode);
 
     // Increase candidate shortlist to give the LLM more options for side-by-side comparison
-        [ClassInfo, LLMClientScore][]|AnalyzerError clientResult = identifyClientClassWithLLM(filteredClasses, 20);
+    [ClassInfo, LLMClientScore][]|AnalyzerError clientResult = identifyClientClassWithLLM(filteredClasses, 20);
     if clientResult is AnalyzerError {
         return clientResult;
     }
 
     // Get top 5 candidates with scores
     [ClassInfo, LLMClientScore][] topCandidates = clientResult;
+    if topCandidates.length() == 0 {
+        return error AnalyzerError("No root client candidates returned by LLM");
+    }
 
     ClassInfo rootClient = selectRootClientCandidate(topCandidates);
 
@@ -174,8 +178,14 @@ public function analyzeJavaSDK(string jarPath, string outputDir, AnalyzerConfig 
     }
 
     // Clean up intermediate class listing files
-    do { check file:remove(string `${outputDir}/classes.txt`); } on fail { }
-    do { check file:remove(string `${outputDir}/filtered-classes.txt`); } on fail { }
+    do {
+        check file:remove(string `${outputDir}/classes.txt`);
+    } on fail {
+    }
+    do {
+        check file:remove(string `${outputDir}/filtered-classes.txt`);
+    } on fail {
+    }
 
     // Calculate final duration
     time:Utc finalEndTime = time:utcNow();
@@ -188,7 +198,7 @@ public function analyzeJavaSDK(string jarPath, string outputDir, AnalyzerConfig 
     return {
         success: true,
         metadataPath: metadataPath,
-        classesAnalyzed: 1,
+        classesAnalyzed: rawClasses.length(),
         methodsExtracted: selectedMethods.length(),
         durationMs: durationMs,
         warnings: warnings
@@ -449,7 +459,7 @@ function extractDatasetKeyFromJarPath(string jarPath) returns string {
 public function analyzeJarWithJavaParserWrapper(string jarPath, AnalyzerConfig config) returns ClassInfo[]|AnalyzerError {
     ClassInfo[]|error res = parseJarFromReference(jarPath, config);
     if res is error {
-        return <AnalyzerError>res;
+        return error AnalyzerError(res.message(), res);
     }
     return res;
 }
@@ -463,7 +473,7 @@ public function analyzeJarWithJavaParserWrapper(string jarPath, AnalyzerConfig c
 public function analyzeJarWithDependencies(string jarPath, AnalyzerConfig config) returns ParsedJarResult|AnalyzerError {
     ParsedJarResult|error res = parseJarWithDependencies(jarPath, config);
     if res is error {
-        return <AnalyzerError>res;
+        return error AnalyzerError(res.message(), res);
     }
     return res;
 }

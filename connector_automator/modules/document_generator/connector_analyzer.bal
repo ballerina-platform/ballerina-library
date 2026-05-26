@@ -100,12 +100,22 @@ function analyzeExamples(string connectorPath, ConnectorMetadata metadata) retur
         foreach file:MetaData example in examples {
             if example.dir {
                 string exampleName = example.absPath.substring(examplesPath.length());
-                if !exampleName.startsWith("/.") && !exampleName.startsWith(".") {
-                    metadata.examples.push(exampleName);
+                string normalizedExampleName = trimLeadingPathSeparators(exampleName);
+                if !normalizedExampleName.startsWith(".") && !normalizedExampleName.startsWith("./") &&
+                        !normalizedExampleName.startsWith(".\\") {
+                    metadata.examples.push(normalizedExampleName);
                 }
             }
         }
     }
+}
+
+function trimLeadingPathSeparators(string path) returns string {
+    string normalized = path;
+    while normalized.startsWith("/") || normalized.startsWith("\\") {
+        normalized = normalized.substring(1);
+    }
+    return normalized;
 }
 
 public function getConnectorSummary(ConnectorMetadata metadata) returns string {

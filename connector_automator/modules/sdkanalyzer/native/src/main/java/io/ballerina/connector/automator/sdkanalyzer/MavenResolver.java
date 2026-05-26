@@ -20,6 +20,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
@@ -37,7 +38,9 @@ import java.util.jar.JarFile;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.XMLConstants;
 
+import org.xml.sax.InputSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -174,12 +177,15 @@ public class MavenResolver {
             String groupId = parts[0];
             String artifactId = parts[1];
             String version = parts[2];
+            int maxDepth = getIntOption(options, "maxDepth", 4);
+            boolean offlineMode = getBooleanOption(options, "offlineMode", false);
+            boolean resolveDependencies = getBooleanOption(options, "resolveDependencies", true);
 
             Path cacheDir = Files.createTempDirectory("maven-cache-");
 
             List<String> allJars = downloadArtifactWithDependencies(
                 groupId, artifactId, version, DEFAULT_MAVEN_CENTRAL, cacheDir,
-                new HashSet<>(), 0);
+                new HashSet<>(), 0, maxDepth, offlineMode, resolveDependencies);
 
             if (allJars.isEmpty()) {
                 return ErrorCreator.createError(StringUtils.fromString(
@@ -209,15 +215,23 @@ public class MavenResolver {
     private static List<String> downloadArtifactWithDependencies(
             String groupId, String artifactId, String version, 
             String baseUrl, Path cacheDir, Set<String> visited, int depth) throws Exception {
+        return downloadArtifactWithDependencies(groupId, artifactId, version, baseUrl, cacheDir, visited, depth,
+                4, false, true);
+    }
+
+    private static List<String> downloadArtifactWithDependencies(
+            String groupId, String artifactId, String version,
+            String baseUrl, Path cacheDir, Set<String> visited, int depth, int maxDepth,
+            boolean offlineMode, boolean resolveDependencies) throws Exception {
         
         List<String> jars = new ArrayList<>();
         String key = groupId + ":" + artifactId + ":" + version;
         
-        // Avoid cycles and limit depth (>4 = depth 5+ is cut off)
+        // Avoid cycles and limit depth.
         if (visited.contains(key)) {
             return jars;
         }
-        if (depth > 4) {
+        if (depth > maxDepth) {
             return jars;
         }
         visited.add(key);
@@ -228,9 +242,16 @@ public class MavenResolver {
         String jarUrl = String.format("%s/%s/%s/%s/%s",
                 baseUrl, groupPath, artifactId, version, jarFileName);
         
-        Path jarPath = cacheDir.resolve(jarFileName);
+        Path artifactDir = cacheDir.resolve(groupPath).resolve(artifactId).resolve(version);
+        Files.createDirectories(artifactDir);
+        Path jarPath = artifactDir.resolve(jarFileName);
         try {
-            downloadFile(jarUrl, jarPath.toFile());
+            if (!Files.exists(jarPath)) {
+                if (offlineMode) {
+                    return jars;
+                }
+                downloadFile(jarUrl, jarPath.toFile());
+            }
             jars.add(jarPath.toString());
         } catch (Exception e) {
             if (depth == 0) {
@@ -238,7 +259,7 @@ public class MavenResolver {
             }
         }
         
-        if (depth < 5) {
+        if (resolveDependencies && depth < maxDepth) {
             List<Dependency> dependencies = new ArrayList<>();
 
             try {
@@ -246,8 +267,13 @@ public class MavenResolver {
                 String pomUrl = String.format("%s/%s/%s/%s/%s",
                         baseUrl, groupPath, artifactId, version, pomFileName);
 
-                Path pomPath = cacheDir.resolve(pomFileName);
-                downloadFile(pomUrl, pomPath.toFile());
+                Path pomPath = artifactDir.resolve(pomFileName);
+                if (!Files.exists(pomPath)) {
+                    if (offlineMode) {
+                        return jars;
+                    }
+                    downloadFile(pomUrl, pomPath.toFile());
+                }
 
                 List<Dependency> parsedDeps = parsePomFileDeps(pomPath.toFile());
                 for (Dependency dep : parsedDeps) {
@@ -273,7 +299,7 @@ public class MavenResolver {
                     if (!dep.optional && dep.version != null && !dep.version.startsWith("$")) {
                         List<String> depJars = downloadArtifactWithDependencies(
                                 dep.groupId, dep.artifactId, dep.version,
-                                baseUrl, cacheDir, visited, depth + 1);
+                                baseUrl, cacheDir, visited, depth + 1, maxDepth, offlineMode, resolveDependencies);
                         jars.addAll(depJars);
                     }
                 }
@@ -301,7 +327,9 @@ public class MavenResolver {
         List<Dependency> dependencies = new ArrayList<>();
         
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        hardenDocumentBuilderFactory(factory);
         DocumentBuilder builder = factory.newDocumentBuilder();
+        builder.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader("")));
         Document doc = builder.parse(pomFile);
         doc.getDocumentElement().normalize();
         
@@ -508,7 +536,9 @@ public class MavenResolver {
         List<BMap<BString, Object>> dependencies = new ArrayList<>();
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        hardenDocumentBuilderFactory(factory);
         DocumentBuilder builder = factory.newDocumentBuilder();
+        builder.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader("")));
         Document doc = builder.parse(pomFile);
         doc.getDocumentElement().normalize();
 
@@ -659,5 +689,39 @@ public class MavenResolver {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private static int getIntOption(BMap<BString, Object> options, String key, int defaultValue) {
+        Object value = options == null ? null : options.get(StringUtils.fromString(key));
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        if (value != null) {
+            try {
+                return Integer.parseInt(value.toString());
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return defaultValue;
+    }
+
+    private static boolean getBooleanOption(BMap<BString, Object> options, String key, boolean defaultValue) {
+        Object value = options == null ? null : options.get(StringUtils.fromString(key));
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        }
+        if (value != null) {
+            return Boolean.parseBoolean(value.toString());
+        }
+        return defaultValue;
+    }
+
+    private static void hardenDocumentBuilderFactory(DocumentBuilderFactory factory) throws Exception {
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        factory.setXIncludeAware(false);
+        factory.setExpandEntityReferences(false);
     }
 }

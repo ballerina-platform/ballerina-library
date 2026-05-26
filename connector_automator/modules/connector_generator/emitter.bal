@@ -78,7 +78,11 @@ function resolveNativeJavaFilePath(string nativeRootDir, string nativeRelativePa
     if srcExists {
         string leafDir = check findLeafDirectory(srcMainJava);
         string javaFileName = extractJavaFileName(nativeRelativePath);
-        return string `${leafDir}/${javaFileName}`;
+        string packageSubpath = extractPackageSubpath(nativeRelativePath, javaFileName);
+        string nativePath = packageSubpath.length() == 0 ? string `${leafDir}/${javaFileName}` :
+            string `${leafDir}/${packageSubpath}/${javaFileName}`;
+        check ensureDir(parentDir(nativePath));
+        return nativePath;
     }
     string fallback = toNativeSourcePath(nativeRootDir, nativeRelativePath);
     check ensureDir(parentDir(fallback));
@@ -109,6 +113,49 @@ function extractJavaFileName(string nativeRelativePath) returns string {
         return baseName;
     }
     return string `${baseName}.java`;
+}
+
+function extractPackageSubpath(string nativeRelativePath, string javaFileName) returns string {
+    string trimmed = nativeRelativePath.trim();
+    if trimmed.startsWith("src/main/java/") {
+        trimmed = trimmed.substring("src/main/java/".length());
+    }
+    if trimmed.endsWith(".java") {
+        int? slashIdx = trimmed.lastIndexOf("/");
+        if slashIdx is int {
+            return normalizePathSeparators(trimmed.substring(0, slashIdx));
+        }
+        int? dotIdx = trimmed.lastIndexOf(".");
+        if dotIdx is int && dotIdx > 0 {
+            return normalizePathSeparators(replaceAllLiteral(trimmed.substring(0, dotIdx), ".", "/"));
+        }
+        return "";
+    }
+    if trimmed.endsWith(javaFileName.substring(0, javaFileName.length() - 5)) {
+        int? slashIdx = trimmed.lastIndexOf("/");
+        if slashIdx is int {
+            return normalizePathSeparators(trimmed.substring(0, slashIdx));
+        }
+        int? dotIdx = trimmed.lastIndexOf(".");
+        if dotIdx is int && dotIdx > 0 {
+            return normalizePathSeparators(replaceAllLiteral(trimmed.substring(0, dotIdx), ".", "/"));
+        }
+    }
+    return "";
+}
+
+function normalizePathSeparators(string path) returns string {
+    string normalized = replaceAllLiteral(path, "\\", "/");
+    while normalized.includes("//") {
+        normalized = replaceAllLiteral(normalized, "//", "/");
+    }
+    while normalized.startsWith("/") {
+        normalized = normalized.substring(1);
+    }
+    while normalized.endsWith("/") {
+        normalized = normalized.substring(0, normalized.length() - 1);
+    }
+    return normalized;
 }
 
 function toNativeSourcePath(string nativeRootDir, string nativeRelativePath) returns string {

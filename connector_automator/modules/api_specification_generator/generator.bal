@@ -15,6 +15,7 @@
 
 import ballerina/io;
 import ballerina/time;
+
 import wso2/connector_automator.utils;
 
 # Generate a Ballerina API Specification from raw sdk_analyzer metadata.
@@ -66,7 +67,11 @@ public function generateSpecification(GeneratorConfig config) returns GeneratorR
             if !config.quietMode {
                 io:println(string `  → IR saved to ${irWriteResult}`);
             }
+        } else if !config.quietMode {
+            io:println(string `  ⚠ Failed to save IR JSON: ${irWriteResult.message()}`);
         }
+    } else if !config.quietMode {
+        io:println(string `  ⚠ Failed to serialize IR JSON: ${irJson.message()}`);
     }
 
     // Step 4: Build Ballerina specification from IR (manual code generation)

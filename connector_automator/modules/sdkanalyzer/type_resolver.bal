@@ -14,6 +14,7 @@
 // under the License.
 
 import ballerina/regex;
+
 import wso2/connector_automator.utils;
 
 # Resolve an underlying Request/Response ClassInfo from a parameter
@@ -450,12 +451,22 @@ function sanitizeGenericTypeArg(string rawArg) returns string {
 public function isCollectionType(string typeName) returns boolean {
     string simple = extractSimpleTypeName(typeName).toLowerAscii();
     string[] collectionTypes = [
-        "list", "set", "collection", "map",
-        "arraylist", "hashset", "hashmap",
-        "linkedlist", "treeset", "treemap",
-        "linkedhashset", "linkedhashmap",
-        "sortedset", "sortedmap",
-        "concurrenthashmap", "copyonwritearraylist"
+        "list",
+        "set",
+        "collection",
+        "map",
+        "arraylist",
+        "hashset",
+        "hashmap",
+        "linkedlist",
+        "treeset",
+        "treemap",
+        "linkedhashset",
+        "linkedhashmap",
+        "sortedset",
+        "sortedmap",
+        "concurrenthashmap",
+        "copyonwritearraylist"
     ];
     foreach string ct in collectionTypes {
         if simple == ct {
@@ -522,10 +533,13 @@ public function extractEnhancedParameters(ParameterInfo[] parameters, ClassInfo[
 # + typeName - Type name to check
 # + return - True if simple type
 public function isSimpleType(string typeName) returns boolean {
-    return typeName == "int" || typeName == "long" || typeName == "boolean" ||
-            typeName == "String" || typeName == "double" || typeName == "float" ||
-            typeName == "byte" || typeName == "char" || typeName == "short" ||
-            typeName == "java.lang.String" || typeName == "java.lang.Object";
+    string simpleName = extractSimpleTypeName(typeName);
+    return simpleName == "int" || simpleName == "long" || simpleName == "boolean" ||
+            simpleName == "String" || simpleName == "double" || simpleName == "float" ||
+            simpleName == "byte" || simpleName == "char" || simpleName == "short" ||
+            simpleName == "Object" || simpleName == "Integer" || simpleName == "Long" ||
+            simpleName == "Boolean" || simpleName == "Double" || simpleName == "Float" ||
+            simpleName == "Byte" || simpleName == "Character" || simpleName == "Short";
 }
 
 # Extract enum metadata from an enum class

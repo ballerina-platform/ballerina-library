@@ -1,8 +1,8 @@
-import wso2/connector_automator.utils;
-
 import ballerina/file;
 import ballerina/io;
 import ballerina/lang.regexp;
+
+import wso2/connector_automator.utils;
 
 const string TEMPLATES_PATH = "./modules/document_generator/templates";
 
@@ -394,8 +394,11 @@ function normalizeGeneratedMarkdown(string content) returns string {
 
     string output = string:'join("\n", ...cleaned);
 
-    output = simpleReplace(output, "\n\n\n", "\n\n");
-    output = simpleReplace(output, "\n\n\n", "\n\n");
+    string previous = "";
+    while previous != output {
+        previous = output;
+        output = simpleReplace(output, "\n\n\n", "\n\n");
+    }
 
     return output.trim() + "\n";
 }

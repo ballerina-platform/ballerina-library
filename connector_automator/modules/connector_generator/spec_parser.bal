@@ -18,18 +18,54 @@ public function parseApiSpec(string apiSpecPath) returns ParsedApiSpec|error {
     SpecMethodSignature[] methods = [];
     string configTypeName = "ConnectionConfig";
     string[] lines = regex:split(clientBlock, "\n");
+    string pendingRemote = "";
+    string pendingInit = "";
     foreach string rawLine in lines {
         string line = rawLine.trim();
-        if line.startsWith("remote isolated function ") {
-            SpecMethodSignature|error parsed = parseMethodSignature(line);
-            if parsed is SpecMethodSignature {
+        if pendingRemote.length() > 0 {
+            pendingRemote = pendingRemote + " " + line;
+            if isCompleteSignature(pendingRemote) {
+                SpecMethodSignature parsed = check parseMethodSignature(pendingRemote);
                 methods.push(parsed);
+                pendingRemote = "";
+            }
+            continue;
+        }
+        if line.startsWith("remote isolated function ") {
+            if isCompleteSignature(line) {
+                SpecMethodSignature parsed = check parseMethodSignature(line);
+                methods.push(parsed);
+            } else {
+                pendingRemote = line;
+            }
+        } else if pendingInit.length() > 0 {
+            pendingInit = pendingInit + " " + line;
+            if isBalancedParentheses(pendingInit) {
+                string extracted = extractInitConfigType(pendingInit);
+                if extracted.length() > 0 {
+                    configTypeName = extracted;
+                }
+                pendingInit = "";
             }
         } else if line.includes("function init(") {
-            string extracted = extractInitConfigType(line);
-            if extracted.length() > 0 {
-                configTypeName = extracted;
+            if isBalancedParentheses(line) {
+                string extracted = extractInitConfigType(line);
+                if extracted.length() > 0 {
+                    configTypeName = extracted;
+                }
+            } else {
+                pendingInit = line;
             }
+        }
+    }
+    if pendingRemote.length() > 0 {
+        SpecMethodSignature parsed = check parseMethodSignature(pendingRemote);
+        methods.push(parsed);
+    }
+    if pendingInit.length() > 0 {
+        string extracted = extractInitConfigType(pendingInit);
+        if extracted.length() > 0 {
+            configTypeName = extracted;
         }
     }
 
@@ -84,6 +120,9 @@ function parseMethodSignature(string line) returns SpecMethodSignature|error {
     if returnType.endsWith("{") {
         returnType = returnType.substring(0, returnType.length() - 1).trim();
     }
+    if returnType.endsWith(";") {
+        returnType = returnType.substring(0, returnType.length() - 1).trim();
+    }
 
     SpecMethodParameter[] params = [];
     if paramsSegment.length() > 0 {
@@ -101,6 +140,27 @@ function parseMethodSignature(string line) returns SpecMethodSignature|error {
         parameters: params,
         returnType: returnType
     };
+}
+
+function isCompleteSignature(string line) returns boolean {
+    string trimmed = line.trim();
+    return isBalancedParentheses(trimmed) && (trimmed.endsWith(";") || trimmed.endsWith("{"));
+}
+
+function isBalancedParentheses(string line) returns boolean {
+    int depth = 0;
+    foreach int i in 0 ..< line.length() {
+        string ch = line.substring(i, i + 1);
+        if ch == "(" {
+            depth += 1;
+        } else if ch == ")" {
+            depth -= 1;
+            if depth < 0 {
+                return false;
+            }
+        }
+    }
+    return depth == 0;
 }
 
 function splitSignatureParameters(string paramsSegment) returns string[] {

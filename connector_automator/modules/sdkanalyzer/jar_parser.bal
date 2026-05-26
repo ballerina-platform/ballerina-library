@@ -495,7 +495,9 @@ function convertParameters(json[]? params) returns ParameterInfo[] {
                     RequestFieldInfo rfi = {
                         name: rfMap.hasKey("name") ? rfMap["name"].toString() : "",
                         typeName: rfMap.hasKey("type") ? rfMap["type"].toString() : (rfMap.hasKey("typeName") ? rfMap["typeName"].toString() : ""),
-                        fullType: rfMap.hasKey("fullType") ? rfMap["fullType"].toString() : (rfMap.hasKey("fullType") ? rfMap["fullType"].toString() : ""),
+                        fullType: rfMap.hasKey("fullType") ? rfMap["fullType"].toString() :
+                            (rfMap.hasKey("type") ? rfMap["type"].toString() :
+                                (rfMap.hasKey("typeName") ? rfMap["typeName"].toString() : "")),
                         isRequired: rfMap.hasKey("isRequired") ? <boolean>rfMap["isRequired"] : false
                     };
                     if rfMap.hasKey("enumReference") {
@@ -803,7 +805,7 @@ function getJarFilename(string filePath) returns string {
 # Infer a Maven coordinate from a JAR filename using the convention `<artifact>-<version>.jar`.
 #
 # + jarPath - Path to (or filename of) the JAR file
-# + return - Maven coordinate string "artifact:version", or () if not parseable
+# + return - Maven coordinate string "groupId:artifactId:version", or () if not parseable
 function inferMavenCoordinateFromJarPath(string jarPath) returns string? {
     string filename = getJarFilename(jarPath);
     if !filename.endsWith(".jar") {
@@ -840,7 +842,7 @@ function inferMavenCoordinateFromJarPath(string jarPath) returns string? {
     if artifact.length() == 0 || version.length() == 0 {
         return ();
     }
-    return string `${artifact}:${version}`;
+    return string `local:${artifact}:${version}`;
 }
 
 # Attempt to resolve the transitive dependency JAR paths for the given Maven coordinate.

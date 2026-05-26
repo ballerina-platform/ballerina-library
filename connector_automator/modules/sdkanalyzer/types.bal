@@ -36,7 +36,7 @@ public type JavadocMethod record {|
     map<string> paramDocs;
     # Return value description
     string returnDoc;
-    # Map of exeception type to description
+    # Map of exception type to description
     map<string> throwsDocs;
 |};
 

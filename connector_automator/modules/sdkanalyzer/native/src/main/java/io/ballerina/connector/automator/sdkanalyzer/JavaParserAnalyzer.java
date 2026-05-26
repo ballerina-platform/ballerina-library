@@ -158,6 +158,7 @@ public class JavaParserAnalyzer {
 
             String explicitSourcesPath = null;
             String explicitJavadocPath = null;
+            javadocIndex = null;
             if (jarPathOrResult instanceof BMap) {
                 BMap<BString, Object> mavenResult = (BMap<BString, Object>) jarPathOrResult;
                 Object sourcesObj = mavenResult.get(StringUtils.fromString("sourcesPath"));
@@ -929,7 +930,10 @@ public class JavaParserAnalyzer {
             BMap<BString, Object> fieldInfo = ValueCreator.createMapValue(mapType);
             
             fieldInfo.put(StringUtils.fromString("name"), StringUtils.fromString(variable.getNameAsString()));
-            fieldInfo.put(StringUtils.fromString("type"), StringUtils.fromString(variable.getTypeAsString()));
+            String typeName = variable.getTypeAsString();
+            fieldInfo.put(StringUtils.fromString("type"), StringUtils.fromString(typeName));
+            fieldInfo.put(StringUtils.fromString("typeName"), StringUtils.fromString(typeName));
+            fieldInfo.put(StringUtils.fromString("fullType"), StringUtils.fromString(typeName));
             fieldInfo.put(StringUtils.fromString("isStatic"), field.isStatic());
             fieldInfo.put(StringUtils.fromString("isFinal"), field.isFinal());
             fieldInfo.put(StringUtils.fromString("isDeprecated"), field.isAnnotationPresent("Deprecated"));
@@ -1225,7 +1229,7 @@ public class JavaParserAnalyzer {
                 extractAsConstantHolder = descriptor.equals(selfDesc);
             }
 
-            boolean extractAsInstanceField = !isStatic && !isEnumCst && !extractAsEnum && !extractAsConstantHolder;
+            boolean extractAsInstanceField = isPublic && !isStatic && !isEnumCst && !extractAsEnum && !extractAsConstantHolder;
             if (extractAsInstanceField) {
                 String fieldTypeName = descriptorToClassName(descriptor);
                 BMap<BString, Object> fieldInfo = ValueCreator.createMapValue(mapType);

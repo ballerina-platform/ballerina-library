@@ -1,10 +1,10 @@
-import wso2/connector_automator.code_fixer;
-
 import ballerina/file;
 import ballerina/io;
 import ballerina/lang.'string as strings;
 import ballerina/lang.regexp;
 import ballerina/os;
+
+import wso2/connector_automator.code_fixer;
 
 // Helper function to check if array contains a value
 function arrayContains(string[] arr, string value) returns boolean {
@@ -160,7 +160,7 @@ public function numberOfExamples(int apiCount) returns int {
 }
 
 public function writeExampleToFile(string connectorPath, string exampleName, string useCase, string exampleCode,
-    string connectorOrg, string connectorName, string connectorVersion, string connectorDistribution) returns error? {
+        string connectorOrg, string connectorName, string connectorVersion, string connectorDistribution) returns error? {
     // Create examples directory if it doesn't exist
     string examplesDir = connectorPath + "/examples";
     check file:createDir(examplesDir, file:RECURSIVE);
@@ -178,7 +178,7 @@ public function writeExampleToFile(string connectorPath, string exampleName, str
     // Write Ballerina.toml file
     string ballerinaTomlPath = exampleDir + "/Ballerina.toml";
     string ballerinaTomlContent = generateBallerinaToml(exampleName, connectorOrg, connectorName,
-        connectorVersion, connectorDistribution);
+            connectorVersion, connectorDistribution);
     check io:fileWriteString(ballerinaTomlPath, ballerinaTomlContent);
 }
 
@@ -463,7 +463,7 @@ function extractFunctionDocumentation(string content, int functionStartIndex) re
                 }
             }
 
-            if docLines.length() > 0 && docLines.length() <= 5 { 
+            if docLines.length() > 0 && docLines.length() <= 5 {
                 docComment = string:'join("\n", ...docLines);
             }
         }
@@ -526,7 +526,7 @@ function extractCompactTypeDefinition(string typesContent, string typeName) retu
         typeDef = extractBlock(typesContent, "public type " + typeName + " ", ";", ";");
     }
 
-    if typeDef != "" && typeDef.length() > 1000 { 
+    if typeDef != "" && typeDef.length() > 1000 {
         // If type is too large, create a simplified version
         string[] lines = regexp:split(re `\n`, typeDef);
         if lines.length() > 15 {
@@ -628,12 +628,7 @@ function ensureConnectorReadme(string ballerinaDir) returns error? {
 }
 
 function runShellInDir(string workingDir, string shellCommand) returns int|error {
-    string redirectedCommand = string `cd "${workingDir}" && ${shellCommand}`;
-
-    os:Command cmd = {
-        value: "sh",
-        arguments: ["-c", redirectedCommand]
-    };
+    os:Command cmd = check buildCommandInDir(workingDir, shellCommand);
 
     os:Process|error process = os:exec(cmd);
     if process is error {
@@ -652,7 +647,7 @@ function prepareNativeInteropForPack(string connectorPath, string ballerinaDir) 
     boolean|error hasBuildGradle = file:test(connectorPath + "/build.gradle", file:EXISTS);
     boolean|error hasNativeBuildGradle = file:test(connectorPath + "/native/build.gradle", file:EXISTS);
     boolean nativeRequired = (hasBuildGradle is boolean && hasBuildGradle) ||
-                             (hasNativeBuildGradle is boolean && hasNativeBuildGradle);
+                            (hasNativeBuildGradle is boolean && hasNativeBuildGradle);
     if !nativeRequired {
         return;
     }
@@ -662,7 +657,7 @@ function prepareNativeInteropForPack(string connectorPath, string ballerinaDir) 
     boolean|error hasNativeSrc = file:test(connectorPath + "/native/src", file:EXISTS);
     boolean|error hasTopLevelSrc = file:test(connectorPath + "/src/main/java", file:EXISTS);
     boolean javaSourceExists = (hasNativeSrc is boolean && hasNativeSrc) ||
-                               (hasTopLevelSrc is boolean && hasTopLevelSrc);
+                                (hasTopLevelSrc is boolean && hasTopLevelSrc);
     if !javaSourceExists {
         return;
     }
@@ -779,13 +774,13 @@ function ensureClientInteropClassBinding(string connectorPath, string ballerinaD
     }
 
     string updatedClient = regexp:replaceAll(re `'class:\s*"[^"]+"`, clientContent,
-        string `'class: "${<string>nativeClassFqcn}"`);
+            string `'class: "${<string>nativeClassFqcn}"`);
     check io:fileWriteString(clientPath, updatedClient);
 }
 
 function detectNativeAdaptorClassFromJar(string connectorPath) returns string? {
     record {|int exitCode; string stdout; string stderr;|}|error jarResult = executeShellInDir(connectorPath,
-        "jar tf build/libs/generated-native-adaptor.jar | grep -E 'Adaptor\\.class$' | head -n 1");
+            "jar tf build/libs/generated-native-adaptor.jar | grep -E 'Adaptor\\.class$' | head -n 1");
     if jarResult is error || jarResult.exitCode != 0 {
         return;
     }
@@ -801,7 +796,7 @@ function detectNativeAdaptorClassFromJar(string connectorPath) returns string? {
 
 function detectNativeAdaptorClass(string connectorPath) returns string? {
     record {|int exitCode; string stdout; string stderr;|}|error findResult = executeShellInDir(connectorPath,
-        "find src/main/java -type f -name '*Adaptor.java' | head -n 1");
+            "find src/main/java -type f -name '*Adaptor.java' | head -n 1");
     if findResult is error || findResult.exitCode != 0 {
         return;
     }
@@ -852,46 +847,65 @@ function detectNativeAdaptorClass(string connectorPath) returns string? {
 }
 
 function executeShellInDir(string workingDir, string shellCommand) returns record {|int exitCode; string stdout; string stderr;|}|error {
-    string stdoutFile = ".example_generator.stdout.log";
-    string stderrFile = ".example_generator.stderr.log";
-    string stdoutPath = workingDir + "/" + stdoutFile;
-    string stderrPath = workingDir + "/" + stderrFile;
-    string command = string `cd "${workingDir}" && ${shellCommand} > "${stdoutFile}" 2> "${stderrFile}"`;
-
-    os:Process process = check os:exec({
-        value: "bash",
-        arguments: ["-c", command]
-    });
+    os:Process process = check os:exec(check buildCommandInDir(workingDir, shellCommand));
+    byte[] stdoutBytes = check process.output();
     int exitCode = check process.waitForExit();
 
-    string stdout = "";
-    string|io:Error stdoutRead = io:fileReadString(stdoutPath);
-    if stdoutRead is string {
-        stdout = stdoutRead;
-    }
-
-    string stderr = "";
-    string|io:Error stderrRead = io:fileReadString(stderrPath);
-    if stderrRead is string {
-        stderr = stderrRead;
-    }
-
-    boolean|error stdoutExists = file:test(stdoutPath, file:EXISTS);
-    if stdoutExists is boolean && stdoutExists {
-        if file:remove(stdoutPath) is error {
-        }
-    }
-    boolean|error stderrExists = file:test(stderrPath, file:EXISTS);
-    if stderrExists is boolean && stderrExists {
-        if file:remove(stderrPath) is error {
-        }
-    }
+    string stdout = check string:fromBytes(stdoutBytes);
 
     return {
         exitCode: exitCode,
         stdout: stdout,
-        stderr: stderr
+        stderr: ""
     };
+}
+
+function buildCommandInDir(string workingDir, string shellCommand) returns os:Command|error {
+    string[] commandParts = check splitCommandArguments(shellCommand);
+    if commandParts.length() == 0 {
+        return error("Command cannot be empty");
+    }
+    string[] envArgs = ["-C", workingDir, commandParts[0]];
+    if commandParts.length() > 1 {
+        foreach string arg in commandParts.slice(1) {
+            envArgs.push(arg);
+        }
+    }
+    return {
+        value: "env",
+        arguments: envArgs
+    };
+}
+
+function splitCommandArguments(string command) returns string[]|error {
+    string[] args = [];
+    string current = "";
+    boolean inSingleQuote = false;
+    boolean inDoubleQuote = false;
+
+    foreach int i in 0 ..< command.length() {
+        string ch = command.substring(i, i + 1);
+        if ch == "'" && !inDoubleQuote {
+            inSingleQuote = !inSingleQuote;
+        } else if ch == "\"" && !inSingleQuote {
+            inDoubleQuote = !inDoubleQuote;
+        } else if ch == " " && !inSingleQuote && !inDoubleQuote {
+            if current.length() > 0 {
+                args.push(current);
+                current = "";
+            }
+        } else {
+            current += ch;
+        }
+    }
+
+    if inSingleQuote || inDoubleQuote {
+        return error("Unclosed quote in command");
+    }
+    if current.length() > 0 {
+        args.push(current);
+    }
+    return args;
 }
 
 function resolveNativeProjectDir(string connectorPath) returns string {
@@ -916,18 +930,19 @@ function runGradleJarInDir(string workingDir) returns record {|int exitCode; str
         }
     }
 
-    string jdkEnvPrefix = "if [ -x /usr/lib/jvm/java-21-openjdk-amd64/bin/javac ]; then export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64; " +
-        "elif command -v javac >/dev/null 2>&1; then export JAVA_HOME=\"$(dirname $(dirname $(readlink -f $(command -v javac))))\"; fi; " +
-        "if [ -n \"$JAVA_HOME\" ]; then export PATH=\"$JAVA_HOME/bin:$PATH\"; fi; " +
-        "gradleJvmArg=\"\"; if [ -n \"$JAVA_HOME\" ]; then gradleJvmArg=\"-Dorg.gradle.java.home=$JAVA_HOME\"; fi; ";
-
-    string jarCommand = jdkEnvPrefix +
-        "if [ -x ./gradlew ]; then ./gradlew $gradleJvmArg jar --console=plain --no-daemon; " +
-        "elif [ -x ../../sdkanalyzer/native/gradlew ]; then ../../sdkanalyzer/native/gradlew -p . $gradleJvmArg jar --console=plain --no-daemon; " +
-        "elif [ -x /usr/bin/gradle ]; then /usr/bin/gradle $gradleJvmArg jar --console=plain --no-daemon; " +
-        "elif command -v gradle >/dev/null 2>&1; then gradle $gradleJvmArg jar --console=plain --no-daemon; " +
-        "else echo 'Gradle executable not found (checked ./gradlew, ../../sdkanalyzer/native/gradlew, gradle in PATH)' >&2; exit 127; fi";
-
+    string jarCommand;
+    boolean hasBuildRootGradlew = check file:test(buildRoot + "/gradlew", file:EXISTS);
+    if hasBuildRootGradlew {
+        jarCommand = "./gradlew jar --console=plain --no-daemon";
+    } else {
+        string analyzerGradlew = "../../sdkanalyzer/native/gradlew";
+        boolean hasAnalyzerGradlew = check file:test(buildRoot + "/" + analyzerGradlew, file:EXISTS);
+        if hasAnalyzerGradlew {
+            jarCommand = analyzerGradlew + " -p . jar --console=plain --no-daemon";
+        } else {
+            jarCommand = "gradle jar --console=plain --no-daemon";
+        }
+    }
     return executeShellInDir(buildRoot, jarCommand);
 }
 
@@ -1023,7 +1038,44 @@ function removeJavaToolchainBlock(string content) returns string {
         return content;
     }
 
-    int startIndex = <int>javaIndex;
+    int javaEnd = cursor;
+    int? toolchainsIndex = content.indexOf("toolchains {", <int>firstBrace);
+    if toolchainsIndex is () || <int>toolchainsIndex >= javaEnd {
+        return content;
+    }
+    int? toolchainsBrace = content.indexOf("{", <int>toolchainsIndex);
+    if toolchainsBrace is () || <int>toolchainsBrace >= javaEnd {
+        return content;
+    }
+
+    int toolchainDepth = 1;
+    cursor = <int>toolchainsBrace + 1;
+    while cursor < javaEnd {
+        string ch = content.substring(cursor, cursor + 1);
+        if ch == "{" {
+            toolchainDepth += 1;
+        } else if ch == "}" {
+            toolchainDepth -= 1;
+        }
+        cursor += 1;
+        if toolchainDepth == 0 {
+            break;
+        }
+    }
+    if toolchainDepth != 0 {
+        return content;
+    }
+
+    int startIndex = <int>toolchainsIndex;
+    while startIndex > 0 {
+        string ch = content.substring(startIndex - 1, startIndex);
+        if ch == " " || ch == "\t" {
+            startIndex -= 1;
+            continue;
+        }
+        break;
+    }
+
     int endIndex = cursor;
     while endIndex < content.length() {
         string ch = content.substring(endIndex, endIndex + 1);

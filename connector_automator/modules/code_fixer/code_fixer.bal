@@ -1,11 +1,11 @@
-import wso2/connector_automator.utils;
-
 import ballerina/file;
 import ballerina/io;
 import ballerina/lang.array;
 import ballerina/lang.regexp;
 import ballerina/log;
 import ballerina/os;
+
+import wso2/connector_automator.utils;
 
 configurable int maxIterations = 3;
 configurable boolean enableLLMResponseLogs = false;
@@ -57,7 +57,7 @@ public function parseCompilationErrors(string stderr) returns CompilationError[]
 
                 if coordStart is int {
                     string filePath = errorPart.substring(0, coordStart);
-                    string coordinates = errorPart.substring(coordStart + 2); 
+                    string coordinates = errorPart.substring(coordStart + 2);
 
                     // Parse coordinates - format can be (line:col) or (line:col,endLine:endCol)
                     string[] coordParts = regexp:split(re `,`, coordinates);
@@ -245,9 +245,9 @@ function executeShellCommand(string workingDir, string shellCommand) returns rec
 
     string script = string `cd "$0" && ${shellCommand} > "$1" 2> "$2"`;
     os:Process process = check os:exec({
-        value: "bash",
-        arguments: ["-c", script, workingDir, stdoutFile, stderrFile]
-    });
+                                           value: "bash",
+                                           arguments: ["-c", script, workingDir, stdoutFile, stderrFile]
+                                       });
 
     int exitCode = check process.waitForExit();
 
@@ -298,7 +298,7 @@ function runGradleBuild(string projectPath, boolean quietMode = true)
         if hasParentGradlew {
             buildRoot = parentDir;
             log:printDebug("gradlew not found in projectPath, elevated build root to parent",
-                projectPath = projectPath, buildRoot = buildRoot);
+                    projectPath = projectPath, buildRoot = buildRoot);
         }
     }
     log:printInfo("Running Gradle build", buildRoot = buildRoot);
@@ -375,7 +375,7 @@ public function fixJavaNativeAdaptorErrors(string projectPath, boolean quietMode
 
         if buildResult.success {
             log:printInfo("Java native fixer complete — build succeeded", projectPath = projectPath,
-                errorsFixed = initialErrorCount);
+                    errorsFixed = initialErrorCount);
             result.success = true;
             result.errorsRemaining = 0;
             result.javaErrorsRemaining = 0;
@@ -389,7 +389,7 @@ public function fixJavaNativeAdaptorErrors(string projectPath, boolean quietMode
 
         if currentErrors.length() == 0 {
             log:printInfo("Gradle build failed but no parseable Java errors found (non-javac failure)",
-                projectPath = projectPath);
+                    projectPath = projectPath);
             result.errorsRemaining = 1;
             result.javaErrorsRemaining = 1;
             result.success = false;
@@ -402,14 +402,14 @@ public function fixJavaNativeAdaptorErrors(string projectPath, boolean quietMode
             initialErrorCount = currentErrors.length();
             initialErrorCountSet = true;
             log:printInfo("Java compile errors detected", errorCount = initialErrorCount,
-                projectPath = projectPath);
+                    projectPath = projectPath);
         }
 
         if iteration > 1 && currentErrors.length() >= previousErrors.length() {
             boolean sameErrors = checkIfErrorsAreSame(currentErrors, previousErrors);
             if sameErrors {
                 log:printInfo("No progress — same Java errors persist, stopping",
-                    iteration = iteration, errorCount = currentErrors.length());
+                        iteration = iteration, errorCount = currentErrors.length());
                 result.remainingFixes.push(string `Iteration ${iteration}: No progress - same Java errors persist`);
                 break;
             }
@@ -425,7 +425,7 @@ public function fixJavaNativeAdaptorErrors(string projectPath, boolean quietMode
             FixResponse|error fixResponse = fixFileWithLLM(projectPath, filePath, fileErrors, quietMode);
             if fixResponse is error {
                 log:printInfo("Failed to generate fix for Java file", filePath = filePath,
-                    reason = fixResponse.message());
+                        reason = fixResponse.message());
                 result.remainingFixes.push(string `Iteration ${iteration}: Failed to fix Java file ${filePath}: ${fixResponse.message()}`);
                 continue;
             }
@@ -472,7 +472,7 @@ public function fixJavaNativeAdaptorErrors(string projectPath, boolean quietMode
 
     if finalBuild.success {
         log:printInfo("Java native fixer complete — all errors resolved", projectPath = projectPath,
-            errorsFixed = initialErrorCount);
+                errorsFixed = initialErrorCount);
         result.success = true;
         result.errorsRemaining = 0;
         result.javaErrorsRemaining = 0;
@@ -495,7 +495,7 @@ public function fixJavaNativeAdaptorErrors(string projectPath, boolean quietMode
             result.errorsFixed = fixedCount > 0 ? fixedCount : 0;
             result.javaErrorsFixed = result.errorsFixed;
             log:printInfo("Java native fixer complete — errors remain", projectPath = projectPath,
-                errorsFixed = result.errorsFixed, errorsRemaining = result.errorsRemaining);
+                    errorsFixed = result.errorsFixed, errorsRemaining = result.errorsRemaining);
         }
     }
 
@@ -634,7 +634,7 @@ public function fixFileWithLLM(string projectPath, string filePath, CompilationE
         string|() deterministicCandidate = applyDeterministicJavaCompileFixes(fileContent, errors);
         if deterministicCandidate is string {
             error? deterministicValidationError = validateJavaFixCandidate(fileContent, <string>deterministicCandidate,
-                filePath, errors.length());
+                    filePath, errors.length());
             if deterministicValidationError is () {
                 log:printInfo("Java fix applied via deterministic pattern", filePath = filePath);
                 if !quietMode {
@@ -657,7 +657,7 @@ public function fixFileWithLLM(string projectPath, string filePath, CompilationE
 
         while attempt <= maxJavaAttempts {
             string prompt = createJavaFixPrompt(fileContent, errors, filePath, lastValidationFailure,
-                lastRawResponse, attempt);
+                    lastRawResponse, attempt);
 
             string|error llmResponse = utils:callAI(prompt);
             if llmResponse is error {
@@ -668,7 +668,7 @@ public function fixFileWithLLM(string projectPath, string filePath, CompilationE
             }
 
             error? rawLogError = writeLLMResponseLog(projectPath, filePath, attempt, "raw-response", llmResponse,
-                quietMode);
+                    quietMode);
             if rawLogError is error && !quietMode {
                 io:println(string `  ⚠  Log write failed: ${rawLogError.message()}`);
             }
@@ -680,9 +680,9 @@ public function fixFileWithLLM(string projectPath, string filePath, CompilationE
                 lastValidationFailure = string `Failed to parse JSON edits: ${editOps.message()}`;
                 lastRawResponse = llmResponse;
                 log:printDebug("LLM edit parse failed", filePath = filePath, attempt = attempt,
-                    reason = editOps.message());
+                        reason = editOps.message());
                 error? parseLogError = writeLLMResponseLog(projectPath, filePath, attempt,
-                    "parse-failure", lastValidationFailure, quietMode);
+                        "parse-failure", lastValidationFailure, quietMode);
                 if parseLogError is error && !quietMode {
                     io:println(string `  ⚠  Log write failed: ${parseLogError.message()}`);
                 }
@@ -705,7 +705,7 @@ public function fixFileWithLLM(string projectPath, string filePath, CompilationE
             }
 
             log:printDebug("LLM returned edit operations", filePath = filePath, attempt = attempt,
-                editCount = editOps.length());
+                    editCount = editOps.length());
 
             // Apply edits to the original file content
             string|error patchedCode = applyJavaEditOperations(fileContent, editOps);
@@ -713,7 +713,7 @@ public function fixFileWithLLM(string projectPath, string filePath, CompilationE
                 lastValidationFailure = string `Failed to apply edits: ${patchedCode.message()}`;
                 lastRawResponse = llmResponse;
                 log:printDebug("Edit application failed", filePath = filePath, attempt = attempt,
-                    reason = patchedCode.message());
+                        reason = patchedCode.message());
                 if !quietMode && attempt < maxJavaAttempts {
                     io:println(string `  ⚠  Edit application failed for ${filePath}; retrying (${attempt + 1}/${maxJavaAttempts})`);
                 }
@@ -723,17 +723,17 @@ public function fixFileWithLLM(string projectPath, string filePath, CompilationE
 
             // Log the patched result
             error? patchedLogError = writeLLMResponseLog(projectPath, filePath, attempt,
-                "patched-result", patchedCode, quietMode);
+                    "patched-result", patchedCode, quietMode);
             if patchedLogError is error && !quietMode {
                 io:println(string `  ⚠  Log write failed: ${patchedLogError.message()}`);
             }
 
             // Validate the patched result
             error? patchValidationError = validateJavaFixCandidate(fileContent, patchedCode, filePath,
-                errors.length());
+                    errors.length());
             if patchValidationError is () {
                 log:printInfo("Java fix applied via LLM patch", filePath = filePath, attempt = attempt,
-                    editCount = editOps.length());
+                        editCount = editOps.length());
                 if !quietMode {
                     io:println(string `  ✓ Fixed ${filePath} using LLM patch (${editOps.length()} edit${editOps.length() == 1 ? "" : "s"})`);
                 }
@@ -748,13 +748,13 @@ public function fixFileWithLLM(string projectPath, string filePath, CompilationE
             string validationMsg = (<error>patchValidationError).message();
             if validationMsg.includes("changed too many lines") {
                 string|() localizedMerge = applyLocalizedJavaMerge(fileContent, patchedCode, errors,
-                    windowRadius = 6);
+                        windowRadius = 6);
                 if localizedMerge is string {
                     error? mergeValidation = validateJavaFixCandidate(fileContent, localizedMerge, filePath,
-                        errors.length());
+                            errors.length());
                     if mergeValidation is () {
                         log:printInfo("Java fix applied via localized merge", filePath = filePath,
-                            attempt = attempt, editCount = editOps.length());
+                                attempt = attempt, editCount = editOps.length());
                         if !quietMode {
                             io:println(string `  ✓ Fixed ${filePath} using localized merge (${editOps.length()} edit${editOps.length() == 1 ? "" : "s"})`);
                         }
@@ -767,13 +767,13 @@ public function fixFileWithLLM(string projectPath, string filePath, CompilationE
                 }
                 // Also try structural safe merge
                 string|() structuralMerge = applyStructuralSafeJavaMerge(fileContent, patchedCode, errors,
-                    windowRadius = 6);
+                        windowRadius = 6);
                 if structuralMerge is string {
                     error? structuralValidation = validateJavaFixCandidate(fileContent, structuralMerge, filePath,
-                        errors.length());
+                            errors.length());
                     if structuralValidation is () {
                         log:printInfo("Java fix applied via structural merge", filePath = filePath,
-                            attempt = attempt, editCount = editOps.length());
+                                attempt = attempt, editCount = editOps.length());
                         if !quietMode {
                             io:println(string `  ✓ Fixed ${filePath} using structural merge (${editOps.length()} edit${editOps.length() == 1 ? "" : "s"})`);
                         }
@@ -793,13 +793,13 @@ public function fixFileWithLLM(string projectPath, string filePath, CompilationE
                 string `validationError=${lastValidationFailure}\n` +
                 string `balancedBraces=${hasBalancedJavaBraces(patchedCode)}\n`;
             error? validationLogError = writeLLMResponseLog(projectPath, filePath, attempt,
-                "validation-result", validationSummary, quietMode);
+                    "validation-result", validationSummary, quietMode);
             if validationLogError is error && !quietMode {
                 io:println(string `  ⚠  Log write failed: ${validationLogError.message()}`);
             }
 
             log:printDebug("Patch validation failed", filePath = filePath, attempt = attempt,
-                reason = lastValidationFailure);
+                    reason = lastValidationFailure);
             if !quietMode && attempt < maxJavaAttempts {
                 io:println(string `  ⚠  Patch validation failed for ${filePath}: ${lastValidationFailure}; retrying (${attempt + 1}/${maxJavaAttempts})`);
             }
@@ -807,7 +807,7 @@ public function fixFileWithLLM(string projectPath, string filePath, CompilationE
         }
 
         log:printInfo("All Java LLM fix attempts exhausted", filePath = filePath, attempts = maxJavaAttempts,
-            lastFailure = lastValidationFailure);
+                lastFailure = lastValidationFailure);
         if !quietMode {
             io:println(string `  ✗ All ${maxJavaAttempts} Java fix attempts failed for ${filePath}`);
         }
@@ -818,7 +818,7 @@ public function fixFileWithLLM(string projectPath, string filePath, CompilationE
     string typeContext = (filePath.includes("test") || filePath.includes("mock")) ?
         getTypeContextForFile(projectPath, filePath) : "";
     string prompt = createFixPromptWithHistory(fileContent, errors, filePath, typeContext,
-        buildFixHistoryContext(previousAttempts));
+            buildFixHistoryContext(previousAttempts));
 
     string|error llmResponse = utils:callAI(prompt);
     if llmResponse is error {
@@ -945,7 +945,8 @@ function parseJavaEditOperations(string jsonText) returns JavaEditOperation[]|er
         string[] replacementLines = [];
         if replacementJson is json[] {
             foreach json lineJson in <json[]>replacementJson {
-                replacementLines.push(lineJson.toString());
+                string line = <string>lineJson;
+                replacementLines.push(line);
             }
         } else {
             return error("replacement must be a JSON array of strings");
@@ -1554,14 +1555,20 @@ public function applyFix(string projectPath, string filePath, string fixedCode, 
         if restoreResult is io:Error && !quietMode {
             io:println(string `  ⚠  Failed to restore original content for ${filePath}`);
         }
-        do { check file:remove(backupPath); } on fail { }
+        do {
+            check file:remove(backupPath);
+        } on fail {
+        }
         return writeResult;
     }
 
     if !quietMode {
         io:println(string `  ✓ Applied fix to ${filePath}`);
     }
-    do { check file:remove(backupPath); } on fail { }
+    do {
+        check file:remove(backupPath);
+    } on fail {
+    }
     return true;
 }
 
@@ -1571,7 +1578,10 @@ function resolveParentDirectory(string dirPath) returns string {
     if lastSlash is int && lastSlash > 0 {
         return normalized.substring(0, lastSlash);
     }
-    return dirPath;
+    if lastSlash is int && lastSlash == 0 {
+        return "/";
+    }
+    return ".";
 }
 
 function getBackupPath(string fullFilePath) returns string {
@@ -1672,7 +1682,7 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
             } else {
                 result.errorsFixed = initialErrorCount;
                 log:printInfo("Ballerina fixer complete — all errors resolved", projectPath = projectPath,
-                    errorsFixed = initialErrorCount);
+                        errorsFixed = initialErrorCount);
                 if !quietMode {
                     io:println("✓ All compilation errors resolved!");
                 }
@@ -1701,14 +1711,13 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
 
             if allInteropErrors {
                 log:printInfo("Ballerina errors are interop CLASS_NOT_FOUND — Java native build likely failed, skipping",
-                    projectPath = projectPath, errorCount = currentErrors.length());
+                        projectPath = projectPath, errorCount = currentErrors.length());
                 result.success = false;
                 result.errorsRemaining = currentErrors.length();
                 result.remainingFixes.push("Ballerina errors are interop CLASS_NOT_FOUND errors from missing/failed Java native build; skipping .bal AI rewrite");
                 return result;
             }
         }
-
 
         if currentErrors.length() == 0 {
             log:printInfo("Ballerina build still failed outside the fixer allowlist", projectPath = projectPath);
@@ -1724,7 +1733,7 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
             initialErrorCount = currentErrors.length();
             initialErrorCountSet = true;
             log:printInfo("Ballerina compile errors detected", errorCount = initialErrorCount,
-                projectPath = projectPath);
+                    projectPath = projectPath);
             if !quietMode {
                 io:println(string `Found ${initialErrorCount} compilation error${initialErrorCount == 1 ? "" : "s"}`);
             }
@@ -1736,7 +1745,7 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
 
             if progressMade > 0 {
                 log:printDebug("Ballerina fix progress", iteration = iteration, errorsFixed = progressMade,
-                    errorsRemaining = currentErrors.length());
+                        errorsRemaining = currentErrors.length());
                 if !quietMode {
                     io:println(string `  Progress: Fixed ${progressMade} error${progressMade == 1 ? "" : "s"}`);
                 }
@@ -1744,7 +1753,7 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
                 boolean sameErrors = checkIfErrorsAreSame(currentErrors, previousErrors);
                 if sameErrors {
                     log:printInfo("No progress — same Ballerina errors persist, stopping",
-                        iteration = iteration, errorCount = currentErrors.length());
+                            iteration = iteration, errorCount = currentErrors.length());
                     if !quietMode {
                         io:println("  ⚠  No progress made - same errors persist");
                     }
@@ -1773,7 +1782,7 @@ public function fixAllErrors(string projectPath, boolean quietMode = true, boole
 
             FixAttempt[] previousAttempts = fileFixHistory.hasKey(filePath) ? fileFixHistory.get(filePath) : [];
             FixResponse|error fixResponse = fixFileWithLLM(projectPath, filePath, fileErrors, quietMode,
-                previousAttempts);
+                    previousAttempts);
             if fixResponse is error {
                 if !quietMode {
                     io:println(string `  ⚠  Could not generate fix for ${filePath}: ${fixResponse.message()}`);

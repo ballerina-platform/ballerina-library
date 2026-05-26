@@ -15,6 +15,7 @@
 
 import ballerina/file;
 import ballerina/io;
+
 import wso2/connector_automator.utils;
 
 # Write the Ballerina specification source to a .bal file.
@@ -42,12 +43,16 @@ public function writeBallerinaSpec(string code, string outputDir, string fileNam
 # + fileName - Target file name (e.g. "sqsclient-ir.json")
 # + return - Full path of the written file or error
 public function writeIRFile(string content, string outputDir, string fileName) returns string|error {
-    boolean dirExists = check file:test(outputDir, file:EXISTS);
+    string normalizedOutputDir = outputDir.trim();
+    if normalizedOutputDir.length() == 0 {
+        normalizedOutputDir = ".";
+    }
+    boolean dirExists = check file:test(normalizedOutputDir, file:EXISTS);
     if !dirExists {
-        check file:createDir(outputDir, file:RECURSIVE);
+        check file:createDir(normalizedOutputDir, file:RECURSIVE);
     }
 
-    string filePath = string `${outputDir}/${fileName}`;
+    string filePath = string `${normalizedOutputDir}/${fileName}`;
     check io:fileWriteString(filePath, content);
     return filePath;
 }
