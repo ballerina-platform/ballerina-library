@@ -1552,12 +1552,15 @@ public function applyFix(string projectPath, string filePath, string fixedCode, 
 
         // Attempt to restore from backup
         io:Error? restoreResult = io:fileWriteString(fullFilePath, originalContent, io:OVERWRITE);
-        if restoreResult is io:Error && !quietMode {
-            io:println(string `  ⚠  Failed to restore original content for ${filePath}`);
-        }
-        do {
-            check file:remove(backupPath);
-        } on fail {
+        if restoreResult is io:Error {
+            if !quietMode {
+                io:println(string `  ⚠  Failed to restore original content for ${filePath}`);
+            }
+        } else {
+            do {
+                check file:remove(backupPath);
+            } on fail {
+            }
         }
         return writeResult;
     }

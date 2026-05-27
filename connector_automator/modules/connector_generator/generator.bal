@@ -835,7 +835,6 @@ function countChar(string value, string ch) returns int {
 function normalizeNativeAdaptorWarnings(string nativeAdaptorJava) returns string {
     string normalized = nativeAdaptorJava;
     normalized = replaceAllLiteral(normalized, "WithStrings(", "(");
-    normalized = replaceAllLiteral(normalized, "catch (Exception e)", "catch (RuntimeException e)");
     return normalized;
 }
 
@@ -843,9 +842,77 @@ function validateNativeWarningPatterns(string nativeAdaptorJava) returns error? 
     if nativeAdaptorJava.includes("WithStrings(") {
         return error("nativeAdaptorJava contains potentially deprecated '*WithStrings(...)' method usage; use non-deprecated alternatives");
     }
-    if nativeAdaptorJava.includes("catch (Exception e)") {
+    if containsDisallowedBroadCatch(nativeAdaptorJava) {
         return error("nativeAdaptorJava contains broad catch(Exception e); use more specific catches or multi-catch");
     }
+}
+
+function containsDisallowedBroadCatch(string nativeAdaptorJava) returns boolean {
+    string broadCatch = "catch (Exception e)";
+    int searchFrom = 0;
+    int? catchIndex = nativeAdaptorJava.indexOf(broadCatch);
+    while catchIndex is int {
+        if !isCatchInsideWithErrorHandlingHelper(nativeAdaptorJava, catchIndex) {
+            return true;
+        }
+        searchFrom = catchIndex + broadCatch.length();
+        catchIndex = nativeAdaptorJava.indexOf(broadCatch, searchFrom);
+    }
+    return false;
+}
+
+function isCatchInsideWithErrorHandlingHelper(string nativeAdaptorJava, int catchIndex) returns boolean {
+    string helperName = "withErrorHandling(";
+    int searchFrom = 0;
+    int? helperIndex = nativeAdaptorJava.indexOf(helperName);
+    while helperIndex is int {
+        if !isWithErrorHandlingHelperDefinition(nativeAdaptorJava, helperIndex) {
+            searchFrom = helperIndex + helperName.length();
+            helperIndex = nativeAdaptorJava.indexOf(helperName, searchFrom);
+            continue;
+        }
+        int? helperBrace = nativeAdaptorJava.indexOf("{", helperIndex);
+        if helperBrace is int && helperBrace < catchIndex {
+            int? helperEnd = findMatchingBrace(nativeAdaptorJava, helperBrace);
+            if helperEnd is int && catchIndex < helperEnd {
+                return true;
+            }
+        }
+        searchFrom = helperIndex + helperName.length();
+        helperIndex = nativeAdaptorJava.indexOf(helperName, searchFrom);
+    }
+    return false;
+}
+
+function isWithErrorHandlingHelperDefinition(string nativeAdaptorJava, int helperIndex) returns boolean {
+    int lineStart = 0;
+    int? previousLineEnd = nativeAdaptorJava.lastIndexOf("\n", helperIndex);
+    if previousLineEnd is int {
+        lineStart = previousLineEnd + 1;
+    }
+
+    string linePrefix = nativeAdaptorJava.substring(lineStart, helperIndex).trim();
+    return linePrefix == "static Object" || linePrefix.endsWith(" static Object") ||
+            linePrefix == "static BError" || linePrefix.endsWith(" static BError") ||
+            linePrefix == "static Object[]" || linePrefix.endsWith(" static Object[]");
+}
+
+function findMatchingBrace(string content, int openBrace) returns int? {
+    int depth = 1;
+    int cursor = openBrace + 1;
+    while cursor < content.length() {
+        string ch = content.substring(cursor, cursor + 1);
+        if ch == "{" {
+            depth += 1;
+        } else if ch == "}" {
+            depth -= 1;
+            if depth == 0 {
+                return cursor;
+            }
+        }
+        cursor += 1;
+    }
+    return ();
 }
 
 function replaceAllLiteral(string inputText, string needle, string replacement) returns string {

@@ -780,13 +780,13 @@ function ensureClientInteropClassBinding(string connectorPath, string ballerinaD
 
 function detectNativeAdaptorClassFromJar(string connectorPath) returns string? {
     record {|int exitCode; string stdout; string stderr;|}|error jarResult = executeShellInDir(connectorPath,
-            "jar tf build/libs/generated-native-adaptor.jar | grep -E 'Adaptor\\.class$' | head -n 1");
+            "jar tf build/libs/generated-native-adaptor.jar");
     if jarResult is error || jarResult.exitCode != 0 {
         return;
     }
 
-    string classEntry = jarResult.stdout.trim();
-    if classEntry.length() == 0 || !classEntry.endsWith(".class") {
+    string classEntry = firstLineEndingWith(jarResult.stdout, "Adaptor.class");
+    if classEntry.length() == 0 {
         return;
     }
 
@@ -796,12 +796,12 @@ function detectNativeAdaptorClassFromJar(string connectorPath) returns string? {
 
 function detectNativeAdaptorClass(string connectorPath) returns string? {
     record {|int exitCode; string stdout; string stderr;|}|error findResult = executeShellInDir(connectorPath,
-            "find src/main/java -type f -name '*Adaptor.java' | head -n 1");
+            "find src/main/java -type f -name '*Adaptor.java'");
     if findResult is error || findResult.exitCode != 0 {
         return;
     }
 
-    string relPath = findResult.stdout.trim();
+    string relPath = firstNonEmptyLine(findResult.stdout);
     if relPath.length() == 0 {
         return;
     }
@@ -849,14 +849,16 @@ function detectNativeAdaptorClass(string connectorPath) returns string? {
 function executeShellInDir(string workingDir, string shellCommand) returns record {|int exitCode; string stdout; string stderr;|}|error {
     os:Process process = check os:exec(check buildCommandInDir(workingDir, shellCommand));
     byte[] stdoutBytes = check process.output();
+    byte[] stderrBytes = check process.output(io:stderr);
     int exitCode = check process.waitForExit();
 
     string stdout = check string:fromBytes(stdoutBytes);
+    string stderr = check string:fromBytes(stderrBytes);
 
     return {
         exitCode: exitCode,
         stdout: stdout,
-        stderr: ""
+        stderr: stderr
     };
 }
 
@@ -967,6 +969,18 @@ function firstNonEmptyLine(string text) returns string {
     return "";
 }
 
+function firstLineEndingWith(string text, string suffix) returns string {
+    string[] lines = regexp:split(re `\n`, text);
+    foreach string line in lines {
+        string trimmed = line.trim();
+        if trimmed.endsWith(suffix) {
+            return trimmed;
+        }
+    }
+
+    return "";
+}
+
 function tryUseExistingNativeJar(string connectorPath) returns boolean|error {
     string existingJar = check file:joinPath(connectorPath, "build", "libs", "generated-native-adaptor.jar");
     boolean|error jarExists = file:test(existingJar, file:EXISTS);
@@ -1039,17 +1053,17 @@ function removeJavaToolchainBlock(string content) returns string {
     }
 
     int javaEnd = cursor;
-    int? toolchainsIndex = content.indexOf("toolchains {", <int>firstBrace);
-    if toolchainsIndex is () || <int>toolchainsIndex >= javaEnd {
+    int? toolchainIndex = content.indexOf("toolchain", <int>firstBrace);
+    if toolchainIndex is () || <int>toolchainIndex >= javaEnd {
         return content;
     }
-    int? toolchainsBrace = content.indexOf("{", <int>toolchainsIndex);
-    if toolchainsBrace is () || <int>toolchainsBrace >= javaEnd {
+    int? toolchainBrace = content.indexOf("{", <int>toolchainIndex);
+    if toolchainBrace is () || <int>toolchainBrace >= javaEnd {
         return content;
     }
 
     int toolchainDepth = 1;
-    cursor = <int>toolchainsBrace + 1;
+    cursor = <int>toolchainBrace + 1;
     while cursor < javaEnd {
         string ch = content.substring(cursor, cursor + 1);
         if ch == "{" {
@@ -1066,7 +1080,7 @@ function removeJavaToolchainBlock(string content) returns string {
         return content;
     }
 
-    int startIndex = <int>toolchainsIndex;
+    int startIndex = <int>toolchainIndex;
     while startIndex > 0 {
         string ch = content.substring(startIndex - 1, startIndex);
         if ch == " " || ch == "\t" {

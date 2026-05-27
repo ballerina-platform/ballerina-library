@@ -678,6 +678,8 @@ public class JavaParserAnalyzer {
                 BMap<BString, Object> fieldInfo = ValueCreator.createMapValue(mapType);
                 fieldInfo.put(StringUtils.fromString("name"), StringUtils.fromString(enumConst.getNameAsString()));
                 fieldInfo.put(StringUtils.fromString("type"), StringUtils.fromString(className));
+                fieldInfo.put(StringUtils.fromString("typeName"), StringUtils.fromString(className));
+                fieldInfo.put(StringUtils.fromString("fullType"), StringUtils.fromString(className));
                 fieldInfo.put(StringUtils.fromString("isStatic"), true);
                 fieldInfo.put(StringUtils.fromString("isFinal"), true);
                 fieldInfo.put(StringUtils.fromString("isDeprecated"), enumConst.isAnnotationPresent("Deprecated"));
@@ -931,9 +933,10 @@ public class JavaParserAnalyzer {
             
             fieldInfo.put(StringUtils.fromString("name"), StringUtils.fromString(variable.getNameAsString()));
             String typeName = variable.getTypeAsString();
+            String fullType = resolveSourceTypeName(variable.getType(), typeName);
             fieldInfo.put(StringUtils.fromString("type"), StringUtils.fromString(typeName));
-            fieldInfo.put(StringUtils.fromString("typeName"), StringUtils.fromString(typeName));
-            fieldInfo.put(StringUtils.fromString("fullType"), StringUtils.fromString(typeName));
+            fieldInfo.put(StringUtils.fromString("typeName"), StringUtils.fromString(fullType));
+            fieldInfo.put(StringUtils.fromString("fullType"), StringUtils.fromString(fullType));
             fieldInfo.put(StringUtils.fromString("isStatic"), field.isStatic());
             fieldInfo.put(StringUtils.fromString("isFinal"), field.isFinal());
             fieldInfo.put(StringUtils.fromString("isDeprecated"), field.isAnnotationPresent("Deprecated"));
@@ -964,6 +967,14 @@ public class JavaParserAnalyzer {
         }
         
         return fields;
+    }
+
+    private static String resolveSourceTypeName(Type type, String fallbackTypeName) {
+        try {
+            return type.resolve().describe();
+        } catch (Exception | LinkageError ignored) {
+            return fallbackTypeName;
+        }
     }
     
     /**
