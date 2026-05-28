@@ -44,6 +44,11 @@ jobs:
               run: |
                 echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
 
+            -   name: Set git user identity
+                run: |
+                  git config --global user.name "ballerina-bot"
+                  git config --global user.email "ballerina-bot@ballerina.org"
+
             -   name: Build the Package
                 env:
                     packageUser: ${{ github.actor }}
@@ -77,6 +82,11 @@ jobs:
             - name: Set ENV Variables
               run: |
                 echo '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' | Out-File -FilePath $env:GITHUB_ENV -Append
+
+            -   name: Set git user identity
+                run: |
+                  git config --global user.name "ballerina-bot"
+                  git config --global user.email "ballerina-bot@ballerina.org"
 
             -   name: Build the Project
                 env:
