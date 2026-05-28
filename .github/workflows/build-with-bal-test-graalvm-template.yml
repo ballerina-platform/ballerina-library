@@ -38,11 +38,18 @@ jobs:
         if: github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'Skip GraalVM Check')
 
         steps:
-            - name: Set up GraalVM for JDK 25
+            - name: Set up JDK 25
               uses: actions/setup-java@v4
               with:
-                  distribution: 'graalvm-community'
+                  distribution: 'temurin'
                   java-version: '25'
+
+            - name: Set up GraalVM
+              uses: graalvm/setup-graalvm@v1
+              with:
+                  java-version: '25'
+                  distribution: 'graalvm-community'
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Checkout Ballerina Lang Repository
               if: ${{ inputs.lang_version == '' && github.event_name != 'pull_request' }}
@@ -99,11 +106,18 @@ jobs:
         if: github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'Skip GraalVM Check')
 
         steps:
-            - name: Set up GraalVM for JDK 25
+            - name: Set up JDK 25
               uses: actions/setup-java@v4
               with:
-                  distribution: 'graalvm-community'
+                  distribution: 'temurin'
                   java-version: '25'
+
+            - name: Set up GraalVM
+              uses: graalvm/setup-graalvm@v1
+              with:
+                  java-version: '25'
+                  distribution: 'graalvm-community'
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Git configure long path
               run: |
