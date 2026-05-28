@@ -1,13 +1,13 @@
-import connector_automator.utils;
-
 import ballerina/file;
 import ballerina/io;
 import ballerina/lang.regexp;
 
-const string TEMPLATES_PATH = "./modules/doc_generator/templates";
+import wso2/connector_automator.utils;
+
+const string TEMPLATES_PATH = "./modules/document_generator/templates";
 
 public function initDocumentationGenerator() returns error? {
-    return utils:initAIService();
+    return utils:initAIService(quietMode = true);
 }
 
 public function generateAllDocumentation(string connectorPath) returns error? {
@@ -54,10 +54,7 @@ public function generateTestsReadme(string connectorPath) returns error? {
 
     string content = check processTemplate("tests_readme_template.md", data);
 
-    string outputPath = connectorPath + "/tests/README.md";
-    if !check file:test(connectorPath + "/tests", file:EXISTS) {
-        outputPath = connectorPath + "/ballerina/tests/README.md";
-    }
+    string outputPath = connectorPath + "/ballerina/tests/README.md";
 
     string? parentPath = check file:parentPath(outputPath);
     if parentPath is string {
@@ -87,6 +84,9 @@ public function generateIndividualExampleReadmes(string connectorPath) returns e
     foreach file:MetaData example in examples {
         if example.dir {
             string exampleDirName = extractDirectoryName(example.absPath);
+            if exampleDirName.startsWith(".") {
+                continue;
+            }
             string exampleDirPath = examplesPath + "/" + exampleDirName;
 
             error? result = generateSingleExampleReadme(example.absPath, exampleDirName, metadata);
@@ -130,7 +130,7 @@ function generateSingleExampleReadme(string examplePath, string exampleDirName, 
 
     string content = check processTemplate("example_specific_template.md", data);
 
-    string readmeFileName = formatExampleName(exampleDirName) + ".md";
+    string readmeFileName = "README.md";
     string outputPath = examplePath + "/" + readmeFileName;
 
     check writeOutput(content, outputPath);
@@ -367,7 +367,40 @@ function simpleReplace(string text, string searchFor, string replaceWith) return
 }
 
 function writeOutput(string content, string outputPath) returns error? {
-    check io:fileWriteString(outputPath, content);
+    string normalized = normalizeGeneratedMarkdown(content);
+    check io:fileWriteString(outputPath, normalized);
+}
+
+function normalizeGeneratedMarkdown(string content) returns string {
+    string[] lines = regexp:split(re `\n`, content);
+    string[] cleaned = [];
+    string previousHeading = "";
+
+    foreach string line in lines {
+        string trimmed = line.trim();
+        boolean isHeading = trimmed.startsWith("#");
+
+        if isHeading {
+            if previousHeading == trimmed {
+                continue;
+            }
+            previousHeading = trimmed;
+        } else if trimmed.length() > 0 {
+            previousHeading = "";
+        }
+
+        cleaned.push(line);
+    }
+
+    string output = string:'join("\n", ...cleaned);
+
+    string previous = "";
+    while previous != output {
+        previous = output;
+        output = simpleReplace(output, "\n\n\n", "\n\n");
+    }
+
+    return output.trim() + "\n";
 }
 
 function createTemplateData(ConnectorMetadata metadata) returns TemplateData {

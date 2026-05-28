@@ -5,12 +5,12 @@
 
 [ballerina]
 dependencies-toml-version = "2"
-distribution-version = "2201.13.1"
+distribution-version = "2201.13.4"
 
 [[package]]
 org = "ballerina"
 name = "ai"
-version = "1.11.1"
+version = "1.11.2"
 dependencies = [
 	{org = "ballerina", name = "cache"},
 	{org = "ballerina", name = "constraint"},
@@ -107,7 +107,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "file"
-version = "1.12.0"
+version = "1.13.0"
 dependencies = [
 	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "jballerina.java"},
@@ -121,7 +121,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "http"
-version = "2.15.5"
+version = "2.16.3"
 dependencies = [
 	{org = "ballerina", name = "auth"},
 	{org = "ballerina", name = "cache"},
@@ -163,6 +163,9 @@ modules = [
 org = "ballerina"
 name = "jballerina.java"
 version = "0.0.0"
+modules = [
+	{org = "ballerina", packageName = "jballerina.java", moduleName = "jballerina.java"}
+]
 
 [[package]]
 org = "ballerina"
@@ -271,7 +274,7 @@ modules = [
 [[package]]
 org = "ballerina"
 name = "log"
-version = "2.16.1"
+version = "2.17.0"
 dependencies = [
 	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "jballerina.java"},
@@ -353,7 +356,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "regex"
-version = "1.4.3"
+version = "1.3.2"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "lang.string"}
@@ -439,7 +442,7 @@ modules = [
 [[package]]
 org = "ballerinax"
 name = "ai.anthropic"
-version = "1.3.2"
+version = "1.3.3"
 dependencies = [
 	{org = "ballerina", name = "ai"},
 	{org = "ballerina", name = "constraint"},
@@ -460,6 +463,7 @@ dependencies = [
 	{org = "ballerina", name = "data.jsondata"},
 	{org = "ballerina", name = "file"},
 	{org = "ballerina", name = "io"},
+	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "lang.array"},
 	{org = "ballerina", name = "lang.regexp"},
 	{org = "ballerina", name = "lang.runtime"},
@@ -475,12 +479,15 @@ dependencies = [
 ]
 modules = [
 	{org = "wso2", packageName = "connector_automator", moduleName = "connector_automator"},
+	{org = "wso2", packageName = "connector_automator", moduleName = "connector_automator.api_specification_generator"},
 	{org = "wso2", packageName = "connector_automator", moduleName = "connector_automator.client_generator"},
 	{org = "wso2", packageName = "connector_automator", moduleName = "connector_automator.client_regenerator"},
 	{org = "wso2", packageName = "connector_automator", moduleName = "connector_automator.code_fixer"},
-	{org = "wso2", packageName = "connector_automator", moduleName = "connector_automator.doc_generator"},
+	{org = "wso2", packageName = "connector_automator", moduleName = "connector_automator.connector_generator"},
+	{org = "wso2", packageName = "connector_automator", moduleName = "connector_automator.document_generator"},
 	{org = "wso2", packageName = "connector_automator", moduleName = "connector_automator.example_generator"},
 	{org = "wso2", packageName = "connector_automator", moduleName = "connector_automator.sanitizor"},
+	{org = "wso2", packageName = "connector_automator", moduleName = "connector_automator.sdkanalyzer"},
 	{org = "wso2", packageName = "connector_automator", moduleName = "connector_automator.test_generator"},
 	{org = "wso2", packageName = "connector_automator", moduleName = "connector_automator.utils"}
 ]

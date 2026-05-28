@@ -100,10 +100,22 @@ function analyzeExamples(string connectorPath, ConnectorMetadata metadata) retur
         foreach file:MetaData example in examples {
             if example.dir {
                 string exampleName = example.absPath.substring(examplesPath.length());
-                metadata.examples.push(exampleName);
+                string normalizedExampleName = trimLeadingPathSeparators(exampleName);
+                if !normalizedExampleName.startsWith(".") && !normalizedExampleName.startsWith("./") &&
+                        !normalizedExampleName.startsWith(".\\") {
+                    metadata.examples.push(normalizedExampleName);
+                }
             }
         }
     }
+}
+
+function trimLeadingPathSeparators(string path) returns string {
+    string normalized = path;
+    while normalized.startsWith("/") || normalized.startsWith("\\") {
+        normalized = normalized.substring(1);
+    }
+    return normalized;
 }
 
 public function getConnectorSummary(ConnectorMetadata metadata) returns string {
@@ -150,7 +162,6 @@ public function analyzeExampleDirectory(string examplePath, string exampleDirNam
 }
 
 public function formatExampleName(string dirName) returns string {
-    // Convert "automated-summary-report" to "Automated summary report"
     string[] parts = regexp:split(re `[-_]`, dirName);
     string[] capitalizedParts = [];
 

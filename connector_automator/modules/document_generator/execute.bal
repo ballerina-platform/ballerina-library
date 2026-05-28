@@ -1,5 +1,6 @@
 import ballerina/io;
 import ballerina/os;
+import ballerina/time;
 
 public function executeDocGen(string... args) returns error? {
     if args.length() == 0 {
@@ -74,30 +75,21 @@ function generateAllReadmes(string connectorPath, boolean autoYes, boolean quiet
         return;
     }
 
+    time:Utc startTime = time:utcNow();
+
     check validateApiKey();
 
-    error? initResult = initDocumentationGenerator();
-    if initResult is error {
-        io:println(string `✗ AI initialization failed: ${initResult.message()}`);
-        if !getUserConfirmation("Continue despite failure?", autoYes) {
-            return initResult;
-        }
-    } else {
-        io:println("✓ AI generator initialized");
-    }
+    check initDocumentationGenerator();
+    io:println("✓ AI generator initialized");
 
     io:println("");
     io:println("Generating documentation files...");
 
-    error? result = generateAllDocumentation(connectorPath);
-    if result is error {
-        io:println(string `✗ Generation failed: ${result.message()}`);
-        if !getUserConfirmation("Continue despite failure?", autoYes) {
-            return result;
-        }
-    }
+    check generateAllDocumentation(connectorPath);
 
-    printDocCompletionSummary(connectorPath, quietMode);
+    time:Utc endTime = time:utcNow();
+    decimal duration = time:utcDiffSeconds(endTime, startTime);
+    printDocCompletionSummary(connectorPath, duration, quietMode);
 }
 
 function genBallerinaReadme(string connectorPath, boolean autoYes, boolean quietMode) returns error? {
@@ -108,6 +100,7 @@ function genBallerinaReadme(string connectorPath, boolean autoYes, boolean quiet
         return;
     }
 
+    time:Utc startTime = time:utcNow();
     check validateApiKey();
     check initDocumentationGenerator();
 
@@ -118,9 +111,12 @@ function genBallerinaReadme(string connectorPath, boolean autoYes, boolean quiet
         return result;
     }
 
+    time:Utc endTime = time:utcNow();
+    decimal duration = time:utcDiffSeconds(endTime, startTime);
     io:println("");
     io:println("✓ README generated successfully");
     io:println(string `  Output: ${connectorPath}/ballerina/README.md`);
+    io:println(string `  Duration: ${duration}s`);
 
     if !quietMode {
         io:println("");
@@ -136,6 +132,7 @@ function genTestsReadme(string connectorPath, boolean autoYes, boolean quietMode
         return;
     }
 
+    time:Utc startTime = time:utcNow();
     check validateApiKey();
     check initDocumentationGenerator();
 
@@ -146,9 +143,12 @@ function genTestsReadme(string connectorPath, boolean autoYes, boolean quietMode
         return result;
     }
 
+    time:Utc endTime = time:utcNow();
+    decimal duration = time:utcDiffSeconds(endTime, startTime);
     io:println("");
     io:println("✓ README generated successfully");
-    io:println(string `  Output: ${connectorPath}/tests/README.md`);
+    io:println(string `  Output: ${connectorPath}/ballerina/tests/README.md`);
+    io:println(string `  Duration: ${duration}s`);
 
     if !quietMode {
         io:println("");
@@ -164,6 +164,7 @@ function genExamplesReadme(string connectorPath, boolean autoYes, boolean quietM
         return;
     }
 
+    time:Utc startTime = time:utcNow();
     check validateApiKey();
     check initDocumentationGenerator();
 
@@ -174,9 +175,12 @@ function genExamplesReadme(string connectorPath, boolean autoYes, boolean quietM
         return result;
     }
 
+    time:Utc endTime = time:utcNow();
+    decimal duration = time:utcDiffSeconds(endTime, startTime);
     io:println("");
     io:println("✓ README generated successfully");
     io:println(string `  Output: ${connectorPath}/examples/README.md`);
+    io:println(string `  Duration: ${duration}s`);
 
     if !quietMode {
         io:println("");
@@ -192,6 +196,7 @@ function genIndividualExampleReadmes(string connectorPath, boolean autoYes, bool
         return;
     }
 
+    time:Utc startTime = time:utcNow();
     check validateApiKey();
     check initDocumentationGenerator();
 
@@ -202,9 +207,12 @@ function genIndividualExampleReadmes(string connectorPath, boolean autoYes, bool
         return result;
     }
 
+    time:Utc endTime = time:utcNow();
+    decimal duration = time:utcDiffSeconds(endTime, startTime);
     io:println("");
     io:println("✓ READMEs generated successfully");
     io:println(string `  Output: ${connectorPath}/examples/*/README.md`);
+    io:println(string `  Duration: ${duration}s`);
 
     if !quietMode {
         io:println("");
@@ -220,6 +228,7 @@ function genMainReadme(string connectorPath, boolean autoYes, boolean quietMode)
         return;
     }
 
+    time:Utc startTime = time:utcNow();
     check validateApiKey();
     check initDocumentationGenerator();
 
@@ -230,9 +239,12 @@ function genMainReadme(string connectorPath, boolean autoYes, boolean quietMode)
         return result;
     }
 
+    time:Utc endTime = time:utcNow();
+    decimal duration = time:utcDiffSeconds(endTime, startTime);
     io:println("");
     io:println("✓ README generated successfully");
     io:println(string `  Output: ${connectorPath}/README.md`);
+    io:println(string `  Duration: ${duration}s`);
 
     if !quietMode {
         io:println("");
@@ -273,18 +285,19 @@ function printDocTypeHeader(string docType, string connectorPath, boolean quietM
     io:println(sep);
 }
 
-function printDocCompletionSummary(string connectorPath, boolean quietMode) {
+function printDocCompletionSummary(string connectorPath, decimal duration, boolean quietMode) {
     string sep = createSeparator("=", 70);
 
     io:println("");
     io:println(sep);
     io:println("Documentation Generation Complete");
     io:println(sep);
+    io:println(string `  • duration: ${duration}s`);
     io:println("");
     io:println("Generated Files:");
     io:println(string `  • ${connectorPath}/README.md`);
     io:println(string `  • ${connectorPath}/ballerina/README.md`);
-    io:println(string `  • ${connectorPath}/tests/README.md`);
+    io:println(string `  • ${connectorPath}/ballerina/tests/README.md`);
     io:println(string `  • ${connectorPath}/examples/README.md`);
     io:println(string `  • ${connectorPath}/examples/*/README.md`);
 
@@ -319,8 +332,8 @@ function getUserConfirmation(string message, boolean autoYes) returns boolean {
 }
 
 function validateApiKey() returns error? {
-    string|error apiKey = os:getEnv("ANTHROPIC_API_KEY");
-    if apiKey is error {
+    string? apiKey = os:getEnv("ANTHROPIC_API_KEY");
+    if apiKey is () || apiKey.trim().length() == 0 {
         return error("ANTHROPIC_API_KEY not configured");
     }
 }

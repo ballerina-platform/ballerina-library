@@ -51,7 +51,6 @@ public function executeCommand(string command, string workingDir, boolean quietM
                 exitCode = 1;
             } else {
                 // Modify command to redirect stdout and stderr to files
-                // Use shell to execute: command > stdout.txt 2> stderr.txt
                 string redirectedCommand = string `cd "${workingDir}" && ${command} > "${stdoutFile}" 2> "${stderrFile}"`;
 
                 os:Command cmd = {
@@ -158,7 +157,6 @@ public function parseCmdCompilationErrors(string output) returns CmdCompilationE
     string[] lines = regex:split(output, "\n");
 
     foreach string line in lines {
-        // Handle both ERROR and WARNING messages
         if (line.includes("ERROR [") || line.includes("WARNING [")) && line.includes(")]") {
             string errorType = line.includes("ERROR [") ? "ERROR" : "WARNING";
             string prefix = errorType + " [";
@@ -167,7 +165,6 @@ public function parseCmdCompilationErrors(string output) returns CmdCompilationE
             int? endBracket = line.indexOf(")]", startBracket ?: 0);
 
             if startBracket is int && endBracket is int {
-                // Extract the part between prefix and ")]"
                 string errorPart = line.substring(startBracket + prefix.length(), endBracket);
 
                 // Find the last occurrence of ":(" to split filename from coordinates
@@ -175,18 +172,15 @@ public function parseCmdCompilationErrors(string output) returns CmdCompilationE
 
                 if coordStart is int {
                     string fileName = errorPart.substring(0, coordStart);
-                    string coordinates = errorPart.substring(coordStart + 2); // Skip ":("
+                    string coordinates = errorPart.substring(coordStart + 2);
 
-                    // Parse coordinates - format can be (line:col) or (line:col,endLine:endCol)
                     string[] coordParts = regex:split(coordinates, ",");
                     if coordParts.length() > 0 {
-                        // Get the first coordinate pair (line:col)
                         string[] lineCol = regex:split(coordParts[0], ":");
                         if lineCol.length() >= 2 {
                             int|error lineNum = int:fromString(lineCol[0]);
                             int|error col = int:fromString(lineCol[1]);
 
-                            // Extract message - everything after ")]" plus 2 for ") "
                             string message = line.substring(endBracket + 2).trim();
 
                             if lineNum is int && col is int {

@@ -1,3 +1,5 @@
+import ballerina/lang.regexp;
+
 public function createFixPrompt(string code, CompilationError[] errors, string filePath) returns string {
     string errorContext = prepareErrorContext(errors);
     string backTick = "`";
@@ -23,7 +25,7 @@ ${code}
 <REFLECTION_PHASE>
 Before providing the fix, analyze systematically:
 
-1. **Error Root Cause Analysis**:
+1. **Error Root Cause Analysis**: 
    - What is causing each compilation error?
    - Are there import issues, type mismatches, or syntax problems?
    - Which errors are interdependent and should be fixed together?
@@ -102,7 +104,7 @@ Your response must contain ONLY the complete, corrected Ballerina source code th
 - Follows proper error handling patterns
 
 DO NOT include:
-- Markdown code blocks or ${tripleBacktick} tags
+- Markdown code blocks or ${tripleBacktick} tags  
 - Any explanatory text or comments about fixes
 - Thinking or analysis sections
 - Any content other than raw .bal file content
@@ -112,227 +114,229 @@ Now provide the complete corrected code following all rules above:
 `;
 }
 
-// Enhanced prompt with type context for better error resolution
-public function createFixPromptWithContext(string code, CompilationError[] errors, string filePath, string typeContext) returns string {
-    // If no type context, use the original prompt
+public function createFixPromptWithContext(string code, CompilationError[] errors, string filePath,
+        string typeContext) returns string {
     if typeContext.length() == 0 {
         return createFixPrompt(code, errors, filePath);
     }
+    string contextualCode = string `${code}
 
-    string errorContext = prepareErrorContext(errors);
-    string backTick = "`";
-    string tripleBacktick = "```";
-
-    return string `
-You are an expert Ballerina language and compiler specialist with deep knowledge of API connector patterns, testing frameworks, and code generation best practices.
-
-<CONTEXT>
-This code was automatically generated for API connector testing/examples and contains compilation errors that need to be fixed while preserving the original intent and functionality.
-
-File: ${filePath}
-</CONTEXT>
-
-<COMPILATION_ERRORS>
-${errorContext}
-</COMPILATION_ERRORS>
-
-<TYPE_CONTEXT>
+<AUTHORITATIVE_TYPE_CONTEXT>
 ${typeContext}
-</TYPE_CONTEXT>
+</AUTHORITATIVE_TYPE_CONTEXT>
 
-<CURRENT_CODE>
-${code}
-</CURRENT_CODE>
-
-<CRITICAL_TYPE_HANDLING_RULES>
-The type definitions above are AUTHORITATIVE. When fixing errors related to field access:
-
-1. **For "invalid field access" errors on optional fields:**
-   - If a field is defined as ${backTick}fieldName?${backTick} (optional), you MUST use member access: ${backTick}response["fieldName"]${backTick}
-   - Cast the result appropriately: ${backTick}string? reportId = <string?>response["reportId"];${backTick}
-   - Do NOT use ${backTick}response.fieldName${backTick} or ${backTick}response?.fieldName${backTick} for rest fields
-
-2. **For "not a required field" errors:**
-   - The field might be a rest field in an open record
-   - Use member access with proper type casting: ${backTick}<TypeName?>response["field"]${backTick}
-
-3. **For "incompatible types" with anydata:**
-   - Cast explicitly: ${backTick}<string?>response["field"]${backTick}
-   - Or use ensureType: ${backTick}string reportId = check response["reportId"].ensureType();${backTick}
-
-4. **For unknown types:**
-   - Check if the type exists in the provided type definitions
-   - Use the exact type name as defined
-   - If a ${backTick}WithErrors${backTick} variant doesn't exist, use the base type
-</CRITICAL_TYPE_HANDLING_RULES>
-
-<REFLECTION_PHASE>
-Before providing the fix, analyze systematically:
-
-1. **Error Root Cause Analysis**:
-   - What is causing each compilation error?
-   - Review the RELEVANT TYPE DEFINITIONS to understand the actual structure
-   - Are fields optional (${backTick}?${backTick}), rest fields, or required?
-   - Which errors are interdependent and should be fixed together?
-
-2. **Type-Aware Fix Strategy**:
-   - For each type-related error, verify against the provided type definitions
-   - Use member access ${backTick}["field"]${backTick} for optional/rest fields
-   - Use field access ${backTick}.field${backTick} only for required fields
-   - Apply proper type casts when dealing with anydata or json
-</REFLECTION_PHASE>
-
-<BALLERINA_CODING_RULES>
-### Library Usage and Imports
-- Only use libraries that are actually needed and available
-- Each .bal file must include its own import statements for external libraries
-- Do NOT import default langlibs (lang.string, lang.boolean, lang.float, lang.decimal, lang.int, lang.map)
-- For packages with dots in names, use aliases: ${backTick}import org/package.one as one;${backTick}
-
-### Field Access Rules (CRITICAL)
-- Required fields: Use ${backTick}.fieldName${backTick}
-- Optional fields defined with ${backTick}?${backTick}: Use ${backTick}.fieldName${backTick} or ${backTick}?.fieldName${backTick}
-- Rest fields (not explicitly defined in record): Use ${backTick}["fieldName"]${backTick} with type cast
-- When error says "not a required field", ALWAYS use member access ${backTick}["field"]${backTick}
-
-### Function and Method Invocation
-- Use dot notation (.) for normal functions
-- Use arrow notation (->) for remote functions or resource functions
-- When invoking resource functions: ${backTick}client->/path1/["param"]/path2.get(key="value")${backTick}
-- ALWAYS use named arguments: ${backTick}.get(key="value")${backTick}
-
-### Error Handling
-- Use proper error handling with check expressions or error returns
-- For nullable fields, handle the nil case appropriately
-</BALLERINA_CODING_RULES>
-
-<OUTPUT_REQUIREMENTS>
-Your response must contain ONLY the complete, corrected Ballerina source code that:
-- Resolves ALL compilation errors
-- Uses the EXACT field access pattern based on field definition (member access for rest fields)
-- Follows ALL Ballerina coding rules above
-- Preserves original functionality and intent
-- Has correct import statements
-
-DO NOT include:
-- Markdown code blocks or ${tripleBacktick} tags
-- Any explanatory text or comments about fixes
-- Thinking or analysis sections
-- Any content other than raw .bal file content
-</OUTPUT_REQUIREMENTS>
-
-Now provide the complete corrected code following all rules above:
-`;
+Use required field access only for required record fields. For optional or rest fields, use member access with the required type conversion.`;
+    return createFixPrompt(contextualCode, errors, filePath);
 }
 
-// Enhanced prompt with type context AND fix history to prevent oscillation
-public function createFixPromptWithHistory(string code, CompilationError[] errors, string filePath, string typeContext, string fixHistory) returns string {
-    // If no history, use the context-aware prompt
-    if fixHistory.length() == 0 {
-        return createFixPromptWithContext(code, errors, filePath, typeContext);
-    }
+public function createFixPromptWithHistory(string code, CompilationError[] errors, string filePath,
+        string typeContext, string fixHistory) returns string {
+    string contextualCode = code;
+    if fixHistory.length() > 0 {
+        contextualCode = string `${contextualCode}
 
-    string errorContext = prepareErrorContext(errors);
-    string backTick = "`";
-    string tripleBacktick = "```";
-
-    string typeContextSection = "";
-    if typeContext.length() > 0 {
-        typeContextSection = string `
-<TYPE_CONTEXT>
-${typeContext}
-</TYPE_CONTEXT>
-`;
-    }
-
-    return string `
-You are an expert Ballerina language and compiler specialist with deep knowledge of API connector patterns, testing frameworks, and code generation best practices.
-
-<CONTEXT>
-This code was automatically generated for API connector testing/examples and contains compilation errors that need to be fixed while preserving the original intent and functionality.
-
-File: ${filePath}
-</CONTEXT>
-
-<COMPILATION_ERRORS>
-${errorContext}
-</COMPILATION_ERRORS>
-${typeContextSection}
-<CURRENT_CODE>
-${code}
-</CURRENT_CODE>
-
-<CRITICAL_FIX_HISTORY>
-**IMPORTANT**: Previous fix attempts for this file have FAILED. You must NOT repeat the same approaches.
-
+<PREVIOUS_FAILED_FIXES>
 ${fixHistory}
+</PREVIOUS_FAILED_FIXES>
 
-**ANALYSIS OF FAILED PATTERNS**:
-If you see oscillation between these error patterns, apply the COMBINED fix:
+Do not repeat a previous failed change.`;
+    }
+    return createFixPromptWithContext(contextualCode, errors, filePath, typeContext);
+}
 
-Pattern 1: "not a required field" or "invalid field access"
-  - This means you tried: ${backTick}response.fieldName${backTick} or ${backTick}response?.fieldName${backTick}
-  - This approach FAILED because the field is a rest field, not an explicit field
+// Build a targeted Java fix prompt that sends only the error-region context
+// and asks for a JSON patch response (not the whole file).
+public function createJavaFixPrompt(string code, CompilationError[] errors, string filePath,
+        string validationFailure = "", string previousCandidate = "", int attempt = 1) returns string {
+    string errorContext = prepareErrorContext(errors);
+    string tripleBacktick = "```";
 
-Pattern 2: "incompatible types: expected 'SomeType?', found 'anydata'"
-  - This means you tried: ${backTick}response["fieldName"]${backTick}
-  - This approach FAILED because member access returns anydata
+    // Build the error-region snippet with line numbers for context
+    string regionSnippet = buildErrorRegionSnippet(code, errors, 30);
 
-**THE CORRECT COMBINED SOLUTION**:
-When BOTH patterns appear in history, you MUST combine member access with a type cast (write this directly in your code response, no fences):
-  string? fieldValue = <string?>response["fieldName"];
-  string fieldValue = check response["fieldName"].ensureType();
+    // Build the import section (first 100 lines typically)
+    string importSection = buildImportSection(code);
 
-DO NOT try ${backTick}response.field${backTick} again - it already failed.
-DO NOT try ${backTick}response["field"]${backTick} without cast - it already failed.
-You MUST use ${backTick}<ExpectedType?>response["field"]${backTick}
-</CRITICAL_FIX_HISTORY>
+    string retryContext = "";
+    if attempt > 1 {
+        string retryOpen = "<" + "RETRY_CONTEXT" + ">";
+        string retryClose = "</" + "RETRY_CONTEXT" + ">";
+        retryContext = string `
+${retryOpen}
+Attempt: ${attempt}/3
+Previous attempt failed validation: ${validationFailure}
+Produce SMALLER, more targeted edits this time.
+${retryClose}`;
+    }
 
-<BALLERINA_FIELD_ACCESS_RULES>
-### Field Access - This is CRITICAL
+    return string `
+You are an expert Java compiler specialist. Fix ONLY the reported compilation errors in a generated Ballerina native adaptor.
 
-1. **For rest fields (NOT explicitly defined in record)**:
-   - WRONG: ${backTick}response.field${backTick} → "not a required field" error
-   - WRONG: ${backTick}response["field"]${backTick} → returns anydata, type mismatch
-   - CORRECT: ${backTick}<ExpectedType?>response["field"]${backTick}
-   - CORRECT: ${backTick}check response["field"].ensureType()${backTick}
+<FILE_INFO>
+File: ${filePath}
+Total lines: ${countLines(code)}
+</FILE_INFO>
 
-2. **For optional fields (defined with ?)**:
-   - Use: ${backTick}response?.field${backTick} or ${backTick}response.field${backTick} (if record allows)
+<COMPILATION_ERRORS>
+${errorContext}
+</COMPILATION_ERRORS>
 
-3. **For required fields (explicitly defined)**:
-   - Use: ${backTick}response.field${backTick}
+<IMPORT_SECTION>
+${importSection}
+</IMPORT_SECTION>
 
-### Type Casting with Member Access
-When accessing a rest field, the return type is ${backTick}anydata${backTick}. You MUST cast:
-${tripleBacktick}ballerina
-// If expecting string?:
-string? status = <string?>response["status"];
+<ERROR_REGION_WITH_LINE_NUMBERS>
+${regionSnippet}
+</ERROR_REGION_WITH_LINE_NUMBERS>
 
-// If expecting int?:
-int? count = <int?>response["count"];
+${retryContext}
 
-// If expecting a record type:
-MyRecord? data = <MyRecord?>response["data"];
-${tripleBacktick}
-</BALLERINA_FIELD_ACCESS_RULES>
+<INSTRUCTIONS>
+Return a JSON array of edit operations. Each operation replaces lines in the original file.
+
+RULES:
+1. Fix ONLY the reported compilation errors - do not change anything else.
+2. Each edit specifies a startLine (1-based inclusive), endLine (1-based inclusive), and replacement lines.
+3. Replacement lines must maintain correct Java syntax, indentation, and balanced braces.
+4. For adding new catch clauses, new imports, or new lines: the replacement can have MORE lines than the original range.
+5. For fixing a single line: startLine == endLine and replacement contains the corrected line.
+6. Keep edits minimal - change the fewest lines possible.
+7. Do NOT delete methods, fields, or functional code.
+8. If an import is needed, add an edit with startLine and endLine pointing to the last existing import line, 
+   and include that original import line PLUS the new import in the replacement.
+
+FORMAT (return ONLY this JSON, no other text):
+[
+  {
+    "startLine": <number>,
+    "endLine": <number>,
+    "replacement": [
+      "<line1>",
+      "<line2>"
+    ]
+  }
+]
+
+COMMON FIX PATTERNS:
+- "unreported exception ... must be caught or declared to be thrown": Add a catch clause for the exception type, or add the exception to the throws declaration.
+- "cannot find symbol": Add the missing import or use fully-qualified class name.
+- "incompatible types": Cast or convert to the expected type.
+- "method does not override": Fix method signature to match parent.
+- "no suitable method found for X(Collection<WrongType>)": Use a correctly-typed collection variable already in scope, or convert elements to the expected type before passing.
+</INSTRUCTIONS>
 
 <OUTPUT_REQUIREMENTS>
-Your response must contain ONLY the complete, corrected Ballerina source code that:
-- Resolves ALL compilation errors
-- DOES NOT repeat any fix that already failed (check the history above)
-- Uses the COMBINED approach (member access + type cast) for rest fields
-- Preserves original functionality and intent
-- Has correct import statements
-
-DO NOT include:
-- Markdown code blocks or ${tripleBacktick} tags
-- Any explanatory text or comments about fixes
-- Any content other than raw .bal file content
+Return ONLY valid JSON. No markdown, no explanations, no ${tripleBacktick} tags.
 </OUTPUT_REQUIREMENTS>
-
-Now provide the complete corrected code. Remember: DO NOT repeat failed approaches from the history.
 `;
 }
 
+// Extract the import section (package + imports) from Java source
+function buildImportSection(string code) returns string {
+    string[] lines = regexp:split(re `\n`, code);
+    string[] importLines = [];
+    foreach string line in lines {
+        string trimmed = line.trim();
+        if trimmed.startsWith("package ") || trimmed.startsWith("import ") || trimmed.length() == 0 {
+            importLines.push(line);
+        } else if importLines.length() > 0 && !trimmed.startsWith("import ") && !trimmed.startsWith("package ") && trimmed.length() > 0 {
+            // Stop after imports end
+            break;
+        }
+    }
+    return string:'join("\n", ...importLines);
+}
 
+// Build a snippet showing lines around each error with line numbers
+function buildErrorRegionSnippet(string code, CompilationError[] errors, int contextRadius) returns string {
+    string[] lines = regexp:split(re `\n`, code);
+    int totalLines = lines.length();
+
+    // Collect all line ranges we need to show
+    int[][] ranges = [];
+    foreach CompilationError err in errors {
+        int startLine = err.line - contextRadius;
+        if startLine < 1 {
+            startLine = 1;
+        }
+        int endLine = err.line + contextRadius;
+        if endLine > totalLines {
+            endLine = totalLines;
+        }
+        ranges.push([startLine, endLine]);
+    }
+
+    // Merge overlapping ranges
+    int[][] mergedRanges = mergeLineRanges(ranges);
+
+    // Build snippet with line numbers
+    string[] snippetParts = [];
+    foreach int[] range in mergedRanges {
+        int rangeStart = range[0];
+        int rangeEnd = range[1];
+        if snippetParts.length() > 0 {
+            snippetParts.push("... (lines omitted) ...");
+        }
+        foreach int lineNum in rangeStart ... rangeEnd {
+            int index = lineNum - 1;
+            if index >= 0 && index < totalLines {
+                string marker = isErrorLine(lineNum, errors) ? ">>>" : "   ";
+                snippetParts.push(string `${marker} ${lineNum}: ${lines[index]}`);
+            }
+        }
+    }
+
+    return string:'join("\n", ...snippetParts);
+}
+
+function isErrorLine(int lineNum, CompilationError[] errors) returns boolean {
+    foreach CompilationError err in errors {
+        if err.line == lineNum {
+            return true;
+        }
+    }
+    return false;
+}
+
+function mergeLineRanges(int[][] ranges) returns int[][] {
+    if ranges.length() == 0 {
+        return [];
+    }
+
+    // Simple sort by start line
+    int[][] sorted = ranges.clone();
+    int i = 0;
+    while i < sorted.length() - 1 {
+        int j = i + 1;
+        while j < sorted.length() {
+            if sorted[j][0] < sorted[i][0] {
+                int[] temp = sorted[i];
+                sorted[i] = sorted[j];
+                sorted[j] = temp;
+            }
+            j += 1;
+        }
+        i += 1;
+    }
+
+    int[][] merged = [sorted[0]];
+    foreach int k in 1 ..< sorted.length() {
+        int[] last = merged[merged.length() - 1];
+        int[] current = sorted[k];
+        if current[0] <= last[1] + 1 {
+            // Overlapping or adjacent
+            if current[1] > last[1] {
+                last[1] = current[1];
+            }
+        } else {
+            merged.push(current);
+        }
+    }
+
+    return merged;
+}
+
+function countLines(string code) returns int {
+    string[] lines = regexp:split(re `\n`, code);
+    return lines.length();
+}
