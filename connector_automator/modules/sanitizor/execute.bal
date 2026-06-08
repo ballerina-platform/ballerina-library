@@ -463,15 +463,16 @@ function convertAlignedYamlToJson(string alignedSpecPath, boolean quietMode = fa
     json|yaml:Error jsonData = yaml:readString(yamlContent);
 
     if jsonData is yaml:Error {
-        // If Ballerina's yaml parser fails, try using yq command-line tool as fallback
+        // Ballerina's YAML parser has known limitations with certain key forms (e.g. quoted
+        // keys starting with '@').  Fall back to Python, which handles the full YAML 1.1/1.2
+        // spec correctly.  Only log at INFO level since this is an expected code path.
         if !quietMode {
-            log:printWarn("Ballerina YAML parser failed, trying yq fallback",
-                errorMsg = jsonData.message());
+            log:printInfo("Ballerina YAML parser unavailable for this spec, using Python fallback",
+                reason = jsonData.message());
         }
 
-        // Shell-escape the path (wrap in single quotes, escape embedded single quotes)
+        // Try yq first if it is installed (faster than spawning a full Python interpreter).
         string escapedPath = "'" + regex:replaceAll(yamlAlignedSpec, "'", "'\\\\''") + "'";
-
         utils:CommandResult yqResult = utils:executeCommand(
             string `yq -o=json '.' ${escapedPath}`,
             ".",
