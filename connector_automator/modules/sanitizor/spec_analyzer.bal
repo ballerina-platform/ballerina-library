@@ -1,3 +1,5 @@
+const string PATH_SEP = "::";
+
 // Helper function to extract API context (info section)
 function extractApiContext(json spec) returns string {
     if (spec is map<json>) {
@@ -92,8 +94,8 @@ function collectDescriptionRequests(map<json> schemaMap, string schemaName, stri
                     if nestedItem is map<json> {
                         map<json> nestedItemMap = <map<json>>nestedItem;
                         string nestedPath = pathPrefix.length() > 0 ?
-                            pathPrefix + "." + nestedType + "[" + i.toString() + "]" :
-                            schemaName + "." + nestedType + "[" + i.toString() + "]";
+                            string `${pathPrefix}${PATH_SEP}${nestedType}[${i}]` :
+                            string `${schemaName}${PATH_SEP}${nestedType}[${i}]`;
                         collectDescriptionRequests(nestedItemMap, schemaName, nestedPath, requests, locationMap, fullSpec);
                     }
                 }
@@ -110,8 +112,8 @@ function collectPropertyDescriptionRequests(map<json> properties, string parentS
         if propertyResult is map<json> {
             map<json> propertyMap = <map<json>>propertyResult;
             string propertyPath = pathPrefix.length() > 0 ?
-                pathPrefix + ".properties." + propertyName :
-                parentSchemaName + ".properties." + propertyName;
+                string `${pathPrefix}${PATH_SEP}properties${PATH_SEP}${propertyName}` :
+                string `${parentSchemaName}${PATH_SEP}properties${PATH_SEP}${propertyName}`;
 
             // Check if property needs description
             if !propertyMap.hasKey("description") {
@@ -160,7 +162,7 @@ function collectPropertyDescriptionRequests(map<json> properties, string parentS
                         json|error itemPropertiesResult = items.get("properties");
                         if itemPropertiesResult is map<json> {
                             map<json> itemProperties = <map<json>>itemPropertiesResult;
-                            string itemPath = propertyPath + ".items";
+                            string itemPath = string `${propertyPath}${PATH_SEP}items`;
                             collectPropertyDescriptionRequests(itemProperties, parentSchemaName, itemPath, requests, locationMap, fullSpec);
                         }
                     }

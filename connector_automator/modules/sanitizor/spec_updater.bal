@@ -3,7 +3,7 @@ import ballerina/regex;
 
 // Helper function to update description in spec using location path
 function updateDescriptionInSpec(map<json> schemas, string location, string description) returns error? {
-    string[] pathParts = regex:split(location, "\\.");
+    string[] pathParts = regex:split(location, PATH_SEP);
 
     if pathParts.length() == 1 {
         // Schema-level description
