@@ -4,8 +4,8 @@ group = 'io.ballerina.connector.automator'
 version = '0.1.0'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 repositories {
@@ -31,7 +31,31 @@ dependencies {
         if (candidate.exists()) {
             ballerinaLibDir = candidate
         } else {
-            logger.warn("Ballerina lib dir not found at ${candidate}. Falling back to system distributions.")
+            // macOS installer layout: BALLERINA_HOME is the root, distributions live inside it
+            def distsDir = file("${ballerinaHome}/distributions")
+            if (distsDir.exists()) {
+                def versionFile = file("${ballerinaHome}/distributions/ballerina-version")
+                def activeVersion = versionFile.exists() ? versionFile.text.trim() : null
+                if (activeVersion) {
+                    def versionedCandidate = file("${ballerinaHome}/distributions/${activeVersion}/bre/lib")
+                    if (versionedCandidate.exists()) {
+                        ballerinaLibDir = versionedCandidate
+                    }
+                }
+                if (ballerinaLibDir == null) {
+                    def distDirs = distsDir.listFiles().findAll { it.isDirectory() && it.name.startsWith("ballerina-") }
+                    if (!distDirs.isEmpty()) {
+                        distDirs.sort { a, b -> a.name <=> b.name }
+                        def versionedCandidate = file("${distDirs.last()}/bre/lib")
+                        if (versionedCandidate.exists()) {
+                            ballerinaLibDir = versionedCandidate
+                        }
+                    }
+                }
+            }
+            if (ballerinaLibDir == null) {
+                logger.warn("Ballerina lib dir not found under ${ballerinaHome}. Falling back to system distributions.")
+            }
         }
     }
 
