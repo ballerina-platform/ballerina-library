@@ -95,6 +95,9 @@
             "name": "module-ballerina-os"
         },
         {
+            "name": "module-ballerina-pdf"
+        },
+        {
             "name": "module-ballerina-persist"
         },
         {
