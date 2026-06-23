@@ -104,6 +104,9 @@
             "name": "module-ballerina-random"
         },
         {
+            "name": "module-ballerina-smb"
+        },
+        {
             "name": "module-ballerina-soap"
         },
         {
@@ -141,6 +144,9 @@
         },
         {
             "name": "module-ballerina-websubhub"
+        },
+        {
+            "name": "module-ballerina-xlsx"
         },
         {
             "name": "module-ballerina-xmldata"
