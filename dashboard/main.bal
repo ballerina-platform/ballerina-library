@@ -96,6 +96,7 @@ function initializeModuleList(Module[] modules, int defaultModuleLevel = 1) retu
 
 function initializeModuleInfo(Module module, int defaultModuleLevel = 1) returns Module|error {
     string moduleName = module.name;
+    log:printInfo(string `Initializing module: ${moduleName}`);
     string defaultBranch = check getDefaultBranch(moduleName);
     string gradleProperties = check getGradlePropertiesFile(moduleName);
     string moduleVersion = check getVersion(moduleName, gradleProperties);

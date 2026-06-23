@@ -16,6 +16,7 @@
 
 import ballerina/io;
 import ballerina/lang.regexp;
+import ballerina/log;
 import ballerina/mime;
 import ballerina/os;
 import ballerina/url;
@@ -40,6 +41,7 @@ function getDefaultBranch(string moduleName) returns string|error {
 
 isolated function getRepoBadges(Module module) returns RepoBadges|error {
     string moduleName = module.name;
+    log:printInfo(string `Generating badges for module: ${moduleName}`);
     string defaultBranch = module.default_branch ?: BRANCH_MAIN;
     github:WorkflowResponse workflowResponse = check github->/repos/[BALLERINA_ORG_NAME]/[module.name]/actions/workflows;
     WorkflowBadge codeCov = getCodeCoverageBadge(module);
