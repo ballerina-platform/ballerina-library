@@ -143,6 +143,9 @@
             "name": "module-ballerina-websubhub"
         },
         {
+            "name": "module-ballerina-xlsx"
+        },
+        {
             "name": "module-ballerina-xmldata"
         },
         {
