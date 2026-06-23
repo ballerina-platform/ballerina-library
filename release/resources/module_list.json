@@ -209,7 +209,7 @@
             "name": "module-ballerinax-aws.sns"
         },
         {
-            "name": "module-ballerinax-azure-service-bus"
+            "name": "module-ballerinax-asb"
         },
         {
             "name": "module-ballerinax-confluent.cavroserdes"
@@ -294,7 +294,7 @@
             "name": "module-ballerinax-github"
         },
         {
-            "name": "module-ballerinax-googleapis.calendar"
+            "name": "module-ballerinax-gcalendar"
         },
         {
             "name": "module-ballerinax-googleapis.gmail"
@@ -357,31 +357,31 @@
             "name": "module-ballerinax-hubspot.crm.lists"
         },
         {
-            "name": "module-ballerinax-hubspot.crm.object.companies"
+            "name": "module-ballerinax-hubspot.crm.obj.companies"
         },
         {
-            "name": "module-ballerinax-hubspot.crm.object.contacts"
+            "name": "module-ballerinax-hubspot.crm.obj.contacts"
         },
         {
-            "name": "module-ballerinax-hubspot.crm.object.deals"
+            "name": "module-ballerinax-hubspot.crm.obj.deals"
         },
         {
-            "name": "module-ballerinax-hubspot.crm.object.feedback"
+            "name": "module-ballerinax-hubspot.crm.obj.feedback"
         },
         {
-            "name": "module-ballerinax-hubspot.crm.object.leads"
+            "name": "module-ballerinax-hubspot.crm.obj.leads"
         },
         {
-            "name": "module-ballerinax-hubspot.crm.object.lineitems"
+            "name": "module-ballerinax-hubspot.crm.obj.lineitems"
         },
         {
-            "name": "module-ballerinax-hubspot.crm.object.products"
+            "name": "module-ballerinax-hubspot.crm.obj.products"
         },
         {
-            "name": "module-ballerinax-hubspot.crm.object.schemas"
+            "name": "module-ballerinax-hubspot.crm.obj.schemas"
         },
         {
-            "name": "module-ballerinax-hubspot.crm.object.tickets"
+            "name": "module-ballerinax-hubspot.crm.obj.tickets"
         },
         {
             "name": "module-ballerinax-hubspot.crm.owners"
