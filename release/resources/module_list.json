@@ -104,6 +104,9 @@
             "name": "module-ballerina-random"
         },
         {
+            "name": "module-ballerina-smb"
+        },
+        {
             "name": "module-ballerina-soap"
         },
         {
