@@ -191,6 +191,9 @@
     ],
     "handwritten_connectors": [
         {
+            "name": "module-ballerinax-asb"
+        },
+        {
             "name": "module-ballerinax-aws.dynamodb"
         },
         {
@@ -207,9 +210,6 @@
         },
         {
             "name": "module-ballerinax-aws.sns"
-        },
-        {
-            "name": "module-ballerinax-asb"
         },
         {
             "name": "module-ballerinax-confluent.cavroserdes"
@@ -291,10 +291,10 @@
             "name": "module-ballerinax-elastic.elasticcloud"
         },
         {
-            "name": "module-ballerinax-github"
+            "name": "module-ballerinax-gcalendar"
         },
         {
-            "name": "module-ballerinax-gcalendar"
+            "name": "module-ballerinax-github"
         },
         {
             "name": "module-ballerinax-googleapis.gmail"
