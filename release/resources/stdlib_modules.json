@@ -406,7 +406,7 @@
         },
         {
             "name": "module-ballerina-xlsx",
-            "module_version": "1.0.0-SNAPSHOT",
+            "module_version": "1.0.2-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibXlsxVersion",
