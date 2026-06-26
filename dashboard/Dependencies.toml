@@ -336,7 +336,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "url"
-version = "2.6.1"
+version = "2.6.2"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
 ]
