@@ -1,58 +1,57 @@
 name: Library Release
 
 on:
-    workflow_dispatch:
-        inputs:
-            release_libs:
-                description: 'Release Ballerina Libraries (ballerina/*)'
-                required: true
-                default: true
-                type: boolean
-            release_extensions:
-                description: 'Release Ballerina Extensions (copybook, persist.*)'
-                required: true
-                default: false
-                type: boolean
-            release_tools:
-                description: 'Release Ballerina Tools (OpenAPI, GraphQL, AsyncAPI, etc.)'
-                required: true
-                default: false
-                type: boolean
-            release_driver_modules:
-                description: 'Release Ballerina Driver Modules (ballerinax/mysql.driver, ballerinax/mssql.driver, etc.)'
-                required: true
-                default: false
-                type: boolean
-            release_handwritten_connectors:
-                description: 'Release Ballerina Handwritten Connectors (ballerinax/mongodb, ballerinax/mysql, etc.)'
-                required: true
-                default: false
-                type: boolean
-            release_generated_connectors:
-                description: 'Release Ballerina Generated Connectors (ballerinax/twillio, ballerinax/docusign, etc.)'
-                required: true
-                default: false
-                type: boolean
+  workflow_dispatch:
+    inputs:
+      release_libs:
+        description: "Release Ballerina Libraries (ballerina/*)"
+        required: true
+        default: true
+        type: boolean
+      release_extensions:
+        description: "Release Ballerina Extensions (copybook, persist.*)"
+        required: true
+        default: false
+        type: boolean
+      release_tools:
+        description: "Release Ballerina Tools (OpenAPI, GraphQL, AsyncAPI, etc.)"
+        required: true
+        default: false
+        type: boolean
+      release_driver_modules:
+        description: "Release Ballerina Driver Modules (ballerinax/mysql.driver, ballerinax/mssql.driver, etc.)"
+        required: true
+        default: false
+        type: boolean
+      release_handwritten_connectors:
+        description: "Release Ballerina Handwritten Connectors (ballerinax/mongodb, ballerinax/mysql, etc.)"
+        required: true
+        default: false
+        type: boolean
+      release_generated_connectors:
+        description: "Release Ballerina Generated Connectors (ballerinax/twillio, ballerinax/docusign, etc.)"
+        required: true
+        default: false
+        type: boolean
 jobs:
-    build:
-        name: Release Ballerina Stdlibs
-        runs-on: ubuntu-22.04
-        if: github.repository_owner == 'ballerina-platform'
-        steps:
-            -   uses: actions/checkout@v2
+  build:
+    name: Release Ballerina Stdlibs
+    runs-on: ubuntu-22.04
+    if: github.repository_owner == 'ballerina-platform'
+    steps:
+      - uses: actions/checkout@v2
 
-            -   name: Release Ballerina Libraries
-                uses: ballerina-platform/ballerina-action@2201.9.0
-                with:
-                    args:
-                        run
-                env:
-                    WORKING_DIR: ./release
-                    BALLERINA_BOT_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
-                    RELEASE_LIBS: ${{ github.event.inputs.release_libs }}
-                    RELEASE_EXTENSIONS: ${{ github.event.inputs.release_extensions }}
-                    RELEASE_TOOLS: ${{ github.event.inputs.release_tools }}
-                    RELEASE_DRIVER_MODULES: ${{ github.event.inputs.release_driver_modules }}
-                    RELEASE_HANDWRITTEN_CONNECTORS: ${{ github.event.inputs.release_handwritten_connectors }}
-                    RELEASE_GENERATED_CONNECTORS: ${{ github.event.inputs.release_generated_connectors }}
-                    BAL_CONFIG_VAR_WORKFLOW: "publish-release.yml"
+      - name: Release Ballerina Libraries
+        uses: ballerina-platform/ballerina-action@2201.9.0
+        with:
+          args: run
+        env:
+          WORKING_DIR: ./release
+          BALLERINA_BOT_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          RELEASE_LIBS: ${{ github.event.inputs.release_libs }}
+          RELEASE_EXTENSIONS: ${{ github.event.inputs.release_extensions }}
+          RELEASE_TOOLS: ${{ github.event.inputs.release_tools }}
+          RELEASE_DRIVER_MODULES: ${{ github.event.inputs.release_driver_modules }}
+          RELEASE_HANDWRITTEN_CONNECTORS: ${{ github.event.inputs.release_handwritten_connectors }}
+          RELEASE_GENERATED_CONNECTORS: ${{ github.event.inputs.release_generated_connectors }}
+          BAL_CONFIG_VAR_WORKFLOW: "release.yml"

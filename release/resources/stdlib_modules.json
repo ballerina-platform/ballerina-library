@@ -184,16 +184,6 @@
       "is_multiple_connectors": false
     },
     {
-      "name": "module-ballerinax-hubspot.crm.obj.companies",
-      "module_version": "2.0.2-SNAPSHOT",
-      "level": 100,
-      "default_branch": "main",
-      "version_key": "stdlibHubspot.crm.obj.companiesVersion",
-      "release": true,
-      "dependents": [],
-      "is_multiple_connectors": false
-    },
-    {
       "name": "module-ballerinax-hubspot.crm.obj.contacts",
       "module_version": "1.0.2-SNAPSHOT",
       "level": 100,
@@ -367,4 +357,3 @@
   "driver_modules": [],
   "tools": []
 }
-
