@@ -1445,7 +1445,7 @@
         },
         {
             "name": "module-ballerinax-hubspot.marketing.events",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibHubspot.marketing.eventsVersion",
