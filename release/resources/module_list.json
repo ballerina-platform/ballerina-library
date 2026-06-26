@@ -1,549 +1,114 @@
 {
-    "library_modules": [
-        {
-            "name": "module-ballerina-ai"
-        },
-        {
-            "name": "module-ballerina-ai.np"
-        },
-        {
-            "name": "module-ballerina-auth"
-        },
-        {
-            "name": "module-ballerina-avro"
-        },
-        {
-            "name": "module-ballerina-cache"
-        },
-        {
-            "name": "module-ballerina-constraint"
-        },
-        {
-            "name": "module-ballerina-crypto"
-        },
-        {
-            "name": "module-ballerina-data.csv",
-            "version_key": "stdlibDataCsvVersion"
-        },
-        {
-            "name": "module-ballerina-data.jsondata",
-            "version_key": "stdlibDataJsonDataVersion"
-        },
-        {
-            "name": "module-ballerina-data.xmldata",
-            "version_key": "stdlibDataXmldataVersion"
-        },
-        {
-            "name": "module-ballerina-data.yaml",
-            "version_key": "stdlibDataYamlVersion"
-        },
-        {
-            "name": "module-ballerina-edi"
-        },
-        {
-            "name": "module-ballerina-email"
-        },
-        {
-            "name": "module-ballerina-file"
-        },
-        {
-            "name": "module-ballerina-ftp"
-        },
-        {
-            "name": "module-ballerina-graphql"
-        },
-        {
-            "name": "module-ballerina-grpc"
-        },
-        {
-            "name": "module-ballerina-http"
-        },
-        {
-            "name": "module-ballerina-io"
-        },
-        {
-            "name": "module-ballerina-jballerina.java.arrays",
-            "version_key": "stdlibJavaArraysVersion"
-        },
-        {
-            "name": "module-ballerina-jwt"
-        },
-        {
-            "name": "module-ballerina-ldap"
-        },
-        {
-            "name": "module-ballerina-log"
-        },
-        {
-            "name": "module-ballerina-math.vector",
-            "version_key": "stdlibMathVectorVersion"
-        },
-        {
-            "name": "module-ballerina-messaging"
-        },
-        {
-            "name": "module-ballerina-mime"
-        },
-        {
-            "name": "module-ballerina-mqtt"
-        },
-        {
-            "name": "module-ballerina-oauth2",
-            "version_key": "stdlibOAuth2Version"
-        },
-        {
-            "name": "module-ballerina-os"
-        },
-        {
-            "name": "module-ballerina-pdf"
-        },
-        {
-            "name": "module-ballerina-persist"
-        },
-        {
-            "name": "module-ballerina-protobuf"
-        },
-        {
-            "name": "module-ballerina-random"
-        },
-        {
-            "name": "module-ballerina-smb"
-        },
-        {
-            "name": "module-ballerina-soap"
-        },
-        {
-            "name": "module-ballerina-sql"
-        },
-        {
-            "name": "module-ballerina-task"
-        },
-        {
-            "name": "module-ballerina-tcp"
-        },
-        {
-            "name": "module-ballerina-time"
-        },
-        {
-            "name": "module-ballerina-toml"
-        },
-        {
-            "name": "module-ballerinai-transaction"
-        },
-        {
-            "name": "module-ballerina-udp"
-        },
-        {
-            "name": "module-ballerina-url"
-        },
-        {
-            "name": "module-ballerina-uuid"
-        },
-        {
-            "name": "module-ballerina-websocket"
-        },
-        {
-            "name": "module-ballerina-websub"
-        },
-        {
-            "name": "module-ballerina-websubhub"
-        },
-        {
-            "name": "module-ballerina-xlsx"
-        },
-        {
-            "name": "module-ballerina-xmldata"
-        },
-        {
-            "name": "module-ballerina-xslt"
-        },
-        {
-            "name": "module-ballerina-yaml"
-        }
-    ],
-    "extended_modules": [
-        {
-            "name": "module-ballerinax-cdc"
-        },
-        {
-            "name": "module-ballerinax-copybook"
-        },
-        {
-            "name": "module-ballerinax-persist.googlesheets",
-            "version_key": "stdlibPersistGoogleSheetVersion"
-        },
-        {
-            "name": "module-ballerinax-persist.inmemory",
-            "version_key": "stdlibPersistInmemoryVersion"
-        },
-        {
-            "name": "module-ballerinax-persist.redis",
-            "version_key": "stdlibPersistRedisVersion"
-        },
-        {
-            "name": "module-ballerinax-persist.sql",
-            "version_key": "stdlibPersistSqlVersion"
-        },
-        {
-            "name": "module-ballerinax-wso2.controlplane",
-            "version_key": "stdlibWso2ControlplaneVersion"
-        }
-    ],
-    "handwritten_connectors": [
-        {
-            "name": "module-ballerinax-asb"
-        },
-        {
-            "name": "module-ballerinax-aws.dynamodb"
-        },
-        {
-            "name": "module-ballerinax-aws.dynamodbstreams"
-        },
-        {
-            "name": "module-ballerinax-aws.marketplace.mpe"
-        },
-        {
-            "name": "module-ballerinax-aws.marketplace.mpm"
-        },
-        {
-            "name": "module-ballerinax-aws.redshift"
-        },
-        {
-            "name": "module-ballerinax-aws.sns"
-        },
-        {
-            "name": "module-ballerinax-confluent.cavroserdes"
-        },
-        {
-            "name": "module-ballerinax-confluent.cregistry"
-        },
-        {
-            "name": "module-ballerinax-ibm.ibmmq"
-        },
-        {
-            "name": "module-ballerinax-java.jdbc",
-            "version_key": "stdlibJdbcVersion"
-        },
-        {
-            "name": "module-ballerinax-java.jms",
-            "version_key": "stdlibJmsVersion"
-        },
-        {
-            "name": "module-ballerinax-kafka"
-        },
-        {
-            "name": "module-ballerinax-mongodb"
-        },
-        {
-            "name": "module-ballerinax-mssql"
-        },
-        {
-            "name": "module-ballerinax-mysql"
-        },
-        {
-            "name": "module-ballerinax-nats"
-        },
-        {
-            "name": "module-ballerinax-oracledb"
-        },
-        {
-            "name": "module-ballerinax-postgresql"
-        },
-        {
-            "name": "module-ballerinax-rabbitmq"
-        },
-        {
-            "name": "module-ballerinax-redis"
-        },
-        {
-            "name": "module-ballerinax-salesforce"
-        },
-        {
-            "name": "module-ballerinax-sap"
-        },
-        {
-            "name": "module-ballerinax-snowflake"
-        }
-    ],
-    "generated_connectors": [
-        {
-            "name": "module-ballerinax-asana"
-        },
-        {
-            "name": "module-ballerinax-candid"
-        },
-        {
-            "name": "module-ballerinax-dayforce"
-        },
-        {
-            "name": "module-ballerinax-discord"
-        },
-        {
-            "name": "module-ballerinax-docusign.dsadmin"
-        },
-        {
-            "name": "module-ballerinax-docusign.dsclick"
-        },
-        {
-            "name": "module-ballerinax-docusign.dsesign"
-        },
-        {
-            "name": "module-ballerinax-elastic.elasticcloud"
-        },
-        {
-            "name": "module-ballerinax-gcalendar"
-        },
-        {
-            "name": "module-ballerinax-github"
-        },
-        {
-            "name": "module-ballerinax-googleapis.gmail"
-        },
-        {
-            "name": "module-ballerinax-guidewire.insnow"
-        },
-        {
-            "name": "module-ballerinax-hubspot.automation.actions"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.associations"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.associations.schema"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.commerce.carts"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.commerce.discounts"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.commerce.orders"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.commerce.quotes"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.commerce.taxes"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.engagement.meeting"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.engagement.notes"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.engagements.calls"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.engagements.communications"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.engagements.email"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.engagements.tasks"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.extensions.timelines"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.extensions.videoconferencing"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.import"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.lists"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.obj.companies"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.obj.contacts"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.obj.deals"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.obj.feedback"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.obj.leads"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.obj.lineitems"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.obj.products"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.obj.schemas"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.obj.tickets"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.owners"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.pipelines"
-        },
-        {
-            "name": "module-ballerinax-hubspot.crm.properties"
-        },
-        {
-            "name": "module-ballerinax-hubspot.marketing.campaigns"
-        },
-        {
-            "name": "module-ballerinax-hubspot.marketing.emails"
-        },
-        {
-            "name": "module-ballerinax-hubspot.marketing.events"
-        },
-        {
-            "name": "module-ballerinax-hubspot.marketing.forms"
-        },
-        {
-            "name": "module-ballerinax-hubspot.marketing.subscriptions"
-        },
-        {
-            "name": "module-ballerinax-hubspot.marketing.transactional"
-        },
-        {
-            "name": "module-ballerinax-jira"
-        },
-        {
-            "name": "module-ballerinax-mailchimp.marketing"
-        },
-        {
-            "name": "module-ballerinax-mailchimp.transactional"
-        },
-        {
-            "name": "module-ballerinax-microsoft.onedrive"
-        },
-        {
-            "name": "module-ballerinax-openai"
-        },
-        {
-            "name": "module-ballerinax-paypal.invoices"
-        },
-        {
-            "name": "module-ballerinax-paypal.orders"
-        },
-        {
-            "name": "module-ballerinax-paypal.payments"
-        },
-        {
-            "name": "module-ballerinax-paypal.subscriptions"
-        },
-        {
-            "name": "module-ballerinax-salesforce.marketingcloud"
-        },
-        {
-            "name": "module-ballerinax-sap.s4hana.sales",
-            "is_multiple_connectors": true
-        },
-        {
-            "name": "module-ballerinax-scim"
-        },
-        {
-            "name": "module-ballerinax-slack"
-        },
-        {
-            "name": "module-ballerinax-smartsheet"
-        },
-        {
-            "name": "module-ballerinax-stripe"
-        },
-        {
-            "name": "module-ballerinax-trello"
-        },
-        {
-            "name": "module-ballerinax-twilio"
-        },
-        {
-            "name": "module-ballerinax-twitter"
-        },
-        {
-            "name": "module-ballerinax-zendesk"
-        },
-        {
-            "name": "module-ballerinax-zoom.meetings"
-        },
-        {
-            "name": "module-ballerinax-zoom.scheduler"
-        }
-    ],
-    "driver_modules": [
-        {
-            "name": "module-ballerinax-activemq.driver",
-            "version_key": "activeMQDriverVersion"
-        },
-        {
-            "name": "module-ballerinax-aws.redshift.driver"
-        },
-        {
-            "name": "module-ballerinax-h2.driver",
-            "version_key": "stdlibH2DriverVersion"
-        },
-        {
-            "name": "module-ballerinax-mssql.cdc.driver"
-        },
-        {
-            "name": "module-ballerinax-mssql.driver",
-            "version_key": "stdlibMssqlDriverVersion"
-        },
-        {
-            "name": "module-ballerinax-mysql.cdc.driver"
-        },
-        {
-            "name": "module-ballerinax-mysql.driver",
-            "version_key": "stdlibMysqlDriverVersion"
-        },
-        {
-            "name": "module-ballerinax-oracledb.driver",
-            "version_key": "stdlibOracledbDriverVersion"
-        },
-        {
-            "name": "module-ballerinax-postgresql.cdc.driver"
-        },
-        {
-            "name": "module-ballerinax-postgresql.driver",
-            "version_key": "stdlibPostgresqlDriverVersion"
-        },
-        {
-            "name": "module-ballerinax-snowflake.driver",
-            "version_key": "snowflakeDriverVersion"
-        }
-    ],
-    "tools": [
-        {
-            "name": "asyncapi-tools"
-        },
-        {
-            "name": "consolidate-packages-tool"
-        },
-        {
-            "name": "copybook-tools"
-        },
-        {
-            "name": "edi-tools"
-        },
-        {
-            "name": "graphql-tools"
-        },
-        {
-            "name": "openapi-tools"
-        },
-        {
-            "name": "persist-tools"
-        },
-        {
-            "name": "wsdl-tools"
-        },
-        {
-            "name": "xsd-tools"
-        }
-    ]
+  "library_modules": [],
+  "extended_modules": [],
+  "handwritten_connectors": [],
+  "generated_connectors": [
+    {
+      "name": "module-ballerinax-hubspot.automation.actions"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.associations"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.associations.schema"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.commerce.carts"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.commerce.discounts"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.commerce.orders"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.commerce.quotes"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.commerce.taxes"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.engagement.meeting"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.engagement.notes"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.engagements.calls"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.engagements.communications"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.engagements.email"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.engagements.tasks"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.extensions.timelines"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.extensions.videoconferencing"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.import"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.lists"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.obj.contacts"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.obj.deals"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.obj.feedback"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.obj.leads"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.obj.lineitems"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.obj.products"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.obj.schemas"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.obj.tickets"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.owners"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.pipelines"
+    },
+    {
+      "name": "module-ballerinax-hubspot.crm.properties"
+    },
+    {
+      "name": "module-ballerinax-hubspot.marketing.campaigns"
+    },
+    {
+      "name": "module-ballerinax-hubspot.marketing.emails"
+    },
+    {
+      "name": "module-ballerinax-hubspot.marketing.events"
+    },
+    {
+      "name": "module-ballerinax-hubspot.marketing.forms"
+    },
+    {
+      "name": "module-ballerinax-hubspot.marketing.subscriptions"
+    },
+    {
+      "name": "module-ballerinax-hubspot.marketing.transactional"
+    }
+  ],
+  "driver_modules": [],
+  "tools": []
 }
