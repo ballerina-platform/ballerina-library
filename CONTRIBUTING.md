@@ -13,7 +13,7 @@ We appreciate your help!
 ## Get started
 
 - Download [Ballerina](https://ballerina.io/downloads/) and go through the [learning resources](https://ballerina.io/learn/).
-- Read the [Ballerina Code of Conduct]("https://ballerina.io/code-of-conduct").
+- Read the [Ballerina Code of Conduct](https://ballerina.io/code-of-conduct).
 - Join the [Ballerina community](https://ballerina.io/community/).
 - Submitting a bug is just as important as contributing to code. [Report an issue](https://github.com/ballerina-platform/ballerina-standard-library/issues).
 - Start with GitHub issues that can be fixed easily:
