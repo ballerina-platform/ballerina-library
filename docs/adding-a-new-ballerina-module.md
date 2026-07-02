@@ -435,7 +435,7 @@ This field defines the name of the module. This should be the name of the reposi
 
 The version key of the module. This is related to the version prefix mentioned in the [`gradle.properties`](#the-gradleproperties-file-required) file. (e.g., `ballerinaStdlibIo`). It is used to add the module as a dependency to another repository including the [`ballerina-distribution`](https://github.com/ballerina-platform/ballerina-distribution) repository.
 
-Refer the [`version_key`](#the-version_key-field) section under [Add the module to the Ballerina library](#add-the-module-to-the-ballerina-library-optional).
+Refer the [`version_key`](#the-version_key-field) section under [Add the module to the Ballerina library](#add-the-module-to-the-ballerina-library-required).
 
 #### The `group_id` JSON field
 
