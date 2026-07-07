@@ -3,7 +3,7 @@ name: generating-ballerina-connectors
 description: Generates a complete Ballerina connector from an OpenAPI specification. Use when the user wants to create, generate, or build a Ballerina connector from an OpenAPI or Swagger spec; run the connector creation pipeline; generate a Ballerina client from an API spec; or produce connector tests, examples, and documentation.
 ---
 
-# Connector Creator Skill
+# Generating Ballerina Connectors Skill
 
 An AI-assisted pipeline for generating and maintaining Ballerina connectors from OpenAPI specifications. Mirrors the `bal connector openapi` workflow with interactive guidance, "2+1" prompting, and LLM reasoning applied only where it adds value.
 
@@ -45,7 +45,7 @@ When this skill is invoked:
 1. Print the welcome banner:
    ```
    ╔══════════════════════════════════════════╗
-   ║        Ballerina Connector Creator       ║
+   ║       Ballerina Connector Generator      ║
    ╚══════════════════════════════════════════╝
 
    I'll guide you through generating a Ballerina connector from your OpenAPI spec.

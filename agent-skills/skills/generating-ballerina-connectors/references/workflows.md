@@ -1,4 +1,4 @@
-# Connector Creator — Internal Agent Workflow Guide
+# Generating Ballerina Connectors — Internal Agent Workflow Guide
 
 This document is for the agent's internal use. It describes sequencing rules, error-handling decisions, and behavioural contracts for each stage.
 
@@ -91,7 +91,7 @@ When `--interactive` is enabled:
 At the end of the pipeline (or when aborted), print:
 
 ```
-=== Connector Creator — Run Summary ===
+=== Generating Ballerina Connectors — Run Summary ===
 Spec:         <input spec path>
 Output:       <output dir>
 Stages run:   sanitize ✓  client ✓  tests ✓  examples ✓  docs ✓

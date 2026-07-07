@@ -53,7 +53,7 @@ this step will report no prefix found and is a no-op.
 
 Run:
 ```bash
-python3 .claude/skills/connector-creator/scripts/parse_openapi_spec.py "<SPEC_PATH>"
+python3 .claude/skills/generating-ballerina-connectors/scripts/parse_openapi_spec.py "<SPEC_PATH>"
 ```
 
 Capture the JSON output as `SPEC_METADATA`. This is the **only** representation of the spec that should enter the LLM context — do not read or inject the raw spec file.
@@ -69,7 +69,7 @@ From `SPEC_METADATA`, note:
 ## Step 2: Flatten the spec
 
 ```bash
-bash .claude/skills/connector-creator/scripts/run_bal_command.sh \
+bash .claude/skills/generating-ballerina-connectors/scripts/run_bal_command.sh \
   "bal openapi flatten -i <SPEC_PATH> -o <SPEC_DIR>" \
   "<OUTPUT_DIR>"
 ```
