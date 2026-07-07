@@ -49,6 +49,18 @@ this step will report no prefix found and is a no-op.
 
 ---
 
+## Step 0c: Snapshot the previous aligned spec (if any)
+
+Step 3b below overwrites `<SPEC_DIR>/aligned_ballerina_openapi.json` with this run's output, so any operationIds a previous run established must be captured first. This is deterministic — no reasoning required:
+
+```bash
+test -f "<SPEC_DIR>/aligned_ballerina_openapi.json" && cp "<SPEC_DIR>/aligned_ballerina_openapi.json" "<SPEC_DIR>/aligned_ballerina_openapi.json.prev" || echo "no previous aligned spec"
+```
+
+If the copy was made, `<SPEC_DIR>/aligned_ballerina_openapi.json.prev` holds the prior run's operationIds for use in Step 4a Pass A. If no previous aligned spec exists, that file will simply be absent — Pass A's script handles this gracefully.
+
+---
+
 ## Step 1: Parse the spec (structured extraction)
 
 Run:
@@ -60,7 +72,7 @@ Capture the JSON output as `SPEC_METADATA`. This is the **only** representation 
 
 From `SPEC_METADATA`, note:
 - `title`, `version`, `description`
-- paths with missing `operationId`
+- paths with missing, verbose, or path-encoded `operationId`s
 - schema names that may be generic (e.g., "Object", "Response", "Item")
 - operations with empty or very short `summary`/`description`
 
@@ -118,19 +130,49 @@ The script prints the JSON output path — update `ALIGNED_SPEC` to that path.
 
 ## Step 4: AI-assisted spec enhancement
 
-Using `SPEC_METADATA` (not the raw spec), review and improve:
+Using `SPEC_METADATA` (not the raw spec), review and improve each category below. Each sub-step applies its own changes directly to `ALIGNED_SPEC` and writes the file back before moving to the next — operationId improvement, schema renaming, and description enhancement are each self-contained, matching how connector-tool treats them as separate read-modify-write passes rather than one deferred bulk write.
 
-### 4a. Missing operationIds
-For each path entry where `operationId` is empty, generate a meaningful camelCase operationId based on the HTTP method and path segments. Example: `GET /users/{id}/orders` → `getUserOrders`.
+### 4a. OperationId improvement (two-pass)
+
+**Pass A — restore from previous run.** This step is fully deterministic — do not reason through it manually, run the script:
+
+```bash
+python3 <skill-root>/scripts/restore_prior_operation_ids.py "<SPEC_DIR>/aligned_ballerina_openapi.json.prev" "<ALIGNED_SPEC>"
+```
+
+The script writes any restored operationIds directly into `ALIGNED_SPEC` — no AI call — and prints a single JSON object to stdout:
+
+```json
+{"prior_spec_found": bool, "restored_count": int, "reserved_operation_ids": [str, ...]}
+```
+
+Parse it and print the status line matching the case:
+- `prior_spec_found` is `false` → `No previous aligned spec found — all operationIds eligible for AI improvement`
+- `prior_spec_found` is `true` and `restored_count` is `0` → `Previous aligned spec found but contains no operationIds — all operationIds will be AI-improved`
+- otherwise → `Restored <restored_count> operationIds from previous run`
+
+Store `restored_count` as `RESTORED_COUNT` and `reserved_operation_ids` as `RESERVED_OPERATION_IDS` for use below.
+
+**Pass B — AI improvement.** For every operation whose path+method is *not* covered by Pass A (new endpoints, or ones with no prior recorded id):
+- If the current operationId (if any) is path-encoded or verbose/non-intuitive, replace it with a concise, intent-revealing camelCase name based on the HTTP method and path segments. Example: `postFilesV3FilesUpload` → `uploadFile`, `GET /users/{id}/orders` → `getUserOrders`.
+- If it's already concise and intent-revealing, leave it unchanged.
+- Hard limit: 37 characters for the camelCase operationId — if a candidate exceeds it, simplify (drop qualifiers, use a shorter verb/object) rather than truncating mechanically.
+- Treat every id in `RESERVED_OPERATION_IDS` as a hard "must not conflict" name. A Pass-B operation's own current id is never in that list (only Pass-A-restored ids are), so it's always free to keep its own id unchanged.
+- Once all Pass B decisions are made, apply them directly to `ALIGNED_SPEC` and write the file back now.
+
+**Duplicate check.** Also fully deterministic — run immediately after Pass B writes back, before continuing to schema renaming:
+
+```bash
+python3 <skill-root>/scripts/check_duplicate_operation_ids.py "<ALIGNED_SPEC>"
+```
+
+Print any `WARNING: duplicate operationId ...` lines verbatim. Non-fatal — record the warning and continue (client generation will also surface any remaining conflicts).
 
 ### 4b. Generic schema names
-If schema names like `Object`, `Response`, `InlineResponse200`, `Item`, `Body` appear, propose better names based on context (the operation that returns/consumes them). Apply renames consistently.
+If schema names like `Object`, `Response`, `InlineResponse200`, `Item`, `Body` appear, propose better names based on context (the operation that returns/consumes them). Apply renames consistently, then write `ALIGNED_SPEC` back before continuing.
 
 ### 4c. Short or missing descriptions
-For operations where `summary` or `description` is fewer than 10 characters (or empty), generate a concise description from the path, method, and parameter names.
-
-### 4d. Apply changes to the aligned spec
-Read `ALIGNED_SPEC`, apply the changes above, and write back.
+For operations where `summary` or `description` is fewer than 10 characters (or empty), generate a concise description from the path, method, and parameter names. Apply directly to `ALIGNED_SPEC` and write back.
 
 ---
 
@@ -169,7 +211,7 @@ Print:
 ✓ Sanitize complete
   Aligned spec: <SPEC_DIR>/aligned_ballerina_openapi.json
   Sanitations:  <SPEC_DIR>/sanitations.md
-  Changes made: <N> operationIds assigned, <M> descriptions enhanced, <K> schemas renamed
+  Changes made: <N> operationIds improved (<R> restored from previous run), <M> descriptions enhanced, <K> schemas renamed
 ```
 
 If `INTERACTIVE_MODE` is true, pause and ask: "Proceed to Client Generation? [Y/n/q]"

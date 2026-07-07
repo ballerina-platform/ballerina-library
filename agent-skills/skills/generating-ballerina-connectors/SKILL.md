@@ -150,4 +150,10 @@ bash scripts/run_bal_command.sh "<command>" "<working-dir>"
 
 # Parse compilation errors from bal build stderr → JSON error array
 python3 scripts/parse_errors.py "<stderr-file-or-stdin>"
+
+# Restore operationIds from a previous run's aligned spec into the current one
+python3 scripts/restore_prior_operation_ids.py "<prior-aligned-spec>" "<current-aligned-spec>"
+
+# Scan an aligned spec for duplicate operationIds — non-fatal warnings
+python3 scripts/check_duplicate_operation_ids.py "<aligned-spec>"
 ```

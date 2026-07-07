@@ -116,7 +116,7 @@ Fill in the TODO sections:
 - `_Author_` → leave blank (to be filled by the developer)
 - `_Created_` → today's date in `YYYY/MM/DD` format
 - `_Updated_` → today's date in `YYYY/MM/DD` format
-- Numbered sanitation list → each entry from Stage 01 Step 4 (AI-assisted enhancements: operationIds added, schemas renamed, descriptions enhanced). Format each as:
+- Numbered sanitation list → each entry from Stage 01 Step 4 (AI-assisted enhancements: operationIds improved/restored, schemas renamed, descriptions enhanced). Format each as:
   ```
   N. <Change type>
   - **Original**: <what was there before>
