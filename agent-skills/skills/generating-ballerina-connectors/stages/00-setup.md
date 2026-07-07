@@ -56,33 +56,46 @@ Store the JSON output as `SPEC_METADATA`.
 
 ---
 
-## Step 3: Output directory
+## Step 3: Ballerina package directory
+
+Before prompting, search downstream from the CWD for an existing Ballerina package — some repos (e.g. ballerina-library modules) keep `Ballerina.toml` nested below the root rather than at `./`:
+
+```bash
+bash <skill-root>/scripts/find_ballerina_toml.sh
+```
 
 Derive a slug from `SPEC_METADATA.title`: lowercase, spaces→underscores, strip special characters (e.g. "Microsoft Graph — SharePoint Admin" → `microsoft_graph_sharepoint_admin`).
 
 "2+1" prompt — options derived at runtime:
 
-> Where should the connector workspace be created?
-> 1. `./` — current directory (connector-tool default, recommended)
-> 2. `./<slug>-connector` (e.g. `./microsoft_graph_sharepoint_admin-connector`)
-> 3. Enter a custom path
+- **If the search found exactly one directory** (and it isn't `.`):
+  > Where does the Ballerina package live?
+  > 1. `<found-dir>` — existing Ballerina.toml found here (recommended)
+  > 2. `./` — current directory
+  > 3. Enter a custom path
+- **If the search found nothing, or only `.`**:
+  > Where should the Ballerina package be created?
+  > 1. `./` — current directory (connector-tool default, recommended)
+  > 2. `./<slug>-connector` (e.g. `./microsoft_graph_sharepoint_admin-connector`)
+  > 3. Enter a custom path
+- **If the search found more than one directory**: list up to two of them as options 1 and 2 (no "recommended" marker — ambiguous), plus option 3 for a custom path.
 
-Store as `OUTPUT_DIR`.
+Store as `BALLERINA_DIR`. This is the directory containing (or that will contain) `Ballerina.toml`, `client.bal`, `types.bal`, `utils.bal`, `tests/`, `README.md`, and `Module.md`.
 
 ---
 
 ## Step 3b: Ballerina project check
 
-Check whether the output directory is already a Ballerina package:
+Check whether `BALLERINA_DIR` is already a Ballerina package:
 
 ```bash
-test -f "<OUTPUT_DIR>/Ballerina.toml" && echo "exists" || echo "missing"
+test -f "<BALLERINA_DIR>/Ballerina.toml" && echo "exists" || echo "missing"
 ```
 
 **If `Ballerina.toml` exists**: read it with:
 
 ```bash
-python3 <skill-root>/scripts/parse_ballerina_toml.py "<OUTPUT_DIR>/Ballerina.toml"
+python3 <skill-root>/scripts/parse_ballerina_toml.py "<BALLERINA_DIR>/Ballerina.toml"
 ```
 
 Confirm with the user:
@@ -93,11 +106,11 @@ If the user wants to change them, ask using the 2+1 prompts below. Store as `BAL
 **If `Ballerina.toml` is missing**: print a clear message and scaffold the package:
 
 ```
-⚠ No Ballerina project found at <OUTPUT_DIR> — creating one with `bal new .`
+⚠ No Ballerina project found at <BALLERINA_DIR> — creating one with `bal new .`
 ```
 
 ```bash
-bash <skill-root>/scripts/init_ballerina_package.sh "<OUTPUT_DIR>"
+bash <skill-root>/scripts/init_ballerina_package.sh "<BALLERINA_DIR>"
 ```
 
 `bal new .` reads the user's Ballerina settings to pick a default org and derives the package name from the directory name. It also creates `main.bal` which the script removes immediately (not needed for a connector package).
@@ -105,7 +118,7 @@ bash <skill-root>/scripts/init_ballerina_package.sh "<OUTPUT_DIR>"
 Then read the generated `Ballerina.toml`:
 
 ```bash
-python3 <skill-root>/scripts/parse_ballerina_toml.py "<OUTPUT_DIR>/Ballerina.toml"
+python3 <skill-root>/scripts/parse_ballerina_toml.py "<BALLERINA_DIR>/Ballerina.toml"
 ```
 
 Ask about **org** with a 2+1 prompt:
@@ -124,43 +137,66 @@ Ask about **package name** with a separate 2+1 prompt. Derive two slug options f
 > 2. `<spec-derived-slug>` — derived from the spec title (`<SPEC_METADATA.title>`)
 > 3. Enter a custom package name
 
-If org or name changed, update `<OUTPUT_DIR>/Ballerina.toml` (edit the `org` and `name` fields in the `[package]` section).
+If org or name changed, update `<BALLERINA_DIR>/Ballerina.toml` (edit the `org` and `name` fields in the `[package]` section).
 
 Store final values as `BAL_ORG` and `BAL_PACKAGE`.
 
-> **Note**: `bal openapi --mode client` (Stage 02) outputs `client.bal`, `types.bal`, and `utils.bal` into `<OUTPUT_DIR>` but does **not** create or modify `Ballerina.toml`. This step is the sole owner of package initialisation.
+> **Note**: `bal openapi --mode client` (Stage 02) outputs `client.bal`, `types.bal`, and `utils.bal` into `<BALLERINA_DIR>` but does **not** create or modify `Ballerina.toml`. This step is the sole owner of package initialisation.
 
 ---
 
-## Step 4: Spec directory
+## Step 4: Stage exclusions
 
-"2+1" prompt (connector-tool default is `<output>/docs/spec`):
+Ask this before any stage-specific questions below, so those can be skipped when their stage won't run:
+
+> Are there any stages you want to skip? (default: run all)
+> 1. Run all stages (recommended)
+> 2. Skip specific stages
+> 3. Run only specific stages
+
+If skipping (or selecting which to run only), collect the stage list across **two** multi-select questions in the same prompt — `AskUserQuestion` caps options at 4 per question, so all 5 stages cannot be offered in one:
+- Question A — options: `sanitize`, `client`
+- Question B — options: `tests`, `examples`, `docs`
+
+Union the selections from both questions into a single list. Validate against the rules in `references/workflows.md` (section: "Skip validation rules").
+
+Store as `EXCLUDED_STAGES` (list).
+
+---
+
+## Step 5: Spec directory
+
+"2+1" prompt (connector-tool default is `./docs/spec`):
 
 > Where should the aligned spec and sanitations.md be written?
-> 1. `<OUTPUT_DIR>/docs/spec` — connector-tool default (recommended)
-> 2. `<OUTPUT_DIR>/spec`
+> 1. `./docs/spec` — connector-tool default (recommended)
+> 2. `./spec`
 > 3. Enter a custom path
 
 Store as `SPEC_DIR`.
 
 ---
 
-## Step 5: Example directory
+## Step 6: Example directory
 
-"2+1" prompt (connector-tool default is `<output>/examples`):
+Skip this step entirely if `examples` is in `EXCLUDED_STAGES` — leave `EXAMPLE_DIR` unset.
+
+"2+1" prompt (connector-tool default is `./examples`):
 
 > Where should generated examples be written?
-> 1. `<OUTPUT_DIR>/examples` — connector-tool default (recommended)
-> 2. `<OUTPUT_DIR>/example`
+> 1. `./examples` — connector-tool default (recommended)
+> 2. `./example`
 > 3. Enter a custom path
 
 Store as `EXAMPLE_DIR`.
 
 ---
 
-## Step 6: License header (optional)
+## Step 7: License header (optional)
 
-Ask:
+Skip this step entirely if **both** `client` and `tests` are in `EXCLUDED_STAGES` — those are the only stages that consume `LICENSE_PATH`. Leave `LICENSE_PATH` empty.
+
+Otherwise, ask:
 
 > Do you have a license header file to include in generated source files? If so, provide the path (or press Enter to skip):
 
@@ -169,7 +205,11 @@ Ask:
 
 ---
 
-## Step 7: Filtering options (progressive disclosure)
+## Step 8: Filtering options (progressive disclosure)
+
+Skip this step entirely if `client` is in `EXCLUDED_STAGES` — `TAGS`, `OPERATIONS`, and `USE_REMOTE` are only consumed by Stage 02 (client generation). Leave `TAGS`/`OPERATIONS` empty and `USE_REMOTE` false.
+
+Otherwise:
 
 > Do you want to filter by OpenAPI tags? [y/N]
 
@@ -185,25 +225,11 @@ Store as `USE_REMOTE` (boolean, default false). Note: connector-tool default is 
 
 ---
 
-## Step 8: Interactive mode
+## Step 9: Interactive mode
 
 > Run in interactive mode (pause after each stage for confirmation)? [y/N]
 
 Store as `INTERACTIVE_MODE` (boolean, default false).
-
----
-
-## Step 9: Stage exclusions
-
-> Are there any stages you want to skip? (default: run all)
-> 1. Run all stages (recommended)
-> 2. Skip specific stages
-> 3. Run only specific stages
-
-If skipping, list the five stages (`sanitize`, `client`, `tests`, `examples`, `docs`) and let the user select which to exclude.
-Validate against the rules in `references/workflows.md` (section: "Skip validation rules").
-
-Store as `EXCLUDED_STAGES` (list).
 
 ---
 
@@ -214,15 +240,15 @@ Print:
 ```
 === Configuration Summary ===
 Spec:           <SPEC_PATH>
-Output dir:     <OUTPUT_DIR>
+Ballerina dir:  <BALLERINA_DIR>
 Spec dir:       <SPEC_DIR>
-Example dir:    <EXAMPLE_DIR>
+Example dir:    <EXAMPLE_DIR or "N/A (examples stage skipped)">
 Bal org:        <BAL_ORG or "not set">
 Bal package:    <BAL_PACKAGE or "not set">
-License:        <file path or "none">
-Tags:           <tags or "all">
-Operations:     <operations or "all">
-Remote methods: <yes/no>
+License:        <file path, "none", or "N/A (client and tests skipped)">
+Tags:           <tags, "all", or "N/A (client stage skipped)">
+Operations:     <operations, "all", or "N/A (client stage skipped)">
+Remote methods: <yes/no, or "N/A (client stage skipped)">
 Interactive:    <yes/no>
 Skip stages:    <stages or "none">
 ```

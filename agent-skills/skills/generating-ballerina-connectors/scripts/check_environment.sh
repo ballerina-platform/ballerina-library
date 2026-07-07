@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Check that the environment has the required tools for the generating-ballerina-connectors skill.
-# Mirrors sdk_workflow.bal and utils/ai_service.bal environment validation logic.
+# Check that the environment has the required tools for this skill.
 #
 # Usage: check_environment.sh
 # Output: status lines per check. Exits 1 if any required check fails.

@@ -11,13 +11,13 @@ Skip this stage if `examples` is in `EXCLUDED_STAGES`.
 Run both scripts upfront — this replaces all inline file reading for this stage:
 
 ```bash
-python3 <skill-root>/scripts/analyze_client.py "<OUTPUT_DIR>/client.bal"
+python3 <skill-root>/scripts/analyze_client.py "<BALLERINA_DIR>/client.bal"
 ```
 
 Store as `CLIENT_ANALYSIS`. Take `NUM_EXAMPLES` from `CLIENT_ANALYSIS.numExamples` (formula already applied). Initialise `USED_FUNCTIONS = []`.
 
 ```bash
-python3 <skill-root>/scripts/parse_ballerina_toml.py "<OUTPUT_DIR>/Ballerina.toml"
+python3 <skill-root>/scripts/parse_ballerina_toml.py "<BALLERINA_DIR>/Ballerina.toml"
 ```
 
 Store as `TOML_META`. Use `TOML_META.distribution` and `TOML_META.version` when writing per-example `Ballerina.toml` files.
@@ -29,8 +29,8 @@ Store as `TOML_META`. Use `TOML_META.distribution` and `TOML_META.version` when 
 Before generating any examples, publish the connector so that each example's `import <BAL_ORG>/<BAL_PACKAGE>` can resolve at build time:
 
 ```bash
-bash <skill-root>/scripts/run_bal_command.sh "bal pack" "<OUTPUT_DIR>"
-bash <skill-root>/scripts/run_bal_command.sh "bal push --repository=local" "<OUTPUT_DIR>"
+bash <skill-root>/scripts/run_bal_command.sh "bal pack" "<BALLERINA_DIR>"
+bash <skill-root>/scripts/run_bal_command.sh "bal push --repository=local" "<BALLERINA_DIR>"
 ```
 
 `bal pack` creates the `.bala` archive in `target/`; `bal push --repository=local` publishes it to `~/.ballerina/repositories/local/bala/` so examples can resolve the import at build time.
@@ -139,7 +139,7 @@ Read `<skill-root>/templates/examples_readme_template.md`.
 Fill in:
 - `<BAL_ORG>/<BAL_PACKAGE>` → from shared state
 - Example table rows — one row per example generated in Step 3 (`<example-name>` and USE_CASE one-liner)
-- `<OUTPUT_DIR>` → the connector output directory path
+- `<BALLERINA_DIR>` → the connector output directory path
 - Auth field names (`<auth_field_1>`, `<auth_field_2>`) → from `SPEC_METADATA.securitySchemes`
 
 Write the filled content to `<EXAMPLE_DIR>/README.md`.

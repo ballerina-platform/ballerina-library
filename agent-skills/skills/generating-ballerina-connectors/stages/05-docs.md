@@ -29,7 +29,7 @@ Collect the following (already in context from prior stages):
 - `BAL_ORG`, `BAL_PACKAGE`
 - `TOML_META` (from `parse_ballerina_toml.py`) — if not already loaded, run:
   ```bash
-  python3 <skill-root>/scripts/parse_ballerina_toml.py "<OUTPUT_DIR>/Ballerina.toml"
+  python3 <skill-root>/scripts/parse_ballerina_toml.py "<BALLERINA_DIR>/Ballerina.toml"
   ```
 - `EXAMPLE_DIR` file list (from stage 04)
 - `CLIENT_ANALYSIS.methods` (from stage 02/03)
@@ -41,7 +41,7 @@ Do **not** re-read the entire source files — use the structured metadata and f
 
 ## Step 2: Generate root README
 
-Check if `<OUTPUT_DIR>/README.md` already exists:
+Check if `<BALLERINA_DIR>/README.md` already exists:
 - **Exists** → use it as the base. It may already have some or all `[//]: # (TODO: ...)` sections and `{{PLACEHOLDER}}` variables filled. Only replace what is still unfilled — do not overwrite content that is already present.
 - **Absent** → read `<skill-root>/templates/readme_template.md` and proceed as below.
 
@@ -55,13 +55,13 @@ Replace each `[//]: # (TODO: ...)` section with generated content:
 
 Copy all other sections (Build from source, Build options, Contribute, Code of conduct, Useful links) verbatim from the template.
 
-Write to `<OUTPUT_DIR>/README.md`.
+Write to `<BALLERINA_DIR>/README.md`.
 
 ---
 
 ## Step 3: Generate Module.md (Ballerina Central)
 
-Check if `<OUTPUT_DIR>/Module.md` already exists:
+Check if `<BALLERINA_DIR>/Module.md` already exists:
 - **Exists** → use it as the base. Only replace sections that still contain unfilled `[//]: # (TODO: ...)` markers or unresolved `{{PLACEHOLDER}}` variables. Do not overwrite already-filled content.
 - **Absent** → read `<skill-root>/templates/module_readme_template.md` and proceed as below.
 
@@ -69,7 +69,7 @@ Replace all `{{PLACEHOLDER}}` variables using the mapping above.
 
 Replace each `[//]: # (TODO: ...)` section with generated content using the same content as Step 2 (Overview, Setup guide, Quickstart, Examples) — the module README mirrors the root README but is shorter (no build/contribute sections).
 
-Write to `<OUTPUT_DIR>/Module.md`.
+Write to `<BALLERINA_DIR>/Module.md`.
 
 ---
 
@@ -77,13 +77,13 @@ Write to `<OUTPUT_DIR>/Module.md`.
 
 ### Tests README
 
-Check if `<OUTPUT_DIR>/tests/README.md` already exists:
+Check if `<BALLERINA_DIR>/tests/README.md` already exists:
 - **Exists** → use it as the base. Only fill in `AI_GENERATED_TESTING_APPROACH` if it still appears as the bare marker. Do not overwrite content that is already filled.
 - **Absent** → read `<skill-root>/templates/tests_readme_template.md` and proceed as below.
 
 Fill in `AI_GENERATED_TESTING_APPROACH` with a short description of what the test suite covers — derived from `CLIENT_ANALYSIS.methods` method names.
 
-Write to `<OUTPUT_DIR>/tests/README.md`.
+Write to `<BALLERINA_DIR>/tests/README.md`.
 
 ### Examples README
 
@@ -134,9 +134,9 @@ Write to `<SPEC_DIR>/sanitations.md`. If a `sanitations.md` already exists (from
 Print:
 ```
 ✓ Documentation complete
-  README.md:            <OUTPUT_DIR>/README.md
-  Module.md:            <OUTPUT_DIR>/Module.md
-  tests/README.md:      <OUTPUT_DIR>/tests/README.md
+  README.md:            <BALLERINA_DIR>/README.md
+  Module.md:            <BALLERINA_DIR>/Module.md
+  tests/README.md:      <BALLERINA_DIR>/tests/README.md
   examples/README.md:   <EXAMPLE_DIR>/README.md
   sanitations.md:       <SPEC_DIR>/sanitations.md
 ```

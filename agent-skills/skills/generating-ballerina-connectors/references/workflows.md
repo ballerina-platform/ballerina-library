@@ -19,7 +19,7 @@ Stages run in this fixed order. Each stage may be skipped if the user excluded i
 
 Skip validation rules (mirror the connector-tool's `OpenApiStageValidationUtils`):
 - If `sanitize` is skipped: `<SPEC_DIR>/aligned_ballerina_openapi.yaml` must exist — fail with a clear message if not.
-- If `client` is skipped: `<OUTPUT_DIR>/client.bal` must exist — fail with a clear message if not.
+- If `client` is skipped: `<BALLERINA_DIR>/client.bal` must exist — fail with a clear message if not.
 - If all stages are skipped: reject immediately.
 
 ---
@@ -29,8 +29,8 @@ Skip validation rules (mirror the connector-tool's `OpenApiStageValidationUtils`
 Compilation errors are resolved **inline within the stage that generated the failing code** — there is no separate fix stage. When any stage's `bal build` call fails, read `references/fix-procedure.md` and invoke it before proceeding.
 
 The fix procedure takes `BUILD_DIR` as its context (the directory where `bal build` was run):
-- **Client stage**: `BUILD_DIR = OUTPUT_DIR`
-- **Tests stage**: `BUILD_DIR = OUTPUT_DIR`
+- **Client stage**: `BUILD_DIR = BALLERINA_DIR`
+- **Tests stage**: `BUILD_DIR = BALLERINA_DIR`
 - **Examples stage**: `BUILD_DIR = EXAMPLE_DIR/<example-name>` (per example, non-fatal if fix exhausted)
 
 ---

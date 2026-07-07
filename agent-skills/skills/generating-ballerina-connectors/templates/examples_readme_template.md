@@ -10,7 +10,7 @@ The `<BAL_ORG>/<BAL_PACKAGE>` connector provides practical examples illustrating
 
 1. Build and push the connector to your local Ballerina repository:
    ```bash
-   cd <OUTPUT_DIR>
+   cd <BALLERINA_DIR>
    bal pack && bal push --repository=local
    ```
 

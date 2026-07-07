@@ -5,7 +5,7 @@ Parse Ballerina compilation errors from bal build stderr output.
 Reads from stdin or a file path argument.
 Output (stdout): JSON array of {fileName, line, col, message, errorType}
 
-Matches the format used by the connector-tool's parseCmdCompilationErrors():
+Matches lines of the form:
   ERROR [<file>:(<line>,<col>)] <message>
   WARNING [<file>:(<line>,<col>)] <message>
 """

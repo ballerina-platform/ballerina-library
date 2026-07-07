@@ -75,9 +75,9 @@ These variables are set in Setup (stage 00) and used by all subsequent stages:
 | Variable | Description |
 |----------|-------------|
 | `SPEC_PATH` | Absolute or relative path to the input OpenAPI spec |
-| `OUTPUT_DIR` | Root directory for the generated connector workspace |
-| `SPEC_DIR` | User-confirmed path for aligned spec + sanitations (default: `<OUTPUT_DIR>/docs/spec`) |
-| `EXAMPLE_DIR` | User-confirmed path for generated examples (default: `<OUTPUT_DIR>/examples`) |
+| `BALLERINA_DIR` | Directory containing (or to contain) `Ballerina.toml` — where `client.bal`, `types.bal`, `utils.bal`, `tests/`, `README.md`, `Module.md` are generated |
+| `SPEC_DIR` | User-confirmed path for aligned spec + sanitations (default: `./docs/spec`) |
+| `EXAMPLE_DIR` | User-confirmed path for generated examples (default: `./examples`) — unset if the `examples` stage is excluded |
 | `BAL_ORG` | Ballerina package org (read from Ballerina.toml or collected from user) |
 | `BAL_PACKAGE` | Ballerina package name (read from Ballerina.toml or collected from user) |
 | `LICENSE_PATH` | Path to the user-provided license file, or empty if not provided |
@@ -86,7 +86,8 @@ These variables are set in Setup (stage 00) and used by all subsequent stages:
 | `USE_REMOTE` | Boolean — generate remote vs resource methods (connector-tool default: false) |
 | `INTERACTIVE_MODE` | Boolean — pause after each stage (connector-tool default: false) |
 | `EXCLUDED_STAGES` | List of stage names to skip — valid values: `sanitize`, `client`, `tests`, `examples`, `docs` |
-| `SPEC_METADATA` | JSON from `parse_openapi_spec.py` — the only spec representation in LLM context |
+| `SPEC_METADATA` | JSON from `parse_openapi_spec.py` on the original spec (Stage 00) — the only spec representation in LLM context |
+| `ALIGNED_SPEC_METADATA` | JSON from `parse_openapi_spec.py` on `ALIGNED_SPEC`, the post-flatten/align spec (Stage 01 onward) — authoritative for path keys, operationIds, and generated schema names |
 
 ---
 
@@ -121,6 +122,9 @@ bash scripts/check_environment.sh
 # Find OpenAPI spec candidates in CWD — use before prompting for spec path
 bash scripts/find_spec_files.sh
 
+# Find an existing Ballerina.toml nested below CWD — use before prompting for output dir
+bash scripts/find_ballerina_toml.sh
+
 # Initialise a Ballerina package in the output dir (bal new . + remove main.bal)
 bash scripts/init_ballerina_package.sh "<output-dir>"
 
@@ -151,8 +155,11 @@ bash scripts/run_bal_command.sh "<command>" "<working-dir>"
 # Parse compilation errors from bal build stderr → JSON error array
 python3 scripts/parse_errors.py "<stderr-file-or-stdin>"
 
-# Restore operationIds from a previous run's aligned spec into the current one
-python3 scripts/restore_prior_operation_ids.py "<prior-aligned-spec>" "<current-aligned-spec>"
+# Extract the prior run's operationId map (run before flatten/align overwrites it)
+python3 scripts/restore_prior_operation_ids.py build "<existing-aligned-spec>" > "<map-file>"
+
+# Apply that map into the newly aligned spec, restoring matching operationIds
+python3 scripts/restore_prior_operation_ids.py apply "<map-file>" "<current-aligned-spec>"
 
 # Scan an aligned spec for duplicate operationIds — non-fatal warnings
 python3 scripts/check_duplicate_operation_ids.py "<aligned-spec>"

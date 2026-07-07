@@ -11,7 +11,7 @@ Skip this stage if `tests` is in `EXCLUDED_STAGES`.
 Run before generating anything — provides method signatures without reading client.bal inline:
 
 ```bash
-python3 <skill-root>/scripts/analyze_client.py "<OUTPUT_DIR>/client.bal"
+python3 <skill-root>/scripts/analyze_client.py "<BALLERINA_DIR>/client.bal"
 ```
 
 Store the JSON output as `CLIENT_ANALYSIS`. Fields used in this stage:
@@ -60,7 +60,7 @@ Store the result as `SELECTED_OPERATIONS`.
 ### 2a: Generate service stub from the spec
 
 ```bash
-bash <skill-root>/scripts/generate_mock_stub.sh "<ALIGNED_SPEC>" "<OUTPUT_DIR>" "<SELECTED_OPERATIONS>" "<LICENSE_PATH>"
+bash <skill-root>/scripts/generate_mock_stub.sh "<ALIGNED_SPEC>" "<BALLERINA_DIR>" "<SELECTED_OPERATIONS>" "<LICENSE_PATH>"
 ```
 
 Pass `SELECTED_OPERATIONS` as the 3rd argument (empty string if not filtered) and `LICENSE_PATH` as the 4th argument (empty string if not set). The script appends `--operations` and `--license` only when the respective values are non-empty.
@@ -70,7 +70,7 @@ This runs `bal openapi -i <spec> --mode service -o tests/` — generating only a
 ### 2b: Complete the stub — LLM fills in mock responses
 
 Read this file into context:
-1. `<OUTPUT_DIR>/tests/mock_service.bal` — the generated stub (correct signatures, empty bodies)
+1. `<BALLERINA_DIR>/tests/mock_service.bal` — the generated stub (correct signatures, empty bodies)
 
 Rewrite `mock_service.bal` completing every resource function body. The following rules are **all mandatory** — violations cause compilation failures:
 
@@ -106,7 +106,7 @@ Rewrite `mock_service.bal` completing every resource function body. The followin
 
 ## Step 3: Generate test suite
 
-Write `<OUTPUT_DIR>/tests/test.bal`. Provide the LLM with:
+Write `<BALLERINA_DIR>/tests/test.bal`. Provide the LLM with:
 - `BAL_ORG`, `BAL_PACKAGE`
 - Full content of `tests/mock_service.bal` (the completed mock)
 - The client's `init` method signature (from `CLIENT_ANALYSIS`)
@@ -153,18 +153,18 @@ final string token = isLiveServer ? os:getEnv("<CRED_ENV_VAR>") : "test_token";
 ## Step 4: Compile and fix
 
 ```bash
-bash <skill-root>/scripts/run_bal_command.sh "bal build" "<OUTPUT_DIR>"
+bash <skill-root>/scripts/run_bal_command.sh "bal build" "<BALLERINA_DIR>"
 ```
 
 - Exit 0 → clean, continue
-- Non-zero → invoke the **Fix Procedure** (`references/fix-procedure.md`) with `BUILD_DIR = <OUTPUT_DIR>`
+- Non-zero → invoke the **Fix Procedure** (`references/fix-procedure.md`) with `BUILD_DIR = <BALLERINA_DIR>`
 
 ---
 
 ## Step 5: Run tests
 
 ```bash
-bash <skill-root>/scripts/run_bal_command.sh "bal test" "<OUTPUT_DIR>"
+bash <skill-root>/scripts/run_bal_command.sh "bal test" "<BALLERINA_DIR>"
 ```
 
 Test failures are **non-fatal** — record the result and continue. Print the test summary.
@@ -176,8 +176,8 @@ Test failures are **non-fatal** — record the result and continue. Print the te
 Print:
 ```
 ✓ Tests complete
-  mock server: <OUTPUT_DIR>/tests/mock_service.bal
-  test suite:  <OUTPUT_DIR>/tests/test.bal
+  mock server: <BALLERINA_DIR>/tests/mock_service.bal
+  test suite:  <BALLERINA_DIR>/tests/test.bal
   build:       passed (fixed in <N> iteration(s) / clean)
   test run:    <N passing, M failing / skipped>
 ```

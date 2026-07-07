@@ -2,8 +2,6 @@
 """
 Convert a YAML spec file to JSON with a fallback chain.
 
-Mirrors sanitizor/execute.bal:convertAlignedYamlToJson logic.
-
 Usage: convert_yaml_to_json.py <path-to-yaml-file>
 Output: Writes <same-path-but-.json>, prints the JSON output path to stdout.
 """
@@ -25,7 +23,7 @@ def try_python_yaml(yaml_path: str) -> dict | None:
         import yaml
         with open(yaml_path, "r", encoding="utf-8") as f:
             content = f.read()
-        # Mirror the Ballerina workaround: replace backtick (U+0060) chars
+        # Backtick (U+0060) breaks some YAML parsers on plain scalars — replace it
         content = content.replace("`", "_")
         return yaml.safe_load(content)
     except ImportError:

@@ -2,8 +2,6 @@
 """
 Analyze a Ballerina client.bal file to extract function signatures and metadata.
 
-Mirrors connector_generator/spec_parser.bal and example_generator/analyzer.bal logic.
-
 Usage: analyze_client.py <path-to-client.bal>
 Output (stdout): JSON {apiCount, numExamples, configType, methods:[{name, params:[{type,name}], returnType}]}
 """

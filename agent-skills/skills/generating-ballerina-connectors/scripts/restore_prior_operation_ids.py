@@ -1,29 +1,25 @@
 #!/usr/bin/env python3
 """
-Deterministically restore operationIds established in a previous run into the
-current aligned spec, keyed by path+method, and compute the reserved-name list
-for Pass B AI improvement. Mirrors connector-tool's buildOperationIdMap +
-collectExistingOperationIds (spec_analyzer.bal / batch_processor.bal): Pass-A
-restoration plus reserved-id collection are both deterministic — no AI call.
+Restore operationIds from a previous run into the current aligned spec, keyed
+by path+method, and compute the reserved-name list for AI-driven improvement
+of the rest.
 
-Usage: restore_prior_operation_ids.py <prior-aligned-spec-path> <current-aligned-spec-path>
-  prior-aligned-spec-path    Path to the aligned spec JSON from a previous run (may not exist)
-  current-aligned-spec-path Path to the current aligned spec JSON (modified in-place)
+Two subcommands, run at different points because `bal openapi align`
+overwrites the aligned spec file in between:
 
-Output (stdout): a single JSON object:
-  {
-    "prior_spec_found": bool,
-    "restored_count": int,
-    "reserved_operation_ids": [str, ...]
-  }
+  build <existing-aligned-spec-path>
+    Run BEFORE flatten/align. Extracts the path -> {method: operationId} map
+    and prints it as JSON — write this to a small temp file.
+    Output: {"prior_spec_found": bool, "operation_id_map": {...}}
 
-reserved_operation_ids mirrors collectExistingOperationIds's two branches:
-  - No prior spec, or a prior spec with no operationIds at all: every current
-    operationId is reserved (there's nothing Pass-A-settled to protect
-    exclusively yet, but Pass B must still avoid clashing with what's there).
-  - A non-empty prior map: only ids belonging to path+methods actually
-    restored in Pass A are reserved — a Pass-B candidate's own current id is
-    never self-reserved, so the AI can keep it unchanged if it's already good.
+  apply <map-file-path> <current-aligned-spec-path>
+    Run AFTER align. Reads the map file from `build`, writes matching
+    operationIds into the current aligned spec (modified in-place), and
+    returns the reserved-name list (ids not eligible for renaming).
+    Output: {"prior_spec_found": bool, "restored_count": int, "reserved_operation_ids": [str, ...]}
+
+The map file passed to `apply` is a transient scratch artifact — delete it
+once `apply` has run.
 """
 
 import sys
@@ -64,21 +60,28 @@ def collect_all_operation_ids(spec: dict) -> list[str]:
     return ids
 
 
-def restore(prior_spec_path: str, current_spec_path: str) -> dict:
+def cmd_build(existing_aligned_spec_path: str) -> dict:
+    if not os.path.isfile(existing_aligned_spec_path):
+        return {"prior_spec_found": False, "operation_id_map": {}}
+
+    with open(existing_aligned_spec_path, "r", encoding="utf-8") as f:
+        spec = json.load(f)
+
+    return {"prior_spec_found": True, "operation_id_map": build_prior_operation_id_map(spec)}
+
+
+def cmd_apply(map_file_path: str, current_spec_path: str) -> dict:
+    with open(map_file_path, "r", encoding="utf-8") as f:
+        build_result = json.load(f)
+    prior_spec_found = bool(build_result.get("prior_spec_found", False))
+    prior_map: dict[str, dict[str, str]] = build_result.get("operation_id_map") or {}
+
     with open(current_spec_path, "r", encoding="utf-8") as f:
         current_spec = json.load(f)
 
-    prior_spec_found = os.path.isfile(prior_spec_path)
-    prior_map: dict[str, dict[str, str]] = {}
-    if prior_spec_found:
-        with open(prior_spec_path, "r", encoding="utf-8") as f:
-            prior_spec = json.load(f)
-        prior_map = build_prior_operation_id_map(prior_spec)
-
     if not prior_map:
         # Either no prior spec, or one with no operationIds — nothing to restore.
-        # Mirror collectExistingOperationIds's "no prior" branch: reserve every
-        # current operationId rather than leaving Pass B with no guard rails.
+        # Reserve every current operationId so AI improvement still has guard rails.
         return {
             "prior_spec_found": prior_spec_found,
             "restored_count": 0,
@@ -103,14 +106,26 @@ def restore(prior_spec_path: str, current_spec_path: str) -> dict:
             json.dump(current_spec, f, indent=2)
 
     return {
-        "prior_spec_found": True,
+        "prior_spec_found": prior_spec_found,
         "restored_count": restored,
         "reserved_operation_ids": reserved_ids,
     }
 
 
+def usage() -> None:
+    print(f"Usage: {sys.argv[0]} build <existing-aligned-spec-path>", file=sys.stderr)
+    print(f"       {sys.argv[0]} apply <map-file-path> <current-aligned-spec-path>", file=sys.stderr)
+    sys.exit(2)
+
+
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print(f"Usage: {sys.argv[0]} <prior-aligned-spec-path> <current-aligned-spec-path>", file=sys.stderr)
-        sys.exit(2)
-    print(json.dumps(restore(sys.argv[1], sys.argv[2])))
+    if len(sys.argv) < 2:
+        usage()
+
+    subcommand = sys.argv[1]
+    if subcommand == "build" and len(sys.argv) == 3:
+        print(json.dumps(cmd_build(sys.argv[2])))
+    elif subcommand == "apply" and len(sys.argv) == 4:
+        print(json.dumps(cmd_apply(sys.argv[2], sys.argv[3])))
+    else:
+        usage()

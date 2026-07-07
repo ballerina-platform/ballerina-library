@@ -7,7 +7,7 @@
 - Ballerina Swan Lake 2201.x or later
 - Push the connector to the local repository:
   ```bash
-  cd <OUTPUT_DIR>
+  cd <BALLERINA_DIR>
   bal pack && bal push --repository=local
   ```
 - Create a `Config.toml` in this directory:

@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 # Generate a Ballerina service stub from an OpenAPI spec into tests/mock_service.bal.
 #
-# Usage: generate_mock_stub.sh <spec-path> <output-dir> [operations] [license-path]
+# Usage: generate_mock_stub.sh <spec-path> <ballerina-dir> [operations] [license-path]
 #   operations    Optional comma-separated operationIds (used when spec has >30 operations)
 #   license-path  Optional path to a license header file passed to --license
 #
-# The stub is written to <output-dir>/tests/mock_service.bal
+# The stub is written to <ballerina-dir>/tests/mock_service.bal
 
 set -euo pipefail
 
-SPEC_PATH="${1:?Usage: generate_mock_stub.sh <spec-path> <output-dir> [operations] [license-path]}"
-OUTPUT_DIR="${2:?Usage: generate_mock_stub.sh <spec-path> <output-dir> [operations] [license-path]}"
+SPEC_PATH="${1:?Usage: generate_mock_stub.sh <spec-path> <ballerina-dir> [operations] [license-path]}"
+BALLERINA_DIR="${2:?Usage: generate_mock_stub.sh <spec-path> <ballerina-dir> [operations] [license-path]}"
 OPERATIONS="${3:-}"     # optional: comma-separated operationIds
 LICENSE_PATH="${4:-}"   # optional: path to license header file
-TESTS_DIR="${OUTPUT_DIR}/tests"
+TESTS_DIR="${BALLERINA_DIR}/tests"
 
 mkdir -p "$TESTS_DIR"
 
