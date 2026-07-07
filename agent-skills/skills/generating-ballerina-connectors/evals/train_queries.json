@@ -1,0 +1,62 @@
+[
+  {
+    "id": "st-01",
+    "query": "I have docs/spec/openapi.json for the HubSpot Files API \u2014 can you generate a Ballerina connector from it?",
+    "should_trigger": true
+  },
+  {
+    "id": "st-02",
+    "query": "generate a ballerina client from this swagger file: ./openapi.yaml",
+    "should_trigger": true
+  },
+  {
+    "id": "st-03",
+    "query": "we need to scaffold ballerinax/hubspot.files \u2014 there's an OpenAPI spec at docs/spec/openapi.json, can you run through sanitize, client, tests and docs for it",
+    "should_trigger": true
+  },
+  {
+    "id": "st-04",
+    "query": "my manager wants a Ballerina SDK for the Microsoft Graph SharePoint Admin API, spec is at ./sharepoint-admin.yaml",
+    "should_trigger": true
+  },
+  {
+    "id": "st-05",
+    "query": "can u make a bal connector out of this openapi spec, skip the tests stage",
+    "should_trigger": true
+  },
+  {
+    "id": "st-06",
+    "query": "Set up a new ballerina-platform connector module using the OpenAPI definition in api/openapi.json, with remote methods instead of resource methods",
+    "should_trigger": true
+  },
+  {
+    "id": "sn-01",
+    "query": "convert this openapi.yaml file to json for me",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-02",
+    "query": "can you review my client.bal file for style issues",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-03",
+    "query": "write a python script that calls the HubSpot Files API and uploads files",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-04",
+    "query": "generate a Java client from this openapi spec using openapi-generator",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-05",
+    "query": "what does the `bal openapi align` command do",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-06",
+    "query": "fix this failing bal build in my existing connector project",
+    "should_trigger": false
+  }
+]

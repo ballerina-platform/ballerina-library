@@ -1,0 +1,42 @@
+[
+  {
+    "id": "st-07",
+    "query": "port this REST API to a Ballerina client package, generate examples and docs too",
+    "should_trigger": true
+  },
+  {
+    "id": "st-08",
+    "query": "there's a sanitations.md and aligned_ballerina_openapi.json already in docs/spec \u2014 reapply those and regenerate the client",
+    "should_trigger": true
+  },
+  {
+    "id": "st-09",
+    "query": "I need help wiring up bal openapi align and flatten for our HubSpot connector, then get the AI to clean up the operationIds",
+    "should_trigger": true
+  },
+  {
+    "id": "st-10",
+    "query": "can you build the ballerinax connector for our internal Files API, following the same five-stage pipeline we used for the last module",
+    "should_trigger": true
+  },
+  {
+    "id": "sn-07",
+    "query": "can you write a few example Ballerina programs using http:Client to hit this REST API",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-08",
+    "query": "explain how OpenAPI 3.0 servers/basePath fields work",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-09",
+    "query": "just want to know if this openapi spec is valid JSON",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-10",
+    "query": "translate this Ballerina client.bal into a Go client",
+    "should_trigger": false
+  }
+]
