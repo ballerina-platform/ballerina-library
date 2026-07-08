@@ -9,13 +9,17 @@ If skipped, run `bash <skill-root>/scripts/find_spec_output.sh "<SPEC_DIR>"` to 
 
 ## Step 0: Check for existing sanitations
 
-Before running any new processing, check whether a `sanitations.md` already exists from a previous run:
+Before running any new processing, check whether a `sanitations.md` already exists from a previous run, and whether it's actually filled in or still just the unfilled scaffold from `templates/sanitations_template.md`:
 
 ```bash
-test -f "<SPEC_DIR>/sanitations.md" && echo "exists" || echo "missing"
+test -f "<SPEC_DIR>/sanitations.md" && grep -qi 'TODO' "<SPEC_DIR>/sanitations.md" && echo "template" || echo "filled-or-missing"
 ```
 
-**If `sanitations.md` exists**, offer the following 2+1 choice:
+(`grep -qi 'TODO'` matches every unfilled marker the template ships with — `<!-- TODO: Add author name -->`, `<!-- TODO: Add date -->`, `(TODO: Add source link)`, `[//]: # (TODO: Add sanitation details)`, `# TODO: Add OpenAPI CLI command used to generate the client` — all of them contain the literal substring "TODO".)
+
+**If the file doesn't exist**, skip Step 0 entirely and proceed to Step 0b.
+
+**If it exists with no `TODO` markers (real recorded content)**, offer the following 2+1 choice:
 
 > A `sanitations.md` was found at `<SPEC_DIR>/sanitations.md`. Apply the recorded sanitations to the spec before processing?
 > 1. Yes — apply pre-existing sanitations first (recommended — preserves prior human edits)
@@ -26,7 +30,14 @@ test -f "<SPEC_DIR>/sanitations.md" && echo "exists" || echo "missing"
 - **Option 2**: Proceed directly to Step 1. `sanitations.md` will be regenerated from scratch at Step 4.
 - **Option 3**: Print the full contents of `sanitations.md`, then re-present this 2+1 choice.
 
-**If `sanitations.md` does not exist**, skip Step 0 entirely and proceed to Step 0b.
+**If it exists but still contains `TODO` markers (unfilled template)**, offer the same choice with the recommendation flipped instead:
+
+> A `sanitations.md` was found at `<SPEC_DIR>/sanitations.md`, but it still contains unfilled `TODO` placeholders — it looks like an empty template rather than a completed record of prior sanitations.
+> 1. No — ignore it, start fresh from the original spec (recommended — file appears to be an unfilled template)
+> 2. Yes — apply it anyway (only if you believe it has real content despite the markers)
+> 3. View `sanitations.md` before deciding
+
+Option semantics are unchanged from above (option 1 = proceed to Step 1, regenerated at Step 4; option 2 = read and patch from it same as the "real content" case's option 1; option 3 = print contents then re-present this same flipped prompt) — only the wording and the recommended default differ.
 
 ---
 
