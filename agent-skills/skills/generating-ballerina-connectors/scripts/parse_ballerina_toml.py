@@ -3,7 +3,7 @@
 Parse a Ballerina.toml file and extract [package] fields.
 
 Usage: parse_ballerina_toml.py <path-to-Ballerina.toml>
-Output (stdout): JSON {org, name, version, distribution}
+Output (stdout): JSON {org, name, version, distribution, keywords, description}
 """
 
 import sys
@@ -31,11 +31,20 @@ def parse(toml_path: str) -> dict:
         m = re.search(rf'^{key}\s*=\s*"([^"]*)"', section, re.MULTILINE)
         return m.group(1) if m else ""
 
+    def get_keywords() -> list:
+        m = re.search(r'^keywords\s*=\s*\[([^\]]*)\]', section, re.MULTILINE)
+        if not m:
+            return []
+        tokens = m.group(1).split(",")
+        return [t.strip().strip('"') for t in tokens if t.strip().strip('"')]
+
     return {
         "org": get_field("org"),
         "name": get_field("name"),
         "version": get_field("version"),
         "distribution": get_field("distribution"),
+        "keywords": get_keywords(),
+        "description": get_field("description"),
     }
 
 
