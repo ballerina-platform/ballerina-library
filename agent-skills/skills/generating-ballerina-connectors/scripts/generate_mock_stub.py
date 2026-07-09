@@ -16,7 +16,9 @@ import sys
 
 def run_bal(args: list, cwd: str) -> subprocess.CompletedProcess:
     if os.name == "nt":
-        return subprocess.run(" ".join(args), shell=True, cwd=cwd)
+        # list2cmdline applies Windows quoting rules (paths with spaces etc.);
+        # shell=True is needed because bal is a .bat/.cmd shim on Windows
+        return subprocess.run(subprocess.list2cmdline(args), shell=True, cwd=cwd)
     return subprocess.run(args, shell=False, cwd=cwd)
 
 

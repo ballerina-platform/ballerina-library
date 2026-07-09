@@ -6,6 +6,8 @@ Usage: convert_yaml_to_json.py <path-to-yaml-file>
 Output: Writes <same-path-but-.json>, prints the JSON output path to stdout.
 """
 
+from __future__ import annotations
+
 import sys
 import json
 import os

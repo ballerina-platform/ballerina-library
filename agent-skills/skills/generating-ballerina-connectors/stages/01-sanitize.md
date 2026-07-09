@@ -63,13 +63,7 @@ If this fails, print the error and ask the user to resolve it before continuing.
 
 ## Step 2: Align the spec
 
-First, locate the flattened output (the exact filename depends on the spec title):
-
-```bash
-<PYTHON_CMD> <skill-root>/scripts/find_spec_output.py "<SPEC_DIR>"
-```
-
-Use the returned path as input to align:
+Use the flattened file path captured from Step 1's stdout as input to align. Do **not** use `find_spec_output.py` here — that script only matches `aligned_ballerina_openapi.*` (deliberately, so intermediates are never fed to client generation), so it cannot find the flattened file, and on a re-run it would return the *previous* run's stale aligned spec instead.
 
 ```bash
 <PYTHON_CMD> <skill-root>/scripts/run_bal_command.py \
@@ -151,7 +145,7 @@ The map file has now been fully consumed — delete it:
 - If the current operationId (if any) is path-encoded or verbose/non-intuitive, replace it with a concise, intent-revealing camelCase name based on the HTTP method and path segments. Example: `postFilesV3FilesUpload` → `uploadFile`, `GET /users/{id}/orders` → `getUserOrders`.
 - If it's already concise and intent-revealing, leave it unchanged.
 - Hard limit: 37 characters for the camelCase operationId — if a candidate exceeds it, simplify (drop qualifiers, use a shorter verb/object) rather than truncating mechanically.
-- Treat every id in `RESERVED_OPERATION_IDS` as a hard "must not conflict" name. A Pass-B operation's own current id is never in that list (only Pass-A-restored ids are), so it's always free to keep its own id unchanged.
+- Treat every id in `RESERVED_OPERATION_IDS` as a hard "must not conflict" name — never assign a reserved id that belongs to a **different** operation. Note the list's contents depend on the case: after a restore, it holds the Pass-A-restored ids; when nothing was restored (fresh run), the script instead reserves **all current ids** as guard rails. An operation keeping its own current id unchanged is always allowed — its own id appearing in the list is not a conflict.
 - Once all Pass B decisions are made, apply them directly to `ALIGNED_SPEC` and write the file back now.
 
 **Duplicate check.** Also fully deterministic — run immediately after Pass B writes back, before continuing to schema renaming:
