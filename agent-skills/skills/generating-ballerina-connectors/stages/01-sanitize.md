@@ -3,19 +3,13 @@
 Flatten, align, and AI-enhance the OpenAPI specification. Records all changes to `sanitations.md` for reproducibility.
 
 Skip this stage if `sanitize` is in `EXCLUDED_STAGES`.
-If skipped, run `bash <skill-root>/scripts/find_spec_output.sh "<SPEC_DIR>"` to verify an aligned spec exists — halt if it exits non-zero.
+If skipped, run `<PYTHON_CMD> <skill-root>/scripts/find_spec_output.py "<SPEC_DIR>"` to verify an aligned spec exists — halt if it exits non-zero.
 
 ---
 
 ## Step 0: Check for existing sanitations
 
-Before running any new processing, check whether a `sanitations.md` already exists from a previous run, and whether it's actually filled in or still just the unfilled scaffold from `templates/sanitations_template.md`:
-
-```bash
-test -f "<SPEC_DIR>/sanitations.md" && grep -qi 'TODO' "<SPEC_DIR>/sanitations.md" && echo "template" || echo "filled-or-missing"
-```
-
-(`grep -qi 'TODO'` matches every unfilled marker the template ships with — `<!-- TODO: Add author name -->`, `<!-- TODO: Add date -->`, `(TODO: Add source link)`, `[//]: # (TODO: Add sanitation details)`, `# TODO: Add OpenAPI CLI command used to generate the client` — all of them contain the literal substring "TODO".)
+Before running any new processing, check whether `<SPEC_DIR>/sanitations.md` already exists. If it does, read it and check whether it still contains the literal substring `TODO` (case-insensitive) — every unfilled marker the template ships with (`<!-- TODO: Add author name -->`, `<!-- TODO: Add date -->`, `(TODO: Add source link)`, `[//]: # (TODO: Add sanitation details)`, `# TODO: Add OpenAPI CLI command used to generate the client`) contains that substring, so its presence means the file is still an unfilled scaffold from `templates/sanitations_template.md` rather than real recorded content.
 
 **If the file doesn't exist**, skip Step 0 entirely and proceed to Step 0b.
 
@@ -46,7 +40,7 @@ Option semantics are unchanged from above (option 1 = proceed to Step 1, regener
 Step 2 below overwrites `<SPEC_DIR>/aligned_ballerina_openapi.json` with this run's output, so any operationIds a previous run established must be captured first. This is deterministic — no reasoning required, and no need to check existence first:
 
 ```bash
-python3 <skill-root>/scripts/restore_prior_operation_ids.py build "<SPEC_DIR>/aligned_ballerina_openapi.json" > "<SPEC_DIR>/.prior_operation_ids.json"
+<PYTHON_CMD> <skill-root>/scripts/restore_prior_operation_ids.py build "<SPEC_DIR>/aligned_ballerina_openapi.json" > "<SPEC_DIR>/.prior_operation_ids.json"
 ```
 
 This extracts just the `path -> {method: operationId}` map (not a full spec copy) into a small scratch file, used by Step 3a Pass A after alignment. If no previous aligned spec exists, the script prints `{"prior_spec_found": false, "operation_id_map": {}}` — no error.
@@ -56,7 +50,7 @@ This extracts just the `path -> {method: operationId}` map (not a full spec copy
 ## Step 1: Flatten the spec
 
 ```bash
-bash .claude/skills/generating-ballerina-connectors/scripts/run_bal_command.sh \
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py \
   "bal openapi flatten -i <SPEC_PATH> -o <SPEC_DIR>" \
   "<BALLERINA_DIR>"
 ```
@@ -72,13 +66,13 @@ If this fails, print the error and ask the user to resolve it before continuing.
 First, locate the flattened output (the exact filename depends on the spec title):
 
 ```bash
-bash <skill-root>/scripts/find_spec_output.sh "<SPEC_DIR>"
+<PYTHON_CMD> <skill-root>/scripts/find_spec_output.py "<SPEC_DIR>"
 ```
 
 Use the returned path as input to align:
 
 ```bash
-bash <skill-root>/scripts/run_bal_command.sh \
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py \
   "bal openapi align -i <flattened-path> -o <SPEC_DIR>" \
   "<BALLERINA_DIR>"
 ```
@@ -90,7 +84,7 @@ If this fails, print the error and ask the user to resolve it before continuing.
 Find the aligned output file:
 
 ```bash
-bash <skill-root>/scripts/find_spec_output.sh "<SPEC_DIR>"
+<PYTHON_CMD> <skill-root>/scripts/find_spec_output.py "<SPEC_DIR>"
 ```
 
 Store the returned path as `ALIGNED_SPEC`.
@@ -98,7 +92,7 @@ Store the returned path as `ALIGNED_SPEC`.
 If `ALIGNED_SPEC` ends in `.yaml` or `.yml`, convert it to JSON:
 
 ```bash
-python3 <skill-root>/scripts/convert_yaml_to_json.py "<ALIGNED_SPEC>"
+<PYTHON_CMD> <skill-root>/scripts/convert_yaml_to_json.py "<ALIGNED_SPEC>"
 ```
 
 The script prints the JSON output path — update `ALIGNED_SPEC` to that path.
@@ -109,7 +103,7 @@ The script prints the JSON output path — update `ALIGNED_SPEC` to that path.
 
 Run:
 ```bash
-python3 <skill-root>/scripts/parse_openapi_spec.py "<ALIGNED_SPEC>"
+<PYTHON_CMD> <skill-root>/scripts/parse_openapi_spec.py "<ALIGNED_SPEC>"
 ```
 
 Capture the JSON output as `ALIGNED_SPEC_METADATA`. This reflects the spec *after* flatten and align — parsing it here (rather than the original spec) keeps path keys, operationIds, and generic schema names (e.g. `InlineResponse200`, introduced by flatten) accurate for Step 3 below, which edits `ALIGNED_SPEC` directly.
@@ -131,7 +125,7 @@ Using `ALIGNED_SPEC_METADATA` (not the raw spec), review and improve each catego
 **Pass A — restore from previous run.** This step is fully deterministic — do not reason through it manually, run the script:
 
 ```bash
-python3 <skill-root>/scripts/restore_prior_operation_ids.py apply "<SPEC_DIR>/.prior_operation_ids.json" "<ALIGNED_SPEC>"
+<PYTHON_CMD> <skill-root>/scripts/restore_prior_operation_ids.py apply "<SPEC_DIR>/.prior_operation_ids.json" "<ALIGNED_SPEC>"
 ```
 
 The script writes any restored operationIds directly into `ALIGNED_SPEC` — no AI call — and prints a single JSON object to stdout:
@@ -150,7 +144,7 @@ Store `restored_count` as `RESTORED_COUNT` and `reserved_operation_ids` as `RESE
 The map file has now been fully consumed — delete it:
 
 ```bash
-rm -f "<SPEC_DIR>/.prior_operation_ids.json"
+<PYTHON_CMD> -c "import os; os.remove(r'<SPEC_DIR>/.prior_operation_ids.json')"
 ```
 
 **Pass B — AI improvement.** For every operation whose path+method is *not* covered by Pass A (new endpoints, or ones with no prior recorded id):
@@ -163,7 +157,7 @@ rm -f "<SPEC_DIR>/.prior_operation_ids.json"
 **Duplicate check.** Also fully deterministic — run immediately after Pass B writes back, before continuing to schema renaming:
 
 ```bash
-python3 <skill-root>/scripts/check_duplicate_operation_ids.py "<ALIGNED_SPEC>"
+<PYTHON_CMD> <skill-root>/scripts/check_duplicate_operation_ids.py "<ALIGNED_SPEC>"
 ```
 
 Print any `WARNING: duplicate operationId ...` lines verbatim. Non-fatal — record the warning and continue (client generation will also surface any remaining conflicts).

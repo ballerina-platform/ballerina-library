@@ -6,10 +6,20 @@ Collect all required inputs, validate the spec, and prepare the workspace. This 
 
 ## Step 0: Environment check
 
-Before collecting any inputs, verify the environment is ready:
+Before anything else, determine which Python 3 command works on this machine — try each in order using the Bash tool directly (plain commands, no shell-specific syntax, so this works identically on macOS/Linux/Windows):
+
+```
+python3 --version
+python --version
+py --version
+```
+
+Use the first one whose output starts with `Python 3`. Store it as `<PYTHON_CMD>` — every script invocation below and in later stages uses this instead of a hardcoded `python3`.
+
+Then verify the rest of the environment is ready:
 
 ```bash
-bash <skill-root>/scripts/check_environment.sh
+<PYTHON_CMD> <skill-root>/scripts/check_environment.py
 ```
 
 If the script exits non-zero, show the errors and stop — do not continue until the user resolves them.
@@ -21,7 +31,7 @@ If the script exits non-zero, show the errors and stop — do not continue until
 Before prompting, scan for existing OpenAPI spec files:
 
 ```bash
-bash <skill-root>/scripts/find_spec_files.sh
+<PYTHON_CMD> <skill-root>/scripts/find_spec_files.py
 ```
 
 Use the results to build the "2+1" prompt dynamically:
@@ -40,7 +50,7 @@ Store the result as `SPEC_PATH`.
 ## Step 2: Validate the spec
 
 ```bash
-python3 <skill-root>/scripts/validate_spec.py "<SPEC_PATH>"
+<PYTHON_CMD> <skill-root>/scripts/validate_spec.py "<SPEC_PATH>"
 ```
 
 - Exit code non-zero → print the error, ask the user to correct the path or fix the file, repeat from Step 1.
@@ -49,7 +59,7 @@ python3 <skill-root>/scripts/validate_spec.py "<SPEC_PATH>"
 Then immediately parse the spec metadata (needed for defaults in later steps):
 
 ```bash
-python3 <skill-root>/scripts/parse_openapi_spec.py "<SPEC_PATH>"
+<PYTHON_CMD> <skill-root>/scripts/parse_openapi_spec.py "<SPEC_PATH>"
 ```
 
 Store the JSON output as `SPEC_METADATA`.
@@ -61,7 +71,7 @@ Store the JSON output as `SPEC_METADATA`.
 Before prompting, search downstream from the CWD for an existing Ballerina package — some repos (e.g. ballerina-library modules) keep `Ballerina.toml` nested below the root rather than at `./`:
 
 ```bash
-bash <skill-root>/scripts/find_ballerina_toml.sh
+<PYTHON_CMD> <skill-root>/scripts/find_ballerina_toml.py
 ```
 
 Derive a slug from `SPEC_METADATA.title`: lowercase, spaces→underscores, strip special characters (e.g. "Microsoft Graph — SharePoint Admin" → `microsoft_graph_sharepoint_admin`).
@@ -86,16 +96,12 @@ Store as `BALLERINA_DIR`. This is the directory containing (or that will contain
 
 ## Step 3b: Ballerina project check
 
-Check whether `BALLERINA_DIR` is already a Ballerina package:
+Check whether `<BALLERINA_DIR>/Ballerina.toml` exists.
+
+**If it exists**: read it with:
 
 ```bash
-test -f "<BALLERINA_DIR>/Ballerina.toml" && echo "exists" || echo "missing"
-```
-
-**If `Ballerina.toml` exists**: read it with:
-
-```bash
-python3 <skill-root>/scripts/parse_ballerina_toml.py "<BALLERINA_DIR>/Ballerina.toml"
+<PYTHON_CMD> <skill-root>/scripts/parse_ballerina_toml.py "<BALLERINA_DIR>/Ballerina.toml"
 ```
 
 Confirm with the user:
@@ -103,14 +109,14 @@ Confirm with the user:
 
 If the user wants to change them, ask using the 2+1 prompts below. Store as `BAL_ORG` and `BAL_PACKAGE`.
 
-**If `Ballerina.toml` is missing**: print a clear message and scaffold the package:
+**If it's missing**: print a clear message and scaffold the package:
 
 ```
 ⚠ No Ballerina project found at <BALLERINA_DIR> — creating one with `bal new .`
 ```
 
 ```bash
-bash <skill-root>/scripts/init_ballerina_package.sh "<BALLERINA_DIR>"
+<PYTHON_CMD> <skill-root>/scripts/init_ballerina_package.py "<BALLERINA_DIR>"
 ```
 
 `bal new .` reads the user's Ballerina settings to pick a default org and derives the package name from the directory name. It also creates `main.bal` which the script removes immediately (not needed for a connector package).
@@ -118,7 +124,7 @@ bash <skill-root>/scripts/init_ballerina_package.sh "<BALLERINA_DIR>"
 Then read the generated `Ballerina.toml`:
 
 ```bash
-python3 <skill-root>/scripts/parse_ballerina_toml.py "<BALLERINA_DIR>/Ballerina.toml"
+<PYTHON_CMD> <skill-root>/scripts/parse_ballerina_toml.py "<BALLERINA_DIR>/Ballerina.toml"
 ```
 
 Ask about **org** with a 2+1 prompt:

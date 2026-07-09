@@ -13,7 +13,7 @@ Resolve the spec input file:
 - Use `ALIGNED_SPEC` if set (populated by Stage 01 Step 3b — this is the `.json` path after YAML conversion).
 - If `ALIGNED_SPEC` is not set (Stage 01 was skipped), run:
   ```bash
-  bash <skill-root>/scripts/find_spec_output.sh "<SPEC_DIR>"
+  <PYTHON_CMD> <skill-root>/scripts/find_spec_output.py "<SPEC_DIR>"
   ```
   and set `ALIGNED_SPEC` from the result before continuing.
 
@@ -37,7 +37,7 @@ Append options based on collected configuration:
 ## Step 2: Run client generation
 
 ```bash
-bash <skill-root>/scripts/run_bal_command.sh \
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py \
   "bal openapi -i <ALIGNED_SPEC> -o <BALLERINA_DIR> --license <LICENSE_PATH> [--tags <tags>] [--operations <ops>] [--client-methods remote] --mode client" \
   "<BALLERINA_DIR>"
 ```
@@ -59,7 +59,7 @@ Verify that `<BALLERINA_DIR>/client.bal`, `<BALLERINA_DIR>/types.bal`, and `<BAL
 Run `bal build` in `<BALLERINA_DIR>`:
 
 ```bash
-bash <skill-root>/scripts/run_bal_command.sh "bal build" "<BALLERINA_DIR>"
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal build" "<BALLERINA_DIR>"
 ```
 
 - Exit 0 → build clean, continue to completion

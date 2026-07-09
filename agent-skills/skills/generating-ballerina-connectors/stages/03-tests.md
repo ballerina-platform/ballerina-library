@@ -11,7 +11,7 @@ Skip this stage if `tests` is in `EXCLUDED_STAGES`.
 Run before generating anything — provides method signatures without reading client.bal inline:
 
 ```bash
-python3 <skill-root>/scripts/analyze_client.py "<BALLERINA_DIR>/client.bal"
+<PYTHON_CMD> <skill-root>/scripts/analyze_client.py "<BALLERINA_DIR>/client.bal"
 ```
 
 Store the JSON output as `CLIENT_ANALYSIS`. Fields used in this stage:
@@ -26,7 +26,7 @@ Store the JSON output as `CLIENT_ANALYSIS`. Fields used in this stage:
 Parse operationIds from the aligned spec — these are the values `bal openapi --operations` requires:
 
 ```bash
-python3 <skill-root>/scripts/parse_openapi_spec.py "<ALIGNED_SPEC>"
+<PYTHON_CMD> <skill-root>/scripts/parse_openapi_spec.py "<ALIGNED_SPEC>"
 ```
 
 Store as `ALIGNED_SPEC_METADATA`. Extract the non-empty operationIds:
@@ -60,7 +60,7 @@ Store the result as `SELECTED_OPERATIONS`.
 ### 2a: Generate service stub from the spec
 
 ```bash
-bash <skill-root>/scripts/generate_mock_stub.sh "<ALIGNED_SPEC>" "<BALLERINA_DIR>" "<SELECTED_OPERATIONS>" "<LICENSE_PATH>"
+<PYTHON_CMD> <skill-root>/scripts/generate_mock_stub.py "<ALIGNED_SPEC>" "<BALLERINA_DIR>" "<SELECTED_OPERATIONS>" "<LICENSE_PATH>"
 ```
 
 Pass `SELECTED_OPERATIONS` as the 3rd argument (empty string if not filtered) and `LICENSE_PATH` as the 4th argument (empty string if not set). The script appends `--operations` and `--license` only when the respective values are non-empty.
@@ -153,7 +153,7 @@ final string token = isLiveServer ? os:getEnv("<CRED_ENV_VAR>") : "test_token";
 ## Step 4: Compile and fix
 
 ```bash
-bash <skill-root>/scripts/run_bal_command.sh "bal build" "<BALLERINA_DIR>"
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal build" "<BALLERINA_DIR>"
 ```
 
 - Exit 0 → clean, continue
@@ -164,7 +164,7 @@ bash <skill-root>/scripts/run_bal_command.sh "bal build" "<BALLERINA_DIR>"
 ## Step 5: Run tests
 
 ```bash
-bash <skill-root>/scripts/run_bal_command.sh "bal test" "<BALLERINA_DIR>"
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal test" "<BALLERINA_DIR>"
 ```
 
 Test failures are **non-fatal** — record the result and continue. Print the test summary.

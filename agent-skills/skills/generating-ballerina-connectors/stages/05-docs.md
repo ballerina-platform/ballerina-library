@@ -29,7 +29,7 @@ Collect the following (already in context from prior stages):
 - `BAL_ORG`, `BAL_PACKAGE`
 - `TOML_META` (from `parse_ballerina_toml.py`) — if not already loaded, run:
   ```bash
-  python3 <skill-root>/scripts/parse_ballerina_toml.py "<BALLERINA_DIR>/Ballerina.toml"
+  <PYTHON_CMD> <skill-root>/scripts/parse_ballerina_toml.py "<BALLERINA_DIR>/Ballerina.toml"
   ```
 - `EXAMPLE_DIR` file list (from stage 04)
 - `CLIENT_ANALYSIS.methods` (from stage 02/03)
@@ -129,7 +129,65 @@ Write to `<SPEC_DIR>/sanitations.md`. If a `sanitations.md` already exists (from
 
 ---
 
-## Step 6: Stage completion
+## Step 6: Generate Ballerina.toml keywords
+
+Classify this connector for Ballerina Central discoverability and write the result into `<BALLERINA_DIR>/Ballerina.toml`'s `keywords` array. Runs unconditionally, after all README/Module.md/sub-README generation above — this is deterministic classification + write, not user-prompted.
+
+Inputs already in context — do not re-read raw source:
+- `SPEC_METADATA.title` / `SPEC_METADATA.description`
+- `CLIENT_ANALYSIS.methods`
+- `TOML_META.keywords` (existing keywords, if any — preserve any conformant `Cost/*`/`Vendor/*`/`Area/*` values already present rather than guessing a worse replacement)
+- `TOML_META.description` (existing Ballerina.toml package description, if any)
+
+Classify exactly one value for each of the following three fields, per this taxonomy:
+
+**cost** — pick exactly one:
+- `Cost/Free` — completely free, no meaningful usage limits
+- `Cost/Freemium` — free tier exists; paid plans unlock more features or capacity
+- `Cost/Paid` — no meaningful free tier; paid subscription required
+
+**vendor** — pick exactly one: `Vendor/<Brand>`, using the vendor's proper public brand name. For multi-product suites use the parent brand (e.g. `Vendor/Google` not `Vendor/Gmail`, `Vendor/Microsoft` not `Vendor/Azure`).
+
+**area** — pick exactly one, based on the platform's PRIMARY PURPOSE, not incidental API operations:
+
+| Value | When to use | Key signals |
+|---|---|---|
+| `Area/CRM & Sales` | CRM platforms, sales pipelines, lead/deal/contact/account management | contacts, deals, leads, pipelines, quotes, owners, engagements |
+| `Area/Marketing & Social Media` | Marketing automation, email campaign delivery, social platforms, ad networks | campaigns, bulk email, social, ads, forms, subscriptions |
+| `Area/Communication` | Team chat, personal email clients, SMS/voice calls, video conferencing, push notifications | slack, gmail, teams, twilio, discord, zoom, outlook.mail, sns |
+| `Area/Productivity & Collaboration` | Project/task management, calendars, document signing, spreadsheets, note-taking | jira, asana, trello, calendar, docusign, excel, smartsheet, notion |
+| `Area/Finance & Accounting` | Payment processing, billing, invoicing, subscriptions, accounting ledgers | stripe, paypal, xero, quickbooks, zuora, invoices, payments |
+| `Area/E-Commerce` | Online storefronts, product catalogs, cart/order management | shopify, woocommerce, standalone commerce storefronts |
+| `Area/ERP & Business Operations` | Enterprise resource planning, supply chain, manufacturing, insurance core systems | sap, netsuite, guidewire, dynamics365.scm |
+| `Area/HRMS` | HR management, payroll, workforce planning, employee records | dayforce, peoplehr, workday, successfactors, dynamics365.hr |
+| `Area/Developer Tools` | Source control, CI/CD, API management portals, issue tracking, developer portals | github, gitlab, bitbucket, wso2.apim |
+| `Area/Database` | SQL, NoSQL, time-series, in-memory, data warehouse, ORM adapters | postgresql, mysql, mssql, mongodb, redis, dynamodb, snowflake |
+| `Area/Messaging` | Message brokers, event streaming, pub/sub queues | kafka, rabbitmq, nats, sqs, servicebus, pubsub, ibmmq, confluent |
+| `Area/Storage & File Management` | Object storage, cloud drives, file sync, document repositories | s3, drive, dropbox, onedrive, sharepoint, .files |
+| `Area/AI & Machine Learning` | LLMs, generative AI, embeddings, vector databases, ML inference platforms | openai, anthropic, mistral, azure.ai, milvus, weaviate, pinecone |
+| `Area/Cloud & Infrastructure` | Cloud marketplace, managed infrastructure, observability, monitoring | elastic.elasticcloud, aws.marketplace, jaeger, prometheus, newrelic |
+| `Area/Security & Identity` | Identity management, user provisioning, SSO, secrets management | scim, okta, auth0, secretmanager, azure.ad |
+| `Area/Other` | Utility connectors that truly don't fit any category above | aws.lambda, azure.functions |
+
+Common classification pitfalls — read carefully:
+- HubSpot commerce/engagements/extensions sub-modules → `Area/CRM & Sales` (they live inside HubSpot CRM, not standalone storefronts or email clients)
+- HubSpot `.files` module → `Area/Storage & File Management` (file storage API, not CRM data)
+- AWS SES → `Area/Marketing & Social Media` (bulk transactional/marketing delivery, not a personal email client)
+- Gmail → `Area/Communication` (personal inbox API, not bulk marketing)
+- Azure Event Hub → `Area/Messaging` (event streaming broker, not storage)
+- SharePoint (lists/pages/sites/files) → `Area/Storage & File Management` (document repository, not productivity tool)
+
+NEVER use these shorthand forms — they are invalid: `Area/AI`, `Area/CRM`, `Area/Finance`, `Area/Productivity`.
+
+Append the hardcoded literal `Type/Connector` as the 4th keyword, then write all four:
+
+```bash
+<PYTHON_CMD> <skill-root>/scripts/write_ballerina_keywords.py "<BALLERINA_DIR>/Ballerina.toml" "<cost>" "<vendor>" "<area>" "Type/Connector"
+```
+
+---
+
+## Step 7: Stage completion
 
 Print:
 ```
@@ -139,6 +197,7 @@ Print:
   tests/README.md:      <BALLERINA_DIR>/tests/README.md
   examples/README.md:   <EXAMPLE_DIR>/README.md
   sanitations.md:       <SPEC_DIR>/sanitations.md
+  Ballerina.toml keywords: <cost> <vendor> <area> Type/Connector
 ```
 
 Then print the **Final Run Summary** from `references/workflows.md` (section: "Final Summary Format"), filled in with actual values.

@@ -34,7 +34,7 @@ Scripts in `scripts/` handle all deterministic operations. Run them via Bash —
 | 2. Client | `stages/02-client.md` | Yes (`client`) | `client.bal`, `types.bal` — build + auto-fix inline |
 | 3. Tests | `stages/03-tests.md` | Yes (`tests`) | `tests/test.bal`, mock server — build + auto-fix inline |
 | 4. Examples | `stages/04-examples.md` | Yes (`examples`) | per-example packages in `examples/` — build + auto-fix inline |
-| 5. Docs | `stages/05-docs.md` | Yes (`docs`) | `README.md`, `Module.md` |
+| 5. Docs | `stages/05-docs.md` | Yes (`docs`) | `README.md`, `Module.md`, Ballerina.toml keywords |
 
 ---
 
@@ -74,6 +74,7 @@ These variables are set in Setup (stage 00) and used by all subsequent stages:
 
 | Variable | Description |
 |----------|-------------|
+| `PYTHON_CMD` | Resolved Python 3 command for this machine (`python3`/`python`/`py`) — determined once in Setup Step 0 |
 | `SPEC_PATH` | Absolute or relative path to the input OpenAPI spec |
 | `BALLERINA_DIR` | Directory containing (or to contain) `Ballerina.toml` — where `client.bal`, `types.bal`, `utils.bal`, `tests/`, `README.md`, `Module.md` are generated |
 | `SPEC_DIR` | User-confirmed path for aligned spec + sanitations (default: `./docs/spec`) |
@@ -113,54 +114,57 @@ These variables are set in Setup (stage 00) and used by all subsequent stages:
 
 ## Scripts Reference
 
-All scripts are in `<skill-root>/scripts/`.
+All scripts are in `<skill-root>/scripts/` and are pure Python (`.py`) — no shell scripts, so they run identically on macOS/Linux/Windows. Invoke them with `<PYTHON_CMD>` (resolved once in Setup Step 0), not a hardcoded `python3`.
 
 ```bash
-# Check environment (bal, python3, ANTHROPIC_API_KEY) — run first in setup
-bash scripts/check_environment.sh
+# Check environment (bal, PyYAML, ANTHROPIC_API_KEY) — run first in setup, after PYTHON_CMD is resolved
+<PYTHON_CMD> scripts/check_environment.py
 
 # Find OpenAPI spec candidates in CWD — use before prompting for spec path
-bash scripts/find_spec_files.sh
+<PYTHON_CMD> scripts/find_spec_files.py
 
 # Find an existing Ballerina.toml nested below CWD — use before prompting for output dir
-bash scripts/find_ballerina_toml.sh
+<PYTHON_CMD> scripts/find_ballerina_toml.py
 
 # Initialise a Ballerina package in the output dir (bal new . + remove main.bal)
-bash scripts/init_ballerina_package.sh "<output-dir>"
+<PYTHON_CMD> scripts/init_ballerina_package.py "<output-dir>"
 
 # Validate spec file (YAML/JSON validity + required fields)
-python3 scripts/validate_spec.py "<spec-path>"
+<PYTHON_CMD> scripts/validate_spec.py "<spec-path>"
 
 # Extract structured spec metadata — the only spec representation in LLM context
-python3 scripts/parse_openapi_spec.py "<spec-path>"
+<PYTHON_CMD> scripts/parse_openapi_spec.py "<spec-path>"
 
 # Convert YAML spec to JSON — writes <same-name>.json, prints output path
-python3 scripts/convert_yaml_to_json.py "<spec.yaml>"
+<PYTHON_CMD> scripts/convert_yaml_to_json.py "<spec.yaml>"
 
 # Locate aligned/flattened spec output in a spec directory
-bash scripts/find_spec_output.sh "<spec-dir>"
+<PYTHON_CMD> scripts/find_spec_output.py "<spec-dir>"
 
-# Read Ballerina.toml package fields → JSON {org, name, version, distribution}
-python3 scripts/parse_ballerina_toml.py "<Ballerina.toml>"
+# Read Ballerina.toml package fields → JSON {org, name, version, distribution, keywords, description}
+<PYTHON_CMD> scripts/parse_ballerina_toml.py "<Ballerina.toml>"
+
+# Write/replace the keywords array in Ballerina.toml's [package] section
+<PYTHON_CMD> scripts/write_ballerina_keywords.py "<Ballerina.toml>" "<keyword1>" "<keyword2>" ...
 
 # Analyse client.bal → JSON {apiCount, numExamples, configType, methods:[...]}
-python3 scripts/analyze_client.py "<client.bal>"
+<PYTHON_CMD> scripts/analyze_client.py "<client.bal>"
 
 # Generate service stub from spec → tests/mock_service.bal
-bash scripts/generate_mock_stub.sh "<aligned-spec>" "<output-dir>"
+<PYTHON_CMD> scripts/generate_mock_stub.py "<aligned-spec>" "<output-dir>"
 
-# Run any bal command in a working directory
-bash scripts/run_bal_command.sh "<command>" "<working-dir>"
+# Run any bal command in a working directory — prints stderr to a temp file and its path on failure
+<PYTHON_CMD> scripts/run_bal_command.py "<command>" "<working-dir>"
 
 # Parse compilation errors from bal build stderr → JSON error array
-python3 scripts/parse_errors.py "<stderr-file-or-stdin>"
+<PYTHON_CMD> scripts/parse_errors.py "<stderr-file-or-stdin>"
 
 # Extract the prior run's operationId map (run before flatten/align overwrites it)
-python3 scripts/restore_prior_operation_ids.py build "<existing-aligned-spec>" > "<map-file>"
+<PYTHON_CMD> scripts/restore_prior_operation_ids.py build "<existing-aligned-spec>" > "<map-file>"
 
 # Apply that map into the newly aligned spec, restoring matching operationIds
-python3 scripts/restore_prior_operation_ids.py apply "<map-file>" "<current-aligned-spec>"
+<PYTHON_CMD> scripts/restore_prior_operation_ids.py apply "<map-file>" "<current-aligned-spec>"
 
 # Scan an aligned spec for duplicate operationIds — non-fatal warnings
-python3 scripts/check_duplicate_operation_ids.py "<aligned-spec>"
+<PYTHON_CMD> scripts/check_duplicate_operation_ids.py "<aligned-spec>"
 ```

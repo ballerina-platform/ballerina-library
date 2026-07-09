@@ -14,10 +14,10 @@ Invoke this procedure whenever `bal build` exits with a non-zero code, passing t
 
 ### Step 1: Parse compilation errors
 
-Save the `bal build` stderr output to a temp file and run:
+`<skill-root>/scripts/run_bal_command.py` (used to run the `bal build` that triggered this procedure) always captures stderr and, on non-zero exit, writes it to a cross-platform temp file and prints its path (e.g. `>>> stderr saved to: <path>`). Use that printed path:
 
 ```bash
-python3 <skill-root>/scripts/parse_errors.py /tmp/bal_build_stderr.txt
+<PYTHON_CMD> <skill-root>/scripts/parse_errors.py "<printed-stderr-path>"
 ```
 
 Capture the JSON array as `COMPILE_ERRORS`.
@@ -47,7 +47,7 @@ Use the Edit tool to apply each fix at the specific file and line.
 #### 2c. Re-run build
 
 ```bash
-bash <skill-root>/scripts/run_bal_command.sh "bal build" "<BUILD_DIR>"
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal build" "<BUILD_DIR>"
 ```
 
 - Exit 0 → build clean, exit loop, report success

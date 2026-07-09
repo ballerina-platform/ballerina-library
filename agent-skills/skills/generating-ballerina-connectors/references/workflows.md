@@ -113,6 +113,6 @@ Generated files:
 Next steps:
   1. Review docs/spec/sanitations.md for AI-made spec changes.
   2. Run `bal test` to verify the generated tests.
-  3. cd examples/<example-name> && bal run  to try an example.
+  3. Navigate into examples/<example-name> and run `bal run` to try an example.
   4. Publish to Ballerina Central when ready.
 ```

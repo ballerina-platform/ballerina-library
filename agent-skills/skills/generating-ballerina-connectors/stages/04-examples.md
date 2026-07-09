@@ -11,13 +11,13 @@ Skip this stage if `examples` is in `EXCLUDED_STAGES`.
 Run both scripts upfront — this replaces all inline file reading for this stage:
 
 ```bash
-python3 <skill-root>/scripts/analyze_client.py "<BALLERINA_DIR>/client.bal"
+<PYTHON_CMD> <skill-root>/scripts/analyze_client.py "<BALLERINA_DIR>/client.bal"
 ```
 
 Store as `CLIENT_ANALYSIS`. Take `NUM_EXAMPLES` from `CLIENT_ANALYSIS.numExamples` (formula already applied). Initialise `USED_FUNCTIONS = []`.
 
 ```bash
-python3 <skill-root>/scripts/parse_ballerina_toml.py "<BALLERINA_DIR>/Ballerina.toml"
+<PYTHON_CMD> <skill-root>/scripts/parse_ballerina_toml.py "<BALLERINA_DIR>/Ballerina.toml"
 ```
 
 Store as `TOML_META`. Use `TOML_META.distribution` and `TOML_META.version` when writing per-example `Ballerina.toml` files.
@@ -29,8 +29,8 @@ Store as `TOML_META`. Use `TOML_META.distribution` and `TOML_META.version` when 
 Before generating any examples, publish the connector so that each example's `import <BAL_ORG>/<BAL_PACKAGE>` can resolve at build time:
 
 ```bash
-bash <skill-root>/scripts/run_bal_command.sh "bal pack" "<BALLERINA_DIR>"
-bash <skill-root>/scripts/run_bal_command.sh "bal push --repository=local" "<BALLERINA_DIR>"
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal pack" "<BALLERINA_DIR>"
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal push --repository=local" "<BALLERINA_DIR>"
 ```
 
 `bal pack` creates the `.bala` archive in `target/`; `bal push --repository=local` publishes it to `~/.ballerina/repositories/local/bala/` so examples can resolve the import at build time.
@@ -122,7 +122,7 @@ The `[[dependency]]` block with `repository = "local"` lets the example resolve 
 ### 3f: Compile and fix
 
 ```bash
-bash <skill-root>/scripts/run_bal_command.sh "bal build" "<EXAMPLE_DIR>/<EXAMPLE_NAME>"
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal build" "<EXAMPLE_DIR>/<EXAMPLE_NAME>"
 ```
 
 - Exit 0 → clean
