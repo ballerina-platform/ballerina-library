@@ -21,7 +21,7 @@ Before running any new processing, check whether `<SPEC_DIR>/sanitations.md` alr
 > 3. View `sanitations.md` before deciding
 
 - **Option 1**: Read `sanitations.md`. For each numbered section, extract the `Updated:` value and patch the corresponding field in `<SPEC_PATH>` in-place. Then proceed to Step 1.
-- **Option 2**: Proceed directly to Step 1. `sanitations.md` will be regenerated from scratch at Step 4.
+- **Option 2**: Proceed directly to Step 1. `sanitations.md`'s auto-detected sections are refreshed at Step 4 (any human-authored sections are preserved via the merge).
 - **Option 3**: Print the full contents of `sanitations.md`, then re-present this 2+1 choice.
 
 **If it exists but still contains `TODO` markers (unfilled template)**, offer the same choice with the recommendation flipped instead:
@@ -31,7 +31,7 @@ Before running any new processing, check whether `<SPEC_DIR>/sanitations.md` alr
 > 2. Yes — apply it anyway (only if you believe it has real content despite the markers)
 > 3. View `sanitations.md` before deciding
 
-Option semantics are unchanged from above (option 1 = proceed to Step 1, regenerated at Step 4; option 2 = read and patch from it same as the "real content" case's option 1; option 3 = print contents then re-present this same flipped prompt) — only the wording and the recommended default differ.
+Option semantics are unchanged from above (option 1 = proceed to Step 1, sanitations refreshed at Step 4; option 2 = read and patch from it same as the "real content" case's option 1; option 3 = print contents then re-present this same flipped prompt) — only the wording and the recommended default differ.
 
 ---
 
@@ -169,14 +169,25 @@ For operations where `summary` is fewer than 10 characters (or empty), generate 
 
 ## Step 4: Record sanitations
 
-Read `<skill-root>/templates/sanitations_template.md` as the scaffold.
+`sanitations.md` records only the **structural** spec changes that flatten/align produced — server URL change, path-prefix removal, `date-time`→`datetime` format, nullability changes, and type changes. It is a deterministic diff of the original spec against the aligned spec. The Step 3 AI enhancements (operationIds, schema renames, descriptions, summaries) are applied to the spec but deliberately **not** recorded here, matching connector-tool.
 
-Create or update `<SPEC_DIR>/sanitations.md` following that structure:
-- Header with `# Sanitation for OpenAPI specification`, created/updated dates
-- Numbered sections — one per change type detected (format, nullability, type, operationId, description, schema rename)
-- Each section follows the `Original / Updated / Reason` format shown in the template
-- Mark auto-detected sections with `<!-- auto-generated -->` so future regenerations can identify and replace them while preserving human-authored sections
-- Footer: `## OpenAPI cli command` section with the exact `bal openapi` command used to generate the client
+Run the generator (fully deterministic — do not hand-write the file):
+
+```bash
+<PYTHON_CMD> <skill-root>/scripts/generate_sanitations.py \
+  "<SPEC_PATH>" "<ALIGNED_SPEC>" "<SPEC_DIR>/sanitations.md" \
+  --template "<skill-root>/templates/sanitations_template.md" \
+  --module-name "<MODULE_NAME_PC>" \
+  --cli-command "<the exact bal openapi ... --mode client command Stage 02 will run>"
+```
+
+- `<MODULE_NAME_PC>` = `BAL_PACKAGE` in PascalCase (e.g. `sharepoint_admin` → `SharepointAdmin`) — same derivation as the Stage 05 placeholder mapping.
+- `--cli-command` = the `bal openapi -i <ALIGNED_SPEC> -o <BALLERINA_DIR> --mode client` command that Stage 02 will run, with the same flags built from the collected config (`--license`/`--tags`/`--operations`/`--client-methods remote` as applicable). This goes into the doc's footer.
+- Optional `--source-link "<url>"` if the spec's upstream source URL is known from context; otherwise the template's `(TODO: Add source link)` placeholder is left for the developer.
+
+The script prints a one-line per-category count (`server-url:N path-prefix:N format:N nullability:N type:N`). If `sanitations.md` already exists, the script **merges** — preserving human-authored numbered sections (those without the `<!-- auto-generated -->` marker), refreshing its own auto-detected sections, and renumbering. No need to check for existence first.
+
+Capture the printed counts as `SANITATION_COUNTS` for the completion print below.
 
 ---
 
@@ -186,8 +197,10 @@ Print:
 ```
 ✓ Sanitize complete
   Aligned spec: <SPEC_DIR>/aligned_ballerina_openapi.json
-  Sanitations:  <SPEC_DIR>/sanitations.md
-  Changes made: <N> operationIds improved (<R> restored from previous run), <K> schemas renamed, <M> descriptions enhanced, <S> summaries improved
+  Sanitations:  <SPEC_DIR>/sanitations.md (structural spec changes: <SANITATION_COUNTS>)
+  AI enhancements applied: <N> operationIds improved (<R> restored from previous run), <K> schemas renamed, <M> descriptions enhanced, <S> summaries improved
 ```
+
+The AI enhancements line reports the Step 3 work applied to the spec — those are intentionally not part of `sanitations.md`, which holds only the structural diff.
 
 If `INTERACTIVE_MODE` is true, pause and ask: "Proceed to Client Generation? [Y/n/q]"

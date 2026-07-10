@@ -111,7 +111,7 @@ Generated files:
   Module.md
 
 Next steps:
-  1. Review docs/spec/sanitations.md for AI-made spec changes.
+  1. Review docs/spec/sanitations.md for the structural spec changes (from flatten/align).
   2. Run `bal test` to verify the generated tests.
   3. Navigate into examples/<example-name> and run `bal run` to try an example.
   4. Publish to Ballerina Central when ready.

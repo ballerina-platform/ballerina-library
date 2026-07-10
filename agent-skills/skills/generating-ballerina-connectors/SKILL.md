@@ -147,6 +147,9 @@ All scripts are in `<skill-root>/scripts/` and are pure Python (`.py`) — no sh
 # Write/replace the keywords array in Ballerina.toml's [package] section
 <PYTHON_CMD> scripts/write_ballerina_keywords.py "<Ballerina.toml>" "<keyword1>" "<keyword2>" ...
 
+# Generate/merge sanitations.md from a structural diff of original vs aligned spec
+<PYTHON_CMD> scripts/generate_sanitations.py "<original-spec>" "<aligned-spec>" "<out.md>" --template "<template>" --module-name "<PC>" --cli-command "<cmd>"
+
 # Analyse client.bal → JSON {apiCount, numExamples, configType, methods:[...]}
 <PYTHON_CMD> scripts/analyze_client.py "<client.bal>"
 

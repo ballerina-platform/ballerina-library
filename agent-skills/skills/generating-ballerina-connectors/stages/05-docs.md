@@ -106,30 +106,7 @@ For each example subdirectory that does not already have a `README.md`, read `<s
 
 ---
 
-## Step 5: Generate sanitations.md
-
-Read `<skill-root>/templates/sanitations_template.md`.
-
-Replace `{{MODULE_NAME_PC}}` with the resolved value from the placeholder mapping.
-
-Fill in the TODO sections:
-- `_Author_` → leave blank (to be filled by the developer)
-- `_Created_` → today's date in `YYYY/MM/DD` format
-- `_Updated_` → today's date in `YYYY/MM/DD` format
-- Numbered sanitation list → each entry from Stage 01 Step 4 (AI-assisted enhancements: operationIds improved/restored, schemas renamed, descriptions enhanced). Format each as:
-  ```
-  N. <Change type>
-  - **Original**: <what was there before>
-  - **Updated**: <what it became>
-  - **Reason**: <why the change was made>
-  ```
-- OpenAPI CLI command → the exact `bal openapi` command used in Stage 02 (with all flags that were passed)
-
-Write to `<SPEC_DIR>/sanitations.md`. If a `sanitations.md` already exists (from a previous run that the user chose to preserve in Stage 01 Step 0), **append** new auto-generated sections rather than overwriting human-authored ones.
-
----
-
-## Step 6: Generate Ballerina.toml keywords
+## Step 5: Generate Ballerina.toml keywords
 
 Classify this connector for Ballerina Central discoverability and write the result into `<BALLERINA_DIR>/Ballerina.toml`'s `keywords` array. Runs unconditionally, after all README/Module.md/sub-README generation above — this is deterministic classification + write, not user-prompted.
 
@@ -187,7 +164,7 @@ Append the hardcoded literal `Type/Connector` as the 4th keyword, then write all
 
 ---
 
-## Step 7: Stage completion
+## Step 6: Stage completion
 
 Print:
 ```
@@ -196,7 +173,6 @@ Print:
   Module.md:            <BALLERINA_DIR>/Module.md
   tests/README.md:      <BALLERINA_DIR>/tests/README.md
   examples/README.md:   <EXAMPLE_DIR>/README.md
-  sanitations.md:       <SPEC_DIR>/sanitations.md
   Ballerina.toml keywords: <cost> <vendor> <area> Type/Connector
 ```
 
