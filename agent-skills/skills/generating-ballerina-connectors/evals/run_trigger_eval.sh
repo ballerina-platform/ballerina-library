@@ -16,7 +16,7 @@
 # whether it passed (should_trigger query with rate > threshold, or
 # should-not-trigger query with rate < threshold).
 #
-# Requires: claude CLI, jq.
+# Requires: claude CLI, jq, bc.
 
 set -euo pipefail
 
@@ -25,12 +25,21 @@ RUNS="${2:-3}"
 SKILL_NAME="generating-ballerina-connectors"
 THRESHOLD="0.5"
 
+if [[ ! "$RUNS" =~ ^[1-9][0-9]*$ ]]; then
+  echo "ERROR: runs must be a positive integer." >&2
+  exit 1
+fi
+
 if ! command -v claude &>/dev/null; then
   echo "ERROR: 'claude' CLI not found on PATH." >&2
   exit 1
 fi
 if ! command -v jq &>/dev/null; then
   echo "ERROR: 'jq' not found on PATH." >&2
+  exit 1
+fi
+if ! command -v bc &>/dev/null; then
+  echo "ERROR: 'bc' not found on PATH." >&2
   exit 1
 fi
 
@@ -59,7 +68,15 @@ check_triggered() {
       > /dev/null 2>&1
 }
 
-count=$(jq length "$QUERIES_FILE")
+count=$(jq 'if type == "array" then length else -1 end' "$QUERIES_FILE")
+if [ "$count" -lt 0 ]; then
+  echo "ERROR: queries file must contain a JSON array." >&2
+  exit 1
+fi
+if [ "$count" -eq 0 ]; then
+  echo "ERROR: queries file contains no queries." >&2
+  exit 1
+fi
 results="[]"
 
 for i in $(seq 0 $((count - 1))); do

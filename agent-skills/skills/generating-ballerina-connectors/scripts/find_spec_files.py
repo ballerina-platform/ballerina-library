@@ -24,8 +24,8 @@ def walk(root: str, max_depth: int, excluded: set):
         if depth >= max_depth:
             dirs[:] = []
             continue
-        dirs[:] = [d for d in dirs if d not in excluded]
-        for f in files:
+        dirs[:] = sorted(d for d in dirs if d not in excluded)
+        for f in sorted(files):
             yield os.path.join(current, f)
 
 

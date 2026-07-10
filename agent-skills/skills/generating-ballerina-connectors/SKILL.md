@@ -154,7 +154,8 @@ All scripts are in `<skill-root>/scripts/` and are pure Python (`.py`) — no sh
 <PYTHON_CMD> scripts/analyze_client.py "<client.bal>"
 
 # Generate service stub from spec → tests/mock_service.bal
-<PYTHON_CMD> scripts/generate_mock_stub.py "<aligned-spec>" "<output-dir>"
+# 3rd/4th args optional (empty string when unset): operation filter + license header
+<PYTHON_CMD> scripts/generate_mock_stub.py "<aligned-spec>" "<output-dir>" "<SELECTED_OPERATIONS>" "<LICENSE_PATH>"
 
 # Run any bal command in a working directory — prints stderr to a temp file and its path on failure
 <PYTHON_CMD> scripts/run_bal_command.py "<command>" "<working-dir>"

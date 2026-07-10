@@ -17,7 +17,8 @@ def parse(toml_path: str) -> dict:
         print(f"ERROR: File not found: {toml_path}", file=sys.stderr)
         sys.exit(1)
 
-    content = open(toml_path, "r", encoding="utf-8").read()
+    with open(toml_path, "r", encoding="utf-8") as f:
+        content = f.read()
 
     # Find [package] section — read until next [section] or EOF
     package_match = re.search(r"^\[package\](.*?)(?=^\[|\Z)", content, re.MULTILINE | re.DOTALL)

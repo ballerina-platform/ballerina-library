@@ -160,11 +160,16 @@ Ask this before any stage-specific questions below, so those can be skipped when
 > 2. Skip specific stages
 > 3. Run only specific stages
 
-If skipping (or selecting which to run only), collect the stage list across **two** multi-select questions in the same prompt — `AskUserQuestion` caps options at 4 per question, so all 5 stages cannot be offered in one:
+If skipping (option 2) or running only specific stages (option 3), collect the stage list across **two** multi-select questions in the same prompt — `AskUserQuestion` caps options at 4 per question, so all 5 stages cannot be offered in one:
 - Question A — options: `sanitize`, `client`
 - Question B — options: `tests`, `examples`, `docs`
 
-Union the selections from both questions into a single list. Validate against the rules in `references/workflows.md` (section: "Skip validation rules").
+Union the selections from both questions into a single list, `SELECTED_STAGES`, then derive `EXCLUDED_STAGES`:
+- **Skip specific stages (option 2)**: `EXCLUDED_STAGES = SELECTED_STAGES` (the chosen stages are the ones to skip).
+- **Run only specific stages (option 3)**: `EXCLUDED_STAGES = [sanitize, client, tests, examples, docs] − SELECTED_STAGES` (every stage *not* chosen is skipped).
+- **Run all stages (option 1)**: `EXCLUDED_STAGES = []`.
+
+Validate the resulting `EXCLUDED_STAGES` against the rules in `references/workflows.md` (section: "Skip validation rules") — in particular, reject if it would exclude all stages.
 
 Store as `EXCLUDED_STAGES` (list).
 

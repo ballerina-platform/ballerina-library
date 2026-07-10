@@ -60,15 +60,21 @@ def balance_parens(content: str, start: int) -> int:
 def parse_params(params_str: str) -> list:
     """Parse comma-separated 'type name' pairs, handling nested generics."""
     params = []
-    # Split on top-level commas (not inside <> or [])
+    # Split on top-level commas (not inside nested type/default expressions).
     depth = 0
+    quote = ""
     current = []
     for ch in params_str:
-        if ch in '<[(':
+        if quote:
+            if ch == quote:
+                quote = ""
+        elif ch in ('"', "'"):
+            quote = ch
+        elif ch in '<[({':
             depth += 1
-        elif ch in '>])':
+        elif ch in '>])}':
             depth -= 1
-        if ch == ',' and depth == 0:
+        if ch == ',' and depth == 0 and not quote:
             params.append(''.join(current).strip())
             current = []
         else:
@@ -82,7 +88,7 @@ def parse_params(params_str: str) -> list:
         if not p:
             continue
         # Remove default values
-        p = re.sub(r'\s*=\s*\S+\s*$', '', p).strip()
+        p = re.sub(r'\s*=.*$', '', p).strip()
         # Split type and name: last word is the name
         parts = p.rsplit(None, 1)
         if len(parts) == 2:

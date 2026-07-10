@@ -49,7 +49,8 @@ def validate(spec_path: str) -> None:
         sys.exit(1)
 
     version_hint = spec.get("openapi") or spec.get("swagger") or "unknown"
-    title = spec.get("info", {}).get("title", "untitled")
+    info = spec.get("info")
+    title = info.get("title", "untitled") if isinstance(info, dict) else "untitled"
     path_count = len(spec.get("paths", {}))
     print(f"OK: '{title}' (OpenAPI {version_hint}) — {path_count} path(s) found.")
 

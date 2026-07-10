@@ -49,7 +49,12 @@ Compare `len(OPERATION_IDS)` against `MAX_OPERATIONS = 30`:
 
 Example valid response: `getFile,listFiles,uploadFile,deleteFile,createFolder,...`
 
-Store the result as `SELECTED_OPERATIONS`.
+**Validate the response deterministically before using it.** Split it on `,` and re-prompt (repeat the prompt above) until all of these hold:
+- exactly **30** entries, all **unique** (no duplicates, no empty entries),
+- every id is a member of `OPERATION_IDS`,
+- no surrounding whitespace, no code fences, no extra prose.
+
+Only once valid, join the validated ids with `,` (no spaces) and store as `SELECTED_OPERATIONS`. Pass only this validated value to Step 2a's `generate_mock_stub.py` — never an unvalidated raw response.
 
 > `CLIENT_ANALYSIS` (from Step 1) is still used in Steps 2b and 3 for `methodType`, `configType`, and method signatures. Only the operation count and selection source changes to the spec.
 

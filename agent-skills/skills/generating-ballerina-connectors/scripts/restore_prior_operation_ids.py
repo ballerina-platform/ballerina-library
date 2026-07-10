@@ -22,6 +22,8 @@ The map file passed to `apply` is a transient scratch artifact — delete it
 once `apply` has run.
 """
 
+from __future__ import annotations
+
 import sys
 import json
 import os

@@ -24,10 +24,7 @@ def try_python_yaml(yaml_path: str) -> dict | None:
     try:
         import yaml
         with open(yaml_path, "r", encoding="utf-8") as f:
-            content = f.read()
-        # Backtick (U+0060) breaks some YAML parsers on plain scalars — replace it
-        content = content.replace("`", "_")
-        return yaml.safe_load(content)
+            return yaml.safe_load(f)
     except ImportError:
         return None
     except Exception as e:
@@ -48,16 +45,17 @@ def try_yq(yaml_path: str) -> dict | None:
     return None
 
 
-def try_python_yaml_raw(yaml_path: str) -> dict | None:
-    # 3rd fallback: PyYAML without backtick replacement — in case the replacement itself corrupted the parse
+def try_python_yaml_with_backtick_replacement(yaml_path: str) -> dict | None:
     try:
         import yaml
         with open(yaml_path, "r", encoding="utf-8") as f:
-            return yaml.safe_load(f)
+            content = f.read()
+        # Last resort: replace backticks only after raw parsers fail.
+        return yaml.safe_load(content.replace("`", "_"))
     except ImportError:
         return None
     except Exception as e:
-        print(f"  python yaml (raw) fallback failed: {e}", file=sys.stderr)
+        print(f"  python yaml (backtick replacement) fallback failed: {e}", file=sys.stderr)
         return None
 
 
@@ -75,13 +73,13 @@ def convert(yaml_path: str) -> str:
     if data is None:
         data = try_yq(yaml_path)
     if data is None:
-        data = try_python_yaml_raw(yaml_path)
+        data = try_python_yaml_with_backtick_replacement(yaml_path)
     if data is None:
         print(
             "ERROR: Could not convert YAML to JSON. Tried:\n"
-            "  1. PyYAML with backtick replacement\n"
+            "  1. PyYAML\n"
             "  2. yq (install: https://github.com/mikefarah/yq)\n"
-            "  3. PyYAML without backtick replacement\n"
+            "  3. PyYAML with backtick replacement\n"
             "Install PyYAML with `pip install pyyaml` or yq to resolve this.",
             file=sys.stderr,
         )

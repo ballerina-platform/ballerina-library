@@ -59,4 +59,4 @@ if __name__ == "__main__":
     if not errors and PLAIN_ERROR.search(text):
         # Unparsed errors exist — emit the raw lines so the agent sees them
         sys.stderr.write("WARNING: Some errors could not be parsed into structured form.\n")
-        sys.exit(0)
+        sys.exit(2)

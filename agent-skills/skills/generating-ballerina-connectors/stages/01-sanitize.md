@@ -37,7 +37,15 @@ Option semantics are unchanged from above (option 1 = proceed to Step 1, sanitat
 
 ## Step 0b: Build the prior operationId map (if any)
 
-Step 2 below overwrites `<SPEC_DIR>/aligned_ballerina_openapi.json` with this run's output, so any operationIds a previous run established must be captured first. This is deterministic — no reasoning required, and no need to check existence first:
+Step 2 below overwrites `<SPEC_DIR>/aligned_ballerina_openapi.json` with this run's output, so any operationIds a previous run established must be captured first. This is deterministic — no reasoning required, and no need to check existence first.
+
+`<SPEC_DIR>` may not exist yet on a first run, and the `>` redirect below will not create it — ensure it exists first:
+
+```bash
+<PYTHON_CMD> -c "import os; os.makedirs(r'<SPEC_DIR>', exist_ok=True)"
+```
+
+Then capture the prior operationId map:
 
 ```bash
 <PYTHON_CMD> <skill-root>/scripts/restore_prior_operation_ids.py build "<SPEC_DIR>/aligned_ballerina_openapi.json" > "<SPEC_DIR>/.prior_operation_ids.json"
