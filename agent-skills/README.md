@@ -13,15 +13,14 @@ Claude Code skills that automate Ballerina library workflows. Each skill lives i
 | Requirement | Install |
 |---|---|
 | [Claude Code](https://claude.ai/code) | Download from claude.ai/code |
-| Ballerina CLI (`bal`) | `brew install ballerina` or from [ballerina.io](https://ballerina.io/downloads/) |
-| `bal openapi` tool | `bal tool pull openapi` |
+| Ballerina CLI (`bal`) | `brew install ballerina` or from [ballerina.io](https://ballerina.io/downloads/) — the `openapi` tool ships bundled with the distribution |
 | Python 3.8+ | `brew install python` or system Python |
 | Git | Pre-installed on most systems |
 
 Verify after install:
 
 ```bash
-bal openapi --version
+bal tool list
 python3 --version
 ```
 

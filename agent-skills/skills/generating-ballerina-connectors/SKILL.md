@@ -117,7 +117,7 @@ These variables are set in Setup (stage 00) and used by all subsequent stages:
 All scripts are in `<skill-root>/scripts/` and are pure Python (`.py`) — no shell scripts, so they run identically on macOS/Linux/Windows. Invoke them with `<PYTHON_CMD>` (resolved once in Setup Step 0), not a hardcoded `python3`.
 
 ```bash
-# Check environment (bal, PyYAML, ANTHROPIC_API_KEY) — run first in setup, after PYTHON_CMD is resolved
+# Check environment (bal, PyYAML) — run first in setup, after PYTHON_CMD is resolved
 <PYTHON_CMD> scripts/check_environment.py
 
 # Find OpenAPI spec candidates in CWD — use before prompting for spec path

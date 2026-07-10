@@ -7,7 +7,6 @@ Output: status lines per check. Exits 1 if any required check fails.
 """
 
 import importlib.util
-import os
 import shutil
 import subprocess
 import sys
@@ -49,11 +48,6 @@ def main() -> None:
         check("PyYAML", True)
     else:
         check("PyYAML", False, "not installed — run: pip install pyyaml  (or yq will be used as fallback)", fatal=False)
-
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        check("ANTHROPIC_API_KEY", False, "not set", fatal=False)
-    else:
-        check("ANTHROPIC_API_KEY", True)
 
     if failed:
         print("")
