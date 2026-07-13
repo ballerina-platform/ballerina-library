@@ -1,0 +1,102 @@
+[
+  {
+    "id": "st-01",
+    "query": "I have docs/spec/openapi.json for the HubSpot Files API — can you generate a Ballerina connector from it?",
+    "should_trigger": true
+  },
+  {
+    "id": "st-02",
+    "query": "generate a ballerina client from this swagger file: ./openapi.yaml",
+    "should_trigger": true
+  },
+  {
+    "id": "st-03",
+    "query": "we need to scaffold ballerinax/hubspot.files — there's an OpenAPI spec at docs/spec/openapi.json, can you run through sanitize, client, tests and docs for it",
+    "should_trigger": true
+  },
+  {
+    "id": "st-04",
+    "query": "my manager wants a Ballerina SDK for the Microsoft Graph SharePoint Admin API, spec is at ./sharepoint-admin.yaml",
+    "should_trigger": true
+  },
+  {
+    "id": "st-05",
+    "query": "can u make a bal connector out of this openapi spec, skip the tests stage",
+    "should_trigger": true
+  },
+  {
+    "id": "st-06",
+    "query": "Set up a new ballerina-platform connector module using the OpenAPI definition in api/openapi.json, with remote methods instead of resource methods",
+    "should_trigger": true
+  },
+  {
+    "id": "st-07",
+    "query": "port this REST API to a Ballerina client package, generate examples and docs too",
+    "should_trigger": true
+  },
+  {
+    "id": "st-08",
+    "query": "there's a sanitations.md and aligned_ballerina_openapi.json already in docs/spec — reapply those and regenerate the client",
+    "should_trigger": true
+  },
+  {
+    "id": "st-09",
+    "query": "I need help wiring up bal openapi align and flatten for our HubSpot connector, then get the AI to clean up the operationIds",
+    "should_trigger": true
+  },
+  {
+    "id": "st-10",
+    "query": "can you build the ballerinax connector for our internal Files API, following the same five-stage pipeline we used for the last module",
+    "should_trigger": true
+  },
+  {
+    "id": "sn-01",
+    "query": "convert this openapi.yaml file to json for me",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-02",
+    "query": "can you review my client.bal file for style issues",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-03",
+    "query": "write a python script that calls the HubSpot Files API and uploads files",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-04",
+    "query": "generate a Java client from this openapi spec using openapi-generator",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-05",
+    "query": "what does the `bal openapi align` command do",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-06",
+    "query": "fix this failing bal build in my existing connector project",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-07",
+    "query": "can you write a few example Ballerina programs using http:Client to hit this REST API",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-08",
+    "query": "explain how OpenAPI 3.0 servers/basePath fields work",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-09",
+    "query": "just want to know if this openapi spec is valid JSON",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-10",
+    "query": "translate this Ballerina client.bal into a Go client",
+    "should_trigger": false
+  }
+]
