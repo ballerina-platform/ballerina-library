@@ -18,9 +18,7 @@
 // Copy Config.toml.example → Config.toml and fill in the required fields.
 
 // === Required ===
-configurable string connectorName = ?;
-configurable string moduleSlug = ?;
-configurable string packageName = ?;
+// The repository is always resolved under github.com/ballerina-platform.
 configurable string githubRepo = ?;
 configurable string category = ?;
 

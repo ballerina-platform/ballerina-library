@@ -29,36 +29,53 @@ import wso2/connector_doc_generator.sidebar;
 
 const string OUTPUT_DIR = "./output";
 
+type ConnectorMetadata record {|
+    string connectorName;
+    string moduleSlug;
+    string packageName;
+|};
+
 # Connector documentation generation pipeline.
 #
-# Reads connector identity from Config.toml and runs a 5-step pipeline:
-#   1. Fetch latest version from Ballerina Central (unless already set)
-#   2. Clone source repository locally (shallow, no web browsing during generation)
-#   3. Call Claude Code CLI with local Read/Glob/Grep tools (two phases)
-#   4. Write the generated markdown files to the docs directory
-#   5. Patch sidebars.ts and catalog/index.md
+# Reads the repository name and category from Config.toml, derives connector metadata from
+# its Ballerina.toml, and runs the documentation pipeline.
 #
 # + return - an error if any step fails
 public function main() returns error? {
     log("=== Connector Doc Generator ===");
-    log(string `Connector: ${connectorName}  |  Module: ${moduleSlug}  |  Category: ${category}`);
+    log(string `Repository: ballerina-platform/${githubRepo}  |  Category: ${category}`);
     log("");
 
     time:Utc startTime = time:utcNow();
 
-    // ── Step 1: Resolve version ─────────────────────────────────────────────
+    // ── Step 1: Discover connector metadata ────────────────────────────────
+    log("[1/7] Reading connector metadata from Ballerina.toml...");
+    string metadataRepoPath = check cloneMetadataRepo(githubRepo);
+    ConnectorMetadata|error metadataResult = readConnectorMetadata(metadataRepoPath, githubRepo);
+    file:Error? metadataCleanupErr = file:remove(metadataRepoPath, file:RECURSIVE);
+    if metadataCleanupErr is file:Error {
+        log(string `WARN  Failed to remove temporary metadata clone: ${metadataCleanupErr.message()}`);
+    }
+    ConnectorMetadata metadata = check metadataResult;
+    string connectorName = metadata.connectorName;
+    string moduleSlug = metadata.moduleSlug;
+    string packageName = metadata.packageName;
+    log(string `      Package: ${packageName}  |  Module: ${moduleSlug}`);
+    log("");
+
+    // ── Step 2: Resolve version ─────────────────────────────────────────────
     string resolvedVersion = connectorVersion;
     if resolvedVersion == "" {
-        log(string `[1/6] Fetching latest version for ${packageName} from Ballerina Central...`);
+        log(string `[2/7] Fetching latest version for ${packageName} from Ballerina Central...`);
         resolvedVersion = check central:fetchLatestVersion(packageName);
         log(string `      Latest version: ${resolvedVersion}`);
     } else {
-        log(string `[1/6] Using configured version: ${resolvedVersion}`);
+        log(string `[2/7] Using configured version: ${resolvedVersion}`);
     }
     log("");
 
-    // ── Step 2: Load existing docs + build prompt ───────────────────────────
-    log("[2/6] Checking for existing docs...");
+    // ── Step 3: Load existing docs + build prompt ───────────────────────────
+    log("[3/7] Checking for existing docs...");
 
     string connectorDocDir = docsRoot + "/catalog/" + category + "/" + moduleSlug;
     boolean docsExist = check file:test(connectorDocDir, file:EXISTS);
@@ -86,18 +103,18 @@ public function main() returns error? {
         string connectorDir = docsRoot + "/catalog/" + category + "/" + moduleSlug;
         string indexPath = docsRoot + "/catalog/index.mdx";
         log("[DRY RUN] Would execute the following steps:");
-        log(string `  [3/6] Clone https://github.com/ballerina-platform/${githubRepo} to /tmp/`);
-        log(string `  [4a/6] Phase 1 — overview, setup guide, trigger reference (prompt: ${dryPromptText.length()} chars)`);
-        log(string `  [4b/6] Phase 2 — action reference (2a discovery + 2b per-client in parallel)`);
-        log(string `  [5/6] Write doc files to: ${connectorDir}/`);
-        log(string `  [6/6] Patch ${sidebarPath} and ${indexPath}`);
+        log(string `  [4/7] Clone https://github.com/ballerina-platform/${githubRepo} at v${resolvedVersion} to /tmp/`);
+        log(string `  [5a/7] Phase 1 — overview, setup guide, trigger reference (prompt: ${dryPromptText.length()} chars)`);
+        log(string `  [5b/7] Phase 2 — action reference (2a discovery + 2b per-client in parallel)`);
+        log(string `  [6/7] Write doc files to: ${connectorDir}/`);
+        log(string `  [7/7] Patch ${sidebarPath} and ${indexPath}`);
         log("");
         log(string `  Prompt saved to: ${promptPath}`);
         return;
     }
 
-    // ── Step 2b: Clone source repository ────────────────────────────────────
-    log("[3/6] Cloning source repository (shallow)...");
+    // ── Step 4: Clone source repository ─────────────────────────────────────
+    log("[4/7] Cloning source repository (shallow)...");
     string localRepoPath = check cloneSourceRepo(githubRepo, moduleSlug, resolvedVersion);
     log(string `      Cloned to: ${localRepoPath}`);
     log("");
@@ -118,7 +135,7 @@ public function main() returns error? {
     log(string `      Prompt saved: ${promptPath}  (${promptText.length()} chars)`);
     log("");
 
-    // ── Step 3: Call Claude Code CLI (two phases) ───────────────────────────
+    // ── Step 5: Call Claude Code CLI (two phases) ───────────────────────────
     if !claude:isClaudeInstalled() {
         file:Error? removeErr = file:remove(localRepoPath, file:RECURSIVE);
         if removeErr is file:Error {
@@ -135,7 +152,7 @@ public function main() returns error? {
     decimal totalCostUsd = 0.0d;
 
     // ── Phase 1: overview, setup-guide, trigger-reference ───────────────────
-    log("[4a/6] Phase 1 — overview, setup guide, trigger reference...");
+    log("[5a/7] Phase 1 — overview, setup guide, trigger reference...");
     log("       Claude is reading local source files...");
 
     string phase1RawPath = OUTPUT_DIR + "/" + moduleSlug + "-phase1-raw.txt";
@@ -184,7 +201,7 @@ public function main() returns error? {
     }
 
     // ── Phase 2a: action-reference header + client discovery ─────────────────
-    log("[4b/6] Phase 2a — discovering packages and clients...");
+    log("[5b/7] Phase 2a — discovering packages and clients...");
 
     prompts:ConnectorInput phase2aInput = {
         name: connectorName,
@@ -216,7 +233,7 @@ public function main() returns error? {
     log(string `      Discovered ${clients.length()} client(s): ${string:'join(", ", ...clients.map(c => c.displayName))}`);
 
     // ── Phase 2b: per-client sections (parallel) ──────────────────────────────
-    log(string `[4c/6] Phase 2b — generating ${clients.length()} client section(s) in parallel...`);
+    log(string `[5c/7] Phase 2b — generating ${clients.length()} client section(s) in parallel...`);
 
     // Build all prompts and launch all Claude calls concurrently
     future<[string, claude:ClaudeResult]|error>[] phase2bFutures = [];
@@ -293,8 +310,8 @@ public function main() returns error? {
 
     log("");
 
-    // ── Step 4: Extract and write files ────────────────────────────────────
-    log("[5/6] Extracting and writing documentation files...");
+    // ── Step 6: Extract and write files ────────────────────────────────────
+    log("[6/7] Extracting and writing documentation files...");
 
     if extracted.files.length() == 0 {
         file:Error? removeErr = file:remove(localRepoPath, file:RECURSIVE);
@@ -332,8 +349,8 @@ public function main() returns error? {
     }
     log("");
 
-    // ── Step 5: Patch sidebar and category index ────────────────────────────
-    log("[6/6] Patching sidebars.ts and category index...");
+    // ── Step 7: Patch sidebar and category index ────────────────────────────
+    log("[7/7] Patching sidebars.ts and category index...");
 
     boolean hasSetup = extracted.files.hasKey("setup-guide.md");
     boolean hasTriggers = extracted.files.hasKey("trigger-reference.md");
@@ -398,6 +415,86 @@ function runPhase2b(string displayName, string promptText, string rawPath) retur
     logClaudeStats(result);
     string section = extractor:extractClientSection(result.text);
     return [section, result];
+}
+
+function cloneMetadataRepo(string repo) returns string|error {
+    int ts = <int>time:utcNow()[0];
+    string repoPath = string `/tmp/conn_doc_metadata_${ts}`;
+    string cloneUrl = string `https://github.com/ballerina-platform/${repo}`;
+
+    os:Process|error proc = os:exec({
+        value: "git",
+        arguments: ["clone", "--depth", "1", cloneUrl, repoPath]
+    });
+    if proc is error {
+        return error("Failed to start metadata git clone: " + proc.message());
+    }
+    int|error exitCode = proc.waitForExit();
+    if exitCode is error {
+        return error("Metadata git clone error: " + exitCode.message());
+    }
+    if exitCode != 0 {
+        return error(string `git clone failed (exit ${exitCode}) for ${cloneUrl}`);
+    }
+    return repoPath;
+}
+
+function readConnectorMetadata(string repoPath, string repo) returns ConnectorMetadata|error {
+    string[] manifestPaths = [
+        repoPath + "/Ballerina.toml",
+        repoPath + "/ballerina/Ballerina.toml",
+        repoPath + "/ballerina/ballerina.toml"
+    ];
+    string? manifestPath = ();
+    foreach string path in manifestPaths {
+        if check file:test(path, file:EXISTS) {
+            manifestPath = path;
+            break;
+        }
+    }
+    if manifestPath is () {
+        return error(string `No Ballerina.toml found in repository '${repo}'. Expected it at the repository root or in the ballerina directory`);
+    }
+
+    string manifest = check io:fileReadString(manifestPath);
+    string? org = ();
+    string? name = ();
+    boolean inPackage = false;
+    foreach string originalLine in re `\n`.split(manifest) {
+        string line = originalLine.trim();
+        if line == "" || line.startsWith("#") {
+            continue;
+        }
+        if line.startsWith("[") && line.endsWith("]") {
+            inPackage = line == "[package]";
+            continue;
+        }
+        if !inPackage {
+            continue;
+        }
+        int? equalsIndex = line.indexOf("=");
+        if equalsIndex is () {
+            continue;
+        }
+        string key = line.substring(0, equalsIndex).trim();
+        string value = line.substring(equalsIndex + 1).trim();
+        int? commentIndex = value.indexOf("#");
+        if commentIndex is int {
+            value = value.substring(0, commentIndex).trim();
+        }
+        if value.length() >= 2 && value.startsWith("\"") && value.endsWith("\"") {
+            value = value.substring(1, value.length() - 1);
+        }
+        if key == "org" {
+            org = value;
+        } else if key == "name" {
+            name = value;
+        }
+    }
+    if org is () || org.length() == 0 || name is () || name.length() == 0 {
+        return error(string `Invalid [package] metadata in '${manifestPath}'. Both 'org' and 'name' are required`);
+    }
+    return {connectorName: name, moduleSlug: name, packageName: string `${org}/${name}`};
 }
 
 function cloneSourceRepo(string repo, string slug, string 'version) returns string|error {

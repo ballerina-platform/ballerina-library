@@ -1,7 +1,8 @@
 # Connector Doc Generator
 
 Automatically generates Docusaurus documentation for Ballerina connectors using Claude AI.
-Given a connector identity, it clones the source repo, calls Claude to read the code, and
+Given a Ballerina connector repository and catalog category, it reads the connector metadata
+from `Ballerina.toml`, clones the source repo, calls Claude to read the code, and
 produces `overview.md`, `setup-guide.md`, `action-reference.md`, and `trigger-reference.md`
 ready to drop into the docs site.
 
@@ -18,19 +19,17 @@ ready to drop into the docs site.
 
 ## Setup
 
-### 1. Copy the example config
+### 1. Optional: copy the example config
 
 ```bash
 cp Config.toml.example Config.toml
 ```
 
-### 2. Fill in Config.toml
+### 2. Optional: fill in Config.toml
 
 ```toml
-# Required
-connectorName    = "HubSpot"
-moduleSlug       = "hubspot"
-packageName      = "ballerinax/hubspot"
+# Required. The repository is resolved under github.com/ballerina-platform.
+# The package name, module slug, and connector name come from Ballerina.toml.
 githubRepo       = "module-ballerinax-hubspot"
 category         = "crm-sales"
 
@@ -57,17 +56,33 @@ docsRepoRoot     = "/path/to/docs-integrator"
 
 ## Running
 
+Run with the two required connector values as Ballerina CLI configurables:
+
 ```bash
 cd connector-doc-generator
-bal run
+bal run -- \
+  -CgithubRepo=module-ballerinax-hubspot \
+  -Ccategory=crm-sales
+```
+
+`-C` values override values in `Config.toml`. Optional values not supplied on the CLI use
+their `config.bal` defaults, or values from `Config.toml` when present. For example:
+
+```bash
+bal run -- \
+  -CgithubRepo=module-ballerinax-hubspot \
+  -Ccategory=crm-sales \
+  -CdocsRepoRoot=/path/to/docs-integrator \
+  -CdryRun=true
 ```
 
 Progress is printed to the terminal as Claude works through each phase.
 
 ### Dry run
 
-Set `dryRun = true` in `Config.toml` to build the prompt and print what would happen
-without cloning the repo or calling Claude.
+Set `dryRun = true` in `Config.toml`, or pass `-CdryRun=true`, to build the prompt and print
+what would happen without cloning the versioned source repo or calling Claude. A short bootstrap
+clone is still used to read `Ballerina.toml` and derive the connector metadata.
 
 ### Update mode
 

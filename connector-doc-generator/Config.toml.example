@@ -1,13 +1,11 @@
 # ============================================================
 # connector-doc-generator-bal — Config.toml
-# Copy this file to Config.toml and fill in the required fields.
+# Copy this file to Config.toml to persist values locally, or pass configurables with `bal run -- -Ckey=value`.
 # ============================================================
 
 # === Required ===
-connectorName = "HubSpot"           # Display name, e.g. "HubSpot"
-moduleSlug    = "hubspot"           # Module/folder slug, e.g. "hubspot"
-packageName   = "ballerinax/hubspot" # Ballerina package, e.g. "ballerinax/hubspot"
-githubRepo    = "module-ballerinax-hubspot" # GitHub repo name
+# GitHub repository name under ballerina-platform. Connector metadata is read from its Ballerina.toml.
+githubRepo = "module-ballerinax-hubspot"
 
 # Category slug — choose from:
 # ai-ml, built-in, cloud-infrastructure, communication, crm-sales,

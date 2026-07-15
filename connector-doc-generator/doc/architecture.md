@@ -2,18 +2,20 @@
 
 ## Overview
 
-The generator runs a 6-step pipeline that clones the connector source, calls Claude in
+The generator runs a 7-step pipeline that derives connector metadata from its repository,
+clones the connector source, calls Claude in
 multiple focused phases, and writes Docusaurus-ready markdown to the docs repository.
 
 ```
-[1/6] Resolve version      — Ballerina Central API or Config.toml
-[2/6] Check existing docs  — Determines fresh generation vs update mode
-[3/6] Clone source repo    — git clone --depth 1 --branch v<version>
-[4a/6] Phase 1 (Opus)      — overview.md, setup-guide.md, trigger-reference.md
-[4b/6] Phase 2a (Opus)     — action-reference header + client discovery
-[4c/6] Phase 2b (Sonnet)   — per-client sections, all clients run in parallel
-[5/6] Write files          — write to docs repo (skip if force=false and file exists)
-[6/6] Patch sidebar        — sidebars.ts + catalog/index.mdx
+[1/7] Read metadata        — bootstrap clone + Ballerina.toml ([package].org and name)
+[2/7] Resolve version      — Ballerina Central API or Config.toml
+[3/7] Check existing docs  — Determines fresh generation vs update mode
+[4/7] Clone source repo    — git clone --depth 1 --branch v<version>
+[5a/7] Phase 1 (Opus)      — overview.md, setup-guide.md, trigger-reference.md
+[5b/7] Phase 2a (Opus)     — action-reference header + client discovery
+[5c/7] Phase 2b (Sonnet)   — per-client sections, all clients run in parallel
+[6/7] Write files          — write to docs repo (skip if force=false and file exists)
+[7/7] Patch sidebar        — sidebars.ts + catalog/index.mdx
 ```
 
 ---
@@ -65,8 +67,13 @@ Phase 1 produces `overview.md`. Its content is passed verbatim to phases 2a and 
 
 ## Source Repository
 
-The connector GitHub repo is shallow-cloned at the exact version tag (`v<version>`)
-before any Claude calls:
+The user supplies the repository name and category. The generator first shallow-clones the
+repository default branch to read `[package].org` and `[package].name` from `Ballerina.toml`
+(at the repository root or in the `ballerina` directory). It derives the package name,
+module slug, and connector name from that metadata.
+
+It then shallow-clones the connector repo at the exact version tag (`v<version>`) before any
+Claude calls:
 
 ```
 git clone --depth 1 --branch v8.6.0 https://github.com/ballerina-platform/<repo> /tmp/conn_doc_<slug>_<ts>
