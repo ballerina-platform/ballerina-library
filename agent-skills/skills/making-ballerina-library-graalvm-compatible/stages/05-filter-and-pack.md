@@ -1,8 +1,6 @@
 # Stage 05 — Filter and Pack Native-Image Config
 
-Merge repo-sourced metadata (stage 02) with filtered tracing output (stages 03/04)
-and pack it into the module so it ships with the library. Full procedure:
-`references/pack-and-mark.md`.
+Merge repo-sourced metadata (stage 02) with filtered tracing output (stages 03/04) and pack it into the module so it ships with the library. Full procedure: `references/pack-and-mark.md`.
 
 **Skip this stage** if stages 02/03/04 produced nothing worth keeping.
 
@@ -10,8 +8,7 @@ and pack it into the module so it ships with the library. Full procedure:
 
 ## Step 1: Confirm coordinates and native module
 
-You have `GROUP_ID`, `ARTIFACT_ID`, `HAS_NATIVE_MODULE`, `NATIVE_DIR`, `META_INF_DIR`
-from setup. If they are stale, re-run `detect_package_coordinates.py`.
+You have `GROUP_ID`, `ARTIFACT_ID`, `HAS_NATIVE_MODULE`, `NATIVE_DIR`, `META_INF_DIR` from setup. If they are stale, re-run `detect_package_coordinates.py`.
 
 If `HAS_NATIVE_MODULE` is false, scaffold a resources-only module:
 
@@ -24,8 +21,7 @@ If `HAS_NATIVE_MODULE` is false, scaffold a resources-only module:
 
 ## Step 2: Filter tracing output (skip if only repo-sourced metadata)
 
-Decide `KEEP_PACKAGE_PREFIXES` — the library's own Java package(s) plus the
-third-party dependency packages that need metadata (judgment call). Then:
+Decide `KEEP_PACKAGE_PREFIXES` — the library's own Java package(s) plus the third-party dependency packages that need metadata (judgment call). Then:
 
 ```bash
 <PYTHON_CMD> <skill-root>/scripts/filter_trace_configs.py \
@@ -33,17 +29,13 @@ third-party dependency packages that need metadata (judgment call). Then:
   --keep-prefixes "<KEEP_PACKAGE_PREFIXES>"
 ```
 
-Review the kept/dropped report with the user. Over-packing bloats the binary;
-under-packing reintroduces runtime errors. Resource/bundle globs pass through
-unfiltered — inspect them. Prefer conditional (`typeReached`) entries
-(`references/reachability-metadata.md`).
+Review the kept/dropped report with the user. Over-packing bloats the binary; under-packing reintroduces runtime errors. Resource/bundle globs pass through unfiltered — inspect them. Prefer conditional (`typeReached`) entries (`references/reachability-metadata.md`).
 
 ---
 
 ## Step 3: Pack
 
-Pack repo-sourced metadata (each `REACHABILITY_REPO_HITS` staging dir) and the
-filtered tracing output, merging same-named files:
+Pack repo-sourced metadata (each `REACHABILITY_REPO_HITS` staging dir) and the filtered tracing output, merging same-named files:
 
 ```bash
 # per repo hit
@@ -69,9 +61,7 @@ Files land under `META-INF/native-image/<GROUP_ID>/<ARTIFACT_ID>/`.
   --out "<NATIVE_DIR>/build/libs/<ARTIFACT_ID>-<BAL_PACKAGE_version>.jar"
 ```
 
-Note this jar path for the dependency wiring in stage 06. If the library already
-has a native module built by its own build system, rebuild that instead and do not
-create a hand-made jar.
+Note this jar path for the dependency wiring in stage 06. If the library already has a native module built by its own build system, rebuild that instead and do not create a hand-made jar.
 
 ---
 

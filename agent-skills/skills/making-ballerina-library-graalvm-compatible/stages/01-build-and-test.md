@@ -1,8 +1,6 @@
 # Stage 01 — Build and Test Baseline
 
-Establish the current GraalVM-compatibility baseline and classify what (if
-anything) needs fixing. Always runs. Routing decisions here follow
-`references/workflow.md`.
+Establish the current GraalVM-compatibility baseline and classify what (if anything) needs fixing. Always runs. Routing decisions here follow `references/workflow.md`.
 
 > Native builds and tests are slow and memory-hungry — expect multi-minute runs.
 
@@ -14,8 +12,7 @@ anything) needs fixing. Always runs. Routing decisions here follow
 <PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal build --graalvm" "<BALLERINA_DIR>"
 ```
 
-Set `BUILD_STATUS` = pass/fail from the exit code. On failure, note the printed
-`>>> output saved to: <path>` — it is the input to classification.
+Set `BUILD_STATUS` = pass/fail from the exit code. On failure, note the printed `>>> output saved to: <path>` — it is the input to classification.
 
 Classify the output (pass the saved path, or pipe the terminal output):
 
@@ -29,14 +26,10 @@ Store `NOT_VERIFIED_WARNING` (`not_verified_warning`) and the error buckets.
 
 ## Step 2: Route on the build result
 
-- **`out_of_memory: true`** → retry once with more builder memory:
-  `bal build --graalvm --graalvm-build-options="-J-Xmx8g"`, then re-classify.
-- **`class_init` non-empty (build failed)** → load
-  `references/class-init-fix-procedure.md` and run its loop with
-  `BUILD_DIR = <BALLERINA_DIR>`. Re-run this step after it completes.
+- **`out_of_memory: true`** → retry once with more builder memory: `bal build --graalvm --graalvm-build-options="-J-Xmx8g"`, then re-classify.
+- **`class_init` non-empty (build failed)** → load `references/class-init-fix-procedure.md` and run its loop with `BUILD_DIR = <BALLERINA_DIR>`. Re-run this step after it completes.
 - **Build passed** → continue to Step 3.
-- **Build failed with only `other` errors** → surface them to the user; ask
-  whether to investigate manually or continue.
+- **Build failed with only `other` errors** → surface them to the user; ask whether to investigate manually or continue.
 
 ---
 
@@ -48,8 +41,7 @@ If `HAS_TESTS` is false, skip to Step 4.
 <PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal test --graalvm" "<BALLERINA_DIR>"
 ```
 
-Set `TEST_STATUS` = pass/fail. On failure, classify the output the same way and
-merge into the error buckets (test failures usually surface `missing_metadata`).
+Set `TEST_STATUS` = pass/fail. On failure, classify the output the same way and merge into the error buckets (test failures usually surface `missing_metadata`).
 
 ---
 

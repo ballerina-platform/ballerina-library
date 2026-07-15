@@ -1,8 +1,6 @@
 # Making a Ballerina Library GraalVM Compatible — Internal Agent Workflow Guide
 
-This document is for the agent's internal use. It describes the decision tree,
-routing rules, and behavioural contracts across stages. Unlike a linear pipeline,
-this workflow branches based on what the baseline build/test reveals.
+This document is for the agent's internal use. It describes the decision tree, routing rules, and behavioural contracts across stages. Unlike a linear pipeline, this workflow branches based on what the baseline build/test reveals.
 
 ---
 
@@ -24,8 +22,7 @@ this workflow branches based on what the baseline build/test reveals.
 06. mark-compatible    → always runs last
 ```
 
-**Prefer the reachability-metadata repo (02) over tracing (03/04).** Repo configs
-are maintainer-vetted and deterministic. Only trace for what the repo does not cover.
+**Prefer the reachability-metadata repo (02) over tracing (03/04).** Repo configs are maintainer-vetted and deterministic. Only trace for what the repo does not cover.
 
 ---
 
@@ -45,52 +42,38 @@ Run `parse_graalvm_errors.py` on the captured output and classify:
 
 ## Class-init fix loop
 
-Build-time class-initialization errors are resolved **inline in stage 01** using
-`class-init-fix-procedure.md` (analogous to the connector skill's fix procedure).
-There is no separate stage. Up to N iterations, then escalate to the user.
+Build-time class-initialization errors are resolved **inline in stage 01** using `class-init-fix-procedure.md` (analogous to the connector skill's fix procedure). There is no separate stage. Up to N iterations, then escalate to the user.
 
 ---
 
 ## Tracing agent contract
 
 Two distinct paths, both in `tracing-agent.md`:
-- **JAR path (03)** — for a `main` or a service. Requires the user to *exercise*
-  the running artifact so the agent observes real dynamic-feature usage.
-- **Tests path (04)** — version-sensitive `BTestMain` invocation. `build_btest_command.py`
-  is the single source of truth for the command; show it and confirm the resolved
-  update branch before running (a wrong signature silently yields bad metadata).
+- **JAR path (03)** — for a `main` or a service. Requires the user to *exercise* the running artifact so the agent observes real dynamic-feature usage.
+- **Tests path (04)** — version-sensitive `BTestMain` invocation. `build_btest_command.py` is the single source of truth for the command; show it and confirm the resolved update branch before running (a wrong signature silently yields bad metadata).
 
-Always validate collected config by rebuilding with
-`--graalvm-build-options="-H:ConfigurationFileDirectories=<CONFIG_DIR>"` before packing.
+Always validate collected config by rebuilding with `--graalvm-build-options="-H:ConfigurationFileDirectories=<CONFIG_DIR>"` before packing.
 
 ---
 
 ## Filtering & packing contract
 
-- `filter_trace_configs.py` prunes JDK/Ballerina-runtime noise. The keep/drop
-  decision is judgment — review the report; over-packing bloats the binary,
-  under-packing reintroduces runtime errors. Use conditional (`typeReached`) entries.
-- Pack into `META-INF/native-image/<groupId>/<artifactId>/`. If no native module
-  exists, scaffold one, build a resources jar, and add it as a
-  `[[platform.javaXX.dependency]]`. See `pack-and-mark.md`.
+- `filter_trace_configs.py` prunes JDK/Ballerina-runtime noise. The keep/drop decision is judgment — review the report; over-packing bloats the binary, under-packing reintroduces runtime errors. Use conditional (`typeReached`) entries.
+- Pack into `META-INF/native-image/<groupId>/<artifactId>/`. If no native module exists, scaffold one, build a resources jar, and add it as a `[[platform.javaXX.dependency]]`. See `pack-and-mark.md`.
 
 ---
 
 ## Interactive mode
 
-When `INTERACTIVE_MODE` is enabled, after each stage print what changed and ask:
-"Proceed to the next stage? [Y/n/q]".
+When `INTERACTIVE_MODE` is enabled, after each stage print what changed and ask: "Proceed to the next stage? [Y/n/q]".
 
 ---
 
 ## Guardrails
 
-- Never mark the package compatible (06) if the last `bal build --graalvm` failed —
-  print why and stop.
-- Degrade gracefully if the reachability repo is unreachable (network/rate-limit):
-  fall back to tracing and log which deps were skipped.
-- Surface (never silently drop) the darwin-aarch64 experimental warning and any
-  GraalVM-JDK/required-JDK mismatch.
+- Never mark the package compatible (06) if the last `bal build --graalvm` failed — print why and stop.
+- Degrade gracefully if the reachability repo is unreachable (network/rate-limit): fall back to tracing and log which deps were skipped.
+- Surface (never silently drop) the darwin-aarch64 experimental warning and any GraalVM-JDK/required-JDK mismatch.
 
 ---
 

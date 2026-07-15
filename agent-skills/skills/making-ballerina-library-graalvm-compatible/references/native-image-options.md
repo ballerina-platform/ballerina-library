@@ -1,20 +1,14 @@
 # Raw native-image Options (for Ballerina --graalvm-build-options)
 
-> **Adapted from** the Oracle GraalVM community skill `build-native-image.md`
-> (see Sources). In a Ballerina library you do **not** invoke `native-image`
-> directly — `bal build --graalvm` / `bal test --graalvm` drive it. To pass any
-> of the flags below, wrap them in `--graalvm-build-options`:
+> **Adapted from** the Oracle GraalVM community skill `build-native-image.md` (see Sources). In a Ballerina library you do **not** invoke `native-image` directly — `bal build --graalvm` / `bal test --graalvm` drive it. To pass any of the flags below, wrap them in `--graalvm-build-options`:
 >
 > ```console
 > $ bal build --graalvm --graalvm-build-options="<flag> <flag> ..."
 > ```
 >
-> The Oracle `native-build-tools.md` (Maven/Gradle plugins) is intentionally
-> **not** adapted — it does not apply to Ballerina.
+> The Oracle `native-build-tools.md` (Maven/Gradle plugins) is intentionally **not** adapted — it does not apply to Ballerina.
 
-This is a reference of the raw flags most useful inside `--graalvm-build-options`.
-For problem-based routing see `troubleshooting.md`; for metadata JSON see
-`reachability-metadata.md`.
+This is a reference of the raw flags most useful inside `--graalvm-build-options`. For problem-based routing see `troubleshooting.md`; for metadata JSON see `reachability-metadata.md`.
 
 ## Build-Time Inputs
 
@@ -78,11 +72,8 @@ For problem-based routing see `troubleshooting.md`; for metadata JSON see
 
 ## Notes for Ballerina
 
-- Multiple flags go in one quoted string:
-  `--graalvm-build-options="-J-Xmx8g --initialize-at-run-time=com.example.Foo"`.
-- The tracing-agent output directory is consumed with
-  `--graalvm-build-options="-H:ConfigurationFileDirectories=config-dir"` — this is
-  how you validate collected metadata before packing it (see `tracing-agent.md`).
+- Multiple flags go in one quoted string: `--graalvm-build-options="-J-Xmx8g --initialize-at-run-time=com.example.Foo"`.
+- The tracing-agent output directory is consumed with `--graalvm-build-options="-H:ConfigurationFileDirectories=config-dir"` — this is how you validate collected metadata before packing it (see `tracing-agent.md`).
 
 ## Sources
 

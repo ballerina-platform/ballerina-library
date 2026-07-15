@@ -1,15 +1,8 @@
 # GraalVM Native Image Reachability Metadata (Ballerina)
 
-> **Adapted from** the Oracle GraalVM community skill
-> `reachability-metadata.md` (see the Sources section). Content trimmed and
-> annotated for the Ballerina library workflow — in particular, where metadata
-> is packed and how raw `native-image` flags reach the build through
-> `bal build --graalvm --graalvm-build-options="..."`.
+> **Adapted from** the Oracle GraalVM community skill `reachability-metadata.md` (see the Sources section). Content trimmed and annotated for the Ballerina library workflow — in particular, where metadata is packed and how raw `native-image` flags reach the build through `bal build --graalvm --graalvm-build-options="..."`.
 
-This is the terminal reference for hand-writing or reviewing native-image config.
-For where these files come from (the reachability-metadata repo or the tracing
-agent) and how they get packed, see `reachability-metadata-repo.md` and
-`pack-and-mark.md`.
+This is the terminal reference for hand-writing or reviewing native-image config. For where these files come from (the reachability-metadata repo or the tracing agent) and how they get packed, see `reachability-metadata-repo.md` and `pack-and-mark.md`.
 
 ## Table of Contents
 
@@ -25,9 +18,7 @@ agent) and how they get packed, see `reachability-metadata-repo.md` and
 
 ## 1. Diagnosing the Error Type
 
-Match the runtime error to the metadata section you need to fix (these appear
-when running the native executable produced by `bal build --graalvm`, or during
-`bal test --graalvm`):
+Match the runtime error to the metadata section you need to fix (these appear when running the native executable produced by `bal build --graalvm`, or during `bal test --graalvm`):
 
 | Runtime Error | Root Cause | Fix In Section |
 |---|---|---|
@@ -38,24 +29,19 @@ when running the native executable produced by `bal build --graalvm`, or during
 | `MissingJNIRegistrationError` | JNI lookup of unregistered type/member | [JNI Metadata](#4-jni-metadata) |
 | `MissingResourceException` | Resource bundle not included | [Resource Metadata](#5-resource-metadata) |
 
-**Quick diagnostic** — pass these through `--graalvm-build-options` to surface
-missing registrations as warnings instead of hard failures while iterating:
+**Quick diagnostic** — pass these through `--graalvm-build-options` to surface missing registrations as warnings instead of hard failures while iterating:
 
 ```console
 $ bal build --graalvm --graalvm-build-options="--exact-reachability-metadata"
 ```
 
-(The `-XX:MissingRegistrationReportingMode=Warn|Exit` runtime flags from the
-upstream doc apply when you run a raw `java`/executable directly, e.g. under the
-tracing agent — see `tracing-agent.md`.)
+(The `-XX:MissingRegistrationReportingMode=Warn|Exit` runtime flags from the upstream doc apply when you run a raw `java`/executable directly, e.g. under the tracing agent — see `tracing-agent.md`.)
 
 ---
 
 ## 2. Where Ballerina Puts Metadata Files
 
-Unlike a Maven/Gradle app, a Ballerina library ships its native-image metadata
-inside its **native module's resource tree**, which is then jarred and declared
-as a `[[platform.javaXX.dependency]]`. All metadata lives in a single JSON file:
+Unlike a Maven/Gradle app, a Ballerina library ships its native-image metadata inside its **native module's resource tree**, which is then jarred and declared as a `[[platform.javaXX.dependency]]`. All metadata lives in a single JSON file:
 
 ```
 native/
@@ -67,9 +53,7 @@ native/
                     └── reachability-metadata.json
 ```
 
-`<groupId>`/`<artifactId>` are the coordinates of the library's native jar (see
-`detect_package_coordinates.py`). The file is a top-level object with one key per
-metadata type:
+`<groupId>`/`<artifactId>` are the coordinates of the library's native jar (see `detect_package_coordinates.py`). The file is a top-level object with one key per metadata type:
 
 ```json
 {
@@ -78,10 +62,7 @@ metadata type:
 }
 ```
 
-> Older GraalVM versions use split files (`reflect-config.json`,
-> `resource-config.json`, `jni-config.json`, `proxy-config.json`,
-> `serialization-config.json`) in the same directory. The scripts handle both;
-> prefer the unified `reachability-metadata.json` on current distributions.
+> Older GraalVM versions use split files (`reflect-config.json`, `resource-config.json`, `jni-config.json`, `proxy-config.json`, `serialization-config.json`) in the same directory. The scripts handle both; prefer the unified `reachability-metadata.json` on current distributions.
 
 See `pack-and-mark.md` for the full packing + jar + `Ballerina.toml` wiring.
 
@@ -167,8 +148,7 @@ For `Unsafe.allocateInstance(MyClass.class)`:
 
 ## 4. JNI Metadata
 
-Used when native C/C++ code calls back into Java via JNI. Fixes `MissingJNIRegistrationError`.
-Ballerina libraries with a `native` directory holding C/JNI code frequently need this.
+Used when native C/C++ code calls back into Java via JNI. Fixes `MissingJNIRegistrationError`. Ballerina libraries with a `native` directory holding C/JNI code frequently need this.
 
 ```json
 {

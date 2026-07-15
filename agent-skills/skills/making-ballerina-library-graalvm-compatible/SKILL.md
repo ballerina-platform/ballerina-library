@@ -1,26 +1,17 @@
----
-name: making-ballerina-library-graalvm-compatible
-description: Makes a Ballerina library GraalVM-compatible by running the native build/test workflow, sourcing reachability metadata, and marking the package compatible. Use when the user wants to make a Ballerina library or package GraalVM compatible; build or test a Ballerina package with `bal build --graalvm` / `bal test --graalvm`; fix GraalVM native-image class-initialization or reflection/JNI/resource errors in a Ballerina project; run the GraalVM tracing agent for Ballerina tests or a service; pack native-image reachability metadata into META-INF for a Ballerina module; resolve the "Package is not verified with GraalVM" warning; or set graalvmCompatible = true in Ballerina.toml.
+--- name: making-ballerina-library-graalvm-compatible description: Makes a Ballerina library GraalVM-compatible by running the native build/test workflow, sourcing reachability metadata, and marking the package compatible. Use when the user wants to make a Ballerina library or package GraalVM compatible; build or test a Ballerina package with `bal build --graalvm` / `bal test --graalvm`; fix GraalVM native-image class-initialization or reflection/JNI/resource errors in a Ballerina project; run the GraalVM tracing agent for Ballerina tests or a service; pack native-image reachability metadata into META-INF for a Ballerina module; resolve the "Package is not verified with GraalVM" warning; or set graalvmCompatible = true in Ballerina.toml.
 ---
 
 # Making a Ballerina Library GraalVM Compatible
 
-An AI-assisted workflow for taking a Ballerina library to a verified, warning-free
-`bal build --graalvm` / `bal test --graalvm`. It builds and tests natively,
-resolves build-time class-initialization errors, sources native-image metadata
-(preferring the vetted `oracle/graalvm-reachability-metadata` repo over the tracing
-agent), packs the required config under `META-INF/native-image/`, and marks the
-package compatible in `Ballerina.toml`.
+An AI-assisted workflow for taking a Ballerina library to a verified, warning-free `bal build --graalvm` / `bal test --graalvm`. It builds and tests natively, resolves build-time class-initialization errors, sources native-image metadata (preferring the vetted `oracle/graalvm-reachability-metadata` repo over the tracing agent), packs the required config under `META-INF/native-image/`, and marks the package compatible in `Ballerina.toml`.
 
-Based on `docs/graalvm-compatibility-in-ballerina-libraries.md`, with GraalVM
-reference material adapted from the Oracle GraalVM community skills.
+Based on `docs/graalvm-compatibility-in-ballerina-libraries.md`, with GraalVM reference material adapted from the Oracle GraalVM community skills.
 
 ---
 
 ## How This Skill Works
 
-Unlike a linear pipeline, this is a **decision tree with loops** driven by what the
-baseline build/test reveals:
+Unlike a linear pipeline, this is a **decision tree with loops** driven by what the baseline build/test reveals:
 
 ```
 Setup → Build & Test ─┬─ (build-time class-init errors) → fix loop → re-build
@@ -30,15 +21,9 @@ Setup → Build & Test ─┬─ (build-time class-init errors) → fix loop →
                                                  → Filter & pack → Mark
 ```
 
-Each stage is a file under `stages/`. **Load only the active stage's file** into
-context — do not preload all stages. Routing between stages follows
-`references/workflow.md`.
+Each stage is a file under `stages/`. **Load only the active stage's file** into context — do not preload all stages. Routing between stages follows `references/workflow.md`.
 
-Scripts in `scripts/` handle all deterministic operations (version derivation,
-classpath extraction, the version-sensitive `BTestMain` command, config
-filtering/packing, `Ballerina.toml` edits). Run them via Bash — do not reimplement
-their logic inline. LLM reasoning is reserved for judgment: class-init strategy,
-exercising a running service, choosing which configs to keep, dependency upgrades.
+Scripts in `scripts/` handle all deterministic operations (version derivation, classpath extraction, the version-sensitive `BTestMain` command, config filtering/packing, `Ballerina.toml` edits). Run them via Bash — do not reimplement their logic inline. LLM reasoning is reserved for judgment: class-init strategy, exercising a running service, choosing which configs to keep, dependency upgrades.
 
 ---
 
@@ -71,15 +56,11 @@ When this skill is invoked:
    → pack it → mark the package compatible.
    ```
 
-2. Read and follow `stages/00-setup.md` to establish all Shared State. Do this
-   before loading any other stage file.
+2. Read and follow `stages/00-setup.md` to establish all Shared State. Do this before loading any other stage file.
 
-3. Run `stages/01-build-and-test.md`, then route to the remaining stages per the
-   classification in `references/workflow.md`. Skip stages per the table above.
+3. Run `stages/01-build-and-test.md`, then route to the remaining stages per the classification in `references/workflow.md`. Skip stages per the table above.
 
-4. When any native build fails at build time with a class-initialization error,
-   read `references/class-init-fix-procedure.md` and invoke it inline before
-   proceeding.
+4. When any native build fails at build time with a class-initialization error, read `references/class-init-fix-procedure.md` and invoke it inline before proceeding.
 
 5. If `INTERACTIVE_MODE`, pause and confirm after each stage.
 
@@ -117,18 +98,13 @@ Set in Setup (stage 00) and used by later stages:
 
 ## Core Principles
 
-**Repo before tracing**: prefer `oracle/graalvm-reachability-metadata` (vetted,
-deterministic) over the tracing agent; trace only for the gaps it doesn't cover.
+**Repo before tracing**: prefer `oracle/graalvm-reachability-metadata` (vetted, deterministic) over the tracing agent; trace only for the gaps it doesn't cover.
 
-**Version sensitivity is load-bearing**: the `BTestMain` argument signature changes
-at Ballerina Update 10. `scripts/build_btest_command.py` is the single source of
-truth — show its resolved branch and confirm before running.
+**Version sensitivity is load-bearing**: the `BTestMain` argument signature changes at Ballerina Update 10. `scripts/build_btest_command.py` is the single source of truth — show its resolved branch and confirm before running.
 
-**Deterministic first**: use scripts for anything mechanical. Use the LLM only for
-judgment — class-init strategy, exercising services, choosing configs, upgrades.
+**Deterministic first**: use scripts for anything mechanical. Use the LLM only for judgment — class-init strategy, exercising services, choosing configs, upgrades.
 
-**Never claim false compatibility**: do not set `graalvmCompatible = true` unless
-the final native build and tests pass with no not-verified warning.
+**Never claim false compatibility**: do not set `graalvmCompatible = true` unless the final native build and tests pass with no not-verified warning.
 
 **Transparency**: print a status line before each sub-step. Use `✓`/`⚠`/`✗`.
 
@@ -150,9 +126,7 @@ the final native build and tests pass with no not-verified warning.
 
 ## Scripts Reference
 
-All scripts are in `<skill-root>/scripts/` and are pure Python (`.py`) — no shell
-scripts, so they run identically on macOS/Linux/Windows. Invoke with `<PYTHON_CMD>`
-(resolved in Setup Step 0), not a hardcoded `python3`.
+All scripts are in `<skill-root>/scripts/` and are pure Python (`.py`) — no shell scripts, so they run identically on macOS/Linux/Windows. Invoke with `<PYTHON_CMD>` (resolved in Setup Step 0), not a hardcoded `python3`.
 
 ```bash
 # Environment + package discovery (Stage 00)

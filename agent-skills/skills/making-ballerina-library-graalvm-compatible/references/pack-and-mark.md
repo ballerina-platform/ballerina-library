@@ -1,8 +1,6 @@
 # Packing Native-Image Config and Marking the Library Compatible
 
-This covers stage 05 (filter + pack) and stage 06 (mark). It follows the Ballerina
-GraalVM compatibility guide's "Pack the additional native image configurations" and
-"Mark the library as GraalVM compatible" sections.
+This covers stage 05 (filter + pack) and stage 06 (mark). It follows the Ballerina GraalVM compatibility guide's "Pack the additional native image configurations" and "Mark the library as GraalVM compatible" sections.
 
 ---
 
@@ -12,9 +10,7 @@ GraalVM compatibility guide's "Pack the additional native image configurations" 
 <PYTHON_CMD> <skill-root>/scripts/detect_package_coordinates.py "<BALLERINA_TOML>"
 ```
 
-Gives `group_id`, `artifact_id` (from the first `[[platform.javaXX.dependency]]`,
-falling back to the package org/name), `has_native_dir`, `native_dir`, and the
-`meta_inf_dir`:
+Gives `group_id`, `artifact_id` (from the first `[[platform.javaXX.dependency]]`, falling back to the package org/name), `has_native_dir`, `native_dir`, and the `meta_inf_dir`:
 
 ```
 <native_dir>/src/main/resources/META-INF/native-image/<groupId>/<artifactId>/
@@ -30,11 +26,7 @@ falling back to the package org/name), `has_native_dir`, `native_dir`, and the
   --keep-prefixes "<lib.package.>,<dep.package.>"
 ```
 
-Review the kept/dropped report — this is a judgment call. Class-keyed entries
-outside the keep-prefixes (JDK, `io.ballerina.`, `org.ballerinalang.`) are dropped.
-Resource/bundle globs pass through unfiltered — inspect them manually. Prefer
-conditional (`typeReached`) entries to keep the binary small (see
-`reachability-metadata.md`).
+Review the kept/dropped report — this is a judgment call. Class-keyed entries outside the keep-prefixes (JDK, `io.ballerina.`, `org.ballerinalang.`) are dropped. Resource/bundle globs pass through unfiltered — inspect them manually. Prefer conditional (`typeReached`) entries to keep the binary small (see `reachability-metadata.md`).
 
 ---
 
@@ -53,8 +45,7 @@ conditional (`typeReached`) entries to keep the binary small (see
 
 ## 4. Pack the config files
 
-Pack both repo-sourced metadata (`REACHABILITY_REPO_HITS` staging dirs) and the
-filtered tracing output into the module tree, merging same-named files:
+Pack both repo-sourced metadata (`REACHABILITY_REPO_HITS` staging dirs) and the filtered tracing output into the module tree, merging same-named files:
 
 ```bash
 # repo-sourced (per dependency staging dir)
@@ -80,16 +71,13 @@ If the library had no native jar, jar the resources tree (pure `zipfile`, no Jav
   --out "<native_dir>/build/libs/<artifactId>-<version>.jar"
 ```
 
-Then declare it as a dependency (step 6). If a native jar already exists and is
-built by the module's own build (e.g. Gradle), rebuild that instead of jarring
-by hand, and skip the `--add-dependency` below.
+Then declare it as a dependency (step 6). If a native jar already exists and is built by the module's own build (e.g. Gradle), rebuild that instead of jarring by hand, and skip the `--add-dependency` below.
 
 ---
 
 ## 6. Mark the library GraalVM compatible
 
-Set `graalvmCompatible = true` in the correct platform block (`PLATFORM_JAVA_VERSION`,
-e.g. `java21`), and — only when you created a new native jar — add the dependency:
+Set `graalvmCompatible = true` in the correct platform block (`PLATFORM_JAVA_VERSION`, e.g. `java21`), and — only when you created a new native jar — add the dependency:
 
 ```bash
 # mark compatible
@@ -130,9 +118,7 @@ Do not mark-and-forget. Re-run and confirm the warning is gone:
 <PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal test --graalvm" "<BALLERINA_DIR>"
 ```
 
-Both should pass with **no** "Package is not verified with GraalVM" warning. If the
-build fails, do not leave `graalvmCompatible = true` in place — revert and continue
-debugging.
+Both should pass with **no** "Package is not verified with GraalVM" warning. If the build fails, do not leave `graalvmCompatible = true` in place — revert and continue debugging.
 
 ## Sources
 
