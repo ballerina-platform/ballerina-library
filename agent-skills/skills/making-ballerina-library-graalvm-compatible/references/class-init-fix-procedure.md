@@ -73,7 +73,7 @@ Print the remaining classified errors and ask:
 
 After the procedure completes, print:
 
-```
+```text
   Class-init fix: <passed after N iteration(s) / escalated to user>
   Flags applied:  --initialize-at-run-time=<...>  (persist? <yes/review>)
 ```

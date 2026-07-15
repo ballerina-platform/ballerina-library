@@ -33,7 +33,7 @@ def main() -> None:
     if bal_path:
         try:
             result = subprocess.run(
-                ["bal", "version"], capture_output=True, text=True, timeout=30
+                [bal_path, "version"], capture_output=True, text=True, timeout=30
             )
             bal_ver = (result.stdout or result.stderr or "unknown").splitlines()[0]
         except Exception:

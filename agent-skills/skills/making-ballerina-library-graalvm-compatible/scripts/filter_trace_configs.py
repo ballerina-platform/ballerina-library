@@ -53,9 +53,16 @@ def keep_name(name: str, keep_prefixes) -> bool:
 def filter_class_list(entries, keep_prefixes, kept_counter, dropped_counter, kind):
     out = []
     for e in entries:
-        # proxy entries have no single type name — keep by interface membership
+        # Proxy entries have no single type name — keep by interface membership.
+        # Legacy proxy-config.json shape: {"interfaces": [...]}.
+        # Unified reachability-metadata.json shape (nested inside "reflection"):
+        #   {"type": {"proxy": [...]}}.
+        ifaces = None
         if isinstance(e, dict) and "interfaces" in e:
             ifaces = e.get("interfaces", [])
+        elif isinstance(e, dict) and isinstance(e.get("type"), dict) and "proxy" in e["type"]:
+            ifaces = e["type"].get("proxy", [])
+        if ifaces is not None:
             if any(keep_name(i, keep_prefixes) for i in ifaces):
                 out.append(e)
                 kept_counter[kind] = kept_counter.get(kind, 0) + 1

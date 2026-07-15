@@ -8,7 +8,7 @@ Why prefer it: the configs are maintainer-vetted, versioned, and deterministic �
 
 ## Repository layout
 
-```
+```text
 metadata/
 └── <groupId>/                       # groupId keeps its dots, e.g. com.h2database
     └── <artifactId>/                # e.g. h2

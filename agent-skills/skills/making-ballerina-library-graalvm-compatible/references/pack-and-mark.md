@@ -12,7 +12,7 @@ This covers stage 05 (filter + pack) and stage 06 (mark). It follows the Balleri
 
 Gives `group_id`, `artifact_id` (from the first `[[platform.javaXX.dependency]]`, falling back to the package org/name), `has_native_dir`, `native_dir`, and the `meta_inf_dir`:
 
-```
+```text
 <native_dir>/src/main/resources/META-INF/native-image/<groupId>/<artifactId>/
 ```
 

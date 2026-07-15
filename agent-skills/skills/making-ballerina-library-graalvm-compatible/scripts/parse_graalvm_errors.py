@@ -117,7 +117,8 @@ def classify(text: str) -> dict:
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
-        text = open(sys.argv[1], "r", encoding="utf-8", errors="replace").read()
+        with open(sys.argv[1], "r", encoding="utf-8", errors="replace") as f:
+            text = f.read()
     else:
         text = sys.stdin.read()
     print(json.dumps(classify(text), indent=2))

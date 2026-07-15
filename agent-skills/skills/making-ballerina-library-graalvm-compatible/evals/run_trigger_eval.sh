@@ -87,7 +87,7 @@ for i in $(seq 0 $((count - 1))); do
 
   echo ">>> [$id] running $RUNS pass(es): ${query:0:70}..." >&2
 
-  for run in $(seq 1 "$RUNS"); do
+  for _ in $(seq 1 "$RUNS"); do
     if check_triggered "$query"; then
       triggers=$((triggers + 1))
     fi

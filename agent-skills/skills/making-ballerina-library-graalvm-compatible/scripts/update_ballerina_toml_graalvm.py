@@ -59,10 +59,13 @@ def set_graalvm_compatible(text: str, java_version: str, value: bool, changes: l
         new_section = gc_re.sub(rf"\g<1>{val_str}", section, count=1)
         changes.append(f"set graalvmCompatible = {val_str} in {header}")
     else:
-        # Insert right after the header line.
-        new_section = f"graalvmCompatible = {val_str}\n" + section.lstrip("\n")
-        if not section.startswith("\n"):
-            new_section = f"graalvmCompatible = {val_str}\n" + section
+        # `section` begins with the header line's own line-ending newline
+        # (since sec_start = m.end(), which sits right before it). Preserve
+        # exactly that one newline so the header keeps its own line, then
+        # insert the key, then keep the remainder — including any blank-line
+        # spacing already present — untouched.
+        rest = section[1:] if section.startswith("\n") else section
+        new_section = f"\ngraalvmCompatible = {val_str}\n" + rest
         changes.append(f"inserted graalvmCompatible = {val_str} into {header}")
 
     return text[:sec_start] + new_section + text[sec_end:]

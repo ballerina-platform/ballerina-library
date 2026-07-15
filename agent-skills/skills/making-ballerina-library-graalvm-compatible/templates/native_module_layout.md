@@ -4,7 +4,7 @@ Where a Ballerina library's native-image metadata lives, and how it is packed in
 
 ## Resources-only layout (scaffolded when no native module exists)
 
-```
+```text
 native/
 └── src/
     └── main/
@@ -18,13 +18,13 @@ native/
 
 The config jar is a zip of everything under `native/src/main/resources`, so its archive entries are:
 
-```
+```text
 META-INF/native-image/<groupId>/<artifactId>/reachability-metadata.json
 ```
 
 Built to (by convention):
 
-```
+```text
 native/build/libs/<artifactId>-<version>.jar
 ```
 

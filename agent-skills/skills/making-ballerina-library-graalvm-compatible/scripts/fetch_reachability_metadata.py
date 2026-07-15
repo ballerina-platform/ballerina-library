@@ -75,8 +75,18 @@ def main() -> None:
     if file_names is None:
         file_names = KNOWN_FILES  # probe well-known names
 
+    out_dir = os.path.abspath(args.out)
     downloaded = []
     for name in file_names:
+        # `name` comes from remote JSON — reduce to a safe basename and
+        # reject anything that would escape out_dir (traversal/absolute paths).
+        safe_name = os.path.basename(name)
+        if not safe_name or safe_name in (".", ".."):
+            continue
+        dest = os.path.abspath(os.path.join(out_dir, safe_name))
+        if os.path.commonpath([out_dir, dest]) != out_dir:
+            continue
+
         url = f"{base}/{name}"
         try:
             data = fetch_bytes(url)
@@ -86,10 +96,9 @@ def main() -> None:
             print(json.dumps({"out_dir": args.out, "files": downloaded,
                               "error": f"network error fetching {name}: {e}"}, indent=2))
             sys.exit(0)
-        dest = os.path.join(args.out, name)
         with open(dest, "wb") as f:
             f.write(data)
-        downloaded.append(name)
+        downloaded.append(safe_name)
 
     error = None if downloaded else "no config files downloaded (none present or network issue)"
     print(json.dumps({"out_dir": args.out, "files": downloaded, "error": error}, indent=2))

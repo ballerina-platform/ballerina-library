@@ -84,8 +84,10 @@ def main() -> None:
                     json.dump(combined, f, indent=2)
                 merged.append(fname)
                 continue
-            except Exception:
-                pass  # fall through to overwrite
+            except Exception as e:
+                print(f"WARNING: failed to merge {fname} at {dest}: {e} — overwriting instead",
+                      file=sys.stderr)
+                # fall through to overwrite
 
         shutil.copy2(src, dest)
         copied.append(fname)

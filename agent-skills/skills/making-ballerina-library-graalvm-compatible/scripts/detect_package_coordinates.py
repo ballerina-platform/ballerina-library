@@ -29,11 +29,11 @@ import sys
 try:
     import tomllib as _toml  # Python 3.11+
     _HAS_TOML = True
-except Exception:
+except ImportError:
     try:
         import tomli as _toml  # backport
         _HAS_TOML = True
-    except Exception:
+    except ImportError:
         _HAS_TOML = False
 
 

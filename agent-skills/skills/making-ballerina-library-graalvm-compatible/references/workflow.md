@@ -6,7 +6,7 @@ This document is for the agent's internal use. It describes the decision tree, r
 
 ## Stage routing (decision tree)
 
-```
+```text
 00. setup              → always runs (cannot be skipped)
 01. build-and-test     → always runs; establishes the baseline
         │
@@ -81,7 +81,7 @@ When `INTERACTIVE_MODE` is enabled, after each stage print what changed and ask:
 
 At the end (or on abort), print:
 
-```
+```text
 === Ballerina GraalVM Compatibility — Run Summary ===
 Package:        <org>/<name>  (distribution <BAL_DISTRIBUTION>)
 GraalVM:        JDK <GRAALVM_JDK_ACTUAL> (required <REQUIRED_GRAALVM_JDK>)  <ok/mismatch>

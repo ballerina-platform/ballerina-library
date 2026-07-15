@@ -34,7 +34,7 @@ def read_package_name(bal_dir: str) -> str:
             m = re.search(r'^\s*name\s*=\s*"([^"]+)"', content, re.MULTILINE)
             if m:
                 return m.group(1)
-        except Exception:
+        except OSError:
             pass
     return os.path.basename(os.path.abspath(bal_dir))
 
@@ -62,7 +62,7 @@ def main() -> None:
         try:
             with open(path, "r", encoding="utf-8", errors="replace") as f:
                 text = f.read()
-        except Exception:
+        except OSError:
             continue
         if MAIN_RE.search(text):
             has_main = True

@@ -43,7 +43,7 @@ $ bal build --graalvm --graalvm-build-options="--exact-reachability-metadata"
 
 Unlike a Maven/Gradle app, a Ballerina library ships its native-image metadata inside its **native module's resource tree**, which is then jarred and declared as a `[[platform.javaXX.dependency]]`. All metadata lives in a single JSON file:
 
-```
+```text
 native/
 └── src/main/resources/
     └── META-INF/

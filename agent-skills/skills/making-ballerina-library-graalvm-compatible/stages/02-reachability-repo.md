@@ -20,7 +20,7 @@ Write `THIRD_PARTY_DEPS` to a JSON file (list of `{groupId, artifactId, version}
 
 Read the JSON result. For each dependency, note `has_metadata`, `metadata_version`, and `version_tested`. Present a short table to the user:
 
-```
+```text
 Dependency                                   Metadata   Version match
 io.example:foo-native  1.2.3                 ✓          exact
 com.bar:baz            4.5.6                 ✓          latest (4.5.0) — confirm
