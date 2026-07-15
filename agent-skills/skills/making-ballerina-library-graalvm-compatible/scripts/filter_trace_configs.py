@@ -62,15 +62,13 @@ def filter_class_list(entries, keep_prefixes, kept_counter, dropped_counter, kin
             ifaces = e.get("interfaces", [])
         elif isinstance(e, dict) and isinstance(e.get("type"), dict) and "proxy" in e["type"]:
             ifaces = e["type"].get("proxy", [])
+
         if ifaces is not None:
-            if any(keep_name(i, keep_prefixes) for i in ifaces):
-                out.append(e)
-                kept_counter[kind] = kept_counter.get(kind, 0) + 1
-            else:
-                dropped_counter[kind] = dropped_counter.get(kind, 0) + 1
-            continue
-        n = name_of(e)
-        if keep_name(n, keep_prefixes):
+            keep = any(keep_name(i, keep_prefixes) for i in ifaces)
+        else:
+            keep = keep_name(name_of(e), keep_prefixes)
+
+        if keep:
             out.append(e)
             kept_counter[kind] = kept_counter.get(kind, 0) + 1
         else:
