@@ -1,4 +1,6 @@
---- name: making-ballerina-library-graalvm-compatible description: Makes a Ballerina library GraalVM-compatible by running the native build/test workflow, sourcing reachability metadata, and marking the package compatible. Use when the user wants to make a Ballerina library or package GraalVM compatible; build or test a Ballerina package with `bal build --graalvm` / `bal test --graalvm`; fix GraalVM native-image class-initialization or reflection/JNI/resource errors in a Ballerina project; run the GraalVM tracing agent for Ballerina tests or a service; pack native-image reachability metadata into META-INF for a Ballerina module; resolve the "Package is not verified with GraalVM" warning; or set graalvmCompatible = true in Ballerina.toml.
+---
+name: making-ballerina-library-graalvm-compatible
+description: Makes a Ballerina library GraalVM-compatible by running the native build/test workflow, sourcing reachability metadata, and marking the package compatible. Use when the user wants to make a Ballerina library or package GraalVM compatible; build or test a Ballerina package with `bal build --graalvm` / `bal test --graalvm`; fix GraalVM native-image class-initialization or reflection/JNI/resource errors in a Ballerina project; run the GraalVM tracing agent for Ballerina tests or a service; pack native-image reachability metadata into META-INF for a Ballerina module; resolve the "Package is not verified with GraalVM" warning; or set graalvmCompatible = true in Ballerina.toml.
 ---
 
 # Making a Ballerina Library GraalVM Compatible
@@ -29,15 +31,15 @@ Scripts in `scripts/` handle all deterministic operations (version derivation, c
 
 ## Quick Reference
 
-| Stage | File | Skip when | Key output |
-|-------|------|-----------|------------|
-| 0. Setup | `stages/00-setup.md` | never | Shared State, GraalVM/JDK check |
-| 1. Build & Test | `stages/01-build-and-test.md` | never | baseline status + class-init fix loop |
-| 2. Reachability repo | `stages/02-reachability-repo.md` | no third-party Java deps | repo-sourced metadata (preferred) |
-| 3. Trace JAR | `stages/03-trace-jar.md` | no main/service, or repo covered all | traced configs (service exercised) |
-| 4. Trace tests | `stages/04-trace-tests.md` | no tests, or tests pass | traced configs (version-aware BTestMain) |
-| 5. Filter & pack | `stages/05-filter-and-pack.md` | nothing to pack | `META-INF/native-image/<g>/<a>/` |
-| 6. Mark compatible | `stages/06-mark-compatible.md` | never | `graalvmCompatible = true` + final verify |
+| Stage                | File                               | Skip when                            | Key output                                  |
+| -------------------- | ---------------------------------- | ------------------------------------ | ------------------------------------------- |
+| 0. Setup             | `stages/00-setup.md`             | never                                | Shared State, GraalVM/JDK check             |
+| 1. Build & Test      | `stages/01-build-and-test.md`    | never                                | baseline status + class-init fix loop       |
+| 2. Reachability repo | `stages/02-reachability-repo.md` | no third-party Java deps             | repo-sourced metadata (preferred)           |
+| 3. Trace JAR         | `stages/03-trace-jar.md`         | no main/service, or repo covered all | traced configs (service exercised)          |
+| 4. Trace tests       | `stages/04-trace-tests.md`       | no tests, or tests pass              | traced configs (version-aware BTestMain)    |
+| 5. Filter & pack     | `stages/05-filter-and-pack.md`   | nothing to pack                      | `META-INF/native-image/<g>/<a>/`          |
+| 6. Mark compatible   | `stages/06-mark-compatible.md`   | never                                | `graalvmCompatible = true` + final verify |
 
 ---
 
@@ -46,22 +48,19 @@ Scripts in `scripts/` handle all deterministic operations (version derivation, c
 When this skill is invoked:
 
 1. Print the welcome banner:
+
    ```
    ╔════════════════════════════════════════════════════╗
-   ║   Ballerina Library — GraalVM Compatibility Helper   ║
+   ║  Ballerina Library — GraalVM Compatibility Helper  ║
    ╚════════════════════════════════════════════════════╝
 
    I'll take your Ballerina library to a verified `bal build --graalvm`
    and `bal test --graalvm`: build/test → resolve errors → source metadata
    → pack it → mark the package compatible.
    ```
-
 2. Read and follow `stages/00-setup.md` to establish all Shared State. Do this before loading any other stage file.
-
 3. Run `stages/01-build-and-test.md`, then route to the remaining stages per the classification in `references/workflow.md`. Skip stages per the table above.
-
 4. When any native build fails at build time with a class-initialization error, read `references/class-init-fix-procedure.md` and invoke it inline before proceeding.
-
 5. If `INTERACTIVE_MODE`, pause and confirm after each stage.
 
 ---
@@ -70,29 +69,29 @@ When this skill is invoked:
 
 Set in Setup (stage 00) and used by later stages:
 
-| Variable | Description |
-|----------|-------------|
-| `PYTHON_CMD` | Resolved Python 3 command (`python3`/`python`/`py`) |
-| `BALLERINA_DIR` | Directory containing `Ballerina.toml` |
-| `BALLERINA_TOML` | Absolute path to that `Ballerina.toml` |
-| `BAL_ORG` / `BAL_PACKAGE` | Package org / name |
-| `BAL_DISTRIBUTION` | e.g. `2201.10.3` |
-| `BAL_UPDATE` | Update number (drives the `BTestMain` signature) |
-| `REQUIRED_GRAALVM_JDK` | `11` / `17` / `21` |
-| `PLATFORM_JAVA_VERSION` | `java11` / `java17` / `java21` — the Ballerina.toml platform block |
-| `GRAALVM_HOME` / `GRAALVM_JDK_ACTUAL` / `GRAALVM_OK` | GraalVM install + detected JDK + match |
-| `IS_ARM64_MAC` | Apple Silicon flag (experimental native-image warning) |
-| `GROUP_ID` / `ARTIFACT_ID` | Native-image metadata coordinates |
-| `HAS_NATIVE_MODULE` / `NATIVE_DIR` / `META_INF_DIR` | Native module presence + paths |
-| `HAS_MAIN` / `HAS_SERVICE` / `HAS_TESTS` / `JAR_NAME` | Routing flags for tracing |
-| `THIRD_PARTY_DEPS` | `[[platform.javaXX.dependency]]` entries `{groupId,artifactId,version,path}` |
-| `REACHABILITY_REPO_HITS` | Deps with published metadata + their staging dirs |
-| `CONFIG_DIR` | Tracing-agent output directory (default `config-dir`) |
-| `CLASSPATH_FILE` | `class-path.txt` produced in Stage 04 |
-| `KEEP_PACKAGE_PREFIXES` | Prefixes kept during filtering (Stage 05) |
-| `BUILD_STATUS` / `TEST_STATUS` / `NOT_VERIFIED_WARNING` | Baseline results (Stage 01) |
-| `GRAALVM_COMPATIBLE_ALREADY` | Whether the toml already declares it |
-| `INTERACTIVE_MODE` | Pause after each stage |
+| Variable                                                      | Description                                                                      |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `PYTHON_CMD`                                                | Resolved Python 3 command (`python3`/`python`/`py`)                        |
+| `BALLERINA_DIR`                                             | Directory containing `Ballerina.toml`                                           |
+| `BALLERINA_TOML`                                            | Absolute path to that `Ballerina.toml`                                          |
+| `BAL_ORG` / `BAL_PACKAGE`                                 | Package org / name                                                               |
+| `BAL_DISTRIBUTION`                                          | e.g. `2201.10.3`                                                                |
+| `BAL_UPDATE`                                                | Update number (drives the `BTestMain` signature)                                |
+| `REQUIRED_GRAALVM_JDK`                                      | `11` / `17` / `21`                                                         |
+| `PLATFORM_JAVA_VERSION`                                     | `java11` / `java17` / `java21` — the Ballerina.toml platform block        |
+| `GRAALVM_HOME` / `GRAALVM_JDK_ACTUAL` / `GRAALVM_OK`    | GraalVM install + detected JDK + match                                           |
+| `IS_ARM64_MAC`                                              | Apple Silicon flag (experimental native-image warning)                           |
+| `GROUP_ID` / `ARTIFACT_ID`                                | Native-image metadata coordinates                                                |
+| `HAS_NATIVE_MODULE` / `NATIVE_DIR` / `META_INF_DIR`     | Native module presence + paths                                                   |
+| `HAS_MAIN` / `HAS_SERVICE` / `HAS_TESTS` / `JAR_NAME` | Routing flags for tracing                                                        |
+| `THIRD_PARTY_DEPS`                                          | `[[platform.javaXX.dependency]]` entries `{groupId,artifactId,version,path}` |
+| `REACHABILITY_REPO_HITS`                                    | Deps with published metadata + their staging dirs                                |
+| `CONFIG_DIR`                                                | Tracing-agent output directory (default `config-dir`)                           |
+| `CLASSPATH_FILE`                                            | `class-path.txt` produced in Stage 04                                          |
+| `KEEP_PACKAGE_PREFIXES`                                     | Prefixes kept during filtering (Stage 05)                                        |
+| `BUILD_STATUS` / `TEST_STATUS` / `NOT_VERIFIED_WARNING` | Baseline results (Stage 01)                                                      |
+| `GRAALVM_COMPATIBLE_ALREADY`                                | Whether the toml already declares it                                             |
+| `INTERACTIVE_MODE`                                          | Pause after each stage                                                           |
 
 ---
 
