@@ -495,7 +495,7 @@ Confirm each step as you complete it. If a step fails, report the error clearly.
         "claude", "--print",
         "--permission-mode", "bypassPermissions",
         "--allowedTools", "Read,Write,Edit,Bash(mkdir:*),Bash(cp:*)",
-        "--model", "claude-sonnet-4-6",
+        "--model", os.environ.get("AI_MODEL", "sonnet-4-6"),
         "-p", prompt,
     ]
     proc = subprocess.Popen(

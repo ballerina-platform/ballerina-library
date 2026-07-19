@@ -11,9 +11,9 @@ multiple focused phases, and writes Docusaurus-ready markdown to the docs reposi
 [2/7] Resolve version      — Ballerina Central API or Config.toml
 [3/7] Check existing docs  — Determines fresh generation vs update mode
 [4/7] Clone source repo    — git clone --depth 1 --branch v<version>
-[5a/7] Phase 1 (Opus)      — overview.md, setup-guide.md, trigger-reference.md
-[5b/7] Phase 2a (Opus)     — action-reference header + client discovery
-[5c/7] Phase 2b (Sonnet)   — per-client sections, all clients run in parallel
+[5a/7] Phase 1             — overview.md, setup-guide.md, trigger-reference.md
+[5b/7] Phase 2a            — action-reference header + client discovery
+[5c/7] Phase 2b            — per-client sections, all clients run in parallel
 [6/7] Write files          — write to docs repo (skip if force=false and file exists)
 [7/7] Patch sidebar        — sidebars.ts + catalog/index.mdx
 ```
@@ -47,13 +47,13 @@ connector-doc-generator/
 
 Large connectors (e.g. Salesforce) have 5+ client types with 50+ operations each.
 A single Claude call cannot generate the full action reference without hitting output
-token limits. The split also lets each phase use the right model and token budget.
+token limits. Every phase uses the configured `aiModel`, with a phase-specific turn budget.
 
 | Phase | Model | Max turns | Purpose |
 |-------|-------|-----------|---------|
-| 1 | Opus | 15 | Overview, setup guide, trigger reference |
-| 2a | Opus | 8 | Discover all client types + write action-reference header |
-| 2b × N | Sonnet | 15 | One section per client — all run in parallel |
+| 1 | Configured `aiModel` | 15 | Overview, setup guide, trigger reference |
+| 2a | Configured `aiModel` | 8 | Discover all client types + write action-reference header |
+| 2b × N | Configured `aiModel` | 15 | One section per client — all run in parallel |
 
 Phase 2b runs N concurrent `claude -p` processes (Ballerina `start`/`wait`). Results are
 collected in client-list order so the assembled `action-reference.md` is stable.

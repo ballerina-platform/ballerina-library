@@ -27,6 +27,7 @@ configurable string connectorVersion = "";
 configurable string docsRepoRoot = "..";
 configurable boolean dryRun = false;
 configurable boolean force = false;
+configurable string aiModel = "sonnet-4-6";
 // Dispatcher stage controls. Defaults preserve the existing standalone behavior.
 configurable boolean generateOverviewSetup = true;
 configurable boolean generateReference = true;

@@ -168,7 +168,7 @@ Single runs write to `artifacts/`:
 | `artifacts/execution-prompt/` | Generated execution prompt sent to the agent |
 | `artifacts/workflow-docs/` | Final Markdown guide |
 | `artifacts/screenshots/` | Captured and cropped screenshots |
-| `artifacts/run-log/` | Target name, project path, timing, costs, and output paths |
+| `artifacts/run-log/` | Target name, model, token usage, timing, and output paths |
 
 Batch runs move each item's `artifacts/` directory to `artifacts_archive/<slug>`
 or `artifacts_archive/<slug>_FAILED`. If a run produces no artifacts, the batch
@@ -223,13 +223,13 @@ Workflow inputs:
 
 | Input | Value |
 |-------|-------|
-| `mode` | `connector` or `trigger` |
 | `github_repo` | repository name under `ballerina-platform` |
+| `mode` | `connector` or `trigger` |
 | `category` | docs-integrator connector category |
 | `generate_overview_setup` | publish the complete connector Phase 1 output |
 | `generate_reference` | publish the connector action reference |
 | `generate_examples` | run this example generator |
-| `example_instructions` | optional extra guidance for example generation |
+| `ai_model` | model used by both documentation generators; defaults to `sonnet-4-6` |
 
 The `mode` input applies only to this example generator. Selecting Overview & Setup Guide
 or Reference runs the connector-doc job regardless of example mode. When connector documents
@@ -264,7 +264,7 @@ The server API is:
 | Method | Path | Description |
 |--------|------|-------------|
 | `POST` | `/run` | Submit `{ "prompt_path": "..." }` |
-| `GET` | `/jobs/<id>` | Poll logs, status, and cost |
+| `GET` | `/jobs/<id>` | Poll logs, status, and token usage |
 | `GET` | `/health` | Health check |
 | `POST` | `/shutdown` | Stop the server |
 

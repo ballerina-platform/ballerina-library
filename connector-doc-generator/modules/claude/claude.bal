@@ -19,8 +19,7 @@ import ballerina/io;
 import ballerina/os;
 import ballerina/time;
 
-const string DEFAULT_MODEL = "opus";
-public const string FAST_MODEL = "sonnet";
+const string DEFAULT_MODEL = "sonnet-4-6";
 public const int MAX_TURNS_PHASE1 = 15;   // overview + setup + triggers: read several files + examples
 public const int MAX_TURNS_PHASE2A = 8;   // discovery only: glob + skim a few files
 public const int MAX_TURNS_PHASE2B = 15;  // per-client: read client + types + examples
@@ -58,7 +57,7 @@ public function isClaudeInstalled() returns boolean {
 # token count extraction.
 #
 # + promptText - Full prompt string to send to Claude
-# + model      - Model alias: "opus" or "sonnet"
+# + model      - Model name accepted by Claude Code
 # + maxTurns   - Maximum tool-use turns (use phase-specific constants)
 # + return     - ClaudeResult with the generated text, or an error
 public function callClaude(string promptText, string model = DEFAULT_MODEL, int maxTurns = MAX_TURNS_PHASE1) returns ClaudeResult|error {

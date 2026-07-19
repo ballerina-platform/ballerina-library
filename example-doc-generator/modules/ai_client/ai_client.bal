@@ -47,36 +47,25 @@ type MessagesResponse record {
     UsageInfo? usage;
 };
 
-# Default Claude model to use.
-const string DEFAULT_MODEL = "claude-sonnet-4-6";
-
 # Anthropic API base URL.
 const string ANTHROPIC_BASE_URL = "https://api.anthropic.com";
 
 # Anthropic API version header value.
 const string ANTHROPIC_VERSION = "2023-06-01";
 
-# Claude Sonnet 4.6 pricing: $3.00 per million input tokens.
-final decimal INPUT_COST_PER_TOKEN = 0.000003d;
-
-# Claude Sonnet 4.6 pricing: $15.00 per million output tokens.
-final decimal OUTPUT_COST_PER_TOKEN = 0.000015d;
-
-# Token usage and USD cost for a single LLM API call.
+# Token usage for a single LLM API call.
 public type LlmUsage record {
     # Number of input (prompt) tokens consumed
     int inputTokens;
     # Number of output (completion) tokens generated
     int outputTokens;
-    # Estimated cost in USD based on model pricing
-    decimal costUsd;
 };
 
-# Result of a Claude API call — the generated text plus token usage/cost.
+# Result of a Claude API call — the generated text plus token usage.
 public type LlmResult record {
     # The generated text content
     string text;
-    # Token usage and cost for this call
+    # Token usage for this call
     LlmUsage usage;
 };
 
@@ -85,14 +74,15 @@ public type LlmResult record {
 # Fails fast before the expensive pipeline calls run.
 #
 # + apiKey - the Anthropic API key
+# + model - Claude model used for validation
 # + return - nil on success, or an error with the HTTP diagnostic details
-public function validateApiKey(string apiKey) returns error? {
+public function validateApiKey(string apiKey, string model) returns error? {
     utils:log("\t[INFO] Sending ping request...");
 
     http:Client httpClient = check new (ANTHROPIC_BASE_URL);
 
     json payload = {
-        "model": DEFAULT_MODEL,
+        "model": model,
         "max_tokens": 10,
         "messages": [
             {"role": "user", "content": "Reply with the single word: OK"}
@@ -138,15 +128,16 @@ public function validateApiKey(string apiKey) returns error? {
 # + systemPrompt - the system prompt instructing the model
 # + userMessage - the user message with the goal details
 # + apiKey - the Anthropic API key
-# + return - LlmResult with text and token usage/cost, or an error
-public function callClaude(string systemPrompt, string userMessage, string apiKey) returns LlmResult|error {
-    utils:log("\t[INFO] Model:              " + DEFAULT_MODEL);
+# + model - Claude model to use
+# + return - LlmResult with text and token usage, or an error
+public function callClaude(string systemPrompt, string userMessage, string apiKey, string model) returns LlmResult|error {
+    utils:log("\t[INFO] Model:              " + model);
     utils:log("\t[INFO] System prompt len:  " + systemPrompt.length().toString() + " chars");
     utils:log("\t[INFO] User message len:   " + userMessage.length().toString() + " chars");
     utils:log("\t[INFO] Sending request to Anthropic API...");
 
     json payload = {
-        "model": DEFAULT_MODEL,
+        "model": model,
         "max_tokens": 16000,
         "system": systemPrompt,
         "messages": [
@@ -199,19 +190,17 @@ public function callClaude(string systemPrompt, string userMessage, string apiKe
 
     utils:log("\t[INFO] Response received. Length: " + resultText.length().toString() + " chars");
 
-    LlmUsage usageData = {inputTokens: 0, outputTokens: 0, costUsd: 0.0d};
+    LlmUsage usageData = {inputTokens: 0, outputTokens: 0};
     UsageInfo? usage = msgResp.usage;
     if usage is UsageInfo {
         int inTok = usage.input_tokens;
         int outTok = usage.output_tokens;
-        decimal cost = (<decimal>inTok * INPUT_COST_PER_TOKEN) + (<decimal>outTok * OUTPUT_COST_PER_TOKEN);
-        usageData = {inputTokens: inTok, outputTokens: outTok, costUsd: cost};
+        usageData = {inputTokens: inTok, outputTokens: outTok};
         utils:log("\t[USAGE] Input: " + inTok.toString()
             + " | Output: " + outTok.toString()
             + " | Total: " + (inTok + outTok).toString()
-            + " | Cost: $" + cost.toString());
+            );
     }
 
     return {text: resultText, usage: usageData};
 }
-

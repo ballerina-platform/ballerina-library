@@ -19,20 +19,16 @@ import ballerina/time;
 
 const string RUN_LOG_DIR = "./artifacts/run-log";
 
-# Token usage and cost for a single direct LLM API call.
+# Token usage for a single direct LLM API call.
 public type LlmCallUsage record {
     # Number of input (prompt) tokens consumed
     int inputTokens;
     # Number of output (completion) tokens generated
     int outputTokens;
-    # Estimated cost in USD based on model pricing
-    decimal costUsd;
 };
 
-# Token usage and cost reported by the Claude Agent SDK for the full agent run.
-public type AgentRunCost record {
-    # Total USD cost reported by the agent SDK (nil if not available)
-    decimal? totalCostUsd;
+# Token usage reported by the Claude Agent SDK for the full agent run.
+public type AgentRunUsage record {
     # Input tokens consumed across the entire agent run
     int inputTokens;
     # Output tokens generated across the entire agent run
@@ -51,6 +47,8 @@ public type RunLogEntry record {
     string connectorName;
     # Filename-safe slug derived from the connector name
     string connectorSlug;
+    # Model selected for this run
+    string model;
     # Optional extra instructions passed to the agent (empty string if none)
     string additionalInstructions;
     # Pipeline start time
@@ -63,12 +61,8 @@ public type RunLogEntry record {
     LlmCallUsage promptGenUsage;
     # Token usage for the doc enforcement call
     LlmCallUsage docEnfUsage;
-    # Token usage and cost from the agent SDK run (nil if agent did not run)
-    AgentRunCost? agentCost;
-    # Total cost of direct Anthropic API calls (excludes agent SDK)
-    decimal totalDirectCostUsd;
-    # Combined cost including both direct API calls and agent SDK
-    decimal totalCombinedCostUsd;
+    # Token usage from the agent SDK run (nil if agent did not run)
+    AgentRunUsage? agentUsage;
     # Path to the saved execution prompt file
     string promptPath;
     # Path to the generated workflow doc (or "(not written)" if absent)
@@ -90,39 +84,34 @@ public function writeRunLog(RunLogEntry entry) {
     string tsSlug = re `[:\.]`.replaceAll(timestamp, "-");
     string logPath = RUN_LOG_DIR + "/" + entry.connectorSlug + "_" + tsSlug + ".json";
 
-    AgentRunCost? ac = entry.agentCost;
-    json agentCostJson = ac is AgentRunCost ? {
-        "totalCostUsd":     ac.totalCostUsd,
-        "inputTokens":      ac.inputTokens,
-        "outputTokens":     ac.outputTokens,
-        "cacheReadTokens":  ac.cacheReadTokens,
-        "cacheWriteTokens": ac.cacheWriteTokens,
-        "numTurns":         ac.numTurns
+    AgentRunUsage? usage = entry.agentUsage;
+    json agentUsageJson = usage is AgentRunUsage ? {
+        "inputTokens":      usage.inputTokens,
+        "outputTokens":     usage.outputTokens,
+        "cacheReadTokens":  usage.cacheReadTokens,
+        "cacheWriteTokens": usage.cacheWriteTokens,
+        "numTurns":         usage.numTurns
     } : "not available";
 
     json logJson = {
         "connectorName":            entry.connectorName,
         "connectorSlug":            entry.connectorSlug,
         "additionalInstructions":   entry.additionalInstructions == "" ? () : entry.additionalInstructions,
-        "model":            "claude-sonnet-4-6",
+        "model":            entry.model,
         "startTime":        timestamp,
         "endTime":          time:utcToString(entry.endTime),
         "durationSeconds":  entry.durationSecs,
         "llmCalls": {
             "promptGeneration": {
                 "inputTokens":  entry.promptGenUsage.inputTokens,
-                "outputTokens": entry.promptGenUsage.outputTokens,
-                "costUsd":      entry.promptGenUsage.costUsd
+                "outputTokens": entry.promptGenUsage.outputTokens
             },
             "docEnforcement": {
                 "inputTokens":  entry.docEnfUsage.inputTokens,
-                "outputTokens": entry.docEnfUsage.outputTokens,
-                "costUsd":      entry.docEnfUsage.costUsd
+                "outputTokens": entry.docEnfUsage.outputTokens
             },
-            "agentExecution": agentCostJson
+            "agentExecution": agentUsageJson
         },
-        "totalDirectApiCostUsd": entry.totalDirectCostUsd,
-        "totalCombinedCostUsd":  entry.totalCombinedCostUsd,
         "artifacts": {
             "executionPromptPath": entry.promptPath,
             "workflowDocPath":     entry.workflowDocPath

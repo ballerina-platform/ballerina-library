@@ -40,14 +40,8 @@ type BatchResult record {|
     string slug;
     string status;
     decimal duration;
-    decimal? cost;
     string? projectPath;
     string archiveDir;
-|};
-
-type RunCost record {|
-    decimal? totalCombinedCostUsd?;
-    decimal? durationSeconds?;
 |};
 
 public function runBatch(string arg1 = "", string arg2 = "", string arg3 = "") returns error? {
@@ -121,7 +115,6 @@ public function runBatch(string arg1 = "", string arg2 = "", string arg3 = "") r
         time:Utc itemEnd = time:utcNow();
         decimal duration = time:utcDiffSeconds(itemEnd, itemStart);
 
-        RunCost? costData = parseRunCost(slug, kind);
         string? projectPath = readCreatedProjectPath();
         string status = success ? "OK" : "FAILED";
         string archivePath = check archiveArtifacts(slug, status);
@@ -132,7 +125,6 @@ public function runBatch(string arg1 = "", string arg2 = "", string arg3 = "") r
             slug: slug,
             status: status,
             duration: duration,
-            cost: costData is RunCost ? costData?.totalCombinedCostUsd : (),
             projectPath: projectPath,
             archiveDir: archivePath
         };
@@ -300,41 +292,6 @@ function runPipeline(BatchItem item, int timeoutSeconds) returns boolean {
     return exitCode == 0;
 }
 
-function parseRunCost(string slug, string kind) returns RunCost? {
-    string runLogDir = ARTIFACTS_DIR + "/run-log";
-    file:MetaData[]|file:Error entries = file:readDir(runLogDir);
-    if entries is file:Error {
-        return ();
-    }
-
-    string goalSlug = kind == "trigger" ? slug + "-trigger-example" : slug + "-connector-example";
-    file:MetaData? latestEntry = ();
-    foreach file:MetaData entry in entries {
-        if entry.absPath.includes(goalSlug + "_") && entry.absPath.endsWith(".json") {
-            if latestEntry is () || time:utcDiffSeconds(entry.modifiedTime, latestEntry.modifiedTime) > 0d {
-                latestEntry = entry;
-            }
-        }
-    }
-    if latestEntry is () {
-        return ();
-    }
-
-    string|io:Error content = io:fileReadString((<file:MetaData>latestEntry).absPath);
-    if content is io:Error {
-        return ();
-    }
-    json|error runJson = content.fromJsonString();
-    if runJson is error {
-        return ();
-    }
-    RunCost|error cost = runJson.cloneWithType(RunCost);
-    if cost is error {
-        return ();
-    }
-    return cost;
-}
-
 function readCreatedProjectPath() returns string? {
     string|io:Error path = io:fileReadString(ARTIFACTS_DIR + "/run-log/created-project.txt");
     if path is io:Error {
@@ -395,22 +352,15 @@ function buildSummary(BatchResult[] results) returns string|error {
     string summary = "======================================================================\n" +
         "BATCH RUN SUMMARY\n" +
         "======================================================================\n" +
-        " #   Type      Name                     Status     Duration     Cost       Archive\n" +
-        " --- --------- ------------------------ ---------- ------------ ---------- ----------------\n";
+        " #   Type      Name                     Status     Duration     Archive\n" +
+        " --- --------- ------------------------ ---------- ------------ ----------------\n";
 
     int okCount = 0;
     int failCount = 0;
-    decimal totalCost = 0.0d;
     decimal totalDuration = 0.0d;
 
     foreach int i in 0 ..< results.length() {
         BatchResult result = results[i];
-        string costText = "n/a";
-        decimal? cost = result.cost;
-        if cost is decimal {
-            costText = "$" + cost.toString();
-            totalCost += cost;
-        }
         totalDuration += result.duration;
         if result.status == "OK" {
             okCount += 1;
@@ -419,14 +369,13 @@ function buildSummary(BatchResult[] results) returns string|error {
         }
         summary += " " + (i + 1).toString() + "   " + result.'type + " " +
             result.name + " " + result.status + " " + result.duration.toString() +
-            "s " + costText + " " + result.archiveDir + "\n";
+            "s " + result.archiveDir + "\n";
     }
 
     summary += "----------------------------------------------------------------------\n" +
         "Total: " + results.length().toString() + " items | " + okCount.toString() +
         " OK | " + failCount.toString() + " failed\n" +
-        "Total cost: $" + totalCost.toString() + " | Total time: " +
-        totalDuration.toString() + "s\n" +
+        "Total time: " + totalDuration.toString() + "s\n" +
         "======================================================================\n";
 
     if results.length() > 0 {

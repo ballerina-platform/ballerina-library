@@ -22,7 +22,7 @@ simple REST API so the Ballerina pipeline can submit jobs and stream logs.
 
 Routes
 ------
-POST /run          { "prompt_path": "<path>" }  → { "job_id": "<uuid>" }
+POST /run          { "prompt_path": "<path>", "model": "<model>" }  → { "job_id": "<uuid>" }
 GET  /jobs/<id>    → { "status": "running|done", "logs": [...] }
 GET  /health       → { "status": "ok" }
 POST /shutdown     → { "status": "shutting down" }
@@ -59,6 +59,7 @@ from claude_agent_sdk import (
 
 # CWD for the Claude agent is the project root (one level above this file)
 CWD = str(Path(__file__).parent.parent)
+AI_MODEL = os.environ.get("AI_MODEL", "sonnet-4-6")
 
 jobs: dict[str, dict] = {}
 running_tasks: set[asyncio.Task] = set()
@@ -97,7 +98,7 @@ def truncate_tool_input(tool_input: any, max_length: int = 500) -> str:
     return text
 
 
-async def run_agent(job_id: str, prompt_path: str) -> None:
+async def run_agent(job_id: str, prompt_path: str, model: str) -> None:
     jobs[job_id]["status"] = "running"
 
     def log(label: str, text: str) -> None:
@@ -113,7 +114,7 @@ async def run_agent(job_id: str, prompt_path: str) -> None:
         async for message in query(
             prompt=prompt,
             options=ClaudeAgentOptions(
-                model="claude-sonnet-4-6",
+                model=model,
                 cwd=CWD,
                 system_prompt=AGENT_SYSTEM_PROMPT,
                 allowed_tools=[
@@ -182,7 +183,6 @@ async def run_agent(job_id: str, prompt_path: str) -> None:
                 log("RESULT", message.result)
 
                 usage = getattr(message, "usage", None)
-                cost_usd = getattr(message, "total_cost_usd", None)
                 turns = getattr(message, "num_turns", None)
 
                 if usage:
@@ -198,15 +198,11 @@ async def run_agent(job_id: str, prompt_path: str) -> None:
                 else:
                     input_tokens = output_tokens = cache_read = cache_write = 0
 
-                if cost_usd is not None:
-                    log("USAGE", f"total_cost=${cost_usd:.6f}")
-
                 if turns is not None:
                     log("USAGE", f"turns={turns}")
 
-                # Store structured cost so it's returned in /jobs/<id> response
-                jobs[job_id]["cost"] = {
-                    "totalCostUsd": cost_usd,
+                # Store structured usage so it is returned in /jobs/<id> response.
+                jobs[job_id]["usage"] = {
                     "inputTokens": input_tokens,
                     "outputTokens": output_tokens,
                     "cacheReadTokens": cache_read,
@@ -223,6 +219,7 @@ async def run_agent(job_id: str, prompt_path: str) -> None:
 async def post_run(request: web.Request) -> web.Response:
     data = await request.json()
     prompt_path = data.get("prompt_path")
+    model = data.get("model", AI_MODEL)
     if not prompt_path:
         return web.json_response({"error": "prompt_path required"}, status=400)
     # Resolve relative paths against the project root (CWD) so callers can
@@ -236,8 +233,8 @@ async def post_run(request: web.Request) -> web.Response:
             {"error": f"prompt file not found: {resolved}"}, status=404
         )
     job_id = str(uuid.uuid4())
-    jobs[job_id] = {"logs": [], "status": "queued", "cost": None}
-    task = asyncio.create_task(run_agent(job_id, str(resolved)))
+    jobs[job_id] = {"logs": [], "status": "queued", "usage": None}
+    task = asyncio.create_task(run_agent(job_id, str(resolved), model))
     running_tasks.add(task)
     task.add_done_callback(running_tasks.discard)
     return web.json_response({"job_id": job_id})

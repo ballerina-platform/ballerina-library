@@ -168,7 +168,7 @@ public function main() returns error? {
     log("       Claude is reading local source files...");
 
     string phase1RawPath = OUTPUT_DIR + "/" + moduleSlug + "-phase1-raw.txt";
-    claude:ClaudeResult phase1Result = check claude:callClaude(promptText, maxTurns = claude:MAX_TURNS_PHASE1);
+    claude:ClaudeResult phase1Result = check claude:callClaude(promptText, model = aiModel, maxTurns = claude:MAX_TURNS_PHASE1);
     check io:fileWriteString(phase1RawPath, phase1Result.text);
     totalCalls += 1;
     totalInputTokens += phase1Result.inputTokens ?: 0;
@@ -237,7 +237,7 @@ public function main() returns error? {
         check io:fileWriteString(phase2aPromptPath, phase2aPromptText);
 
         phase2aRawPath = OUTPUT_DIR + "/" + moduleSlug + "-phase2a-raw.txt";
-        claude:ClaudeResult phase2aResult = check claude:callClaude(phase2aPromptText, maxTurns = claude:MAX_TURNS_PHASE2A);
+        claude:ClaudeResult phase2aResult = check claude:callClaude(phase2aPromptText, model = aiModel, maxTurns = claude:MAX_TURNS_PHASE2A);
         check io:fileWriteString(phase2aRawPath, phase2aResult.text);
         totalCalls += 1;
         totalInputTokens += phase2aResult.inputTokens ?: 0;
@@ -445,7 +445,7 @@ public function main() returns error? {
 // Runs a single phase 2b Claude call and logs stats immediately on completion.
 // Called via `start` so multiple clients run concurrently.
 function runPhase2b(string displayName, string promptText, string rawPath) returns [string, claude:ClaudeResult]|error {
-    claude:ClaudeResult result = check claude:callClaude(promptText, model = claude:FAST_MODEL, maxTurns = claude:MAX_TURNS_PHASE2B);
+    claude:ClaudeResult result = check claude:callClaude(promptText, model = aiModel, maxTurns = claude:MAX_TURNS_PHASE2B);
     check io:fileWriteString(rawPath, result.text);
     log(string `      Completed: '${displayName}'`);
     logClaudeStats(result);
@@ -558,7 +558,7 @@ function cloneSourceRepo(string repo, string slug, string 'version) returns stri
 
 function logClaudeStats(claude:ClaudeResult result) {
     log("      ── Claude stats ──────────────────────");
-    log(string `      Model:    ${result.model ?: "claude-opus-4-6"}`);
+    log(string `      Model:    ${result.model ?: aiModel}`);
     decimal? dur = result.durationMs;
     if dur is decimal {
         log(string `      Duration: ${dur / 1000.0d}s`);

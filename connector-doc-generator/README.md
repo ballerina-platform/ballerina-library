@@ -43,6 +43,7 @@ docsRepoRoot     = "/path/to/docs-integrator"
 # force = false
 # generateOverviewSetup = true
 # generateReference = true
+# aiModel = "sonnet-4-6"
 
 # Set true to print what would happen without calling Claude
 # dryRun = false
@@ -138,9 +139,9 @@ Intermediate files (prompts and raw Claude responses) are saved to `./output/` f
 ## Cost
 
 Each run makes **2 + N** Claude API calls (N = number of client types in the connector):
-- Phase 1 (Opus): overview, setup guide, trigger reference
-- Phase 2a (Opus): client discovery
-- Phase 2b × N (Sonnet, parallel): one section per client
+- Phase 1 (selected model): overview, setup guide, trigger reference
+- Phase 2a (selected model): client discovery
+- Phase 2b × N (selected model, parallel): one section per client
 
 A typical single-client connector costs ~$0.50–$1.00. A large connector like Salesforce
 (5 clients) costs ~$2.00–$3.00.

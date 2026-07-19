@@ -70,14 +70,14 @@ public function main(string modeOrConnectorName, string arg2 = "", string arg3 =
     }
     utils:log("");
 
-    // Track LLM usage across all direct API calls (agent cost is tracked separately)
-    ai_client:LlmUsage promptGenUsage    = {inputTokens: 0, outputTokens: 0, costUsd: 0.0d};
-    ai_client:LlmUsage docEnfUsage       = {inputTokens: 0, outputTokens: 0, costUsd: 0.0d};
+    // Track LLM usage across all direct API calls.
+    ai_client:LlmUsage promptGenUsage = {inputTokens: 0, outputTokens: 0};
+    ai_client:LlmUsage docEnfUsage = {inputTokens: 0, outputTokens: 0};
 
     // ── Phase 1: Pre-flight validation ─────────────────────────────────────
 
     utils:log("[STEP 1] Validating Anthropic API key...");
-    check ai_client:validateApiKey(llmApiKey);
+    check ai_client:validateApiKey(llmApiKey, llmModel);
     utils:log("");
 
     utils:log("[STEP 2] Checking if Claude Code CLI is installed...");
@@ -169,7 +169,7 @@ public function main(string modeOrConnectorName, string arg2 = "", string arg3 =
     utils:log("\t[INFO] " + (triggerMode ? "Trigger" : "Connector") + " name saved to " + runLogDir + "/" + targetNameFile);
     utils:log("");
 
-    agent_client:AgentCost? agentCost = ();
+    agent_client:AgentUsage? agentUsage = ();
     string enforcedDocPath = "";
     error? pipelineErr = ();
     do {
@@ -184,7 +184,7 @@ public function main(string modeOrConnectorName, string arg2 = "", string arg3 =
         prompts:buildConnectorUserMessage(targetName, codeServerUrl, projectRoot, additionalInstructions);
 
     utils:log("[STEP 8] Calling Anthropic API to generate execution prompt...");
-    ai_client:LlmResult promptResult = check ai_client:callClaude(systemPrompt, userMessage, llmApiKey);
+    ai_client:LlmResult promptResult = check ai_client:callClaude(systemPrompt, userMessage, llmApiKey, llmModel);
     string executionPrompt = promptResult.text;
     promptGenUsage = promptResult.usage;
 
@@ -210,7 +210,7 @@ public function main(string modeOrConnectorName, string arg2 = "", string arg3 =
     // ── Phase 4: Agent execution ─────────────────────────────────────────────
 
     utils:log("[STEP 11] Running Claude agent...");
-    agentCost = check agent_client:runClaudeAgent(promptPath, agentUrl);
+    agentUsage = check agent_client:runClaudeAgent(promptPath, agentUrl, llmModel);
     utils:log("");
 
     // ── Phase 5: Post-processing ──────────────────────────────────────────────
@@ -241,7 +241,7 @@ public function main(string modeOrConnectorName, string arg2 = "", string arg3 =
                 string enforcementSystemPrompt = triggerMode ?
                     prompts:buildTriggerDocEnforcementSystemPrompt() :
                     prompts:buildDocEnforcementSystemPrompt();
-                ai_client:LlmResult enfResult = check ai_client:callClaude(enforcementSystemPrompt, rawDoc, llmApiKey);
+                ai_client:LlmResult enfResult = check ai_client:callClaude(enforcementSystemPrompt, rawDoc, llmApiKey, llmModel);
                 io:Error? writeErr = io:fileWriteString(docPath, enfResult.text);
                 if writeErr is io:Error {
                     check error("Could not write enforced doc: " + writeErr.message());
@@ -301,34 +301,21 @@ public function main(string modeOrConnectorName, string arg2 = "", string arg3 =
     time:Utc endTime = time:utcNow();
     decimal durationSecs = time:utcDiffSeconds(endTime, startTime);
 
-    // Aggregate direct API call costs
     int totalInputTokens  = promptGenUsage.inputTokens  + docEnfUsage.inputTokens;
     int totalOutputTokens = promptGenUsage.outputTokens + docEnfUsage.outputTokens;
-    decimal totalCostUsd  = promptGenUsage.costUsd      + docEnfUsage.costUsd;
-
-    // Add agent SDK cost to combined total
-    decimal agentCostUsd = 0.0d;
-    if agentCost is agent_client:AgentCost {
-        decimal? ac = agentCost.totalCostUsd;
-        if ac is decimal {
-            agentCostUsd = ac;
-        }
-    }
-    decimal totalCombinedCostUsd = totalCostUsd + agentCostUsd;
 
     utils:log("[STEP 16] Writing run log...");
     utils:writeRunLog({
         connectorName:            targetName,
         connectorSlug:            goalSlug,
+        model:                    llmModel,
         additionalInstructions:   additionalInstructions,
         startTime:           startTime,
         endTime:             endTime,
         durationSecs:        durationSecs,
         promptGenUsage:      promptGenUsage,
         docEnfUsage:         docEnfUsage,
-        agentCost:           agentCost,
-        totalDirectCostUsd:  totalCostUsd,
-        totalCombinedCostUsd: totalCombinedCostUsd,
+        agentUsage:          agentUsage,
         promptPath:          promptPath,
         workflowDocPath:     enforcedDocPath == "" ? "(not written)" : enforcedDocPath
     });
@@ -340,12 +327,10 @@ public function main(string modeOrConnectorName, string arg2 = "", string arg3 =
     utils:log(string `End time:        ${time:utcToString(endTime)}`);
     utils:log(string `Duration:        ${durationSecs}s`);
     utils:log(string `Prompt length:   ${fullPrompt.length()} chars`);
-    utils:log("--- LLM Cost Breakdown ---");
-    utils:log(string `Prompt gen:      ${promptGenUsage.inputTokens} in / ${promptGenUsage.outputTokens} out  |  $${promptGenUsage.costUsd}`);
-    utils:log(string `Doc enforcement: ${docEnfUsage.inputTokens} in / ${docEnfUsage.outputTokens} out  |  $${docEnfUsage.costUsd}`);
-    utils:log(string `Direct API total:${totalInputTokens} in / ${totalOutputTokens} out  |  $${totalCostUsd}`);
-    utils:log(string `Agent SDK:       $${agentCostUsd}`);
-    utils:log(string `COMBINED TOTAL:  $${totalCombinedCostUsd}`);
+    utils:log("--- LLM Usage ---");
+    utils:log(string `Prompt gen:      ${promptGenUsage.inputTokens} in / ${promptGenUsage.outputTokens} out`);
+    utils:log(string `Doc enforcement: ${docEnfUsage.inputTokens} in / ${docEnfUsage.outputTokens} out`);
+    utils:log(string `Direct API total:${totalInputTokens} in / ${totalOutputTokens} out`);
     } on fail error e {
         pipelineErr = e;
     }

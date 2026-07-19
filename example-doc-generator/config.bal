@@ -19,6 +19,7 @@
 
 // === Required ===
 configurable string llmApiKey = ?;
+configurable string llmModel = "sonnet-4-6";
 
 // === Service Ports ===
 configurable int codeServerPort = 8080;

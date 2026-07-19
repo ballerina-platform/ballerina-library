@@ -3,6 +3,10 @@ name: Generate Connector Documentation
 on:
   workflow_dispatch:
     inputs:
+      github_repo:
+        description: Repository name under ballerina-platform
+        required: true
+        type: string
       mode:
         description: Example documentation mode
         required: true
@@ -11,10 +15,6 @@ on:
         options:
           - connector
           - trigger
-      github_repo:
-        description: Repository name under ballerina-platform
-        required: true
-        type: string
       category:
         description: Documentation catalog category
         required: true
@@ -38,25 +38,30 @@ on:
           - security-identity
           - storage-file
       generate_overview_setup:
-        description: Generate Overview and Setup Guide
+        description: Overview and Setup Guide
         required: true
         default: true
         type: boolean
       generate_reference:
-        description: Generate Action Reference Guide
+        description: Action Reference Guide
         required: true
         default: true
         type: boolean
       generate_examples:
-        description: Generate Example Guide and UI Screenshots
+        description: Example Guide
         required: true
         default: true
         type: boolean
-      example_instructions:
-        description: Optional instructions for example generation
-        required: false
-        default: ""
-        type: string
+      ai_model:
+        description: AI model
+        required: true
+        default: sonnet-4-6
+        type: choice
+        options:
+          - sonnet-4-6
+          - sonnet-5
+          - opus-4-6
+          - opus-4-8
 
 concurrency:
   group: connector-documentation-${{ inputs.github_repo }}
@@ -180,6 +185,7 @@ jobs:
             echo "- Overview & Setup Guide: ${{ inputs.generate_overview_setup }}"
             echo "- Reference: ${{ inputs.generate_reference }}"
             echo "- Examples: ${{ inputs.generate_examples }} (${{ inputs.mode }} mode)"
+            echo "- AI model: ${{ inputs.ai_model }}"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Write run manifest
@@ -199,10 +205,11 @@ jobs:
             --arg baseSha "$BASE_SHA" \
             --arg docsBranch "$BRANCH" \
             --arg mode "${{ inputs.mode }}" \
+            --arg aiModel "${{ inputs.ai_model }}" \
             --argjson overviewSetup '${{ inputs.generate_overview_setup }}' \
             --argjson reference '${{ inputs.generate_reference }}' \
             --argjson examples '${{ inputs.generate_examples }}' \
-            '{repository:$repository, package:$package, moduleSlug:$moduleSlug, displayName:$displayName, category:$category, baseSha:$baseSha, docsBranch:$docsBranch, mode:$mode, selectedStages:{overviewSetup:$overviewSetup, reference:$reference, examples:$examples}}' \
+            '{repository:$repository, package:$package, moduleSlug:$moduleSlug, displayName:$displayName, category:$category, baseSha:$baseSha, docsBranch:$docsBranch, mode:$mode, aiModel:$aiModel, selectedStages:{overviewSetup:$overviewSetup, reference:$reference, examples:$examples}}' \
             > run-manifest.json
 
       - name: Upload run manifest
@@ -265,6 +272,7 @@ jobs:
             -CdocsRepoRoot="$GITHUB_WORKSPACE/docs-integrator" \
             -CgenerateOverviewSetup="${{ inputs.generate_overview_setup }}" \
             -CgenerateReference="${{ inputs.generate_reference }}" \
+            -CaiModel="${{ inputs.ai_model }}" \
             -Cforce=true
 
       - name: Validate and commit connector documents
@@ -346,10 +354,10 @@ jobs:
           from pathlib import Path
           key = os.environ["LLM_API_KEY"].replace("\\", "\\\\").replace('"', '\\"')
           Path("example-doc-generator/Config.toml").write_text(
-              f'llmApiKey = "{key}"\ncodeServerPort = 8080\nagentServerPort = 8765\n', encoding="utf-8"
+              f'llmApiKey = "{key}"\nllmModel = "${{ inputs.ai_model }}"\ncodeServerPort = 8080\nagentServerPort = 8765\n', encoding="utf-8"
           )
           Path("example-doc-generator/.env").write_text(
-              "CODE_SERVER_PORT=8080\nAGENT_SERVER_PORT=8765\n", encoding="utf-8"
+              "CODE_SERVER_PORT=8080\nAGENT_SERVER_PORT=8765\nAI_MODEL=${{ inputs.ai_model }}\n", encoding="utf-8"
           )
           PY
 
@@ -363,17 +371,10 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.LLM_API_KEY }}
           TARGET: ${{ needs.prepare.outputs.module_slug }}
-          INSTRUCTIONS: ${{ inputs.example_instructions }}
           MODE: ${{ inputs.mode }}
         run: |
           if [ "$MODE" = "trigger" ]; then
-            if [ -n "$INSTRUCTIONS" ]; then
-              bal run -- trigger "$TARGET" "$INSTRUCTIONS"
-            else
-              bal run -- trigger "$TARGET"
-            fi
-          elif [ -n "$INSTRUCTIONS" ]; then
-            bal run -- "$TARGET" "$INSTRUCTIONS"
+            bal run -- trigger "$TARGET"
           else
             bal run -- "$TARGET"
           fi

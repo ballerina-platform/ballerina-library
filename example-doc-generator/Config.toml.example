@@ -8,6 +8,9 @@
 # Anthropic API Key (required — get yours at https://console.anthropic.com/settings/api-keys)
 llmApiKey = ""
 
+# Model used by direct Anthropic calls and the Claude agent.
+llmModel = "sonnet-4-6"
+
 # Code-Server port (code-server runs locally on this port)
 # The pipeline will verify code-server is running and start it if needed.
 # Start manually with: code-server --auth none --bind-addr 0.0.0.0:8080
@@ -25,4 +28,3 @@ agentServerPort = 8765
 # Leave empty or omit to use defaults.
 # Example: additionalInstructions = "Use BearerTokenConfig for authentication. The token field maps to the Zoom API Bearer token."
 # additionalInstructions = ""
-
