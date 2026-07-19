@@ -40,6 +40,10 @@ import wso2/example_doc_generator.utils;
 # + arg4                   - third batch option
 # + return                 - an error if any step fails
 public function main(string modeOrConnectorName, string arg2 = "", string arg3 = "", string arg4 = "") returns error? {
+    string anthropicApiKey = os:getEnv("ANTHROPIC_API_KEY");
+    if anthropicApiKey.trim() == "" {
+        return error("ANTHROPIC_API_KEY environment variable is required.");
+    }
     if modeOrConnectorName == "batch" {
         check batch_runner:runBatch(arg2, arg3, arg4);
         return;
@@ -77,7 +81,7 @@ public function main(string modeOrConnectorName, string arg2 = "", string arg3 =
     // ── Phase 1: Pre-flight validation ─────────────────────────────────────
 
     utils:log("[STEP 1] Validating Anthropic API key...");
-    check ai_client:validateApiKey(llmApiKey, llmModel);
+    check ai_client:validateApiKey(anthropicApiKey, llmModel);
     utils:log("");
 
     utils:log("[STEP 2] Checking if Claude Code CLI is installed...");
@@ -184,7 +188,7 @@ public function main(string modeOrConnectorName, string arg2 = "", string arg3 =
         prompts:buildConnectorUserMessage(targetName, codeServerUrl, projectRoot, additionalInstructions);
 
     utils:log("[STEP 8] Calling Anthropic API to generate execution prompt...");
-    ai_client:LlmResult promptResult = check ai_client:callClaude(systemPrompt, userMessage, llmApiKey, llmModel);
+    ai_client:LlmResult promptResult = check ai_client:callClaude(systemPrompt, userMessage, anthropicApiKey, llmModel);
     string executionPrompt = promptResult.text;
     promptGenUsage = promptResult.usage;
 
@@ -241,7 +245,7 @@ public function main(string modeOrConnectorName, string arg2 = "", string arg3 =
                 string enforcementSystemPrompt = triggerMode ?
                     prompts:buildTriggerDocEnforcementSystemPrompt() :
                     prompts:buildDocEnforcementSystemPrompt();
-                ai_client:LlmResult enfResult = check ai_client:callClaude(enforcementSystemPrompt, rawDoc, llmApiKey, llmModel);
+                ai_client:LlmResult enfResult = check ai_client:callClaude(enforcementSystemPrompt, rawDoc, anthropicApiKey, llmModel);
                 io:Error? writeErr = io:fileWriteString(docPath, enfResult.text);
                 if writeErr is io:Error {
                     check error("Could not write enforced doc: " + writeErr.message());

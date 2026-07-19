@@ -345,16 +345,11 @@ jobs:
           curl -fsSL https://code-server.dev/install.sh | sh
 
       - name: Configure example generator
-        env:
-          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
         run: |
-          test -n "$LLM_API_KEY" || { echo "LLM_API_KEY is required"; exit 1; }
           python3 - <<'PY'
-          import os
           from pathlib import Path
-          key = os.environ["LLM_API_KEY"].replace("\\", "\\\\").replace('"', '\\"')
           Path("example-doc-generator/Config.toml").write_text(
-              f'llmApiKey = "{key}"\nllmModel = "${{ inputs.ai_model }}"\ncodeServerPort = 8080\nagentServerPort = 8765\n', encoding="utf-8"
+              'llmModel = "${{ inputs.ai_model }}"\ncodeServerPort = 8080\nagentServerPort = 8765\n', encoding="utf-8"
           )
           Path("example-doc-generator/.env").write_text(
               "CODE_SERVER_PORT=8080\nAGENT_SERVER_PORT=8765\nAI_MODEL=${{ inputs.ai_model }}\n", encoding="utf-8"
@@ -369,7 +364,7 @@ jobs:
         working-directory: example-doc-generator
         timeout-minutes: 90
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.LLM_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           TARGET: ${{ needs.prepare.outputs.module_slug }}
           MODE: ${{ inputs.mode }}
         run: |

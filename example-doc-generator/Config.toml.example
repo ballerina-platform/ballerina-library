@@ -5,9 +5,6 @@
 #   cp Config.toml.example Config.toml
 # =============================================================================
 
-# Anthropic API Key (required — get yours at https://console.anthropic.com/settings/api-keys)
-llmApiKey = ""
-
 # Model used by direct Anthropic calls and the Claude agent.
 llmModel = "sonnet-4-6"
 

@@ -37,7 +37,7 @@ Run all commands from `example-doc-generator/`.
 cp Config.toml.example Config.toml
 ```
 
-Set `llmApiKey` in `Config.toml`.
+Set the model and service ports in `Config.toml`, then provide the API key through the environment.
 
 2. Create the Python scripts config:
 
@@ -215,8 +215,7 @@ Required repository/environment secrets:
 
 | Secret | Required for | Description |
 |--------|--------------|-------------|
-| `LLM_API_KEY` | generation | Anthropic API key used by Ballerina and Claude Code |
-| `ANTHROPIC_API_KEY` | connector documents | Anthropic API key used by the connector-doc generator |
+| `ANTHROPIC_API_KEY` | all generation | Anthropic API key used by both documentation generators and Claude Code |
 | `BALLERINA_BOT_TOKEN` | integration and PR | Token used to create the docs-integrator branch and PR |
 
 Workflow inputs:
@@ -292,7 +291,7 @@ make clean-artifacts
 
 | Problem | Fix |
 |---------|-----|
-| API key validation failed | Set `llmApiKey` in `Config.toml` and export `ANTHROPIC_API_KEY` |
+| API key validation failed | Export a valid `ANTHROPIC_API_KEY` before running the generator |
 | `claude` not found | Install Claude Code CLI and verify with `claude --version` |
 | Batch fails because `artifacts/` exists | Move or delete `artifacts/` after reviewing it |
 | Agent server not ready | Start `python/agent_server.py` manually and inspect the Python error |
