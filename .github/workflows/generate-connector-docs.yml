@@ -3,6 +3,14 @@ name: Generate Connector Documentation
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: Example documentation mode
+        required: true
+        default: connector
+        type: choice
+        options:
+          - connector
+          - trigger
       github_repo:
         description: Repository name under ballerina-platform
         required: true
@@ -29,18 +37,94 @@ on:
           - productivity-collaboration
           - security-identity
           - storage-file
+      generate_overview_setup:
+        description: Generate Overview and Setup Guide
+        required: true
+        default: true
+        type: boolean
+      generate_reference:
+        description: Generate Action Reference Guide
+        required: true
+        default: true
+        type: boolean
+      generate_examples:
+        description: Generate Example Guide and UI Screenshots
+        required: true
+        default: true
+        type: boolean
+      example_instructions:
+        description: Optional instructions for example generation
+        required: false
+        default: ""
+        type: string
+
+concurrency:
+  group: connector-documentation-${{ inputs.github_repo }}
+  cancel-in-progress: false
 
 jobs:
-  generate:
-    name: Generate ${{ inputs.github_repo }} documentation
+  prepare:
+    name: Validate request and create docs branch
     runs-on: ubuntu-22.04
-    timeout-minutes: 90
-
+    timeout-minutes: 15
+    outputs:
+      module_slug: ${{ steps.metadata.outputs.module_slug }}
+      package_name: ${{ steps.metadata.outputs.package_name }}
+      display_name: ${{ steps.metadata.outputs.display_name }}
+      docs_branch: ${{ steps.branch.outputs.docs_branch }}
+      base_sha: ${{ steps.branch.outputs.base_sha }}
     steps:
+      - name: Validate selected stages
+        env:
+          OVERVIEW_SETUP: ${{ inputs.generate_overview_setup }}
+          REFERENCE: ${{ inputs.generate_reference }}
+          EXAMPLES: ${{ inputs.generate_examples }}
+          SOURCE_REPO: ${{ inputs.github_repo }}
+        run: |
+          if ! printf '%s' "$SOURCE_REPO" | grep -Eq '^[A-Za-z0-9_.-]+$'; then
+            echo "Invalid repository name: $SOURCE_REPO"
+            exit 1
+          fi
+          if [ "$OVERVIEW_SETUP" != "true" ] && [ "$REFERENCE" != "true" ] && [ "$EXAMPLES" != "true" ]; then
+            echo "At least one documentation stage must be selected."
+            exit 1
+          fi
+
       - name: Check out generator
         uses: actions/checkout@v4
         with:
           path: generator
+
+      - name: Check out source repository
+        uses: actions/checkout@v4
+        with:
+          repository: ballerina-platform/${{ inputs.github_repo }}
+          token: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          path: source
+
+      - name: Read connector metadata
+        id: metadata
+        env:
+          SOURCE_REPO: ${{ inputs.github_repo }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import pathlib
+          import tomllib
+
+          root = pathlib.Path("source")
+          candidates = [root / "Ballerina.toml", root / "ballerina" / "Ballerina.toml", root / "ballerina" / "ballerina.toml"]
+          manifest = next((path for path in candidates if path.exists()), None)
+          if manifest is None:
+              raise SystemExit(f"No Ballerina.toml found in {os.environ['SOURCE_REPO']}")
+          package = tomllib.loads(manifest.read_text(encoding="utf-8"))["package"]
+          org = package["org"]
+          name = package["name"]
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"module_slug={name}\n")
+              output.write(f"package_name={org}/{name}\n")
+              output.write(f"display_name={name.replace('.', ' ').replace('-', ' ').title()}\n")
+          PY
 
       - name: Check out docs-integrator
         uses: actions/checkout@v4
@@ -55,6 +139,107 @@ jobs:
             en/docs/connectors/catalog/${{ inputs.category }}
           sparse-checkout-cone-mode: false
 
+      - name: Validate existing overview anchor
+        if: ${{ !inputs.generate_overview_setup }}
+        env:
+          MODULE: ${{ steps.metadata.outputs.module_slug }}
+          CATEGORY: ${{ inputs.category }}
+        run: |
+          overview="docs-integrator/en/docs/connectors/catalog/${CATEGORY}/${MODULE}/overview.md"
+          if [ ! -f "$overview" ]; then
+            echo "Overview & Setup Guide was not selected, but no existing connector overview was found at $overview"
+            exit 1
+          fi
+
+      - name: Create run-specific docs branch
+        id: branch
+        working-directory: docs-integrator
+        env:
+          MODULE: ${{ steps.metadata.outputs.module_slug }}
+        run: |
+          branch="connector-docs/${MODULE}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          base_sha=$(git rev-parse HEAD)
+          git config user.name "ballerina-bot"
+          git config user.email "ballerina-bot@ballerina.org"
+          git checkout -b "$branch"
+          git push origin "$branch"
+          echo "docs_branch=$branch" >> "$GITHUB_OUTPUT"
+          echo "base_sha=$base_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Write run summary
+        env:
+          MODULE: ${{ steps.metadata.outputs.module_slug }}
+          PACKAGE: ${{ steps.metadata.outputs.package_name }}
+          BRANCH: ${{ steps.branch.outputs.docs_branch }}
+        run: |
+          {
+            echo "## Connector documentation request"
+            echo "- Module: $MODULE"
+            echo "- Package: $PACKAGE"
+            echo "- Docs branch: $BRANCH"
+            echo "- Overview & Setup Guide: ${{ inputs.generate_overview_setup }}"
+            echo "- Reference: ${{ inputs.generate_reference }}"
+            echo "- Examples: ${{ inputs.generate_examples }} (${{ inputs.mode }} mode)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Write run manifest
+        env:
+          MODULE: ${{ steps.metadata.outputs.module_slug }}
+          PACKAGE: ${{ steps.metadata.outputs.package_name }}
+          DISPLAY_NAME: ${{ steps.metadata.outputs.display_name }}
+          BRANCH: ${{ steps.branch.outputs.docs_branch }}
+          BASE_SHA: ${{ steps.branch.outputs.base_sha }}
+        run: |
+          jq -n \
+            --arg repository "${{ inputs.github_repo }}" \
+            --arg package "$PACKAGE" \
+            --arg moduleSlug "$MODULE" \
+            --arg displayName "$DISPLAY_NAME" \
+            --arg category "${{ inputs.category }}" \
+            --arg baseSha "$BASE_SHA" \
+            --arg docsBranch "$BRANCH" \
+            --arg mode "${{ inputs.mode }}" \
+            --argjson overviewSetup '${{ inputs.generate_overview_setup }}' \
+            --argjson reference '${{ inputs.generate_reference }}' \
+            --argjson examples '${{ inputs.generate_examples }}' \
+            '{repository:$repository, package:$package, moduleSlug:$moduleSlug, displayName:$displayName, category:$category, baseSha:$baseSha, docsBranch:$docsBranch, mode:$mode, selectedStages:{overviewSetup:$overviewSetup, reference:$reference, examples:$examples}}' \
+            > run-manifest.json
+
+      - name: Upload run manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: connector-docs-request-${{ github.run_id }}
+          path: run-manifest.json
+          retention-days: 30
+
+  connector-docs:
+    name: Generate connector documents
+    needs: prepare
+    if: ${{ inputs.generate_overview_setup || inputs.generate_reference }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    outputs:
+      commit_sha: ${{ steps.commit.outputs.commit_sha }}
+    steps:
+      - name: Check out generator
+        uses: actions/checkout@v4
+        with:
+          path: generator
+
+      - name: Check out prepared docs branch
+        uses: actions/checkout@v4
+        with:
+          repository: wso2/docs-integrator
+          ref: ${{ needs.prepare.outputs.docs_branch }}
+          token: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          path: docs-integrator
+          sparse-checkout: |
+            en/sidebars.ts
+            en/docs/connectors/catalog/index.mdx
+            en/docs/connectors/catalog/${{ inputs.category }}
+            en/static/img/connectors/catalog/${{ inputs.category }}
+          sparse-checkout-cone-mode: false
+
       - name: Set up Ballerina
         uses: ballerina-platform/setup-ballerina@v1.1.3
         with:
@@ -63,54 +248,442 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: 20
 
       - name: Install Claude Code CLI
         run: npm install -g @anthropic-ai/claude-code
 
-      - name: Generate documentation
+      - name: Generate selected connector documentation
         working-directory: generator/connector-doc-generator
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          CONNECTOR_REPOSITORY: ${{ inputs.github_repo }}
-          CATEGORY: ${{ inputs.category }}
         run: |
-          if [ -z "$ANTHROPIC_API_KEY" ]; then
-            echo "ANTHROPIC_API_KEY secret is required."
+          test -n "$ANTHROPIC_API_KEY" || { echo "ANTHROPIC_API_KEY is required"; exit 1; }
+          bal run -- \
+            -CgithubRepo="${{ inputs.github_repo }}" \
+            -Ccategory="${{ inputs.category }}" \
+            -CdocsRepoRoot="$GITHUB_WORKSPACE/docs-integrator" \
+            -CgenerateOverviewSetup="${{ inputs.generate_overview_setup }}" \
+            -CgenerateReference="${{ inputs.generate_reference }}" \
+            -Cforce=true
+
+      - name: Validate and commit connector documents
+        id: commit
+        working-directory: docs-integrator
+        env:
+          BRANCH: ${{ needs.prepare.outputs.docs_branch }}
+          BASE_SHA: ${{ needs.prepare.outputs.base_sha }}
+          MODULE: ${{ needs.prepare.outputs.module_slug }}
+        run: |
+          allowed='^(en/sidebars\.ts|en/docs/connectors/catalog/index\.mdx|en/docs/connectors/catalog/${{ inputs.category }}/'"$MODULE"'/|en/static/img/connectors/catalog/${{ inputs.category }}/'"$MODULE"'/)'
+          unexpected=$(git status --short | awk '{print $2}' | grep -Ev "$allowed" || true)
+          if [ -n "$unexpected" ]; then
+            echo "Unexpected generated paths:"
+            echo "$unexpected"
             exit 1
           fi
-          bal run -- \
-            -CgithubRepo="$CONNECTOR_REPOSITORY" \
-            -Ccategory="$CATEGORY" \
-            -CdocsRepoRoot="$GITHUB_WORKSPACE/docs-integrator"
+          git config user.name "ballerina-bot"
+          git config user.email "ballerina-bot@ballerina.org"
+          git add en/
+          if git diff --cached --quiet; then
+            echo "commit_sha=$BASE_SHA" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git commit -m "docs: generate ${MODULE} connector documentation"
+          commit_sha=$(git rev-parse HEAD)
+          git push --force-with-lease="refs/heads/${BRANCH}:${BASE_SHA}" origin "HEAD:${BRANCH}"
+          echo "commit_sha=$commit_sha" >> "$GITHUB_OUTPUT"
+
+  example-docs:
+    name: Generate ${{ inputs.mode }} example documentation
+    needs: prepare
+    if: ${{ inputs.generate_examples }}
+    runs-on: ubuntu-22.04
+    environment: docs-automation
+    timeout-minutes: 150
+    steps:
+      - name: Check out generator
+        uses: actions/checkout@v4
+
+      - name: Set up Ballerina
+        uses: ballerina-platform/setup-ballerina@v1.1.3
+        with:
+          version: 2201.13.3
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install example-generator dependencies
+        run: |
+          python -m pip install uv
+          cd example-doc-generator/python
+          uv venv
+          uv pip install -r requirements.txt
+          .venv/bin/playwright install chromium --with-deps
+          npm install -g @anthropic-ai/claude-code
+          curl -fsSL https://code-server.dev/install.sh | sh
+
+      - name: Configure example generator
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+        run: |
+          test -n "$LLM_API_KEY" || { echo "LLM_API_KEY is required"; exit 1; }
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          key = os.environ["LLM_API_KEY"].replace("\\", "\\\\").replace('"', '\\"')
+          Path("example-doc-generator/Config.toml").write_text(
+              f'llmApiKey = "{key}"\ncodeServerPort = 8080\nagentServerPort = 8765\n', encoding="utf-8"
+          )
+          Path("example-doc-generator/.env").write_text(
+              "CODE_SERVER_PORT=8080\nAGENT_SERVER_PORT=8765\n", encoding="utf-8"
+          )
+          PY
+
+      - name: Build example generator
+        working-directory: example-doc-generator
+        run: bal build
+
+      - name: Generate example artifacts
+        working-directory: example-doc-generator
+        timeout-minutes: 90
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.LLM_API_KEY }}
+          TARGET: ${{ needs.prepare.outputs.module_slug }}
+          INSTRUCTIONS: ${{ inputs.example_instructions }}
+          MODE: ${{ inputs.mode }}
+        run: |
+          if [ "$MODE" = "trigger" ]; then
+            if [ -n "$INSTRUCTIONS" ]; then
+              bal run -- trigger "$TARGET" "$INSTRUCTIONS"
+            else
+              bal run -- trigger "$TARGET"
+            fi
+          elif [ -n "$INSTRUCTIONS" ]; then
+            bal run -- "$TARGET" "$INSTRUCTIONS"
+          else
+            bal run -- "$TARGET"
+          fi
+
+      - name: Upload example artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: example-docs-${{ needs.prepare.outputs.module_slug }}-${{ github.run_id }}
+          path: example-doc-generator/artifacts/
+          retention-days: 30
+          if-no-files-found: error
+
+  integrate-and-finalize:
+    name: Integrate artifacts and finalize branch
+    needs:
+      - prepare
+      - connector-docs
+      - example-docs
+    if: >-
+      ${{ always() && needs.prepare.result == 'success' &&
+          (needs.connector-docs.result == 'success' || needs.connector-docs.result == 'skipped') &&
+          (needs.example-docs.result == 'success' || needs.example-docs.result == 'skipped') }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    outputs:
+      final_sha: ${{ steps.finalize.outputs.final_sha }}
+      has_changes: ${{ steps.finalize.outputs.has_changes }}
+    steps:
+      - name: Check out generator
+        uses: actions/checkout@v4
+        with:
+          path: generator
+
+      - name: Check out prepared docs branch
+        uses: actions/checkout@v4
+        with:
+          repository: wso2/docs-integrator
+          ref: ${{ needs.prepare.outputs.docs_branch }}
+          token: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          path: docs-integrator
+
+      - name: Download example artifacts
+        if: ${{ inputs.generate_examples }}
+        uses: actions/download-artifact@v4
+        with:
+          name: example-docs-${{ needs.prepare.outputs.module_slug }}-${{ github.run_id }}
+          path: example-output
+
+      - name: Verify branch and merge latest main
+        id: lease
+        working-directory: docs-integrator
+        env:
+          BRANCH: ${{ needs.prepare.outputs.docs_branch }}
+          CONNECTOR_SHA: ${{ needs.connector-docs.outputs.commit_sha }}
+          BASE_SHA: ${{ needs.prepare.outputs.base_sha }}
+        run: |
+          git fetch origin main "$BRANCH"
+          expected="${CONNECTOR_SHA:-$BASE_SHA}"
+          remote_sha=$(git rev-parse "origin/$BRANCH")
+          if [ "$remote_sha" != "$expected" ]; then
+            echo "Branch changed unexpectedly: expected $expected, found $remote_sha"
+            exit 1
+          fi
+          git config user.name "ballerina-bot"
+          git config user.email "ballerina-bot@ballerina.org"
+          git merge origin/main --no-edit
+          echo "expected_sha=$remote_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Place example documentation
+        if: ${{ inputs.generate_examples }}
+        run: |
+          python3 generator/connector-doc-generator/scripts/integrate_example.py \
+            --docs-repo docs-integrator \
+            --artifacts-dir example-output \
+            --category "${{ inputs.category }}" \
+            --module "${{ needs.prepare.outputs.module_slug }}" \
+            --mode "${{ inputs.mode }}" \
+            --result integration-result.json
+
+      - name: Validate, commit, and push final branch
+        id: finalize
+        working-directory: docs-integrator
+        env:
+          BRANCH: ${{ needs.prepare.outputs.docs_branch }}
+          EXPECTED_SHA: ${{ steps.lease.outputs.expected_sha }}
+          MODULE: ${{ needs.prepare.outputs.module_slug }}
+        run: |
+          allowed='^(en/sidebars\.ts|en/docs/connectors/catalog/index\.mdx|en/docs/connectors/catalog/${{ inputs.category }}/'"$MODULE"'/|en/static/img/connectors/catalog/${{ inputs.category }}/'"$MODULE"'/)'
+          unexpected=$(git status --short | awk '{print $2}' | grep -Ev "$allowed" || true)
+          if [ -n "$unexpected" ]; then
+            echo "Unexpected integration paths:"
+            echo "$unexpected"
+            exit 1
+          fi
+          validation_args=()
+          if [ "${{ inputs.generate_reference }}" = "true" ]; then validation_args+=(--reference); fi
+          if [ "${{ inputs.generate_examples }}" = "true" ]; then validation_args+=(--examples); fi
+          python3 ../generator/connector-doc-generator/scripts/validate_docs.py \
+            --docs-repo . \
+            --category "${{ inputs.category }}" \
+            --module "$MODULE" \
+            "${validation_args[@]}"
+          git add en/
+          if ! git diff --cached --quiet; then
+            git commit -m "docs: integrate ${MODULE} connector examples"
+          fi
+          final_sha=$(git rev-parse HEAD)
+          git push --force-with-lease="refs/heads/${BRANCH}:${EXPECTED_SHA}" origin "HEAD:${BRANCH}"
+          git fetch origin main
+          if git diff --quiet origin/main...HEAD; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "final_sha=$final_sha" >> "$GITHUB_OUTPUT"
+
+  render-and-pr:
+    name: Render documentation and create PR
+    needs:
+      - prepare
+      - integrate-and-finalize
+    if: ${{ needs.integrate-and-finalize.outputs.has_changes == 'true' }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - name: Check out generator
+        uses: actions/checkout@v4
+        with:
+          path: generator
+
+      - name: Check out exact final docs commit
+        uses: actions/checkout@v4
+        with:
+          repository: wso2/docs-integrator
+          ref: ${{ needs.integrate-and-finalize.outputs.final_sha }}
+          token: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          path: docs-integrator
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: docs-integrator/package-lock.json
+
+      - name: Install docs and preview dependencies
+        working-directory: docs-integrator
+        run: |
+          npm ci
+          python3 -m pip install playwright
+          python3 -m playwright install chromium --with-deps
+
+      - name: Typecheck documentation
+        id: typecheck
+        continue-on-error: true
+        working-directory: docs-integrator
+        run: npm run typecheck
+
+      - name: Build documentation
+        id: build
+        continue-on-error: true
+        working-directory: docs-integrator
+        run: npm run build
+
+      - name: Capture rendered pages
+        if: ${{ steps.build.outcome == 'success' }}
+        continue-on-error: true
+        env:
+          MODULE: ${{ needs.prepare.outputs.module_slug }}
+        run: |
+          cd docs-integrator
+          npm run serve -- --port 3333 --no-open > ../docs-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 60); do
+            curl -fsS http://127.0.0.1:3333/ >/dev/null && break
+            echo "Waiting for docs server (${attempt}/60)..."
+            sleep 1
+          done
+          mapfile -t pages < <(git diff --name-only origin/main...HEAD -- "en/docs/connectors/catalog/${{ inputs.category }}/${MODULE}/*.md")
+          args=()
+          for page in "${pages[@]}"; do args+=(--page "$PWD/$page"); done
+          cd ..
+          python3 generator/connector-doc-generator/scripts/capture_previews.py \
+            --docs-repo docs-integrator \
+            --base-url http://127.0.0.1:3333 \
+            --module "$MODULE" \
+            --output-dir preview-screenshots \
+            --result preview-result.json \
+            "${args[@]}"
+
+      - name: Upload rendered previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-docs-${{ needs.prepare.outputs.module_slug }}-${{ github.run_id }}
+          path: |
+            preview-screenshots/
+            preview-result.json
+            docs-server.log
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload previews for PR body
+        id: previews
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          MODULE: ${{ needs.prepare.outputs.module_slug }}
+          BRANCH: ${{ needs.prepare.outputs.docs_branch }}
+        run: |
+          if ! compgen -G 'preview-screenshots/*.png' >/dev/null; then exit 0; fi
+          tag="docs-preview-${MODULE//./_}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          gh release create "$tag" preview-screenshots/*.png \
+            --repo wso2/docs-integrator \
+            --target "$BRANCH" \
+            --title "Documentation preview: $MODULE" \
+            --notes "Rendered documentation previews for workflow run $GITHUB_RUN_ID." \
+            --prerelease
+          owner_repo="wso2/docs-integrator"
+          body=""
+          for image in preview-screenshots/*.png; do
+            name=$(basename "$image")
+            body="${body}\n\n![${name}](https://github.com/${owner_repo}/releases/download/${tag}/${name})"
+          done
+          {
+            echo "markdown<<EOF"
+            printf '%b\n' "$body"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Create docs-integrator pull request
-        id: pull_request
+        id: pr
         working-directory: docs-integrator
         env:
           GH_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
-          CONNECTOR_REPOSITORY: ${{ inputs.github_repo }}
+          MODULE: ${{ needs.prepare.outputs.module_slug }}
+          DISPLAY_NAME: ${{ needs.prepare.outputs.display_name }}
+          BRANCH: ${{ needs.prepare.outputs.docs_branch }}
+          PREVIEWS: ${{ steps.previews.outputs.markdown }}
         run: |
-          if git diff --quiet; then
-            echo "created=false" >> "$GITHUB_OUTPUT"
-            echo "No documentation changes were produced." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
+          changed=$(git diff --name-only origin/main...HEAD | sed 's/^/- `/' | sed 's/$/`/')
+          cat > /tmp/pr-body.md <<EOF
+          ## Purpose
 
-          branch="connector-docs/${CONNECTOR_REPOSITORY}-${GITHUB_RUN_ID}"
-          git config user.name "ballerina-bot"
-          git config user.email "ballerina-bot@ballerina.org"
-          git checkout -b "$branch"
-          git add en/
-          git commit -m "docs: add ${CONNECTOR_REPOSITORY} connector documentation"
-          git push origin "$branch"
+          Adds or updates generated documentation for the ${DISPLAY_NAME} connector.
 
+          ## Goals
+
+          Publish the selected connector documentation stages through one validated docs-integrator change.
+
+          ## Approach
+
+          Connector documents and example artifacts were generated independently, integrated on one run-specific branch, and validated before this PR was opened.
+
+          ## Release note
+
+          Updated ${DISPLAY_NAME} connector documentation.
+
+          ## Documentation
+
+          ${changed}
+
+          ## Automation tests
+
+          - Typecheck: ${{ steps.typecheck.outcome }}
+          - Docusaurus build: ${{ steps.build.outcome }}
+          - Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          ## Security checks
+
+          - Documentation-only change; generated paths were restricted and checked for unresolved local paths.
+          - No credentials or generated local configuration files are committed.
+
+          ## Samples
+
+          Example mode: ${{ inputs.mode }}. Generated sample artifacts are attached to the workflow run.
+
+          ## Test environment
+
+          Ubuntu 22.04, Node.js 20, Chromium via Playwright, Ballerina 2201.13.3.
+
+          ## Rendered page previews
+          ${PREVIEWS:-No preview images were available; see the workflow result for warnings.}
+          EOF
           pr_url=$(gh pr create \
             --repo wso2/docs-integrator \
             --base main \
-            --head "$branch" \
-            --title "docs: add ${CONNECTOR_REPOSITORY} connector documentation" \
-            --body "Generated by the connector documentation workflow.")
-          echo "created=true" >> "$GITHUB_OUTPUT"
+            --head "$BRANCH" \
+            --title "docs: update ${MODULE} connector documentation" \
+            --body-file /tmp/pr-body.md)
+          pr_number=$(gh pr view "$pr_url" --repo wso2/docs-integrator --json number --jq .number)
           echo "url=$pr_url" >> "$GITHUB_OUTPUT"
-          echo "Created docs-integrator PR: $pr_url" >> "$GITHUB_STEP_SUMMARY"
+          echo "number=$pr_number" >> "$GITHUB_OUTPUT"
+          echo "Created PR: $pr_url" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Request source CODEOWNERS
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+        run: |
+          python3 generator/connector-doc-generator/scripts/request_reviewers.py \
+            --source-repo "ballerina-platform/${{ inputs.github_repo }}" \
+            --target-repo wso2/docs-integrator \
+            --pr-number "${{ steps.pr.outputs.number }}" | tee reviewers.json
+          {
+            echo "## Source CODEOWNERS review requests"
+            echo '```json'
+            cat reviewers.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

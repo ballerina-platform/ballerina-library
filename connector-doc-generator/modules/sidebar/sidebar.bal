@@ -19,20 +19,22 @@ import ballerina/io;
 # Inject a connector entry into the Docusaurus sidebars.ts file under the
 # "Connector Catalog" category, in alphabetical order.
 #
-# + sidebarPath  - Absolute path to sidebars.ts
-# + name         - Connector display name, e.g. "HubSpot"
-# + module       - Module slug, e.g. "hubspot"
+# + sidebarPath - Absolute path to sidebars.ts
+# + name - Connector display name, e.g. "HubSpot"
+# + module - Module slug, e.g. "hubspot"
 # + categorySlug - Category slug, e.g. "crm-sales"
-# + hasSetup     - Whether a setup-guide.md was generated
-# + hasTriggers  - Whether a trigger-reference.md was generated
-# + return       - nil on success, or an error
+# + hasSetup - Whether a setup-guide.md was generated
+# + hasAction - Whether an action-reference.md exists
+# + hasTriggers - Whether a trigger-reference.md was generated
+# + return - nil on success, or an error
 public function injectConnector(
-    string sidebarPath,
-    string name,
-    string module,
-    string categorySlug,
-    boolean hasSetup,
-    boolean hasTriggers
+        string sidebarPath,
+        string name,
+        string module,
+        string categorySlug,
+        boolean hasSetup,
+        boolean hasAction,
+        boolean hasTriggers
 ) returns error? {
     string|io:Error fileResult = io:fileReadString(sidebarPath);
     if fileResult is io:Error {
@@ -40,21 +42,35 @@ public function injectConnector(
     }
     string text = <string>fileResult;
 
-    // Guard: already present
-    if text.includes(string `/${module}/overview`) {
-        return error(string `Connector '${module}' already exists in sidebar`);
+    string basePath = string `connectors/catalog/${categorySlug}/${module}`;
+    string overviewId = basePath + "/overview";
+
+    // Existing connectors are reconciled in place. Preserve an existing Example entry
+    // while deriving the remaining entries from files that actually exist.
+    int? existingOverviewPos = text.indexOf(overviewId);
+    if existingOverviewPos is int {
+        int? existingItemsPos = text.indexOf("items: [", existingOverviewPos);
+        if existingItemsPos is () {
+            return error(string `Could not find items array for existing connector '${module}'`);
+        }
+        int existingItemsStart = existingItemsPos + "items: [".length();
+        int existingItemsEnd = findClosingBracket(text, existingItemsStart);
+        if existingItemsEnd < 0 {
+            return error(string `Could not find closing items bracket for existing connector '${module}'`);
+        }
+        string existingItems = text.substring(existingItemsStart, existingItemsEnd);
+        boolean hasExample = existingItems.includes(basePath + "/example");
+        string reconciledItems = "\n" + buildItems(basePath, hasSetup, hasAction, hasTriggers, hasExample) + "          ";
+        string reconciledText = text.substring(0, existingItemsStart) + reconciledItems +
+            text.substring(existingItemsEnd);
+        io:Error? reconcileErr = io:fileWriteString(sidebarPath, reconciledText);
+        if reconcileErr is io:Error {
+            return error("Failed to reconcile sidebar: " + reconcileErr.message());
+        }
+        return;
     }
 
-    // Build the connector sidebar block
-    string basePath = string `connectors/catalog/${categorySlug}/${module}`;
-    string items = "";
-    if hasSetup {
-        items += string `            '${basePath}/setup-guide',` + "\n";
-    }
-    items += string `            '${basePath}/action-reference',` + "\n";
-    if hasTriggers {
-        items += string `            '${basePath}/trigger-reference',` + "\n";
-    }
+    string items = buildItems(basePath, hasSetup, hasAction, hasTriggers, false);
 
     string connectorBlock = string `        {
           type: 'category',
@@ -107,6 +123,29 @@ ${items}          ],
     }
 }
 
+function buildItems(
+        string basePath,
+        boolean hasSetup,
+        boolean hasAction,
+        boolean hasTriggers,
+        boolean hasExample
+) returns string {
+    string items = "";
+    if hasSetup {
+        items += string `            '${basePath}/setup-guide',` + "\n";
+    }
+    if hasAction {
+        items += string `            '${basePath}/action-reference',` + "\n";
+    }
+    if hasTriggers {
+        items += string `            '${basePath}/trigger-reference',` + "\n";
+    }
+    if hasExample {
+        items += string `            '${basePath}/example',` + "\n";
+    }
+    return items;
+}
+
 // Find the position of the closing "]" by counting bracket depth.
 // Returns -1 if not found.
 function findClosingBracket(string text, int startPos) returns int {
@@ -130,11 +169,11 @@ function findClosingBracket(string text, int startPos) returns int {
 // Find the alphabetical insertion position within the items text.
 // Returns closingBracketPos to append at end if no later entry is found.
 function findAlphabeticalInsertPos(
-    string itemsText,
-    int itemsStart,
-    int closingBracketPos,
-    string newName,
-    string fullText
+        string itemsText,
+        int itemsStart,
+        int closingBracketPos,
+        string newName,
+        string fullText
 ) returns int {
     string nameLower = newName.toLowerAscii();
 

@@ -203,11 +203,12 @@ automated yet, so review and publish trigger artifacts manually.
 
 ## Run In GitHub Actions
 
-Use the `Connector Documentation Automation` workflow from the Actions tab.
-The workflow file is:
+Example generation is coordinated by the combined `Generate Connector Documentation`
+workflow. The former example-only workflow has been removed so branch integration and
+pull-request creation have a single owner. The combined workflow file is:
 
 ```text
-.github/workflows/connector-example-doc-generation.yml
+.github/workflows/generate-connector-docs.yml
 ```
 
 Required repository/environment secrets:
@@ -215,47 +216,28 @@ Required repository/environment secrets:
 | Secret | Required for | Description |
 |--------|--------------|-------------|
 | `LLM_API_KEY` | generation | Anthropic API key used by Ballerina and Claude Code |
-| `DOCS_INTEGRATOR_TOKEN` | connector publishing only | Token with permission to push to the docs-integrator fork and create PRs |
+| `ANTHROPIC_API_KEY` | connector documents | Anthropic API key used by the connector-doc generator |
+| `BALLERINA_BOT_TOKEN` | integration and PR | Token used to create the docs-integrator branch and PR |
 
 Workflow inputs:
 
 | Input | Value |
 |-------|-------|
 | `mode` | `connector` or `trigger` |
-| `name` | connector name like `mysql`, or trigger name like `trigger.twilio` |
-| `instructions` | optional extra guidance |
-| `publishConnector` | set to `true` only for connector runs that should publish docs |
-| `docsIntegratorFork` | required when `publishConnector` is `true` |
-| `docsIntegratorUpstream` | defaults to `wso2/docs-integrator` |
-| `docsIntegratorBaseBranch` | defaults to `main` |
+| `github_repo` | repository name under `ballerina-platform` |
+| `category` | docs-integrator connector category |
+| `generate_overview_setup` | publish the complete connector Phase 1 output |
+| `generate_reference` | publish the connector action reference |
+| `generate_examples` | run this example generator |
+| `example_instructions` | optional extra guidance for example generation |
 
-Examples:
+The `mode` input applies only to this example generator. Selecting Overview & Setup Guide
+or Reference runs the connector-doc job regardless of example mode. When connector documents
+and Examples are selected, the two generators run in parallel and their output is integrated
+into one docs-integrator branch and PR.
 
-```text
-mode: connector
-name: mysql
-instructions:
-publishConnector: false
-```
-
-```text
-mode: trigger
-name: trigger.twilio
-instructions: Use the onReceived handler.
-publishConnector: false
-```
-
-```text
-mode: connector
-name: zoom.meetings
-instructions: Use BearerTokenConfig for authentication.
-publishConnector: true
-docsIntegratorFork: your-org/docs-integrator
-```
-
-After the workflow completes, open the workflow run summary and download the
-artifact named `example-doc-generator-<mode>-<name>`. It contains the generated
-Markdown guide, screenshots, run logs, and a README describing the output.
+After the workflow completes, the generated guide, screenshots, sample, and run logs remain
+available from the workflow artifacts in addition to the integrated docs PR.
 
 GitHub Actions intentionally does not support batch mode. Run batch queues
 locally with `bal run -- batch config=batch_items.json`.

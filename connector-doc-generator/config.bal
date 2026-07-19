@@ -27,6 +27,9 @@ configurable string connectorVersion = "";
 configurable string docsRepoRoot = "..";
 configurable boolean dryRun = false;
 configurable boolean force = false;
+// Dispatcher stage controls. Defaults preserve the existing standalone behavior.
+configurable boolean generateOverviewSetup = true;
+configurable boolean generateReference = true;
 
 // Derived paths
 final string docsRoot = docsRepoRoot + "/en/docs/connectors";

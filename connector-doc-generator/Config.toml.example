@@ -19,3 +19,5 @@ category = "crm-sales"
 # docsRepoRoot = "/path/to/docs-integrator"
 # dryRun = false      # Build prompt only — skip Claude call and file writes
 # force = false       # Overwrite existing doc files
+# generateOverviewSetup = true  # Publish the complete Phase 1 output bundle
+# generateReference = true      # Generate and publish action-reference.md
