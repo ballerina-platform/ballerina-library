@@ -69,7 +69,7 @@ concurrency:
 
 jobs:
   prepare:
-    name: Validate request and create docs branch
+    name: Validate request and credentials, then create docs branch
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     outputs:
@@ -94,6 +94,48 @@ jobs:
             echo "At least one documentation stage must be selected."
             exit 1
           fi
+
+      - name: Validate Anthropic API key
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "ANTHROPIC_API_KEY is required. Configure it as a repository or organization secret."
+            exit 1
+          fi
+
+          response_file=$(mktemp)
+          curl_config=$(mktemp)
+          trap 'rm -f "$response_file" "$curl_config"' EXIT
+          chmod 600 "$curl_config"
+          printf 'header = "x-api-key: %s"\nheader = "anthropic-version: 2023-06-01"\n' \
+            "$ANTHROPIC_API_KEY" > "$curl_config"
+
+          if ! status=$(curl \
+            --silent \
+            --show-error \
+            --retry 3 \
+            --retry-delay 2 \
+            --retry-all-errors \
+            --config "$curl_config" \
+            --output "$response_file" \
+            --write-out '%{http_code}' \
+            'https://api.anthropic.com/v1/models?limit=1'); then
+            echo "Unable to reach the Anthropic API while validating ANTHROPIC_API_KEY."
+            exit 1
+          fi
+
+          if [[ ! "$status" =~ ^2[0-9][0-9]$ ]]; then
+            message=$(jq -r '.error.message // .message // empty' "$response_file" 2>/dev/null || true)
+            if [ -n "$message" ]; then
+              echo "Anthropic API key validation failed (HTTP $status): $message"
+            else
+              echo "Anthropic API key validation failed (HTTP $status)."
+            fi
+            exit 1
+          fi
+
+          echo "ANTHROPIC_API_KEY is valid."
 
       - name: Check out generator
         uses: actions/checkout@v4
