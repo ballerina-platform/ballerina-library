@@ -97,7 +97,7 @@ Each skill is just markdown instructions plus deterministic scripts — nothing 
 
 ### Generic (any agent)
 
-1. Clone the repo (see [Install](#install)) so the agent can read `agent-skills/skills/<skill-name>/`.
+1. Clone the repo (see [Install](#installation)) so the agent can read `agent-skills/skills/<skill-name>/`.
 2. Tell the agent: "Read `/path/to/ballerina-library/agent-skills/skills/generating-ballerina-connectors/SKILL.md` and follow it to generate a Ballerina connector from `<spec-path>`."
 3. The agent should read `stages/*.md` in order, running each referenced script through its own shell/execute tool, substituting `<skill-root>` with the actual path to the skill directory.
 
