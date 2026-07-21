@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Trigger-accuracy eval for the generating-ballerina-connectors skill.
+# Trigger-accuracy eval for the generating-connectors skill.
 #
 # Runs each query in a queries file (evals/*.json) against Claude Code with
 # the skill installed, and checks whether the "Skill" tool was invoked with
@@ -22,7 +22,7 @@ set -euo pipefail
 
 QUERIES_FILE="${1:?Usage: $0 <queries.json> [runs]}"
 RUNS="${2:-3}"
-SKILL_NAME="generating-ballerina-connectors"
+SKILL_NAME="generating-connectors"
 THRESHOLD="0.5"
 
 if [[ ! "$RUNS" =~ ^[1-9][0-9]*$ ]]; then

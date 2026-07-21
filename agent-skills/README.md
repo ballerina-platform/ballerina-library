@@ -1,12 +1,12 @@
 # Ballerina Library Agent Skills
 
-Skills that automate Ballerina library workflows. They are distributed as the `ballerina-library` Claude Code plugin and as standard Agent Skills for other supported coding agents.
+Skills that automate Ballerina library workflows. They are distributed as the `ballerina-libdev` Claude Code plugin and as standard Agent Skills for other supported coding agents.
 
 ## Available skills
 
 | Skill | Description |
 |---|---|
-| [`generating-ballerina-connectors`](skills/generating-ballerina-connectors) | Generates a complete Ballerina connector from an OpenAPI specification — a five-stage pipeline (sanitize → client → tests → examples → docs) producing a production-ready connector package. |
+| [`generating-connectors`](skills/generating-connectors) | Generates a complete Ballerina connector from an OpenAPI specification — a five-stage pipeline (sanitize → client → tests → examples → docs) producing a production-ready connector package. |
 
 ## Prerequisites
 
@@ -32,7 +32,7 @@ Register the Ballerina Skills marketplace, then install the Ballerina library pl
 
 ```bash
 /plugin marketplace add ballerina-platform/skills
-/plugin install ballerina-library@ballerina-skills
+/plugin install ballerina-libdev@ballerina-skills
 ```
 
 Claude Code discovers all skills and other plugin artifacts under `agent-skills/` automatically. Marketplace auto-update is a per-user setting and is disabled by default for third-party marketplaces. Enable it through `/plugin`, or update manually with:
@@ -58,8 +58,8 @@ Clone the repository and symlink an individual skill when marketplace installati
 ```bash
 git clone https://github.com/ballerina-platform/ballerina-library
 mkdir -p ~/.claude/skills
-ln -s /path/to/ballerina-library/agent-skills/skills/generating-ballerina-connectors \
-  ~/.claude/skills/generating-ballerina-connectors
+ln -s /path/to/ballerina-library/agent-skills/skills/generating-connectors \
+  ~/.claude/skills/generating-connectors
 ```
 
 Update this fallback installation by pulling the cloned repository:
@@ -76,7 +76,7 @@ Repeat the symlink step for any additional directory under `agent-skills/skills/
 Start a Claude Code session in the directory where you want the connector generated (or where one already exists), then invoke the skill directly:
 
 ```
-/ballerina-library:generating-ballerina-connectors
+/ballerina-libdev:generating-connectors
 ```
 
 Or describe your goal in natural language:
@@ -98,7 +98,7 @@ Each skill is just markdown instructions plus deterministic scripts — nothing 
 ### Generic (any agent)
 
 1. Clone the repo (see [Install](#installation)) so the agent can read `agent-skills/skills/<skill-name>/`.
-2. Tell the agent: "Read `/path/to/ballerina-library/agent-skills/skills/generating-ballerina-connectors/SKILL.md` and follow it to generate a Ballerina connector from `<spec-path>`."
+2. Tell the agent: "Read `/path/to/ballerina-library/agent-skills/skills/generating-connectors/SKILL.md` and follow it to generate a Ballerina connector from `<spec-path>`."
 3. The agent should read `stages/*.md` in order, running each referenced script through its own shell/execute tool, substituting `<skill-root>` with the actual path to the skill directory.
 
 ### OpenAI Codex CLI
@@ -108,7 +108,7 @@ Codex CLI reads an `AGENTS.md` file (repo root or nearest ancestor) for standing
 ```markdown
 ## Ballerina connector generation
 When asked to generate a Ballerina connector from an OpenAPI spec, read and follow
-/path/to/ballerina-library/agent-skills/skills/generating-ballerina-connectors/SKILL.md.
+/path/to/ballerina-library/agent-skills/skills/generating-connectors/SKILL.md.
 ```
 
 You can also just paste the `SKILL.md` path directly into a Codex prompt instead of editing `AGENTS.md`.

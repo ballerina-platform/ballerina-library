@@ -6,7 +6,7 @@ Tests whether the skill's `description` in `SKILL.md` causes Claude Code to invo
 
 - `trigger_queries.json` — full set of 20 labeled queries (10 `should_trigger: true`, 10 `should_trigger: false`), grounded in real details from this skill (HubSpot Files API, `ballerinax` org convention, `docs/spec/openapi.json` layout, the five-stage pipeline) and near-miss negatives (Java/Python/Go client generation, spec validation only, build-fix requests) that share keywords but need something else.
 - `train_queries.json` / `validation_queries.json` — 60/40 split of the same set (12/8), balanced positives and negatives, for iterating on the description without overfitting to it.
-- `run_trigger_eval.sh` — runs a queries file against `claude -p` and checks whether the `Skill` tool was invoked with `generating-ballerina-connectors`.
+- `run_trigger_eval.sh` — runs a queries file against `claude -p` and checks whether the `Skill` tool was invoked with `generating-connectors`.
 
 ## Quick start
 
@@ -21,7 +21,7 @@ bc --version          # if missing: brew install bc (usually preinstalled)
 **2. Confirm the skill is installed** — the eval invokes Claude Code as a fresh process, so it only sees skills actually registered on this machine (not just files in this repo):
 
 ```bash
-ls ~/.claude/skills/generating-ballerina-connectors/SKILL.md
+ls ~/.claude/skills/generating-connectors/SKILL.md
 ```
 
 If that fails, symlink it first — see the install steps in `agent-skills/README.md` (repo root → `agent-skills/`).
@@ -29,7 +29,7 @@ If that fails, symlink it first — see the install steps in `agent-skills/READM
 **3. `cd` into this directory** — the script is run in place, and reads the queries file by relative path:
 
 ```bash
-cd agent-skills/skills/generating-ballerina-connectors/evals
+cd agent-skills/skills/generating-connectors/evals
 ```
 
 **4. Run it** against one of the query files:
