@@ -28,18 +28,45 @@ python3 --version
 
 ### Claude Code
 
-Register the Ballerina Skills marketplace, then install the Ballerina library plugin:
+Register the Ballerina Skills marketplace:
 
 ```bash
 /plugin marketplace add ballerina-platform/skills
+```
+
+#### Choose an installation scope
+
+Install for yourself across all projects (the default **User scope**):
+
+```bash
 /plugin install ballerina-libdev@ballerina-skills
 ```
 
-Claude Code discovers all skills and other plugin artifacts under `agent-skills/` automatically. Marketplace auto-update is a per-user setting and is disabled by default for third-party marketplaces. Enable it through `/plugin`, or update manually with:
+To install at a different scope, run `/plugin`, open **Discover**, select `ballerina-libdev`, and choose one of the following options:
+
+- **User scope:** Install for yourself across all projects.
+- **Project scope:** Install for repository collaborators through `.claude/settings.json`.
+- **Local scope:** Install for yourself in the current repository only; this is not shared with collaborators.
+
+#### Activate the plugin
+
+Claude Code discovers the skills and other plugin artifacts under `agent-skills/`. Run the following command after installing, enabling, disabling, or updating a plugin during a session to apply the change without restarting Claude Code:
 
 ```bash
-/plugin marketplace update
+/reload-plugins
 ```
+
+#### Marketplace and plugin updates
+
+To manually refresh the Ballerina Skills marketplace and retrieve its latest plugin listings and version changes, run:
+
+```bash
+/plugin marketplace update ballerina-skills
+```
+
+To enable automatic marketplace and installed-plugin updates, run `/plugin`, open **Marketplaces**, select `ballerina-skills`, and choose **Enable auto-update**. Auto-update is disabled by default for third-party marketplaces. Claude Code checks after startup and, when an installed plugin is updated, prompts you to run `/reload-plugins` before using the new version in the current session.
+
+For more details, see Anthropic's [plugin discovery and installation guide](https://code.claude.com/docs/en/discover-plugins).
 
 ### Other agents (Open Agent Skills CLI)
 
