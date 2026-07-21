@@ -58,13 +58,16 @@ Claude Code discovers the skills and other plugin artifacts under `agent-skills/
 
 #### Marketplace and plugin updates
 
-To manually refresh the Ballerina Skills marketplace and retrieve its latest plugin listings and version changes, run:
+To manually update the plugin, first refresh the Ballerina Skills marketplace, then fetch the latest plugin version:
 
 ```bash
 /plugin marketplace update ballerina-skills
+/plugin update ballerina-libdev@ballerina-skills
 ```
 
-To enable automatic marketplace and installed-plugin updates, run `/plugin`, open **Marketplaces**, select `ballerina-skills`, and choose **Enable auto-update**. Auto-update is disabled by default for third-party marketplaces. Claude Code checks after startup and, when an installed plugin is updated, prompts you to run `/reload-plugins` before using the new version in the current session.
+If you run these commands during an active session, run `/reload-plugins` afterwards to use the updated plugin without restarting Claude Code.
+
+Auto-update is a client-side, per-user setting and is disabled by default for third-party marketplaces. To enable it, run `/plugin`, open **Marketplaces**, select `ballerina-skills`, and choose **Enable auto-update**. An organization can instead set `"autoUpdate": true` for the marketplace in managed `settings.json`. Claude Code checks for updates after startup and prompts you to run `/reload-plugins` when an installed plugin is updated.
 
 For more details, see Anthropic's [plugin discovery and installation guide](https://code.claude.com/docs/en/discover-plugins).
 
