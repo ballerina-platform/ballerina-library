@@ -48,14 +48,6 @@ To install at a different scope, run `/plugin`, open **Discover**, select `balle
 - **Project scope:** Install for repository collaborators through `.claude/settings.json`.
 - **Local scope:** Install for yourself in the current repository only; this is not shared with collaborators.
 
-#### Activate the plugin
-
-Claude Code discovers the skills and other plugin artifacts under `agent-skills/`. Run the following command after installing, enabling, disabling, or updating a plugin during a session to apply the change without restarting Claude Code:
-
-```bash
-/reload-plugins
-```
-
 #### Marketplace and plugin updates
 
 To manually update the plugin, first refresh the Ballerina Skills marketplace, then fetch the latest plugin version:
@@ -65,7 +57,11 @@ To manually update the plugin, first refresh the Ballerina Skills marketplace, t
 /plugin update ballerina-libdev@ballerina-skills
 ```
 
-If you run these commands during an active session, run `/reload-plugins` afterwards to use the updated plugin without restarting Claude Code.
+If you update the plugin during an active session, reload it to use the new version without restarting Claude Code:
+
+```bash
+/reload-plugins
+```
 
 Auto-update is a client-side, per-user setting and is disabled by default for third-party marketplaces. To enable it, run `/plugin`, open **Marketplaces**, select `ballerina-skills`, and choose **Enable auto-update**. An organization can instead set `"autoUpdate": true` for the marketplace in managed `settings.json`. Claude Code checks for updates after startup and prompts you to run `/reload-plugins` when an installed plugin is updated.
 
