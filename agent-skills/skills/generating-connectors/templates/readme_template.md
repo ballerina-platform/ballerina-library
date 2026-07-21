@@ -22,16 +22,16 @@ The `{{MODULE_NAME_PC}}` connector provides practical examples illustrating usag
 
 [//]: # (TODO: Add examples)
 
-## Build from the source
+## Build from source
 
-### Setting up the prerequisites
+### Setting up prerequisites
 
-1. Download and install Java SE Development Kit (JDK) version 21. You can download it from either of the following sources:
+1. Download and install Java SE Development Kit (JDK) version 21 from either of the following sources:
 
     * [Oracle JDK](https://www.oracle.com/java/technologies/downloads/)
     * [OpenJDK](https://adoptium.net/)
 
-   > **Note:** After installation, remember to set the `JAVA_HOME` environment variable to the directory where JDK was installed.
+   > **Note:** After installation, remember to set the `JAVA_HOME` environment variable to the directory where the JDK is installed.
 
 2. Download and install [Ballerina Swan Lake](https://ballerina.io/).
 
@@ -39,16 +39,16 @@ The `{{MODULE_NAME_PC}}` connector provides practical examples illustrating usag
 
    > **Note**: Ensure that the Docker daemon is running before executing any tests.
 
-4. Export Github Personal access token with read package permissions as follows,
+4. Export a GitHub Personal Access Token with read package permissions as follows:
 
     ```bash
     export packageUser=<Username>
-    export packagePAT=<Personal access token>
+    export packagePAT=<Personal Access Token>
     ```
 
 ### Build options
 
-Execute the commands below to build from the source.
+Run the following commands to build from source.
 
 1. To build the package:
 

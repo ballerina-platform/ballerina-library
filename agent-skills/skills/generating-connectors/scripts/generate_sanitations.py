@@ -430,7 +430,7 @@ def build_fresh(template: str, module_name: str, cli_command: str,
     sections_text = "\n\n".join(sections) if sections else "_No structural sanitations were detected._"
     content = re.sub(
         r"\[//\]: # \(TODO: Add sanitation details\)\n(?:\d+\.[ \t]*\n)+",
-        sections_text + "\n",
+        lambda _match: sections_text + "\n",
         content,
     )
 

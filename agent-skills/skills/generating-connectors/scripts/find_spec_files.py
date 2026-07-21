@@ -8,6 +8,7 @@ Usage: find_spec_files.py
 """
 
 import os
+from itertools import chain
 
 SPEC_EXTS = (".yaml", ".yml", ".json")
 NAMED_CANDIDATES = {"openapi.yaml", "openapi.yml", "openapi.json"}
@@ -53,7 +54,7 @@ def main() -> None:
     seen = set()
     results = []
 
-    for candidate in (*find_named(cwd), *find_docs_spec(cwd), *find_any(cwd)):
+    for candidate in chain(find_named(cwd), find_docs_spec(cwd), find_any(cwd)):
         if candidate not in seen:
             seen.add(candidate)
             results.append(candidate)

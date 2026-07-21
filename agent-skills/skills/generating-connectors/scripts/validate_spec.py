@@ -17,6 +17,10 @@ def validate(spec_path: str) -> None:
     if ext in (".yaml", ".yml"):
         try:
             import yaml
+        except ImportError:
+            print("ERROR: PyYAML is required to validate YAML specs. Install it with: pip install PyYAML", file=sys.stderr)
+            sys.exit(1)
+        try:
             spec = yaml.safe_load(raw)
         except Exception as e:
             print(f"ERROR: Invalid YAML — {e}", file=sys.stderr)
@@ -31,6 +35,10 @@ def validate(spec_path: str) -> None:
         # Try YAML first, then JSON
         try:
             import yaml
+        except ImportError:
+            print("ERROR: PyYAML is required to validate YAML specs. Install it with: pip install PyYAML", file=sys.stderr)
+            sys.exit(1)
+        try:
             spec = yaml.safe_load(raw)
         except Exception:
             try:
