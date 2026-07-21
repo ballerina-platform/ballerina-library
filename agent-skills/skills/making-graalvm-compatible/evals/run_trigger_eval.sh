@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Trigger-accuracy eval for the making-ballerina-library-graalvm-compatible skill.
+# Trigger-accuracy eval for the making-graalvm-compatible skill.
 #
 # Runs each query in a queries file (evals/*.json) against Claude Code with
 # the skill installed, and checks whether the "Skill" tool was invoked with
@@ -22,7 +22,7 @@ set -euo pipefail
 
 QUERIES_FILE="${1:?Usage: $0 <queries.json> [runs]}"
 RUNS="${2:-3}"
-SKILL_NAME="making-ballerina-library-graalvm-compatible"
+SKILL_NAME="making-graalvm-compatible"
 THRESHOLD="0.5"
 
 if [[ ! "$RUNS" =~ ^[1-9][0-9]*$ ]]; then

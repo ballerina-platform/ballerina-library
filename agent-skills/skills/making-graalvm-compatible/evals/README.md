@@ -6,7 +6,7 @@ Tests whether the skill's `description` in `SKILL.md` causes Claude Code to invo
 
 - `trigger_queries.json` — full set of 20 labeled queries (10 `should_trigger: true`, 10 `should_trigger: false`), grounded in real details from this skill (`bal build --graalvm` / `bal test --graalvm`, the "Package is not verified with GraalVM" warning, `BTestMain` tracing, META-INF packing, `graalvmCompatible = true`, the reachability-metadata repo). Near-miss negatives share keywords but need something else: generating a Ballerina connector (the *other* skill), making a **Java** app a native image, plain `bal build`, installing GraalVM, or explaining AOT/closed-world concepts.
 - `train_queries.json` / `validation_queries.json` — 60/40 split of the same set (12/8), balanced positives and negatives, for iterating on the description without overfitting to it.
-- `run_trigger_eval.sh` — runs a queries file against `claude -p` and checks whether the `Skill` tool was invoked with `making-ballerina-library-graalvm-compatible`.
+- `run_trigger_eval.sh` — runs a queries file against `claude -p` and checks whether the `Skill` tool was invoked with `making-graalvm-compatible`.
 
 ## Quick start
 
@@ -21,7 +21,7 @@ bc --version          # if missing: brew install bc (usually preinstalled)
 **2. Confirm the skill is installed** — the eval invokes Claude Code as a fresh process, so it only sees skills actually registered on this machine (not just files in this repo):
 
 ```bash
-ls ~/.claude/skills/making-ballerina-library-graalvm-compatible/SKILL.md
+ls ~/.claude/skills/making-graalvm-compatible/SKILL.md
 ```
 
 If that fails, symlink it first — see the install steps in `agent-skills/README.md` (repo root → `agent-skills/`).
@@ -29,7 +29,7 @@ If that fails, symlink it first — see the install steps in `agent-skills/READM
 **3. `cd` into this directory** — the script is run in place, and reads the queries file by relative path:
 
 ```bash
-cd agent-skills/skills/making-ballerina-library-graalvm-compatible/evals
+cd agent-skills/skills/making-graalvm-compatible/evals
 ```
 
 **4. Run it** against one of the query files:

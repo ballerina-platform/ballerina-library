@@ -1,5 +1,5 @@
 ---
-name: making-ballerina-library-graalvm-compatible
+name: making-graalvm-compatible
 description: Makes a Ballerina library GraalVM-compatible by running the native build/test workflow, sourcing reachability metadata, and marking the package compatible. Use when the user wants to make a Ballerina library or package GraalVM compatible; build or test a Ballerina package with `bal build --graalvm` / `bal test --graalvm`; fix GraalVM native-image class-initialization or reflection/JNI/resource errors in a Ballerina project; run the GraalVM tracing agent for Ballerina tests or a service; pack native-image reachability metadata into META-INF for a Ballerina module; resolve the "Package is not verified with GraalVM" warning; or set graalvmCompatible = true in Ballerina.toml.
 ---
 
