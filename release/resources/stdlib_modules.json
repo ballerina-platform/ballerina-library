@@ -1753,7 +1753,7 @@
         },
         {
             "name": "module-ballerinax-mysql.cdc.driver",
-            "module_version": "1.0.3-SNAPSHOT",
+            "module_version": "1.1.0-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibMysql.cdc.driverVersion",
@@ -1797,7 +1797,7 @@
         },
         {
             "name": "module-ballerinax-postgresql.driver",
-            "module_version": "1.6.4-SNAPSHOT",
+            "module_version": "1.7.0-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlDriverVersion",
