@@ -29,7 +29,11 @@ DEFAULT_ARGS = os.path.join("target", "cache", "tests_cache", "native-config",
 
 
 def extract_classpath(text: str) -> str:
-    # Match `-cp <value>` (value has no spaces); tolerate `-cp` and `--class-path`.
+    # Prefer a quoted value (may contain spaces); tolerate `-cp`, `--class-path`,
+    # `-classpath`. Fall back to an unquoted, whitespace-delimited value.
+    m = re.search(r'(?:-cp|--class-path|-classpath)\s+"([^"]*)"', text)
+    if m:
+        return m.group(1)
     m = re.search(r"(?:-cp|--class-path|-classpath)\s+(\S+)", text)
     return m.group(1) if m else ""
 

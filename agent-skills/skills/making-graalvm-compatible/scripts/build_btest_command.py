@@ -17,11 +17,15 @@ Usage:
                          --classpath-file <class-path.txt>
                          [--target target]
 
-Output (stdout): the ready-to-run command string (uses $GRAALVM_HOME).
+Output (stdout): the ready-to-run command string. GRAALVM_HOME is resolved from
+the current environment into a literal path (rather than emitting `$GRAALVM_HOME`
+shell syntax), so the printed command runs the same under bash/zsh and under
+Windows shells (cmd.exe, PowerShell) that don't expand `$VAR`.
 Also prints the resolved update/branch to stderr for transparency.
 """
 
 import argparse
+import os
 import re
 import sys
 
@@ -74,11 +78,13 @@ def build_command(update: int, config_dir: str, classpath_file: str, target: str
         trailing = ARGS_LT_10
     trailing = [a.replace("{target}", target) for a in trailing]
 
+    graalvm_home = os.environ.get("GRAALVM_HOME", "$GRAALVM_HOME")
+    java_bin = os.path.join(graalvm_home, "bin", "java.exe" if os.name == "nt" else "java")
     parts = [
-        '"$GRAALVM_HOME/bin/java"',
-        f"-agentlib:native-image-agent=config-output-dir={config_dir}",
+        f'"{java_bin}"',
+        f'-agentlib:native-image-agent=config-output-dir="{config_dir}"',
         "-cp",
-        f"@{classpath_file}",
+        f'"@{classpath_file}"',
         f'"{MAIN_CLASS}"',
         *trailing,
     ]

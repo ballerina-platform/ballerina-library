@@ -26,7 +26,7 @@ For GraalVM versions prior to JDK 23, use the build-time options `-H:ThrowMissin
 
 Build-time errors are frequently class-initialization problems. See `class-init-fix-procedure.md` for the full loop. The relevant flags (passed via `--graalvm-build-options`):
 
-```
+```text
 --initialize-at-run-time=com.example.LazyClass     # must NOT initialize at build time
 --initialize-at-build-time=com.example.EagerClass  # must initialize at build time
 --link-at-build-time                               # type must be fully defined at build time
@@ -52,7 +52,7 @@ $ bal build --graalvm --graalvm-build-options="-J-Xmx8g"
 
 Pass through `--graalvm-build-options`:
 
-```
+```text
 -g                                          # debug symbols in the binary
 --verbose                                   # verbose build output
 --diagnostics-mode                          # inspect class initialization and substitutions

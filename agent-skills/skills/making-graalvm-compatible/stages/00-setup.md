@@ -8,7 +8,7 @@ Verify the environment, locate the library package, derive GraalVM requirements 
 
 Determine which Python 3 command works — try each in order via Bash (plain commands, cross-platform):
 
-```
+```bash
 python3 --version
 python --version
 py --version
@@ -103,7 +103,7 @@ Store as `INTERACTIVE_MODE` (default false).
 
 Print:
 
-```
+```text
 === Configuration Summary ===
 Package:        <BAL_ORG>/<BAL_PACKAGE>
 Ballerina dir:  <BALLERINA_DIR>

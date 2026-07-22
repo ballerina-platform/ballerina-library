@@ -12,14 +12,14 @@ This is a reference of the raw flags most useful inside `--graalvm-build-options
 
 ## Build-Time Inputs
 
-```
+```text
 -Dkey=value        # set a system property at build time
 -J<flag>           # pass a flag to the JVM running the builder (e.g. -J-Xmx8g)
 ```
 
 ## Class Initialization and Linking
 
-```
+```text
 --initialize-at-run-time=<class>     # defer initialization to run time
 --initialize-at-build-time=<class>   # force initialization at build time
 --link-at-build-time                 # type must be fully defined at build time
@@ -27,7 +27,7 @@ This is a reference of the raw flags most useful inside `--graalvm-build-options
 
 ## Performance and Optimization
 
-```
+```text
 -Ob                    # fastest build (dev iteration)
 -O3                    # best runtime performance
 -Os                    # optimize for binary size
@@ -39,20 +39,20 @@ This is a reference of the raw flags most useful inside `--graalvm-build-options
 
 ## Network Support
 
-```
+```text
 --enable-http --enable-https
 --enable-url-protocols=http,https
 ```
 
 ## Monitoring and Observability
 
-```
+```text
 --enable-monitoring=heapdump,jfr,threaddump
 ```
 
 ## Security and Compliance
 
-```
+```text
 --enable-all-security-services          # all security services incl. TLS/SSL
 -H:AdditionalSecurityProviders=<list>   # pre-initialize specific providers
 -H:+AddAllCharsets                      # add all charsets (larger binary)
@@ -62,7 +62,7 @@ This is a reference of the raw flags most useful inside `--graalvm-build-options
 
 ## Metadata / Diagnostics
 
-```
+```text
 --exact-reachability-metadata[=<pkg>]        # strict metadata mode
 -H:ConfigurationFileDirectories=<config-dir> # consume tracing-agent config (see tracing-agent.md)
 -g                                           # debug symbols

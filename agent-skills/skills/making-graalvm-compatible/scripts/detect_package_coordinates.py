@@ -92,16 +92,16 @@ def _parse_with_regex(text: str) -> dict:
                          text, re.MULTILINE | re.DOTALL):
         pk, section = m.group(1), m.group(2)
 
-        def field(key: str) -> str:
+        def field(key: str, section: str) -> str:
             fm = re.search(rf'^{key}\s*=\s*"?([^"\n]*)"?', section, re.MULTILINE)
             return fm.group(1).strip().strip('"') if fm else ""
 
         java_dependencies.append({
             "platform": pk,
-            "groupId": field("groupId"),
-            "artifactId": field("artifactId"),
-            "version": field("version"),
-            "path": field("path"),
+            "groupId": field("groupId", section),
+            "artifactId": field("artifactId", section),
+            "version": field("version", section),
+            "path": field("path", section),
         })
 
     return {

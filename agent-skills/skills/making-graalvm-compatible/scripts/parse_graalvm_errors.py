@@ -100,11 +100,8 @@ def classify(text: str) -> dict:
         if not matched and ERROR_LINE_RE.search(stripped) and not NOT_VERIFIED_RE.search(stripped):
             other.append(stripped[:300])
 
-    # Dedup + cap `other` so it stays readable.
-    deduped_other = []
-    for o in other:
-        if o not in deduped_other:
-            deduped_other.append(o)
+    # Dedup (preserving order) + cap `other` so it stays readable.
+    deduped_other = list(dict.fromkeys(other))
 
     return {
         "not_verified_warning": not_verified,

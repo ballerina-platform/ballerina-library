@@ -2,7 +2,7 @@
 
 The tracing agent runs the application (or tests) on a regular JVM and records all uses of dynamic features (reflection, JNI, resources, proxies, serialization) into config files. Use it to discover metadata the reachability-metadata repo does not already provide (`reachability-metadata-repo.md`).
 
-**Always use the `java` bundled with the GraalVM distribution** (`$GRAALVM_HOME/bin/java`).
+**Always use the `java` bundled with the GraalVM distribution** (`$GRAALVM_HOME/bin/java`). The command-building scripts below resolve `GRAALVM_HOME` from the environment into a literal path, so the commands they print run the same under bash/zsh and Windows shells (cmd.exe, PowerShell).
 
 There are two paths. The JAR path is straightforward; the tests path is version-sensitive.
 
@@ -20,7 +20,7 @@ Use when `HAS_MAIN` or `HAS_SERVICE` is true and runtime errors remain after the
 
 ### 2. Run under the tracing agent
 
-Generate the exact command (uses `$GRAALVM_HOME`):
+Generate the exact command (resolves GraalVM home from the environment):
 
 ```bash
 <PYTHON_CMD> <skill-root>/scripts/build_jar_trace_command.py \
