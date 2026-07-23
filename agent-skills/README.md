@@ -4,18 +4,19 @@ Claude Code skills that automate Ballerina library workflows. Each skill lives i
 
 ## Available skills
 
-| Skill | Description |
-|---|---|
-| [`generating-ballerina-connectors`](skills/generating-ballerina-connectors) | Generates a complete Ballerina connector from an OpenAPI specification — a five-stage pipeline (sanitize → client → tests → examples → docs) producing a production-ready connector package. |
+| Skill                                                                                                | Description                                                                                                                                                                                                                                                                          |
+| ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`generating-ballerina-connectors`](skills/generating-ballerina-connectors)                         | Generates a complete Ballerina connector from an OpenAPI specification — a five-stage pipeline (sanitize → client → tests → examples → docs) producing a production-ready connector package.                                                                                    |
+| [`making-graalvm-compatible`](skills/making-graalvm-compatible) | Takes a Ballerina library to a verified, warning-free `bal build --graalvm` / `bal test --graalvm` — build/test baseline, class-init fixes, reachability metadata (repo-sourced first, then the tracing agent), META-INF packing, and marking the package `graalvmCompatible`. |
 
 ## Prerequisites
 
-| Requirement | Install |
-|---|---|
-| [Claude Code](https://claude.ai/code) | Download from claude.ai/code |
-| Ballerina CLI (`bal`) | `brew install ballerina` or from [ballerina.io](https://ballerina.io/downloads/) — the `openapi` tool ships bundled with the distribution |
-| Python 3.8+ | `brew install python` or system Python |
-| Git | Pre-installed on most systems |
+| Requirement                          | Install                                                                                                                                       |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Claude Code](https://claude.ai/code) | Download from claude.ai/code                                                                                                                  |
+| Ballerina CLI (`bal`)              | `brew install ballerina` or from [ballerina.io](https://ballerina.io/downloads/) — the `openapi` tool ships bundled with the distribution |
+| Python 3.8+                          | `brew install python` or system Python                                                                                                      |
+| Git                                  | Pre-installed on most systems                                                                                                                 |
 
 Verify after install:
 
