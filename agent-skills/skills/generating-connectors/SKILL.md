@@ -1,5 +1,5 @@
 ---
-name: generating-ballerina-connectors
+name: generating-connectors
 description: Generates a complete Ballerina connector from an OpenAPI specification. Use when the user wants to create, generate, or build a Ballerina connector from an OpenAPI or Swagger spec; run the connector creation pipeline; generate a Ballerina client from an API spec; or produce connector tests, examples, and documentation.
 ---
 

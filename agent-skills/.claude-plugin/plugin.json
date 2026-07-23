@@ -1,0 +1,12 @@
+{
+  "name": "ballerina-libdev",
+  "displayName": "Ballerina Library Development",
+  "description": "Agent skills for developing and maintaining Ballerina library modules.",
+  "version": "0.1.0",
+  "author": {
+    "name": "WSO2",
+    "url": "https://wso2.com"
+  },
+  "repository": "https://github.com/ballerina-platform/ballerina-library",
+  "license": "Apache-2.0"
+}

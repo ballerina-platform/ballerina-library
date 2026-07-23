@@ -13,6 +13,10 @@ import sys
 
 
 def run_bal(args: list, cwd: str) -> subprocess.CompletedProcess:
+    """Run a trusted `bal` command; callers must not pass untrusted arguments.
+
+    Windows uses ``shell=True`` because ``bal`` is a ``.bat``/``.cmd`` shim.
+    """
     if os.name == "nt":
         # list2cmdline applies Windows quoting rules (paths with spaces etc.);
         # shell=True is needed because bal is a .bat/.cmd shim on Windows

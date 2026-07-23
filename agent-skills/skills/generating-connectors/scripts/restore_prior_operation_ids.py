@@ -50,7 +50,7 @@ def build_prior_operation_id_map(spec: dict) -> dict[str, dict[str, str]]:
 
 def collect_all_operation_ids(spec: dict) -> list[str]:
     ids: list[str] = []
-    for path, path_item in (spec.get("paths") or {}).items():
+    for _path, path_item in (spec.get("paths") or {}).items():
         if not isinstance(path_item, dict):
             continue
         for method in HTTP_METHODS:

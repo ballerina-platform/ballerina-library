@@ -41,9 +41,13 @@ def write_keywords(toml_path: str, keywords: list) -> None:
             new_lines.append(keywords_line if _is_key(line, "keywords") else line)
     else:
         inserted = False
+        in_package = False
         for line in lines:
+            stripped = line.strip()
+            if stripped.startswith("["):
+                in_package = stripped == "[package]"
             new_lines.append(line)
-            if not inserted and _is_key(line, "version"):
+            if not inserted and in_package and _is_key(line, "version"):
                 new_lines.append(keywords_line)
                 inserted = True
         if not inserted:

@@ -98,7 +98,7 @@ Stages run:   sanitize ✓  client ✓  tests ✓  examples ✓  docs ✓
 Stages skipped: (none)
 
 Generated files:
-  docs/spec/aligned_ballerina_openapi.yaml
+  docs/spec/aligned_ballerina_openapi.json
   docs/spec/sanitations.md
   client.bal
   types.bal
