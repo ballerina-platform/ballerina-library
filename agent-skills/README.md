@@ -1,4 +1,4 @@
-# Ballerina Library Agent Skills
+# Ballerina Library Development Skills
 
 Skills that automate Ballerina library workflows. They are distributed as the `ballerina-libdev` Claude Code plugin and as standard Agent Skills for other supported coding agents.
 

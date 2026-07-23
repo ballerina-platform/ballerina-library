@@ -1,6 +1,6 @@
 {
   "name": "ballerina-libdev",
-  "displayName": "Ballerina Library Skills",
+  "displayName": "Ballerina Library Development",
   "description": "Agent skills for developing and maintaining Ballerina library modules.",
   "version": "0.1.0",
   "author": {
