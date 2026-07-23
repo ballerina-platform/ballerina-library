@@ -6,6 +6,9 @@ on:
       hana-connector-group:
         required: true
         type: string
+    secrets:
+      CODECOV_TOKEN:
+        required: false
 
 jobs:
   build-examples:
