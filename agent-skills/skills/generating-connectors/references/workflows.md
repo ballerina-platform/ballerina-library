@@ -18,7 +18,7 @@ Stages run in this fixed order. Each stage may be skipped if the user excluded i
 ```
 
 Skip validation rules (mirror the connector-tool's `OpenApiStageValidationUtils`):
-- If `sanitize` is skipped: `<SPEC_DIR>/aligned_ballerina_openapi.yaml` must exist — fail with a clear message if not.
+- If `sanitize` is skipped: `<SPEC_DIR>/aligned_ballerina_openapi.json` must exist — fail with a clear message if not.
 - If `client` is skipped: `<BALLERINA_DIR>/client.bal` must exist — fail with a clear message if not.
 - If all stages are skipped: reject immediately.
 

@@ -101,6 +101,11 @@ class VersionAndExampleTests(unittest.TestCase):
         (example / "Ballerina.toml").write_text("", encoding="utf-8")
         return example
 
+    def create_quarantine(self, root: Path, name: str) -> Path:
+        quarantine = root / f".generated-examples-quarantine-{name}"
+        quarantine.mkdir()
+        return quarantine
+
     def test_baseline_ignores_comment_only_client_and_normalizes_line_endings(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             directory = Path(temp)
@@ -153,6 +158,68 @@ class VersionAndExampleTests(unittest.TestCase):
                 self.assertTrue((example / "main.bal").is_file())
                 self.assertTrue((example / "Ballerina.toml").is_file())
             self.assertTrue((preserved / "README.md").is_file())
+
+    def test_example_scan_recovers_stale_quarantine(self) -> None:
+        module = load_script_module("manage_examples.py")
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            quarantine = self.create_quarantine(root, "interrupted")
+            self.create_example(quarantine, "recovered")
+            output = io.StringIO()
+
+            with contextlib.redirect_stdout(output):
+                module.scan(root)
+
+            result = json.loads(output.getvalue())
+            self.assertEqual(result, {"examples": ["recovered"], "count": 1})
+            self.assertTrue((root / "recovered" / "main.bal").is_file())
+            self.assertFalse(quarantine.exists())
+
+    def test_example_cleanup_reports_stale_quarantine_conflicts_without_deleting(self) -> None:
+        module = load_script_module("manage_examples.py")
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            visible = self.create_example(root, "duplicate")
+            quarantine = self.create_quarantine(root, "interrupted")
+            self.create_example(quarantine, "duplicate")
+            output = io.StringIO()
+
+            with patch.object(module.shutil, "rmtree") as delete_quarantine:
+                with contextlib.redirect_stdout(output), self.assertRaises(SystemExit) as exit_info:
+                    module.cleanup(root)
+
+            result = json.loads(output.getvalue())
+            self.assertEqual(exit_info.exception.code, 1)
+            self.assertEqual(result["removed"], [])
+            self.assertTrue(result["failures"])
+            self.assertFalse(result["complete"])
+            self.assertTrue((visible / "main.bal").is_file())
+            self.assertTrue((quarantine / "duplicate" / "main.bal").is_file())
+            delete_quarantine.assert_not_called()
+
+    def test_example_cleanup_marks_failed_rollback_as_removed(self) -> None:
+        module = load_script_module("manage_examples.py")
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            self.create_example(root, "first")
+            original_rename = Path.rename
+            output = io.StringIO()
+
+            def fail_rollback(path: Path, target: Path) -> Path:
+                if path.parent.name.startswith(module.QUARANTINE_PREFIX) and path.name == "first":
+                    raise OSError("simulated restore failure")
+                return original_rename(path, target)
+
+            with patch.object(module.shutil, "rmtree", side_effect=OSError("simulated deletion failure")):
+                with patch.object(Path, "rename", new=fail_rollback):
+                    with contextlib.redirect_stdout(output), self.assertRaises(SystemExit) as exit_info:
+                        module.cleanup(root)
+
+            result = json.loads(output.getvalue())
+            self.assertEqual(exit_info.exception.code, 1)
+            self.assertEqual(result["removed"], ["first"])
+            self.assertTrue(any("restore failed" in failure for failure in result["failures"]))
+            self.assertFalse((root / "first").exists())
 
     def test_bal_runner_uses_argv_without_a_shell(self) -> None:
         module = load_script_module("run_bal_command.py")
