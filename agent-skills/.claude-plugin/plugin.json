@@ -2,7 +2,7 @@
   "name": "ballerina-libdev",
   "displayName": "Ballerina Library Skills",
   "description": "Agent skills for developing and maintaining Ballerina library modules.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "WSO2",
     "url": "https://wso2.com"
