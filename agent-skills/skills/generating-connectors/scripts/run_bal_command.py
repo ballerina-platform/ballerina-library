@@ -2,13 +2,12 @@
 """
 Wrapper for Ballerina CLI commands.
 
-Usage: run_bal_command.py "<full command>" [<working-dir>]
+Usage: run_bal_command.py [--cwd <working-dir>] <command> [<argument>...]
 Prints stdout/stderr to terminal and exits with the command's exit code.
 On failure, also writes captured stderr to a temp file and prints its path.
 """
 
 import os
-import shlex
 import subprocess
 import sys
 import tempfile
@@ -17,21 +16,27 @@ DEFAULT_TIMEOUT_SECONDS = 1800
 
 
 def main() -> None:
-    if len(sys.argv) < 2:
-        print('Usage: run_bal_command.py "<command>" [<working-dir>]', file=sys.stderr)
+    arguments = sys.argv[1:]
+    workdir = os.getcwd()
+    if arguments[:1] == ["--cwd"]:
+        if len(arguments) < 3:
+            print("Usage: run_bal_command.py [--cwd <working-dir>] <command> [<argument>...]", file=sys.stderr)
+            sys.exit(2)
+        workdir = arguments[1]
+        arguments = arguments[2:]
+
+    if not arguments:
+        print("Usage: run_bal_command.py [--cwd <working-dir>] <command> [<argument>...]", file=sys.stderr)
         sys.exit(2)
 
-    command = sys.argv[1]
-    workdir = sys.argv[2] if len(sys.argv) > 2 else os.getcwd()
+    command = arguments
 
     os.makedirs(workdir, exist_ok=True)
 
-    print(f">>> Running: {command}")
+    print(f">>> Running: {subprocess.list2cmdline(command)}")
     print(f">>> Working dir: {workdir}")
     print("")
     sys.stdout.flush()
-
-    args = shlex.split(command, posix=(os.name != "nt"))
 
     try:
         timeout_seconds = int(os.environ.get("CONNECTOR_BAL_TIMEOUT_SECONDS", DEFAULT_TIMEOUT_SECONDS))
@@ -41,16 +46,17 @@ def main() -> None:
         print("ERROR: CONNECTOR_BAL_TIMEOUT_SECONDS must be a positive integer.", file=sys.stderr)
         sys.exit(2)
     try:
-        if os.name == "nt":
-            result = subprocess.run(command, shell=True, cwd=workdir, capture_output=True, text=True,
-                                    timeout=timeout_seconds)
-        else:
-            result = subprocess.run(args, shell=False, cwd=workdir, capture_output=True, text=True,
-                                    timeout=timeout_seconds)
+        result = subprocess.run(command, shell=False, cwd=workdir, capture_output=True, text=True,
+                                timeout=timeout_seconds)
     except subprocess.TimeoutExpired as exc:
-        stdout = exc.stdout or ""
-        stderr = (exc.stderr or "") + f"\nCommand timed out after {timeout_seconds} seconds."
-        result = subprocess.CompletedProcess(args, 124, stdout, stderr)
+        def text_output(value):
+            if isinstance(value, bytes):
+                return value.decode("utf-8", errors="replace")
+            return value or ""
+
+        stdout = text_output(exc.stdout)
+        stderr = text_output(exc.stderr) + f"\nCommand timed out after {timeout_seconds} seconds."
+        result = subprocess.CompletedProcess(command, 124, stdout, stderr)
 
     if result.stdout:
         print(result.stdout, end="")

@@ -43,8 +43,8 @@ Store as `TOML_META`. Use `TOML_META.distribution` and `TOML_META.version` when 
 Before generating any examples, publish the connector so that each example's `import <BAL_ORG>/<BAL_PACKAGE>` can resolve at build time:
 
 ```bash
-<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal pack" "<BALLERINA_DIR>"
-<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal push --repository=local" "<BALLERINA_DIR>"
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py --cwd "<BALLERINA_DIR>" bal pack
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py --cwd "<BALLERINA_DIR>" bal push --repository=local
 ```
 
 `bal pack` creates the `.bala` archive in `target/`; `bal push --repository=local` publishes it to `~/.ballerina/repositories/local/bala/` so examples can resolve the import at build time.
@@ -136,7 +136,7 @@ The `[[dependency]]` block with `repository = "local"` lets the example resolve 
 ### 3f: Compile and fix
 
 ```bash
-<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal build" "<EXAMPLE_DIR>/<EXAMPLE_NAME>"
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py --cwd "<EXAMPLE_DIR>/<EXAMPLE_NAME>" bal build
 ```
 
 - Exit 0 → clean

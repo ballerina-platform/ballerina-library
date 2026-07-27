@@ -47,7 +47,7 @@ Use the Edit tool to apply each fix at the specific file and line.
 #### 2c. Re-run build
 
 ```bash
-<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal build" "<BUILD_DIR>"
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py --cwd "<BUILD_DIR>" bal build
 ```
 
 - Exit 0 → build clean, exit loop, report success

@@ -160,7 +160,7 @@ All scripts are in `<skill-root>/scripts/` and are pure Python (`.py`) — no sh
 <PYTHON_CMD> scripts/generate_mock_stub.py "<aligned-spec>" "<output-dir>" "<SELECTED_OPERATIONS>" "<LICENSE_PATH>"
 
 # Run any bal command in a working directory — prints stderr to a temp file and its path on failure
-<PYTHON_CMD> scripts/run_bal_command.py "<command>" "<working-dir>"
+<PYTHON_CMD> scripts/run_bal_command.py --cwd "<working-dir>" <command> [<argument>...]
 
 # Parse compilation errors from bal build stderr → JSON error array
 <PYTHON_CMD> scripts/parse_errors.py "<stderr-file-or-stdin>"

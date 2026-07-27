@@ -59,8 +59,8 @@ This extracts just the `path -> {method: operationId}` map (not a full spec copy
 
 ```bash
 <PYTHON_CMD> <skill-root>/scripts/run_bal_command.py \
-  "bal openapi flatten -i <SPEC_PATH> -o <SPEC_DIR>" \
-  "<BALLERINA_DIR>"
+  --cwd "<BALLERINA_DIR>" \
+  bal openapi flatten -i "<SPEC_PATH>" -o "<SPEC_DIR>"
 ```
 
 Output: `<SPEC_DIR>/flattened_openapi.yaml` (or similar — capture the actual filename from stdout).
@@ -75,8 +75,8 @@ Use the flattened file path captured from Step 1's stdout as input to align. Do 
 
 ```bash
 <PYTHON_CMD> <skill-root>/scripts/run_bal_command.py \
-  "bal openapi align -i <flattened-path> -o <SPEC_DIR>" \
-  "<BALLERINA_DIR>"
+  --cwd "<BALLERINA_DIR>" \
+  bal openapi align -i "<flattened-path>" -o "<SPEC_DIR>"
 ```
 
 If this fails, print the error and ask the user to resolve it before continuing.
@@ -185,9 +185,9 @@ First prepare the current run and apply reusable decisions:
   "<ALIGNED_SPEC>" "<SPEC_DIR>/ai-mappings.json" "<SPEC_DIR>/.schema_mappings_candidate.json"
 ```
 
-Read the returned `unseen_schemas` JSON only. On the first run this contains every schema. On later runs it contains only newly introduced schemas; prior decisions have already been applied, including every local `#/components/schemas/...` reference.
+Parse the returned JSON and store `UNSEEN_SCHEMAS` from `unseen_schemas`, `REUSED_SCHEMA_COUNT` from `reused_count`, and `PRUNED_SCHEMA_COUNT` from `pruned_count`. On the first run `UNSEEN_SCHEMAS` contains every schema. On later runs it contains only newly introduced schemas; prior decisions have already been applied, including every local `#/components/schemas/...` reference. Only `UNSEEN_SCHEMAS` is input to schema decisions.
 
-For every unseen schema, ask AI for one concise, unique public schema name based on its structured metadata. Require a JSON object mapping every source name to its target name. Preserve an already good name as an identity mapping. Never include prose or code fences.
+For every schema in `UNSEEN_SCHEMAS`, ask AI for one concise, unique public schema name based on its structured metadata. Require a JSON object mapping every source name to its target name. Preserve an already good name as an identity mapping. Never include prose or code fences.
 
 Validate the response by writing it to `<SPEC_DIR>/.schema_name_decisions.json` and apply it:
 
@@ -197,7 +197,7 @@ Validate the response by writing it to `<SPEC_DIR>/.schema_name_decisions.json` 
   "<SPEC_DIR>/.schema_name_decisions.json" "<SPEC_DIR>/ai-mappings.json"
 ```
 
-If validation rejects malformed, incomplete, or colliding names, retry the AI response up to the normal bounded retry limit. For any remaining schema, use an identity mapping (`"OriginalName": "OriginalName"`) and re-run `apply`; print a warning. The script atomically persists the spec and mappings, prunes mappings for removed schemas, and preserves unknown top-level mapping data. Delete the two transient dot-files after a successful apply.
+Parse the successful `apply` result and store `SCHEMA_DECISION_COUNT` from `applied_count` and `IDENTITY_SCHEMA_COUNT` from `identity_count`. If validation rejects malformed, incomplete, or colliding names, retry the AI response up to the normal bounded retry limit. For any remaining schema, use an identity mapping (`"OriginalName": "OriginalName"`) and re-run `apply`; print a warning. The script atomically persists the spec and mappings, prunes mappings for removed schemas, and preserves unknown top-level mapping data. Delete the two transient dot-files after a successful apply.
 
 ---
 
@@ -232,7 +232,7 @@ Print:
 ✓ Sanitize complete
   Aligned spec: <SPEC_DIR>/aligned_ballerina_openapi.json
   Sanitations:  <SPEC_DIR>/sanitations.md (structural spec changes: <SANITATION_COUNTS>)
-  AI enhancements applied: <M> descriptions enhanced, <S> summaries improved, <N> operationIds improved (<R> restored), <K> schema decisions (<U> reused, <I> identity fallbacks, <P> pruned)
+  AI enhancements applied: <M> descriptions enhanced, <S> summaries improved, <N> operationIds improved (<R> restored), <SCHEMA_DECISION_COUNT> schema decisions (<REUSED_SCHEMA_COUNT> reused, <IDENTITY_SCHEMA_COUNT> identity fallbacks, <PRUNED_SCHEMA_COUNT> pruned)
 ```
 
 The AI enhancements line reports the Step 3 work applied to the spec — those are intentionally not part of `sanitations.md`, which holds only the structural diff.

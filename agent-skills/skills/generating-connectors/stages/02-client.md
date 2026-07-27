@@ -51,11 +51,11 @@ Append options based on collected configuration:
 
 ```bash
 <PYTHON_CMD> <skill-root>/scripts/run_bal_command.py \
-  "bal openapi -i '<ALIGNED_SPEC>' -o '<BALLERINA_DIR>' --license '<LICENSE_PATH>' [--tags <tags>] [--operations <ops>] [--client-methods remote] --mode client" \
-  "<BALLERINA_DIR>"
+  --cwd "<BALLERINA_DIR>" \
+  bal openapi -i "<ALIGNED_SPEC>" -o "<BALLERINA_DIR>" --mode client
 ```
 
-Omit `--license <LICENSE_PATH>` if `LICENSE_PATH` is not set. Omit any other optional flag that does not apply.
+Append each applicable option as separate arguments: `--license "<LICENSE_PATH>"`, one `--tags "<tag>"` pair per tag, one `--operations "<id>"` pair per operation ID, and `--client-methods remote` when `USE_REMOTE` is true. Omit every optional flag/value pair that does not apply.
 
 ### On success:
 Verify that `<BALLERINA_DIR>/client.bal`, `<BALLERINA_DIR>/types.bal`, and `<BALLERINA_DIR>/utils.bal` were created. Print the file list.
@@ -72,7 +72,7 @@ Verify that `<BALLERINA_DIR>/client.bal`, `<BALLERINA_DIR>/types.bal`, and `<BAL
 Run `bal build` in `<BALLERINA_DIR>`:
 
 ```bash
-<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal build" "<BALLERINA_DIR>"
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py --cwd "<BALLERINA_DIR>" bal build
 ```
 
 - Exit 0 → build clean, continue to completion

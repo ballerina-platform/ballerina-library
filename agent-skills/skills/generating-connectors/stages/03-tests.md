@@ -158,7 +158,7 @@ final string token = isLiveServer ? os:getEnv("<CRED_ENV_VAR>") : "test_token";
 ## Step 4: Compile and fix
 
 ```bash
-<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal build" "<BALLERINA_DIR>"
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py --cwd "<BALLERINA_DIR>" bal build
 ```
 
 - Exit 0 → clean, continue
@@ -169,17 +169,18 @@ final string token = isLiveServer ? os:getEnv("<CRED_ENV_VAR>") : "test_token";
 ## Step 5: Run and repair generated tests
 
 ```bash
-<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal test" "<BALLERINA_DIR>"
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py --cwd "<BALLERINA_DIR>" bal test
 ```
 
-If `bal test` succeeds, record the passing result. On failure, repair only generated test files under `tests/` using this bounded loop:
+If `bal test` succeeds, record the passing result. On failure, use the runner's saved stderr path with `parse_errors.py` to obtain structured diagnostics. Repair only eligible generated test files under `tests/` using this bounded loop:
 
-1. Combine stdout and stderr; select `tests/mock_service.bal` and/or `tests/test.bal` only when their path or basename appears in diagnostics. If neither is named, try `tests/test.bal` first, then the generated mock service.
-2. Give AI the failing file's current contents, relevant type context, stdout, stderr, and the attempt number. Require raw replacement source and prohibit changes outside `tests/test.bal` and `tests/mock_service.bal`.
-3. Apply only a non-empty, changed response, then rerun `bal test`.
-4. Stop when tests pass, diagnostics are unchanged from the prior attempt, AI produces no applicable edit, no generated test files exist, or the normal fix iteration limit is reached.
+1. Keep only parseable `ERROR` diagnostics for `.bal` files whose normalized path resolves to `<BALLERINA_DIR>/tests/test.bal` or `<BALLERINA_DIR>/tests/mock_service.bal`. Ignore runtime failures, pathless diagnostics, diagnostics for other files, and warnings.
+2. If no eligible diagnostics or generated target files exist, stop without an AI repair attempt and record that test repair was skipped because no eligible compilation diagnostics were found.
+3. Give AI only each eligible file's current contents, relevant type context, structured diagnostics, and the attempt number. Require raw replacement source and prohibit changes outside `tests/test.bal` and `tests/mock_service.bal`.
+4. Apply only a non-empty, changed response, then rerun `bal test` and parse its new stderr diagnostics.
+5. Stop when tests pass, eligible diagnostics are unchanged from the prior attempt, AI produces no applicable edit, no eligible diagnostics remain, or the normal fix iteration limit is reached.
 
-Remaining test failures are non-fatal: print the final diagnostics and record the number of repair attempts. Do not invoke the general client fix procedure for a runtime test failure.
+Remaining test failures are non-fatal: print the final diagnostics and record the actual number of compilation-repair attempts (or that none were attempted because no eligible diagnostics existed). Do not invoke the general client fix procedure.
 
 ---
 
@@ -192,6 +193,7 @@ Print:
   test suite:  <BALLERINA_DIR>/tests/test.bal
   build:       passed (fixed in <N> iteration(s) / clean)
   test run:    <N passing, M failing / skipped>
+  test repair: <N compilation-repair attempt(s) / skipped: no eligible diagnostics>
 ```
 
 If `INTERACTIVE_MODE` is true, pause and ask: "Proceed to Examples? [Y/n/q]"

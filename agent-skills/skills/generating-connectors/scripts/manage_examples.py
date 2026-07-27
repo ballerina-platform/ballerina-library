@@ -11,6 +11,7 @@ import json
 import shutil
 import sys
 from pathlib import Path
+from uuid import uuid4
 
 
 def examples(root: Path) -> list[Path]:
@@ -27,12 +28,55 @@ def scan(root: Path) -> None:
 
 def cleanup(root: Path) -> None:
     removed, failures = [], []
-    for item in examples(root):
+    found = examples(root)
+    if not found:
+        print(json.dumps({"removed": removed, "failures": failures, "complete": True}))
+        raise SystemExit(0)
+
+    quarantine = root / f".generated-examples-quarantine-{uuid4().hex}"
+    moved: list[tuple[Path, Path]] = []
+
+    def restore() -> None:
+        for original, quarantined in reversed(moved):
+            if not quarantined.exists():
+                if not original.exists():
+                    removed.append(original.name)
+                    failures.append(f"{quarantined}: cannot restore; package was deleted")
+                continue
+            try:
+                quarantined.rename(original)
+            except OSError as exc:
+                failures.append(f"{quarantined}: restore failed: {exc}")
         try:
-            shutil.rmtree(item)
-            removed.append(item.name)
+            quarantine.rmdir()
         except OSError as exc:
-            failures.append(f"{item}: {exc}")
+            if quarantine.exists():
+                failures.append(f"{quarantine}: cleanup failed: {exc}")
+
+    try:
+        quarantine.mkdir()
+    except OSError as exc:
+        failures.append(f"{quarantine}: {exc}")
+    else:
+        for item in found:
+            try:
+                quarantined = quarantine / item.name
+                item.rename(quarantined)
+                moved.append((item, quarantined))
+            except OSError as exc:
+                failures.append(f"{item}: {exc}")
+                restore()
+                break
+
+        if not failures:
+            try:
+                shutil.rmtree(quarantine)
+            except OSError as exc:
+                failures.append(f"{quarantine}: {exc}")
+                restore()
+            else:
+                removed = [item.name for item in found]
+
     print(json.dumps({"removed": removed, "failures": failures, "complete": not failures}))
     raise SystemExit(0 if not failures else 1)
 

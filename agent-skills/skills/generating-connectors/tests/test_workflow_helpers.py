@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+import contextlib
+import importlib.util
+import io
 import json
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -15,6 +19,14 @@ SCRIPTS = ROOT / "scripts"
 def run(script: str, *args: str, check: bool = True) -> subprocess.CompletedProcess:
     return subprocess.run([sys.executable, str(SCRIPTS / script), *args], text=True,
                           capture_output=True, check=check)
+
+
+def load_script_module(script: str):
+    spec = importlib.util.spec_from_file_location(script.removesuffix(".py"), SCRIPTS / script)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 class SchemaMappingTests(unittest.TestCase):
@@ -82,6 +94,13 @@ class SchemaMappingTests(unittest.TestCase):
 
 
 class VersionAndExampleTests(unittest.TestCase):
+    def create_example(self, root: Path, name: str) -> Path:
+        example = root / name
+        example.mkdir()
+        (example / "main.bal").write_text("", encoding="utf-8")
+        (example / "Ballerina.toml").write_text("", encoding="utf-8")
+        return example
+
     def test_baseline_ignores_comment_only_client_and_normalizes_line_endings(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             directory = Path(temp)
@@ -101,16 +120,71 @@ class VersionAndExampleTests(unittest.TestCase):
     def test_example_cleanup_only_removes_recognized_packages(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            generated = root / "generated"
-            generated.mkdir()
-            (generated / "main.bal").write_text("", encoding="utf-8")
-            (generated / "Ballerina.toml").write_text("", encoding="utf-8")
+            self.create_example(root, "generated")
             preserved = root / "notes"
             preserved.mkdir()
             (preserved / "README.md").write_text("keep", encoding="utf-8")
             result = json.loads(run("manage_examples.py", "cleanup", str(root)).stdout)
             self.assertEqual(result["removed"], ["generated"])
             self.assertTrue(preserved.is_dir())
+
+    def test_example_cleanup_restores_packages_when_quarantine_deletion_fails(self) -> None:
+        module = load_script_module("manage_examples.py")
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            first = self.create_example(root, "first")
+            second = self.create_example(root, "second")
+            preserved = root / "notes"
+            preserved.mkdir()
+            (preserved / "README.md").write_text("keep", encoding="utf-8")
+            output = io.StringIO()
+
+            with patch.object(module.shutil, "rmtree", side_effect=OSError("simulated deletion failure")):
+                with contextlib.redirect_stdout(output), self.assertRaises(SystemExit) as exit_info:
+                    module.cleanup(root)
+
+            result = json.loads(output.getvalue())
+            self.assertEqual(exit_info.exception.code, 1)
+            self.assertEqual(result["removed"], [])
+            self.assertTrue(result["failures"])
+            self.assertFalse(result["complete"])
+            for example in (first, second):
+                self.assertTrue((example / "main.bal").is_file())
+                self.assertTrue((example / "Ballerina.toml").is_file())
+            self.assertTrue((preserved / "README.md").is_file())
+
+    def test_bal_runner_uses_argv_without_a_shell(self) -> None:
+        module = load_script_module("run_bal_command.py")
+        with tempfile.TemporaryDirectory() as temp:
+            command = ["bal", "openapi", "-i", "spec with spaces.yaml"]
+            with patch.object(module.subprocess, "run", return_value=subprocess.CompletedProcess(command, 0, "", "")) as run_command:
+                with patch.object(sys, "argv", ["run_bal_command.py", "--cwd", temp, *command]):
+                    with self.assertRaises(SystemExit) as exit_info:
+                        module.main()
+
+            self.assertEqual(exit_info.exception.code, 0)
+            run_command.assert_called_once_with(
+                command, shell=False, cwd=temp, capture_output=True, text=True,
+                timeout=module.DEFAULT_TIMEOUT_SECONDS,
+            )
+
+    def test_bal_runner_decodes_byte_timeout_output(self) -> None:
+        module = load_script_module("run_bal_command.py")
+        with tempfile.TemporaryDirectory() as temp:
+            command = ["bal", "build"]
+            timeout = subprocess.TimeoutExpired(command, 1, output=b"stdout\xff", stderr=b"stderr\xff")
+            stdout, stderr = io.StringIO(), io.StringIO()
+            with patch.object(module.subprocess, "run", side_effect=timeout):
+                with patch.object(sys, "argv", ["run_bal_command.py", "--cwd", temp, *command]):
+                    with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                        with self.assertRaises(SystemExit) as exit_info:
+                            module.main()
+
+            self.assertEqual(exit_info.exception.code, 124)
+            self.assertIn("stdout�", stdout.getvalue())
+            self.assertIn("stderr�", stderr.getvalue())
+            self.assertIn("Command timed out after", stderr.getvalue())
 
 
 if __name__ == "__main__":
