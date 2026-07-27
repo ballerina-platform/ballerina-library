@@ -4,7 +4,7 @@ The `<BAL_ORG>/<BAL_PACKAGE>` connector provides practical examples illustrating
 
 | Example | Description |
 |---------|-------------|
-| [`<example-name>`](./<example-name>) | <USE_CASE one-liner> |
+| [`<example-name>`](./<example-name>/<example-name>.md) | <USE_CASE one-liner> |
 
 ## Prerequisites
 

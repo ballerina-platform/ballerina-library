@@ -6,6 +6,20 @@ Skip this stage if `examples` is in `EXCLUDED_STAGES`.
 
 ---
 
+## Step 0: Safely replace or retain examples
+
+If this stage is running, clean only recognized generated use-case packages before creating replacements:
+
+```bash
+<PYTHON_CMD> <skill-root>/scripts/manage_examples.py cleanup "<EXAMPLE_DIR>"
+```
+
+The script recognizes only immediate child directories containing both `main.bal` and `Ballerina.toml`; it does not remove hand-authored files or directories. If cleanup reports any failure, **skip example generation entirely** and report the failures to avoid a mixed old/new set.
+
+If `examples` is in `EXCLUDED_STAGES`, do not generate anything. Instead run `manage_examples.py scan "<EXAMPLE_DIR>"`, pack and push the current connector once, and run `bal build` plus the normal compilation fix procedure for each retained package. Report every retained package's result; unresolved packages are warnings, not a pipeline failure.
+
+---
+
 ## Step 1: Analyse the client and connector metadata
 
 Run both scripts upfront — this replaces all inline file reading for this stage:
@@ -132,21 +146,7 @@ Compilation errors in examples are **non-fatal if fix fails** — warn the user 
 
 ---
 
-## Step 4: Write `<EXAMPLE_DIR>/README.md`
-
-Read `<skill-root>/templates/examples_readme_template.md`.
-
-Fill in:
-- `<BAL_ORG>/<BAL_PACKAGE>` → from shared state
-- Example table rows — one row per example generated in Step 3 (`<example-name>` and USE_CASE one-liner)
-- `<BALLERINA_DIR>` → the connector output directory path
-- Auth field names (`<auth_field_1>`, `<auth_field_2>`) → from `SPEC_METADATA.securitySchemes`
-
-Write the filled content to `<EXAMPLE_DIR>/README.md`.
-
----
-
-## Stage completion
+## Step 4: Stage completion
 
 Print:
 ```

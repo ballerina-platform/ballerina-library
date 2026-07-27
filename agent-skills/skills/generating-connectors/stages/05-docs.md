@@ -51,7 +51,7 @@ Replace each `[//]: # (TODO: ...)` section with generated content:
 - **Overview**: 3–5 sentences describing what the API does and what this connector enables. Derived from `SPEC_METADATA.description` and title.
 - **Setup guide**: Numbered steps to obtain credentials and configure the connector. Derived from `SPEC_METADATA.securitySchemes` — list the required fields (API keys, OAuth tokens, etc.) and how to get them.
 - **Quickstart**: One short Ballerina code snippet showing a single representative API call. Use a simple GET or list operation from `CLIENT_ANALYSIS.methods`. Include the `Config.toml` snippet needed.
-- **Examples**: Bullet list of example names and one-line descriptions from `EXAMPLE_DIR` subdirectory names. Format: `[example-name](examples/example-name) — <one liner>`.
+- **Examples**: Bullet list of documented example names and one-line descriptions. Format: `[example-name](examples/example-name/example-name.md) — <one liner>`. Include only packages whose named document exists.
 
 Copy all other sections (Build from source, Build options, Contribute, Code of conduct, Useful links) verbatim from the template.
 
@@ -73,7 +73,7 @@ Write to `<BALLERINA_DIR>/Module.md`.
 
 ---
 
-## Step 4: Generate sub-READMEs
+## Step 4: Generate sub-documents
 
 ### Tests README
 
@@ -85,6 +85,12 @@ Fill in `AI_GENERATED_TESTING_APPROACH` with a short description of what the tes
 
 Write to `<BALLERINA_DIR>/tests/README.md`.
 
+### Individual example documents — generate first
+
+For every example package, generate the required file `<EXAMPLE_DIR>/<name>/<name>.md` before any aggregate documentation. Use `templates/example_readme_template.md`, with a human-readable title and a 2–3 sentence use-case description. Preserve the exact directory-name casing in the filename.
+
+If individual generation fails, warn and omit that example from aggregates; never create a broken link.
+
 ### Examples README
 
 Check if `<EXAMPLE_DIR>/README.md` already exists:
@@ -93,16 +99,12 @@ Check if `<EXAMPLE_DIR>/README.md` already exists:
 
 Fill in:
 - `<BAL_ORG>/<BAL_PACKAGE>` → from shared state
-- Example table rows — one row per subdirectory in `EXAMPLE_DIR`
+- Example table rows — one row per subdirectory whose `<name>.md` exists, with the direct relative link `./<name>/<name>.md`
 - Auth field names from `SPEC_METADATA.securitySchemes`
 
 Write to `<EXAMPLE_DIR>/README.md`.
 
-### Per-example READMEs (generate if time permits)
-
-For each example subdirectory that does not already have a `README.md`, read `<skill-root>/templates/example_readme_template.md` and fill in:
-- `<EXAMPLE_TITLE>` → human-readable name from the directory kebab slug
-- `AI_GENERATED_DESCRIPTION` → 2–3 sentences describing the use case
+Root/package README and Module.md example lists must likewise link directly to `examples/<name>/<name>.md` and include only documented examples. Do not alter a repository-root README outside `BALLERINA_DIR` that uses directory links.
 
 ---
 

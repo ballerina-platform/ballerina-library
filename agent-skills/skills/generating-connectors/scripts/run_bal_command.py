@@ -13,6 +13,8 @@ import subprocess
 import sys
 import tempfile
 
+DEFAULT_TIMEOUT_SECONDS = 1800
+
 
 def main() -> None:
     if len(sys.argv) < 2:
@@ -31,10 +33,24 @@ def main() -> None:
 
     args = shlex.split(command, posix=(os.name != "nt"))
 
-    if os.name == "nt":
-        result = subprocess.run(command, shell=True, cwd=workdir, capture_output=True, text=True)
-    else:
-        result = subprocess.run(args, shell=False, cwd=workdir, capture_output=True, text=True)
+    try:
+        timeout_seconds = int(os.environ.get("CONNECTOR_BAL_TIMEOUT_SECONDS", DEFAULT_TIMEOUT_SECONDS))
+        if timeout_seconds <= 0:
+            raise ValueError
+    except ValueError:
+        print("ERROR: CONNECTOR_BAL_TIMEOUT_SECONDS must be a positive integer.", file=sys.stderr)
+        sys.exit(2)
+    try:
+        if os.name == "nt":
+            result = subprocess.run(command, shell=True, cwd=workdir, capture_output=True, text=True,
+                                    timeout=timeout_seconds)
+        else:
+            result = subprocess.run(args, shell=False, cwd=workdir, capture_output=True, text=True,
+                                    timeout=timeout_seconds)
+    except subprocess.TimeoutExpired as exc:
+        stdout = exc.stdout or ""
+        stderr = (exc.stderr or "") + f"\nCommand timed out after {timeout_seconds} seconds."
+        result = subprocess.CompletedProcess(args, 124, stdout, stderr)
 
     if result.stdout:
         print(result.stdout, end="")

@@ -166,13 +166,20 @@ final string token = isLiveServer ? os:getEnv("<CRED_ENV_VAR>") : "test_token";
 
 ---
 
-## Step 5: Run tests
+## Step 5: Run and repair generated tests
 
 ```bash
 <PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal test" "<BALLERINA_DIR>"
 ```
 
-Test failures are **non-fatal** — record the result and continue. Print the test summary.
+If `bal test` succeeds, record the passing result. On failure, repair only generated test files under `tests/` using this bounded loop:
+
+1. Combine stdout and stderr; select `tests/mock_service.bal` and/or `tests/test.bal` only when their path or basename appears in diagnostics. If neither is named, try `tests/test.bal` first, then the generated mock service.
+2. Give AI the failing file's current contents, relevant type context, stdout, stderr, and the attempt number. Require raw replacement source and prohibit changes outside `tests/test.bal` and `tests/mock_service.bal`.
+3. Apply only a non-empty, changed response, then rerun `bal test`.
+4. Stop when tests pass, diagnostics are unchanged from the prior attempt, AI produces no applicable edit, no generated test files exist, or the normal fix iteration limit is reached.
+
+Remaining test failures are non-fatal: print the final diagnostics and record the number of repair attempts. Do not invoke the general client fix procedure for a runtime test failure.
 
 ---
 

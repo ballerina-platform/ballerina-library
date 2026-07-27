@@ -27,8 +27,27 @@ from __future__ import annotations
 import sys
 import json
 import os
+import tempfile
 
 HTTP_METHODS = ("get", "post", "put", "patch", "delete", "head", "options", "trace")
+
+
+def atomic_write_json(path: str, value: dict) -> None:
+    directory = os.path.dirname(os.path.abspath(path))
+    fd, temporary = tempfile.mkstemp(prefix=".connector-operation-ids-", suffix=".json", dir=directory)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(value, f, indent=2)
+            f.write("\n")
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(temporary, path)
+    except OSError:
+        try:
+            os.unlink(temporary)
+        except OSError:
+            pass
+        raise
 
 
 def build_prior_operation_id_map(spec: dict) -> dict[str, dict[str, str]]:
@@ -104,8 +123,7 @@ def cmd_apply(map_file_path: str, current_spec_path: str) -> dict:
                 reserved_ids.append(operation_id)
 
     if restored:
-        with open(current_spec_path, "w", encoding="utf-8") as f:
-            json.dump(current_spec, f, indent=2)
+        atomic_write_json(current_spec_path, current_spec)
 
     return {
         "prior_spec_found": prior_spec_found,

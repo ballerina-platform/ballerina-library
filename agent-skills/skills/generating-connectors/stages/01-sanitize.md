@@ -122,7 +122,17 @@ From `ALIGNED_SPEC_METADATA`, note:
 
 Using `ALIGNED_SPEC_METADATA` (not the raw spec), review and improve each category below. Each sub-step applies its own changes directly to `ALIGNED_SPEC` and writes the file back before moving to the next — operationId improvement, schema renaming, description enhancement, and summary improvement are each self-contained, matching how connector-tool treats them as separate read-modify-write passes rather than one deferred bulk write.
 
-### 3a. OperationId improvement (two-pass)
+When a category has enough items to require multiple AI requests, process deterministic batches. If every batch fails, stop sanitation without claiming success. If only some batches fail, preserve successful changes, print the failed batch identifiers, and continue with a partial-failure warning.
+
+### 3a. Short or missing descriptions
+
+For schema fields, parameters, and operations where `description` is fewer than 10 characters (or empty), generate a concise description from the structured aligned metadata and apply it directly to `ALIGNED_SPEC`.
+
+### 3b. Operation summary improvement
+
+For operations where `summary` is fewer than 10 characters (or empty), generate a concise summary from the path, method, and parameter names. Apply it directly to `ALIGNED_SPEC` before improving operationIds.
+
+### 3c. OperationId improvement (two-pass)
 
 **Pass A — restore from previous run.** This step is fully deterministic — do not reason through it manually, run the script:
 
@@ -164,14 +174,30 @@ The map file has now been fully consumed — delete it:
 
 Print any `WARNING: duplicate operationId ...` lines verbatim. Non-fatal — record the warning and continue (client generation will also surface any remaining conflicts).
 
-### 3b. Generic schema names
-If schema names like `Object`, `Response`, `InlineResponse200`, `Item`, `Body` appear, propose better names based on context (the operation that returns/consumes them). Apply renames consistently, then write `ALIGNED_SPEC` back before continuing.
+### 3d. Stable schema names
 
-### 3c. Short or missing descriptions
-For schema fields, parameters, and operations where `description` is fewer than 10 characters (or empty), generate a concise description from context (field/parameter name, or the operation's path, method, and parameters). Apply directly to `ALIGNED_SPEC` and write back.
+Schema-name decisions are persisted in `<SPEC_DIR>/ai-mappings.json`; it is a regeneration artifact and may contain unrelated top-level sections that must be preserved. Do not hand-edit the aligned JSON or mapping file.
 
-### 3d. Operation summary improvement
-For operations where `summary` is fewer than 10 characters (or empty), generate a concise summary from the path, method, and parameter names — this becomes the doc comment on the generated client's resource/remote function. Apply directly to `ALIGNED_SPEC` and write back.
+First prepare the current run and apply reusable decisions:
+
+```bash
+<PYTHON_CMD> <skill-root>/scripts/schema_mappings.py prepare \
+  "<ALIGNED_SPEC>" "<SPEC_DIR>/ai-mappings.json" "<SPEC_DIR>/.schema_mappings_candidate.json"
+```
+
+Read the returned `unseen_schemas` JSON only. On the first run this contains every schema. On later runs it contains only newly introduced schemas; prior decisions have already been applied, including every local `#/components/schemas/...` reference.
+
+For every unseen schema, ask AI for one concise, unique public schema name based on its structured metadata. Require a JSON object mapping every source name to its target name. Preserve an already good name as an identity mapping. Never include prose or code fences.
+
+Validate the response by writing it to `<SPEC_DIR>/.schema_name_decisions.json` and apply it:
+
+```bash
+<PYTHON_CMD> <skill-root>/scripts/schema_mappings.py apply \
+  "<ALIGNED_SPEC>" "<SPEC_DIR>/.schema_mappings_candidate.json" \
+  "<SPEC_DIR>/.schema_name_decisions.json" "<SPEC_DIR>/ai-mappings.json"
+```
+
+If validation rejects malformed, incomplete, or colliding names, retry the AI response up to the normal bounded retry limit. For any remaining schema, use an identity mapping (`"OriginalName": "OriginalName"`) and re-run `apply`; print a warning. The script atomically persists the spec and mappings, prunes mappings for removed schemas, and preserves unknown top-level mapping data. Delete the two transient dot-files after a successful apply.
 
 ---
 
@@ -206,7 +232,7 @@ Print:
 ✓ Sanitize complete
   Aligned spec: <SPEC_DIR>/aligned_ballerina_openapi.json
   Sanitations:  <SPEC_DIR>/sanitations.md (structural spec changes: <SANITATION_COUNTS>)
-  AI enhancements applied: <N> operationIds improved (<R> restored from previous run), <K> schemas renamed, <M> descriptions enhanced, <S> summaries improved
+  AI enhancements applied: <M> descriptions enhanced, <S> summaries improved, <N> operationIds improved (<R> restored), <K> schema decisions (<U> reused, <I> identity fallbacks, <P> pruned)
 ```
 
 The AI enhancements line reports the Step 3 work applied to the spec — those are intentionally not part of `sanitations.md`, which holds only the structural diff.

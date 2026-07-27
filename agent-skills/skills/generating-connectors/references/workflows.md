@@ -13,7 +13,7 @@ Stages run in this fixed order. Each stage may be skipped if the user excluded i
 1. sanitize   → skippable; requires aligned spec to exist if skipped
 2. client     → skippable; requires client.bal to exist if skipped; runs fix procedure inline on build failure
 3. tests      → skippable; runs fix procedure inline on build failure
-4. examples   → skippable; runs fix procedure inline per example on build failure (non-fatal if fix fails)
+4. examples   → safely cleans recognized generated packages before regeneration; when excluded, its retained-example validation path still runs; runs fix procedure inline per example (non-fatal if fix fails)
 5. docs       → skippable
 ```
 
@@ -73,7 +73,7 @@ When `--interactive` is enabled:
 → Invoke fix procedure with `BUILD_DIR = EXAMPLE_DIR/<example-name>`. If exhausted, warn and continue to the next example — non-fatal.
 
 ### `bal test` failure
-→ Non-fatal. Record and continue. Note failure in the final summary.
+→ Run the bounded test-only repair loop on `tests/test.bal` and `tests/mock_service.bal`. Stop on pass, unchanged diagnostics, no applicable edit, or the iteration limit. Record unresolved failures and continue.
 
 ---
 
@@ -99,6 +99,7 @@ Stages skipped: (none)
 
 Generated files:
   docs/spec/aligned_ballerina_openapi.json
+  docs/spec/ai-mappings.json
   docs/spec/sanitations.md
   client.bal
   types.bal
@@ -106,6 +107,7 @@ Generated files:
   tests/test.bal
   examples/<example-name>/main.bal
   examples/<example-name>/Ballerina.toml
+  examples/<example-name>/<example-name>.md
   examples/README.md
   README.md
   Module.md

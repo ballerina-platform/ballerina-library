@@ -190,7 +190,7 @@ Store as `SPEC_DIR`.
 
 ## Step 6: Example directory
 
-Skip this step entirely if `examples` is in `EXCLUDED_STAGES` — leave `EXAMPLE_DIR` unset.
+If `examples` is in `EXCLUDED_STAGES`, set `EXAMPLE_DIR = ./examples` without prompting. This is the connector-tool default and lets the excluded-stage path retain and validate existing generated examples. Otherwise ask:
 
 "2+1" prompt (connector-tool default is `./examples`):
 
