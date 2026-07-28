@@ -149,6 +149,11 @@ jobs:
           token: ${{ secrets.BALLERINA_BOT_TOKEN }}
           path: source
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Read connector metadata
         id: metadata
         env:
