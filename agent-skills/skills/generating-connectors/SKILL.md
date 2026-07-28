@@ -33,7 +33,7 @@ Scripts in `scripts/` handle all deterministic operations. Run them via Bash —
 | 1. Sanitize | `stages/01-sanitize.md` | Yes (`sanitize`) | `aligned_ballerina_openapi.yaml`, `sanitations.md` |
 | 2. Client | `stages/02-client.md` | Yes (`client`) | `client.bal`, `types.bal` — build + auto-fix inline |
 | 3. Tests | `stages/03-tests.md` | Yes (`tests`) | `tests/test.bal`, mock server — build + auto-fix inline |
-| 4. Examples | `stages/04-examples.md` | Yes (`examples`) | per-example packages in `examples/` — build + auto-fix inline |
+| 4. Examples | `stages/04-examples.md` | Yes (`examples`) | regenerate safely, or retain + validate existing packages when excluded |
 | 5. Docs | `stages/05-docs.md` | Yes (`docs`) | `README.md`, `Module.md`, Ballerina.toml keywords |
 
 ---
@@ -46,7 +46,7 @@ When this skill is invoked:
    ```
    ╔══════════════════════════════════════════╗
    ║       Ballerina Connector Generator      ║
-   ╚══════════════════════════════════════════╝
+   ╚════════════════════════════════ ᵥ₀․₂․₀ ══╝
 
    I'll guide you through generating a Ballerina connector from your OpenAPI spec.
    This involves up to 5 stages: sanitize → client → tests → examples → docs.
@@ -62,6 +62,8 @@ When this skill is invoked:
        Read the corresponding stage file
        Follow its instructions completely
        If INTERACTIVE_MODE: pause and confirm before next stage
+     elif stage == examples:
+       Read `stages/04-examples.md` and follow its retained-example validation path
    ```
 
 4. When any stage runs `bal build` and it fails, read `references/fix-procedure.md` and invoke it immediately in that stage's context before proceeding.
@@ -77,8 +79,8 @@ These variables are set in Setup (stage 00) and used by all subsequent stages:
 | `PYTHON_CMD` | Resolved Python 3 command for this machine (`python3`/`python`/`py`) — determined once in Setup Step 0 |
 | `SPEC_PATH` | Absolute or relative path to the input OpenAPI spec |
 | `BALLERINA_DIR` | Directory containing (or to contain) `Ballerina.toml` — where `client.bal`, `types.bal`, `utils.bal`, `tests/`, `README.md`, `Module.md` are generated |
-| `SPEC_DIR` | User-confirmed path for aligned spec + sanitations (default: `./docs/spec`) |
-| `EXAMPLE_DIR` | User-confirmed path for generated examples (default: `./examples`) — unset if the `examples` stage is excluded |
+| `SPEC_DIR` | User-confirmed path for aligned spec, `sanitations.md`, and `ai-mappings.json` (default: `./docs/spec`) |
+| `EXAMPLE_DIR` | User-confirmed path for generated examples (default: `./examples`); retained examples use this default even when generation is excluded |
 | `BAL_ORG` | Ballerina package org (read from Ballerina.toml or collected from user) |
 | `BAL_PACKAGE` | Ballerina package name (read from Ballerina.toml or collected from user) |
 | `LICENSE_PATH` | Path to the user-provided license file, or empty if not provided |
@@ -158,7 +160,7 @@ All scripts are in `<skill-root>/scripts/` and are pure Python (`.py`) — no sh
 <PYTHON_CMD> scripts/generate_mock_stub.py "<aligned-spec>" "<output-dir>" "<SELECTED_OPERATIONS>" "<LICENSE_PATH>"
 
 # Run any bal command in a working directory — prints stderr to a temp file and its path on failure
-<PYTHON_CMD> scripts/run_bal_command.py "<command>" "<working-dir>"
+<PYTHON_CMD> scripts/run_bal_command.py --cwd "<working-dir>" <command> [<argument>...]
 
 # Parse compilation errors from bal build stderr → JSON error array
 <PYTHON_CMD> scripts/parse_errors.py "<stderr-file-or-stdin>"
@@ -171,4 +173,15 @@ All scripts are in `<skill-root>/scripts/` and are pure Python (`.py`) — no sh
 
 # Scan an aligned spec for duplicate operationIds — non-fatal warnings
 <PYTHON_CMD> scripts/check_duplicate_operation_ids.py "<aligned-spec>"
+
+# Reuse and persist stable AI schema-name decisions across regeneration runs
+<PYTHON_CMD> scripts/schema_mappings.py prepare "<aligned-spec>" "<ai-mappings.json>" "<candidate.json>"
+<PYTHON_CMD> scripts/schema_mappings.py apply "<aligned-spec>" "<candidate.json>" "<decisions.json>" "<ai-mappings.json>"
+
+# Capture and compare client/types source snapshots for semantic-version advice
+<PYTHON_CMD> scripts/client_version_summary.py capture "<ballerina-dir>" "<baseline.json>"
+<PYTHON_CMD> scripts/client_version_summary.py diff "<ballerina-dir>" "<baseline.json>"
+
+# Scan or safely clean generated example packages only
+<PYTHON_CMD> scripts/manage_examples.py <scan|cleanup> "<examples-dir>"
 ```

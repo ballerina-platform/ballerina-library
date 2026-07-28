@@ -42,16 +42,25 @@ Do **not** re-read the entire source files — use the structured metadata and f
 ## Step 2: Generate root README
 
 Check if `<BALLERINA_DIR>/README.md` already exists:
-- **Exists** → use it as the base. It may already have some or all `[//]: # (TODO: ...)` sections and `{{PLACEHOLDER}}` variables filled. Only replace what is still unfilled — do not overwrite content that is already present.
+- **Exists** → use it as the base. It may already have some or all `[//]: # (TODO: ...)` sections and `{{PLACEHOLDER}}` variables filled. Only replace what is still unfilled, except reconcile generated example entries as specified in Step 4; do not overwrite other existing content.
 - **Absent** → read `<skill-root>/templates/readme_template.md` and proceed as below.
 
 Replace all `{{PLACEHOLDER}}` variables using the mapping above.
+
+Before rendering either root/package README or `Module.md` example list, derive each documented example's link target from its generated document path:
+
+```text
+example_doc = <EXAMPLE_DIR>/<name>/<name>.md
+example_link = relative path from <BALLERINA_DIR> to example_doc, with path separators normalized to `/`
+```
+
+For example, when `EXAMPLE_DIR` is `./examples`, `example_link` is `examples/<name>/<name>.md`; a custom example directory may yield `custom-examples/<name>/<name>.md` or `../examples/<name>/<name>.md`.
 
 Replace each `[//]: # (TODO: ...)` section with generated content:
 - **Overview**: 3–5 sentences describing what the API does and what this connector enables. Derived from `SPEC_METADATA.description` and title.
 - **Setup guide**: Numbered steps to obtain credentials and configure the connector. Derived from `SPEC_METADATA.securitySchemes` — list the required fields (API keys, OAuth tokens, etc.) and how to get them.
 - **Quickstart**: One short Ballerina code snippet showing a single representative API call. Use a simple GET or list operation from `CLIENT_ANALYSIS.methods`. Include the `Config.toml` snippet needed.
-- **Examples**: Bullet list of example names and one-line descriptions from `EXAMPLE_DIR` subdirectory names. Format: `[example-name](examples/example-name) — <one liner>`.
+- **Examples**: Bullet list of documented example names and one-line descriptions. Format: `[example-name](<example_link>) — <one liner>`. Include only packages whose named document exists.
 
 Copy all other sections (Build from source, Build options, Contribute, Code of conduct, Useful links) verbatim from the template.
 
@@ -62,7 +71,7 @@ Write to `<BALLERINA_DIR>/README.md`.
 ## Step 3: Generate Module.md (Ballerina Central)
 
 Check if `<BALLERINA_DIR>/Module.md` already exists:
-- **Exists** → use it as the base. Only replace sections that still contain unfilled `[//]: # (TODO: ...)` markers or unresolved `{{PLACEHOLDER}}` variables. Do not overwrite already-filled content.
+- **Exists** → use it as the base. Only replace sections that still contain unfilled `[//]: # (TODO: ...)` markers or unresolved `{{PLACEHOLDER}}` variables, except reconcile generated example entries as specified in Step 4. Do not overwrite other already-filled content.
 - **Absent** → read `<skill-root>/templates/module_readme_template.md` and proceed as below.
 
 Replace all `{{PLACEHOLDER}}` variables using the mapping above.
@@ -73,7 +82,7 @@ Write to `<BALLERINA_DIR>/Module.md`.
 
 ---
 
-## Step 4: Generate sub-READMEs
+## Step 4: Generate sub-documents
 
 ### Tests README
 
@@ -85,24 +94,28 @@ Fill in `AI_GENERATED_TESTING_APPROACH` with a short description of what the tes
 
 Write to `<BALLERINA_DIR>/tests/README.md`.
 
+### Individual example documents — generate first
+
+For every example package, generate the required file `<EXAMPLE_DIR>/<name>/<name>.md` before any aggregate documentation. Use `templates/example_readme_template.md`, with a human-readable title and a 2–3 sentence use-case description. Preserve the exact directory-name casing in the filename. Build `DOCUMENTED_EXAMPLES` from only the package names whose named document was generated successfully or confirmed present for this run.
+
+If individual generation fails, warn and omit that example from `DOCUMENTED_EXAMPLES`; never create a broken link.
+
 ### Examples README
 
 Check if `<EXAMPLE_DIR>/README.md` already exists:
-- **Exists** → use it as the base. Update or add example table rows for any new examples added since the last run. Only replace `<angle-bracket>` placeholders that are still unfilled. Do not overwrite content that is already present.
+- **Exists** → use it as the base. Reconcile generated example table rows as specified below and replace `<angle-bracket>` placeholders that are still unfilled. Do not overwrite other existing content.
 - **Absent** → read `<skill-root>/templates/examples_readme_template.md` and proceed as below.
 
 Fill in:
 - `<BAL_ORG>/<BAL_PACKAGE>` → from shared state
-- Example table rows — one row per subdirectory in `EXAMPLE_DIR`
+- Example table rows — one row per `DOCUMENTED_EXAMPLES` entry, with the direct relative link `./<name>/<name>.md`
 - Auth field names from `SPEC_METADATA.securitySchemes`
 
 Write to `<EXAMPLE_DIR>/README.md`.
 
-### Per-example READMEs (generate if time permits)
+Reconcile all aggregate example sections against `DOCUMENTED_EXAMPLES` before writing. Replace or prune only generated entries: table rows that use the generated direct-link form `./<name>/<name>.md`, and README/Module.md bullets that use the generated computed `example_link` convention. Remove matching stale entries for packages not in `DOCUMENTED_EXAMPLES`, add or replace entries for packages in it, and preserve unrelated user-authored prose, rows, links, headings, and aggregate structure.
 
-For each example subdirectory that does not already have a `README.md`, read `<skill-root>/templates/example_readme_template.md` and fill in:
-- `<EXAMPLE_TITLE>` → human-readable name from the directory kebab slug
-- `AI_GENERATED_DESCRIPTION` → 2–3 sentences describing the use case
+Root/package README and Module.md example lists must use the computed `example_link` value for every `DOCUMENTED_EXAMPLES` entry. Do not alter a repository-root README outside `BALLERINA_DIR` that uses directory links.
 
 ---
 

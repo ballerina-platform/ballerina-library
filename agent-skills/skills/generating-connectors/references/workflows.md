@@ -13,12 +13,12 @@ Stages run in this fixed order. Each stage may be skipped if the user excluded i
 1. sanitize   → skippable; requires aligned spec to exist if skipped
 2. client     → skippable; requires client.bal to exist if skipped; runs fix procedure inline on build failure
 3. tests      → skippable; runs fix procedure inline on build failure
-4. examples   → skippable; runs fix procedure inline per example on build failure (non-fatal if fix fails)
+4. examples   → safely cleans recognized generated packages before regeneration; when excluded, its retained-example validation path still runs; runs fix procedure inline per example (non-fatal if fix fails)
 5. docs       → skippable
 ```
 
 Skip validation rules (mirror the connector-tool's `OpenApiStageValidationUtils`):
-- If `sanitize` is skipped: `<SPEC_DIR>/aligned_ballerina_openapi.yaml` must exist — fail with a clear message if not.
+- If `sanitize` is skipped: `<SPEC_DIR>/aligned_ballerina_openapi.json` must exist — fail with a clear message if not.
 - If `client` is skipped: `<BALLERINA_DIR>/client.bal` must exist — fail with a clear message if not.
 - If all stages are skipped: reject immediately.
 
@@ -73,7 +73,7 @@ When `--interactive` is enabled:
 → Invoke fix procedure with `BUILD_DIR = EXAMPLE_DIR/<example-name>`. If exhausted, warn and continue to the next example — non-fatal.
 
 ### `bal test` failure
-→ Non-fatal. Record and continue. Note failure in the final summary.
+→ Run the bounded test-only repair loop on `tests/test.bal` and `tests/mock_service.bal`. Stop on pass, unchanged diagnostics, no applicable edit, or the iteration limit. Record unresolved failures and continue.
 
 ---
 
@@ -93,26 +93,32 @@ At the end of the pipeline (or when aborted), print:
 ```
 === Generating Ballerina Connectors — Run Summary ===
 Spec:         <input spec path>
-Output:       <output dir>
+Output:       <BALLERINA_DIR>
 Stages run:   sanitize ✓  client ✓  tests ✓  examples ✓  docs ✓
 Stages skipped: (none)
 
 Generated files:
-  docs/spec/aligned_ballerina_openapi.json
-  docs/spec/sanitations.md
-  client.bal
-  types.bal
-  tests/mock_service.bal
-  tests/test.bal
-  examples/<example-name>/main.bal
-  examples/<example-name>/Ballerina.toml
-  examples/README.md
-  README.md
-  Module.md
+  <SPEC_DIR>/aligned_ballerina_openapi.json          # sanitize completed
+  <SPEC_DIR>/ai-mappings.json                        # sanitize completed
+  <SPEC_DIR>/sanitations.md                          # sanitize completed
+  <BALLERINA_DIR>/client.bal                         # client completed
+  <BALLERINA_DIR>/types.bal                          # client completed
+  <BALLERINA_DIR>/utils.bal                          # client completed, if generated
+  <BALLERINA_DIR>/tests/mock_service.bal             # tests completed
+  <BALLERINA_DIR>/tests/test.bal                     # tests completed
+  <EXAMPLE_DIR>/<example-name>/main.bal              # examples completed
+  <EXAMPLE_DIR>/<example-name>/Ballerina.toml        # examples completed
+  <EXAMPLE_DIR>/<example-name>/<example-name>.md     # docs completed; documented examples only
+  <EXAMPLE_DIR>/README.md                            # docs completed
+  <BALLERINA_DIR>/README.md                          # docs completed
+  <BALLERINA_DIR>/Module.md                          # docs completed
+  <BALLERINA_DIR>/tests/README.md                    # docs completed
 
 Next steps:
-  1. Review docs/spec/sanitations.md for the structural spec changes (from flatten/align).
-  2. Run `bal test` to verify the generated tests.
-  3. Navigate into examples/<example-name> and run `bal run` to try an example.
+  1. Review <SPEC_DIR>/sanitations.md for the structural spec changes (from flatten/align).
+  2. Run `bal test` from <BALLERINA_DIR> to verify the generated tests.
+  3. Navigate into <EXAMPLE_DIR>/<example-name> and run `bal run` to try an example.
   4. Publish to Ballerina Central when ready.
 ```
+
+Replace the illustrative stage statuses with the actual completed and skipped stages. List a generated-file entry only when the stage named in its comment completed; omit files that were not produced (including `utils.bal` when absent and example documents that failed generation). List the corresponding Next steps only when their prerequisite stage completed.

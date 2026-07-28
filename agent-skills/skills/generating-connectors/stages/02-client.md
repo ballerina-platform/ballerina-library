@@ -7,6 +7,19 @@ If skipped, verify that `<BALLERINA_DIR>/client.bal` already exists — halt if 
 
 ---
 
+## Step 0: Capture the client baseline
+
+Before generation, capture source snapshots without using Git:
+
+```bash
+<PYTHON_CMD> <skill-root>/scripts/client_version_summary.py capture \
+  "<BALLERINA_DIR>" "<BALLERINA_DIR>/.client_version_baseline.json"
+```
+
+Keep this transient baseline until Step 4. A missing, empty, or comment-only previous `client.bal` means version analysis is skipped.
+
+---
+
 ## Step 1: Build the `bal openapi` command
 
 Resolve the spec input file:
@@ -38,11 +51,11 @@ Append options based on collected configuration:
 
 ```bash
 <PYTHON_CMD> <skill-root>/scripts/run_bal_command.py \
-  "bal openapi -i <ALIGNED_SPEC> -o <BALLERINA_DIR> --license <LICENSE_PATH> [--tags <tags>] [--operations <ops>] [--client-methods remote] --mode client" \
-  "<BALLERINA_DIR>"
+  --cwd "<BALLERINA_DIR>" \
+  bal openapi -i "<ALIGNED_SPEC>" -o "<BALLERINA_DIR>" --mode client
 ```
 
-Omit `--license <LICENSE_PATH>` if `LICENSE_PATH` is not set. Omit any other optional flag that does not apply.
+Append each applicable option as separate arguments: `--license "<LICENSE_PATH>"`, one `--tags "<tag>"` pair per tag, one `--operations "<id>"` pair per operation ID, and `--client-methods remote` when `USE_REMOTE` is true. Omit every optional flag/value pair that does not apply.
 
 ### On success:
 Verify that `<BALLERINA_DIR>/client.bal`, `<BALLERINA_DIR>/types.bal`, and `<BALLERINA_DIR>/utils.bal` were created. Print the file list.
@@ -59,7 +72,7 @@ Verify that `<BALLERINA_DIR>/client.bal`, `<BALLERINA_DIR>/types.bal`, and `<BAL
 Run `bal build` in `<BALLERINA_DIR>`:
 
 ```bash
-<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py "bal build" "<BALLERINA_DIR>"
+<PYTHON_CMD> <skill-root>/scripts/run_bal_command.py --cwd "<BALLERINA_DIR>" bal build
 ```
 
 - Exit 0 → build clean, continue to completion
@@ -69,7 +82,24 @@ Run `bal build` in `<BALLERINA_DIR>`:
 
 ---
 
-## Step 4: Stage completion
+## Step 4: Recommend a semantic-version update
+
+Run this only if client generation itself succeeded. It compares the pre-generation snapshot with the final, fixed `client.bal` and `types.bal`; tests, examples, and docs are never included.
+
+```bash
+<PYTHON_CMD> <skill-root>/scripts/client_version_summary.py diff \
+  "<BALLERINA_DIR>" "<BALLERINA_DIR>/.client_version_baseline.json"
+```
+
+- `skipped` is non-empty → print that status and continue.
+- Empty `diff` → report that no version bump is required.
+- Otherwise, ask AI to classify only the supplied diff as `MAJOR`, `MINOR`, or `PATCH`, with a concise rationale. Recommend `<major+1>.0.0`, `<major>.<minor+1>.0`, or `<major>.<minor>.<patch+1>` from the reported package version. Classification failure is a warning only.
+
+Delete `.client_version_baseline.json` after reporting.
+
+---
+
+## Step 5: Stage completion
 
 Print:
 ```

@@ -1,0 +1,194 @@
+#!/usr/bin/env python3
+"""Maintain stable OpenAPI component-schema names across regeneration runs.
+
+Usage:
+  schema_mappings.py prepare <aligned-spec.json> <ai-mappings.json> <candidate.json>
+  schema_mappings.py apply <aligned-spec.json> <candidate.json> <decisions.json> <ai-mappings.json>
+
+``prepare`` applies the reusable decisions from ``ai-mappings.json`` to the
+current aligned spec, prunes mappings for schemas that no longer exist, and
+prints schema metadata that still needs an AI decision. ``apply`` validates
+the supplied decisions, applies every rename (including local $refs), and
+persists the merged mapping document atomically. Unknown top-level mapping
+sections are intentionally preserved.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import re
+import sys
+import tempfile
+from pathlib import Path
+from typing import Any
+
+
+def fail(message: str) -> None:
+    print(f"ERROR: {message}", file=sys.stderr)
+    raise SystemExit(1)
+
+
+def read_json(path: str, default: Any = None) -> Any:
+    if not os.path.exists(path):
+        return default
+    try:
+        with open(path, encoding="utf-8") as file:
+            return json.load(file)
+    except (OSError, json.JSONDecodeError) as exc:
+        fail(f"could not read JSON file {path}: {exc}")
+
+
+def atomic_write_json(path: str, value: Any) -> None:
+    directory = os.path.dirname(os.path.abspath(path))
+    os.makedirs(directory, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix=".connector-schema-", suffix=".json", dir=directory)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as file:
+            json.dump(value, file, indent=2, ensure_ascii=False)
+            file.write("\n")
+            file.flush()
+            os.fsync(file.fileno())
+        os.replace(temporary, path)
+    except OSError as exc:
+        try:
+            os.unlink(temporary)
+        except OSError:
+            pass
+        fail(f"could not atomically write {path}: {exc}")
+
+
+def schemas(spec: dict[str, Any]) -> dict[str, Any]:
+    components = spec.get("components")
+    if not isinstance(components, dict) or not isinstance(components.get("schemas"), dict):
+        fail("aligned specification has no components.schemas mapping")
+    return components["schemas"]
+
+
+def schema_metadata(name: str, schema: Any) -> dict[str, Any]:
+    schema = schema if isinstance(schema, dict) else {}
+    return {
+        "name": name,
+        "type": schema.get("type", "object"),
+        "description": (schema.get("description") or "")[:200],
+        "properties": list((schema.get("properties") or {}).keys())[:10],
+    }
+
+
+def is_valid_name(name: Any) -> bool:
+    return isinstance(name, str) and bool(name.strip()) and not any(c in name for c in ("/", "#", "\n", "\r"))
+
+
+def rewrite_refs(value: Any, renames: dict[str, str]) -> Any:
+    if isinstance(value, dict):
+        result: dict[str, Any] = {}
+        for key, item in value.items():
+            if key == "$ref" and isinstance(item, str) and item.startswith("#/components/schemas/"):
+                source = item.rsplit("/", 1)[1]
+                result[key] = "#/components/schemas/" + renames.get(source, source)
+            else:
+                result[key] = rewrite_refs(item, renames)
+        return result
+    if isinstance(value, list):
+        return [rewrite_refs(item, renames) for item in value]
+    return value
+
+
+def apply_renames(spec: dict[str, Any], renames: dict[str, str]) -> None:
+    current = schemas(spec)
+    active = {source: target for source, target in renames.items() if source in current and source != target}
+    targets = list(active.values())
+    if len(targets) != len(set(targets)):
+        fail("schema mapping has duplicate target names")
+    untouched = set(current) - set(active)
+    collisions = sorted(set(targets) & untouched)
+    if collisions:
+        fail("schema mapping target collides with current schema: " + ", ".join(collisions))
+    renamed = {active.get(name, name): value for name, value in current.items()}
+    spec["components"]["schemas"] = renamed
+    rewritten = rewrite_refs(spec, active)
+    spec.clear()
+    spec.update(rewritten)
+
+
+def load_mapping_document(path: str) -> dict[str, Any]:
+    document = read_json(path, {})
+    if not isinstance(document, dict):
+        fail("ai-mappings.json must contain a JSON object")
+    mappings = document.get("schemaNames", {})
+    if not isinstance(mappings, dict) or not all(is_valid_name(k) and is_valid_name(v) for k, v in mappings.items()):
+        fail("ai-mappings.json schemaNames must be a string-to-string mapping")
+    return document
+
+
+def prepare(spec_path: str, mappings_path: str, candidate_path: str) -> None:
+    spec = read_json(spec_path)
+    if not isinstance(spec, dict):
+        fail("aligned specification must contain a JSON object")
+    document = load_mapping_document(mappings_path)
+    current = schemas(spec)
+    original_names = set(current)
+    stored = document.get("schemaNames", {})
+    reusable = {source: target for source, target in stored.items() if source in original_names}
+    pruned = sorted(set(stored) - original_names)
+    if reusable:
+        apply_renames(spec, reusable)
+        atomic_write_json(spec_path, spec)
+    mapped_sources = set(reusable)
+    # New schemas are identified from the pre-rename names, so a target name is
+    # never accidentally treated as a new source schema on reruns.
+    unseen = [schema_metadata(name, current[name]) for name in sorted(original_names - mapped_sources)]
+    candidate = dict(document)
+    candidate["schemaNames"] = reusable
+    atomic_write_json(candidate_path, candidate)
+    print(json.dumps({
+        "reused_count": len(reusable),
+        "pruned_count": len(pruned),
+        "pruned_schema_names": pruned,
+        "unseen_schemas": unseen,
+        "candidate_path": str(Path(candidate_path)),
+    }))
+
+
+def apply(spec_path: str, candidate_path: str, decisions_path: str, output_path: str) -> None:
+    spec = read_json(spec_path)
+    candidate = load_mapping_document(candidate_path)
+    decisions = read_json(decisions_path)
+    if not isinstance(spec, dict) or not isinstance(decisions, dict):
+        fail("spec and decisions must be JSON objects")
+    current = schemas(spec)
+    existing = candidate.get("schemaNames", {})
+    unknown = set(current) - set(existing.values())
+    supplied = set(decisions)
+    missing = sorted(unknown - supplied)
+    extra = sorted(supplied - unknown)
+    if missing or extra:
+        fail("schema decisions must cover exactly the unseen schemas" +
+             (f"; missing: {', '.join(missing)}" if missing else "") +
+             (f"; unexpected: {', '.join(extra)}" if extra else ""))
+    if not all(is_valid_name(source) and is_valid_name(target) for source, target in decisions.items()):
+        fail("schema decisions must use non-empty, path-safe names")
+    targets = list(existing.values()) + list(decisions.values())
+    if len(targets) != len(set(targets)):
+        fail("schema decisions contain a duplicate or reserved target name")
+    all_mappings = {**existing, **decisions}
+    apply_renames(spec, decisions)
+    candidate["schemaNames"] = all_mappings
+    atomic_write_json(spec_path, spec)
+    atomic_write_json(output_path, candidate)
+    print(json.dumps({"applied_count": len(decisions), "identity_count": sum(k == v for k, v in decisions.items())}))
+
+
+def usage() -> None:
+    print(f"Usage: {sys.argv[0]} prepare <aligned-spec.json> <ai-mappings.json> <candidate.json>", file=sys.stderr)
+    print(f"       {sys.argv[0]} apply <aligned-spec.json> <candidate.json> <decisions.json> <ai-mappings.json>", file=sys.stderr)
+    raise SystemExit(2)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) == 5 and sys.argv[1] == "prepare":
+        prepare(*sys.argv[2:])
+    elif len(sys.argv) == 6 and sys.argv[1] == "apply":
+        apply(*sys.argv[2:])
+    else:
+        usage()
