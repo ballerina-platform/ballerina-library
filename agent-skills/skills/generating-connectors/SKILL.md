@@ -79,7 +79,7 @@ These variables are set in Setup (stage 00) and used by all subsequent stages:
 | `PYTHON_CMD` | Resolved Python 3 command for this machine (`python3`/`python`/`py`) — determined once in Setup Step 0 |
 | `SPEC_PATH` | Absolute or relative path to the input OpenAPI spec |
 | `BALLERINA_DIR` | Directory containing (or to contain) `Ballerina.toml` — where `client.bal`, `types.bal`, `utils.bal`, `tests/`, `README.md`, `Module.md` are generated |
-| `SPEC_DIR` | User-confirmed path for aligned spec, `sanitations.md`, and `ai-mappings.json` (default: `./docs/spec`) |
+| `SPEC_DIR` | User-confirmed path for the aligned spec, `sanitations.md`, and stable operation-ID/schema-name decisions in `ai-mappings.json` (default: `./docs/spec`) |
 | `EXAMPLE_DIR` | User-confirmed path for generated examples (default: `./examples`); retained examples use this default even when generation is excluded |
 | `BAL_ORG` | Ballerina package org (read from Ballerina.toml or collected from user) |
 | `BAL_PACKAGE` | Ballerina package name (read from Ballerina.toml or collected from user) |
@@ -165,18 +165,23 @@ All scripts are in `<skill-root>/scripts/` and are pure Python (`.py`) — no sh
 # Parse compilation errors from bal build stderr → JSON error array
 <PYTHON_CMD> scripts/parse_errors.py "<stderr-file-or-stdin>"
 
-# Extract the prior run's operationId map (run before flatten/align overwrites it)
-<PYTHON_CMD> scripts/restore_prior_operation_ids.py build "<existing-aligned-spec>" > "<map-file>"
-
-# Apply that map into the newly aligned spec, restoring matching operationIds
-<PYTHON_CMD> scripts/restore_prior_operation_ids.py apply "<map-file>" "<current-aligned-spec>"
+# Reuse and persist stable AI operation-ID decisions across regeneration runs
+<PYTHON_CMD> scripts/operation_id_mappings.py prepare "<aligned-spec>" "<ai-mappings.json>" "<candidate.json>"
+<PYTHON_CMD> scripts/operation_id_mappings.py apply "<aligned-spec>" "<candidate.json>" "<decisions.json>" "<ai-mappings.json>"
 
 # Scan an aligned spec for duplicate operationIds — non-fatal warnings
 <PYTHON_CMD> scripts/check_duplicate_operation_ids.py "<aligned-spec>"
 
-# Reuse and persist stable AI schema-name decisions across regeneration runs
+# Reuse and persist stable AI schema-name decisions; schema-less specs are supported
 <PYTHON_CMD> scripts/schema_mappings.py prepare "<aligned-spec>" "<ai-mappings.json>" "<candidate.json>"
 <PYTHON_CMD> scripts/schema_mappings.py apply "<aligned-spec>" "<candidate.json>" "<decisions.json>" "<ai-mappings.json>"
+
+# Collect/apply missing request-body and API-key descriptions
+<PYTHON_CMD> scripts/spec_descriptions.py prepare "<aligned-spec>" "<requests.json>"
+<PYTHON_CMD> scripts/spec_descriptions.py apply "<aligned-spec>" "<requests.json>" "<decisions.json>"
+
+# Normalize and resolve a unique snake_case example name
+<PYTHON_CMD> scripts/example_names.py resolve "<examples-dir>" "<suggested-name>" "<fallback-name>"
 
 # Capture and compare client/types source snapshots for semantic-version advice
 <PYTHON_CMD> scripts/client_version_summary.py capture "<ballerina-dir>" "<baseline.json>"

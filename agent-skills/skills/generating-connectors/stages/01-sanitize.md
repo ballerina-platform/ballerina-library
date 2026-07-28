@@ -35,26 +35,6 @@ Option semantics are unchanged from above (option 1 = proceed to Step 1, sanitat
 
 ---
 
-## Step 0b: Build the prior operationId map (if any)
-
-Step 2 below overwrites `<SPEC_DIR>/aligned_ballerina_openapi.json` with this run's output, so any operationIds a previous run established must be captured first. This is deterministic — no reasoning required, and no need to check existence first.
-
-`<SPEC_DIR>` may not exist yet on a first run, and the `>` redirect below will not create it — ensure it exists first:
-
-```bash
-<PYTHON_CMD> -c "import os; os.makedirs(r'<SPEC_DIR>', exist_ok=True)"
-```
-
-Then capture the prior operationId map:
-
-```bash
-<PYTHON_CMD> <skill-root>/scripts/restore_prior_operation_ids.py build "<SPEC_DIR>/aligned_ballerina_openapi.json" > "<SPEC_DIR>/.prior_operation_ids.json"
-```
-
-This extracts just the `path -> {method: operationId}` map (not a full spec copy) into a small scratch file, used by Step 3a Pass A after alignment. If no previous aligned spec exists, the script prints `{"prior_spec_found": false, "operation_id_map": {}}` — no error.
-
----
-
 ## Step 1: Flatten the spec
 
 ```bash
@@ -126,47 +106,90 @@ When a category has enough items to require multiple AI requests, process determ
 
 ### 3a. Short or missing descriptions
 
-For schema fields, parameters, and operations where `description` is fewer than 10 characters (or empty), generate a concise description from the structured aligned metadata and apply it directly to `ALIGNED_SPEC`.
+For schema fields, parameters, and operations where `description` is fewer than 10 characters, empty, or an obvious placeholder (`TBD`, `TODO`, `N/A`, `Not available`), generate a concise description from the structured aligned metadata and apply it directly to `ALIGNED_SPEC`. Preserve every valid existing description.
+
+Request bodies and API-key security schemes use deterministic collection and application. Prepare their structured requests:
+
+```bash
+<PYTHON_CMD> <skill-root>/scripts/spec_descriptions.py prepare \
+  "<ALIGNED_SPEC>" "<SPEC_DIR>/.description_requests.json"
+```
+
+Batch only the returned `requests`. Classify `requestBody` before the generic operation category:
+
+- `requestBody` — describe the complete submitted payload and its purpose in under 100 characters.
+- `securityScheme` — describe the credential and where or how it is supplied in under 100 characters.
+
+Return one non-empty description per request ID with no prose or code fences. Merge successful batches into a single JSON object at `<SPEC_DIR>/.description_decisions.json`:
+
+```json
+{
+  "requestBody:0": "File content, destination, and upload options",
+  "securityScheme:1": "Private app token supplied in the request header"
+}
+```
+
+Apply successful decisions:
+
+```bash
+<PYTHON_CMD> <skill-root>/scripts/spec_descriptions.py apply \
+  "<ALIGNED_SPEC>" "<SPEC_DIR>/.description_requests.json" \
+  "<SPEC_DIR>/.description_decisions.json"
+```
+
+The helper processes inline request bodies only, preserves exact paths and security-scheme names, skips `$ref`-only request bodies, and ignores non-API-key schemes. Delete both transient description files after a successful apply. If no requests were returned, skip the AI call and apply command, then delete the empty request file.
 
 ### 3b. Operation summary improvement
 
 For operations where `summary` is fewer than 10 characters (or empty), generate a concise summary from the path, method, and parameter names. Apply it directly to `ALIGNED_SPEC` before improving operationIds.
 
-### 3c. OperationId improvement (two-pass)
+### 3c. Stable operationId improvement
 
-**Pass A — restore from previous run.** This step is fully deterministic — do not reason through it manually, run the script:
+Operation-ID decisions are persisted in `<SPEC_DIR>/ai-mappings.json`, keyed by exact aligned path and lowercase HTTP method. Do not restore IDs from an earlier aligned spec and do not edit the mapping file manually.
+
+Prepare the current run and apply reusable decisions:
 
 ```bash
-<PYTHON_CMD> <skill-root>/scripts/restore_prior_operation_ids.py apply "<SPEC_DIR>/.prior_operation_ids.json" "<ALIGNED_SPEC>"
+<PYTHON_CMD> <skill-root>/scripts/operation_id_mappings.py prepare \
+  "<ALIGNED_SPEC>" "<SPEC_DIR>/ai-mappings.json" \
+  "<SPEC_DIR>/.operation_id_mappings_candidate.json"
 ```
 
-The script writes any restored operationIds directly into `ALIGNED_SPEC` — no AI call — and prints a single JSON object to stdout:
+Store `OPERATION_ID_REUSED_COUNT`, `OPERATION_ID_PRUNED_COUNT`, `UNSEEN_OPERATIONS`, and `RESERVED_OPERATION_IDS` from the result. Every operation in `UNSEEN_OPERATIONS` requires one decision, including operations whose existing ID is already good; preserve those as explicit identity decisions.
+
+Process `UNSEEN_OPERATIONS` in deterministic batches. For each operation:
+- Replace a path-encoded or verbose/non-intuitive ID with a concise, intent-revealing camelCase name based on method, path, summary, description, and parameters. Example: `postFilesV3FilesUpload` → `uploadFile`, `GET /users/{id}/orders` → `getUserOrders`.
+- Preserve an already concise ID unchanged.
+- Hard limit: 37 characters for the camelCase operationId — if a candidate exceeds it, simplify (drop qualifiers, use a shorter verb/object) rather than truncating mechanically.
+- Treat every ID in `RESERVED_OPERATION_IDS` as belonging to another persisted operation.
+- Require each successful batch response to cover exactly its requested path+method entries.
+
+Merge successful responses into `<SPEC_DIR>/.operation_id_decisions.json` using nested path/method objects:
 
 ```json
-{"prior_spec_found": bool, "restored_count": int, "reserved_operation_ids": [str, ...]}
+{
+  "/users": {
+    "get": "listUsers",
+    "post": "createUser"
+  }
+}
 ```
 
-Parse it and print the status line matching the case:
-- `prior_spec_found` is `false` → `No previous aligned spec found — all operationIds eligible for AI improvement`
-- `prior_spec_found` is `true` and `restored_count` is `0` → `Previous aligned spec found but contains no operationIds — all operationIds will be AI-improved`
-- otherwise → `Restored <restored_count> operationIds from previous run`
+If every batch fails, stop sanitization without applying or persisting operation-ID changes. Partial successful batches may be applied; missing decisions remain pending and will be reviewed on the next run.
 
-Store `restored_count` as `RESTORED_COUNT` and `reserved_operation_ids` as `RESERVED_OPERATION_IDS` for use below.
+If `UNSEEN_OPERATIONS` is empty, write `{}` to the decisions file and continue to `apply` without an AI call. Applying the empty decision object finalizes pruning and the normalized mapping document.
 
-The map file has now been fully consumed — delete it:
+Apply the decisions:
 
 ```bash
-<PYTHON_CMD> -c "import os; os.remove(r'<SPEC_DIR>/.prior_operation_ids.json')"
+<PYTHON_CMD> <skill-root>/scripts/operation_id_mappings.py apply \
+  "<ALIGNED_SPEC>" "<SPEC_DIR>/.operation_id_mappings_candidate.json" \
+  "<SPEC_DIR>/.operation_id_decisions.json" "<SPEC_DIR>/ai-mappings.json"
 ```
 
-**Pass B — AI improvement.** For every operation whose path+method is *not* covered by Pass A (new endpoints, or ones with no prior recorded id):
-- If the current operationId (if any) is path-encoded or verbose/non-intuitive, replace it with a concise, intent-revealing camelCase name based on the HTTP method and path segments. Example: `postFilesV3FilesUpload` → `uploadFile`, `GET /users/{id}/orders` → `getUserOrders`.
-- If it's already concise and intent-revealing, leave it unchanged.
-- Hard limit: 37 characters for the camelCase operationId — if a candidate exceeds it, simplify (drop qualifiers, use a shorter verb/object) rather than truncating mechanically.
-- Treat every id in `RESERVED_OPERATION_IDS` as a hard "must not conflict" name — never assign a reserved id that belongs to a **different** operation. Note the list's contents depend on the case: after a restore, it holds the Pass-A-restored ids; when nothing was restored (fresh run), the script instead reserves **all current ids** as guard rails. An operation keeping its own current id unchanged is always allowed — its own id appearing in the list is not a conflict.
-- Once all Pass B decisions are made, apply them directly to `ALIGNED_SPEC` and write the file back now.
+Store `OPERATION_ID_APPLIED_COUNT`, `OPERATION_ID_CHANGED_COUNT`, and `OPERATION_ID_PENDING_COUNT` from the result. The script resolves remaining collisions deterministically with numeric suffixes and atomically persists both files. Delete the transient candidate and decisions files after successful application.
 
-**Duplicate check.** Also fully deterministic — run immediately after Pass B writes back, before continuing to schema renaming:
+**Duplicate check.** Also fully deterministic — run immediately after operation-ID decisions are applied, before continuing to schema renaming:
 
 ```bash
 <PYTHON_CMD> <skill-root>/scripts/check_duplicate_operation_ids.py "<ALIGNED_SPEC>"
@@ -186,6 +209,8 @@ First prepare the current run and apply reusable decisions:
 ```
 
 Parse the returned JSON and store `UNSEEN_SCHEMAS` from `unseen_schemas`, `REUSED_SCHEMA_COUNT` from `reused_count`, and `PRUNED_SCHEMA_COUNT` from `pruned_count`. On the first run `UNSEEN_SCHEMAS` contains every schema. On later runs it contains only newly introduced schemas; prior decisions have already been applied, including every local `#/components/schemas/...` reference. Only `UNSEEN_SCHEMAS` is input to schema decisions.
+
+If `UNSEEN_SCHEMAS` is empty, set `SCHEMA_DECISION_COUNT = 0` and `IDENTITY_SCHEMA_COUNT = 0`, skip the AI decision and apply commands, then delete the transient candidate file. `prepare` has already finalized `ai-mappings.json`, including pruning stale schema mappings. This also covers specifications with no `components.schemas`.
 
 For every schema in `UNSEEN_SCHEMAS`, ask AI for one concise, unique public schema name based on its structured metadata. Require a JSON object mapping every source name to its target name. Preserve an already good name as an identity mapping. Never include prose or code fences.
 
@@ -232,7 +257,7 @@ Print:
 ✓ Sanitize complete
   Aligned spec: <SPEC_DIR>/aligned_ballerina_openapi.json
   Sanitations:  <SPEC_DIR>/sanitations.md (structural spec changes: <SANITATION_COUNTS>)
-  AI enhancements applied: <M> descriptions enhanced, <S> summaries improved, <N> operationIds improved (<R> restored), <SCHEMA_DECISION_COUNT> schema decisions (<REUSED_SCHEMA_COUNT> reused, <IDENTITY_SCHEMA_COUNT> identity fallbacks, <PRUNED_SCHEMA_COUNT> pruned)
+  AI enhancements applied: <M> descriptions enhanced, <S> summaries improved, <OPERATION_ID_CHANGED_COUNT> operationIds changed (<OPERATION_ID_REUSED_COUNT> reused, <OPERATION_ID_PENDING_COUNT> pending, <OPERATION_ID_PRUNED_COUNT> pruned), <SCHEMA_DECISION_COUNT> schema decisions (<REUSED_SCHEMA_COUNT> reused, <IDENTITY_SCHEMA_COUNT> identity fallbacks, <PRUNED_SCHEMA_COUNT> pruned)
 ```
 
 The AI enhancements line reports the Step 3 work applied to the spec — those are intentionally not part of `sanitations.md`, which holds only the structural diff.
