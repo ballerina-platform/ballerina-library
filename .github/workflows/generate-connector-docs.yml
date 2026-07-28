@@ -76,6 +76,8 @@ jobs:
       module_slug: ${{ steps.metadata.outputs.module_slug }}
       package_name: ${{ steps.metadata.outputs.package_name }}
       display_name: ${{ steps.metadata.outputs.display_name }}
+      docs_fork: ${{ steps.fork.outputs.repository }}
+      docs_fork_owner: ${{ steps.fork.outputs.owner }}
       docs_branch: ${{ steps.branch.outputs.docs_branch }}
       base_sha: ${{ steps.branch.outputs.base_sha }}
     steps:
@@ -178,6 +180,28 @@ jobs:
               output.write(f"display_name={name.replace('.', ' ').replace('-', ' ').title()}\n")
           PY
 
+      - name: Create or reuse docs-integrator fork
+        id: fork
+        env:
+          GH_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+        run: |
+          owner=$(gh api user --jq .login)
+          repository="${owner}/docs-integrator"
+          if ! gh repo view "$repository" >/dev/null 2>&1; then
+            gh repo fork wso2/docs-integrator --clone=false
+          fi
+          for attempt in {1..12}; do
+            if gh repo view "$repository" >/dev/null 2>&1; then
+              echo "owner=$owner" >> "$GITHUB_OUTPUT"
+              echo "repository=$repository" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Waiting for fork $repository ($attempt/12)..."
+            sleep 5
+          done
+          echo "Fork $repository was not available after waiting one minute."
+          exit 1
+
       - name: Check out docs-integrator
         uses: actions/checkout@v4
         with:
@@ -213,6 +237,7 @@ jobs:
           base_sha=$(git rev-parse HEAD)
           git config user.name "ballerina-bot"
           git config user.email "ballerina-bot@ballerina.org"
+          git remote set-url origin "https://github.com/${{ steps.fork.outputs.repository }}.git"
           git checkout -b "$branch"
           git push origin "$branch"
           echo "docs_branch=$branch" >> "$GITHUB_OUTPUT"
@@ -283,7 +308,7 @@ jobs:
       - name: Check out prepared docs branch
         uses: actions/checkout@v4
         with:
-          repository: wso2/docs-integrator
+          repository: ${{ needs.prepare.outputs.docs_fork }}
           ref: ${{ needs.prepare.outputs.docs_branch }}
           token: ${{ secrets.BALLERINA_BOT_TOKEN }}
           path: docs-integrator
@@ -454,7 +479,7 @@ jobs:
       - name: Check out prepared docs branch
         uses: actions/checkout@v4
         with:
-          repository: wso2/docs-integrator
+          repository: ${{ needs.prepare.outputs.docs_fork }}
           ref: ${{ needs.prepare.outputs.docs_branch }}
           token: ${{ secrets.BALLERINA_BOT_TOKEN }}
           path: docs-integrator
@@ -474,7 +499,9 @@ jobs:
           CONNECTOR_SHA: ${{ needs.connector-docs.outputs.commit_sha }}
           BASE_SHA: ${{ needs.prepare.outputs.base_sha }}
         run: |
-          git fetch origin main "$BRANCH"
+          git remote add upstream https://github.com/wso2/docs-integrator.git
+          git fetch origin "$BRANCH"
+          git fetch upstream main
           expected="${CONNECTOR_SHA:-$BASE_SHA}"
           remote_sha=$(git rev-parse "origin/$BRANCH")
           if [ "$remote_sha" != "$expected" ]; then
@@ -483,7 +510,7 @@ jobs:
           fi
           git config user.name "ballerina-bot"
           git config user.email "ballerina-bot@ballerina.org"
-          git merge origin/main --no-edit
+          git merge upstream/main --no-edit
           echo "expected_sha=$remote_sha" >> "$GITHUB_OUTPUT"
 
       - name: Place example documentation
@@ -526,8 +553,8 @@ jobs:
           fi
           final_sha=$(git rev-parse HEAD)
           git push --force-with-lease="refs/heads/${BRANCH}:${EXPECTED_SHA}" origin "HEAD:${BRANCH}"
-          git fetch origin main
-          if git diff --quiet origin/main...HEAD; then
+          git fetch upstream main
+          if git diff --quiet upstream/main...HEAD; then
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
           else
             echo "has_changes=true" >> "$GITHUB_OUTPUT"
@@ -551,7 +578,7 @@ jobs:
       - name: Check out exact final docs commit
         uses: actions/checkout@v4
         with:
-          repository: wso2/docs-integrator
+          repository: ${{ needs.prepare.outputs.docs_fork }}
           ref: ${{ needs.integrate-and-finalize.outputs.final_sha }}
           token: ${{ secrets.BALLERINA_BOT_TOKEN }}
           path: docs-integrator
@@ -633,12 +660,12 @@ jobs:
           if ! compgen -G 'preview-screenshots/*.png' >/dev/null; then exit 0; fi
           tag="docs-preview-${MODULE//./_}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           gh release create "$tag" preview-screenshots/*.png \
-            --repo wso2/docs-integrator \
+            --repo "${{ needs.prepare.outputs.docs_fork }}" \
             --target "$BRANCH" \
             --title "Documentation preview: $MODULE" \
             --notes "Rendered documentation previews for workflow run $GITHUB_RUN_ID." \
             --prerelease
-          owner_repo="wso2/docs-integrator"
+          owner_repo="${{ needs.prepare.outputs.docs_fork }}"
           body=""
           for image in preview-screenshots/*.png; do
             name=$(basename "$image")
@@ -658,9 +685,12 @@ jobs:
           MODULE: ${{ needs.prepare.outputs.module_slug }}
           DISPLAY_NAME: ${{ needs.prepare.outputs.display_name }}
           BRANCH: ${{ needs.prepare.outputs.docs_branch }}
+          FORK_OWNER: ${{ needs.prepare.outputs.docs_fork_owner }}
           PREVIEWS: ${{ steps.previews.outputs.markdown }}
         run: |
-          changed=$(git diff --name-only origin/main...HEAD | sed 's/^/- `/' | sed 's/$/`/')
+          git remote add upstream https://github.com/wso2/docs-integrator.git
+          git fetch upstream main
+          changed=$(git diff --name-only upstream/main...HEAD | sed 's/^/- `/' | sed 's/$/`/')
           cat > /tmp/pr-body.md <<EOF
           ## Purpose
 
@@ -707,7 +737,7 @@ jobs:
           pr_url=$(gh pr create \
             --repo wso2/docs-integrator \
             --base main \
-            --head "$BRANCH" \
+            --head "${FORK_OWNER}:$BRANCH" \
             --title "docs: update ${MODULE} connector documentation" \
             --body-file /tmp/pr-body.md)
           pr_number=$(gh pr view "$pr_url" --repo wso2/docs-integrator --json number --jq .number)

@@ -216,7 +216,7 @@ Required repository/environment secrets:
 | Secret | Required for | Description |
 |--------|--------------|-------------|
 | `ANTHROPIC_API_KEY` | all generation | Anthropic API key used by both documentation generators and Claude Code |
-| `BALLERINA_BOT_TOKEN` | integration and PR | Token used to create the docs-integrator branch and PR |
+| `BALLERINA_BOT_TOKEN` | integration and PR | Token used to create or reuse the bot's docs-integrator fork, push the generated branch, and open the upstream PR |
 
 Configure `ANTHROPIC_API_KEY` as a repository or organization secret. The prepare job
 validates it against Anthropic's Models API before checking out repositories or creating
