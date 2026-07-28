@@ -448,8 +448,48 @@ jobs:
             bal run -- "$TARGET"
           fi
 
+      - name: Validate example artifacts
+        working-directory: example-doc-generator
+        env:
+          MODE: ${{ inputs.mode }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          artifacts = Path("artifacts")
+          guides = sorted((artifacts / "workflow-docs").glob("*.md"))
+          screenshots = sorted((artifacts / "screenshots").glob("*_screenshot_*.png"))
+          expected_screenshots = 7 if os.environ["MODE"] == "trigger" else 6
+
+          errors = []
+          if len(guides) != 1:
+              errors.append(f"expected exactly 1 workflow guide, found {len(guides)}")
+          if len(screenshots) != expected_screenshots:
+              errors.append(
+                  f"expected exactly {expected_screenshots} screenshots for "
+                  f"{os.environ['MODE']} mode, found {len(screenshots)}"
+              )
+
+          if errors:
+              print("Example artifact validation failed:")
+              for error in errors:
+                  print(f"- {error}")
+              print("Generated guides:")
+              for guide in guides:
+                  print(f"  {guide}")
+              print("Generated screenshots:")
+              for screenshot in screenshots:
+                  print(f"  {screenshot}")
+              raise SystemExit(1)
+
+          print(
+              f"Validated 1 workflow guide and {expected_screenshots} "
+              f"screenshots for {os.environ['MODE']} mode."
+          )
+          PY
+
       - name: Upload example artifacts
-        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: example-docs-${{ needs.prepare.outputs.module_slug }}-${{ github.run_id }}

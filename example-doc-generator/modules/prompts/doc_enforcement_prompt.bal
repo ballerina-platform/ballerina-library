@@ -397,7 +397,7 @@ If this step is absent, add it as the last step of the "## Configuring the [Conn
 
 ## SCREENSHOT PLACEMENT RULES
 
-Each screenshot must be embedded in the step whose **action directly produced what the screenshot shows**. If a screenshot is misplaced, move it to the correct step — do not remove it. There are **5 mandatory screenshots** per run, numbered 01–05 (06 is optional).
+Each screenshot must be embedded in the step whose **action directly produced what the screenshot shows**. If a screenshot is misplaced, move it to the correct step — do not remove it. There are **6 mandatory screenshots** per run, numbered 01–06.
 
 **Screenshot 01 — Connector palette open (_01_palette):**
 - MUST be embedded in the step that describes **opening the Add Connection panel** (clicking "Add Connection" or the "+" button in the Connections section).
@@ -423,10 +423,11 @@ Each screenshot must be embedded in the step whose **action directly produced wh
 - MUST be embedded in the step that describes **selecting the operation and filling ALL its input fields / Record Configuration** values.
 - MUST NOT appear before any operation fields have been described in that step.
 
-**Screenshot 06 — Completed canvas flow (_06_completed_flow, optional):**
-- If present, embed after the operation save step, showing the completed flow on the canvas.
-- **If _06_completed_flow is absent but a file with that name exists**: the agent captured it — add it as the final image in the last step of the ## Configuring the operation section, after _05_operation_filled. Use this format:
+**Screenshot 06 — Completed canvas flow (_06_completed_flow):**
+- MUST be embedded after the operation save step, showing the completed flow on the canvas.
+- If the screenshot file exists but its reference is absent, add it as the final image in the last step of the ## Configuring the operation section, after _05_operation_filled. Use this format:
   ![Completed {ConnectorName} automation flow](../screenshots/{prefix}_screenshot_06_completed_flow.png)
+- If the screenshot file does not exist, do not describe screenshot 06 as optional and do not fabricate a reference to a missing file.
 
 **Save-then-reopen prohibition:**
 - If the document contains a step that saves the connection with defaults, immediately followed by a step that re-opens the same connection to fill parameters, this is a workflow error.
