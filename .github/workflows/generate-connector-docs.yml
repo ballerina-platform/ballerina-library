@@ -209,6 +209,7 @@ jobs:
           ref: main
           token: ${{ secrets.BALLERINA_BOT_TOKEN }}
           path: docs-integrator
+          fetch-depth: 0
           sparse-checkout: |
             en/sidebars.ts
             en/docs/connectors/catalog/index.mdx
@@ -312,6 +313,7 @@ jobs:
           ref: ${{ needs.prepare.outputs.docs_branch }}
           token: ${{ secrets.BALLERINA_BOT_TOKEN }}
           path: docs-integrator
+          fetch-depth: 0
           sparse-checkout: |
             en/sidebars.ts
             en/docs/connectors/catalog/index.mdx
@@ -483,6 +485,7 @@ jobs:
           ref: ${{ needs.prepare.outputs.docs_branch }}
           token: ${{ secrets.BALLERINA_BOT_TOKEN }}
           path: docs-integrator
+          fetch-depth: 0
 
       - name: Download example artifacts
         if: ${{ inputs.generate_examples }}
