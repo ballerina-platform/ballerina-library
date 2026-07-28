@@ -587,6 +587,12 @@ jobs:
           path: docs-integrator
           fetch-depth: 0
 
+      - name: Fetch upstream docs base
+        working-directory: docs-integrator
+        run: |
+          git remote add upstream https://github.com/wso2/docs-integrator.git
+          git fetch upstream main
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -628,7 +634,7 @@ jobs:
             echo "Waiting for docs server (${attempt}/60)..."
             sleep 1
           done
-          mapfile -t pages < <(git diff --name-only origin/main...HEAD -- "en/docs/connectors/catalog/${{ inputs.category }}/${MODULE}/*.md")
+          mapfile -t pages < <(git diff --name-only upstream/main...HEAD -- "en/docs/connectors/catalog/${{ inputs.category }}/${MODULE}/*.md")
           args=()
           for page in "${pages[@]}"; do args+=(--page "$PWD/$page"); done
           cd ..
@@ -691,8 +697,6 @@ jobs:
           FORK_OWNER: ${{ needs.prepare.outputs.docs_fork_owner }}
           PREVIEWS: ${{ steps.previews.outputs.markdown }}
         run: |
-          git remote add upstream https://github.com/wso2/docs-integrator.git
-          git fetch upstream main
           changed=$(git diff --name-only upstream/main...HEAD | sed 's/^/- `/' | sed 's/$/`/')
           cat > /tmp/pr-body.md <<EOF
           ## Purpose
