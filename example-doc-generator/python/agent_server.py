@@ -59,7 +59,7 @@ from claude_agent_sdk import (
 
 # CWD for the Claude agent is the project root (one level above this file)
 CWD = str(Path(__file__).parent.parent)
-AI_MODEL = os.environ.get("AI_MODEL", "sonnet-4-6")
+AI_MODEL = os.environ.get("AI_MODEL", "claude-sonnet-4-6")
 
 jobs: dict[str, dict] = {}
 running_tasks: set[asyncio.Task] = set()

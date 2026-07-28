@@ -6,7 +6,7 @@
 # =============================================================================
 
 # Model used by direct Anthropic calls and the Claude agent.
-llmModel = "sonnet-4-6"
+llmModel = "claude-sonnet-4-6"
 
 # Code-Server port (code-server runs locally on this port)
 # The pipeline will verify code-server is running and start it if needed.

@@ -19,7 +19,7 @@ import ballerina/io;
 import ballerina/os;
 import ballerina/time;
 
-const string DEFAULT_MODEL = "sonnet-4-6";
+const string DEFAULT_MODEL = "claude-sonnet-4-6";
 public const int MAX_TURNS_PHASE1 = 15;   // overview + setup + triggers: read several files + examples
 public const int MAX_TURNS_PHASE2A = 8;   // discovery only: glob + skim a few files
 public const int MAX_TURNS_PHASE2B = 15;  // per-client: read client + types + examples

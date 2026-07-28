@@ -55,13 +55,13 @@ on:
       ai_model:
         description: AI model
         required: true
-        default: sonnet-4-6
+        default: claude-sonnet-4-6
         type: choice
         options:
-          - sonnet-4-6
-          - sonnet-5
-          - opus-4-6
-          - opus-4-8
+          - claude-sonnet-4-6
+          - claude-sonnet-5
+          - claude-opus-4-6
+          - claude-opus-4-8
 
 concurrency:
   group: connector-documentation-${{ inputs.github_repo }}

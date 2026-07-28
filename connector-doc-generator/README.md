@@ -43,7 +43,7 @@ docsRepoRoot     = "/path/to/docs-integrator"
 # force = false
 # generateOverviewSetup = true
 # generateReference = true
-# aiModel = "sonnet-4-6"
+# aiModel = "claude-sonnet-4-6"
 
 # Set true to print what would happen without calling Claude
 # dryRun = false

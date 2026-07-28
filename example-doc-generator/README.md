@@ -232,7 +232,7 @@ Workflow inputs:
 | `generate_overview_setup` | publish the complete connector Phase 1 output |
 | `generate_reference` | publish the connector action reference |
 | `generate_examples` | run this example generator |
-| `ai_model` | model used by both documentation generators; defaults to `sonnet-4-6` |
+| `ai_model` | model used by both documentation generators; defaults to `claude-sonnet-4-6` |
 
 The `mode` input applies only to this example generator. Selecting Overview & Setup Guide
 or Reference runs the connector-doc job regardless of example mode. When connector documents
