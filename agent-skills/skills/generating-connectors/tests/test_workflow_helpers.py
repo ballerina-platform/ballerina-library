@@ -212,6 +212,34 @@ class OperationIdMappingTests(unittest.TestCase):
             self.assertEqual(persisted["custom"], "keep")
             self.assertNotIn("/stale", persisted["operationIds"])
 
+    def test_partial_apply_reserves_ids_from_omitted_operations(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            spec = directory / "aligned.json"
+            mappings = directory / "ai-mappings.json"
+            candidate = directory / "candidate.json"
+            decisions = directory / "decisions.json"
+            spec.write_text(json.dumps({
+                "openapi": "3.0.0",
+                "paths": {
+                    "/decided": {"post": {"operationId": "createItem"}},
+                    "/omitted": {"get": {"operationId": "listItems"}},
+                },
+            }), encoding="utf-8")
+            run("operation_id_mappings.py", "prepare", str(spec), str(mappings), str(candidate))
+            decisions.write_text(json.dumps({
+                "/decided": {"post": "listItems"},
+            }), encoding="utf-8")
+
+            result = json.loads(run(
+                "operation_id_mappings.py", "apply", str(spec), str(candidate),
+                str(decisions), str(mappings)).stdout)
+
+            generated = json.loads(spec.read_text(encoding="utf-8"))
+            self.assertEqual(result["pending_count"], 1)
+            self.assertEqual(generated["paths"]["/decided"]["post"]["operationId"], "listItems1")
+            self.assertEqual(generated["paths"]["/omitted"]["get"]["operationId"], "listItems")
+
     def test_duplicate_persisted_ids_are_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             directory = Path(temp)
@@ -398,11 +426,32 @@ class DescriptionTests(unittest.TestCase):
             requests = directory / "requests.json"
             decisions = directory / "decisions.json"
             run("spec_descriptions.py", "prepare", str(spec), str(requests))
-            decisions.write_text(json.dumps({"unknown": "Description"}), encoding="utf-8")
+            decisions.write_text(json.dumps({"unknown": "Useful description"}), encoding="utf-8")
             result = run("spec_descriptions.py", "apply", str(spec), str(requests),
                          str(decisions), check=False)
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("unknown description", result.stderr)
+
+    def test_normalized_empty_and_placeholder_decisions_are_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            spec = self.write_spec(directory)
+            requests = directory / "requests.json"
+            decisions = directory / "decisions.json"
+            prepared = json.loads(run(
+                "spec_descriptions.py", "prepare", str(spec), str(requests)).stdout)
+            request_id = prepared["requests"][0]["id"]
+            original = spec.read_text(encoding="utf-8")
+
+            for description in ("TBD", "TBD.", "  TBD.  ", ".", "..."):
+                with self.subTest(description=description):
+                    decisions.write_text(json.dumps({request_id: description}), encoding="utf-8")
+                    result = run(
+                        "spec_descriptions.py", "apply", str(spec), str(requests),
+                        str(decisions), check=False)
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn("non-placeholder descriptions", result.stderr)
+                    self.assertEqual(spec.read_text(encoding="utf-8"), original)
 
     def test_apply_preserves_description_added_after_prepare_and_rejects_duplicates(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

@@ -172,9 +172,12 @@ def parse_decisions(value: Any) -> dict[str, str]:
         fail("description decisions must be a JSON object")
     decisions: dict[str, str] = {}
     for request_id, description in value.items():
-        if not isinstance(request_id, str) or not isinstance(description, str) or not description.strip():
-            fail("description decisions must map request IDs to non-empty strings")
-        decisions[request_id] = description.strip().rstrip(".")
+        if not isinstance(request_id, str) or not isinstance(description, str):
+            fail("description decisions must map request IDs to non-placeholder descriptions")
+        normalized = description.strip().rstrip(".")
+        if invalid_description(normalized):
+            fail("description decisions must map request IDs to non-placeholder descriptions")
+        decisions[request_id] = normalized
     return decisions
 
 

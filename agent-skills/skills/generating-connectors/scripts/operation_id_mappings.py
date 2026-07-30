@@ -216,6 +216,10 @@ def apply(spec_path: str, candidate_path: str, decisions_path: str, output_path:
              ", ".join(f"{method} {path}" for path, method in unexpected))
 
     reserved = set(existing.values())
+    for location in unseen - set(decisions):
+        operation_id = current[location].get("operationId")
+        if isinstance(operation_id, str) and operation_id.strip():
+            reserved.add(operation_id.strip())
     final_decisions: dict[tuple[str, str], str] = {}
     changed = 0
     for location in sorted(decisions, key=lambda item: (item[0], HTTP_METHODS.index(item[1]))):

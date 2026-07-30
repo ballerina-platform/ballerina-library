@@ -75,14 +75,20 @@ From `USE_CASE`, suggest a snake_case directory name:
 Good: `sharepoint_tenant_configuration`, `admin_settings_update`
 Bad: `get_sharepoint_example`, `getSharepoint_demo`
 
-Store the raw suggestion as `SUGGESTED_EXAMPLE_NAME`, then normalize it and resolve collisions deterministically:
+Store the raw suggestion as `SUGGESTED_EXAMPLE_NAME`, then normalize it and resolve collisions deterministically. Invoke the helper with an argument array so every value is passed as a separate argv element:
 
-```bash
-<PYTHON_CMD> <skill-root>/scripts/example_names.py resolve \
-  "<EXAMPLE_DIR>" "<SUGGESTED_EXAMPLE_NAME>" "example_<iteration-number>"
+```text
+[
+  <PYTHON_CMD>,
+  <skill-root>/scripts/example_names.py,
+  resolve,
+  <EXAMPLE_DIR>,
+  SUGGESTED_EXAMPLE_NAME,
+  example_<iteration-number>
+]
 ```
 
-Parse the returned JSON and store `name` as `EXAMPLE_NAME`. Use this exact value for the directory, Ballerina package name, named documentation file, and aggregate documentation links. The helper converts arbitrary suggestions to snake_case and appends `_2`, `_3`, and so on when any existing filesystem entry already uses the name.
+Never interpolate `SUGGESTED_EXAMPLE_NAME` into shell source, including inside ordinary double quotes; shell metacharacters in an AI-generated suggestion must remain literal argument data. Parse the returned JSON and store `name` as `EXAMPLE_NAME`. Use this exact value for the directory, Ballerina package name, named documentation file, and aggregate documentation links. The helper converts arbitrary suggestions to snake_case and appends `_2`, `_3`, and so on when any existing filesystem entry already uses the name.
 
 ### 3c: Extract targeted code context
 
