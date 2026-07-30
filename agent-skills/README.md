@@ -11,24 +11,19 @@ Skills that automate Ballerina library workflows. They are distributed as the `b
 
 ## Prerequisites
 
-Both skills require [Claude Code](https://claude.ai/code) when installed through the plugin. Their workflow-specific requirements are:
-
-| Skill | Requirements |
+| Requirement | Install |
 |---|---|
-| `generating-connectors` | Ballerina CLI (`bal`), Python 3.8+, and Git. The `openapi` tool ships with Ballerina. |
-| `generate-connector-example-docs` | Node.js 18+, Python 3, Pillow, `code-server` with the WSO2 Integrator extension, and Chromium. |
+| [Claude Code](https://claude.ai/code) | Download from claude.ai/code |
+| Ballerina CLI (`bal`) | `brew install ballerina` or from [ballerina.io](https://ballerina.io/downloads/) — the `openapi` tool ships bundled with the distribution |
+| Python 3.8+ | `brew install python` or system Python |
+| Git | Pre-installed on most systems |
 
-Verify the common command-line dependencies after installation:
+Verify after install:
 
 ```bash
 bal tool list
-node --version
-npx --version
 python3 --version
-code-server --list-extensions
 ```
-
-The documentation skill checks its own prerequisites before browser work. It asks before installing Pillow from its pinned `requirements.txt`, installing the WSO2 extension, or downloading Chromium.
 
 ## Installation
 
