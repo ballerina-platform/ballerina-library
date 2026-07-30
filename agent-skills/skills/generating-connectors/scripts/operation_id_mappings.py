@@ -216,10 +216,12 @@ def apply(spec_path: str, candidate_path: str, decisions_path: str, output_path:
              ", ".join(f"{method} {path}" for path, method in unexpected))
 
     reserved = set(existing.values())
+    omitted: dict[tuple[str, str], str] = {}
     for location in unseen - set(decisions):
         operation_id = current[location].get("operationId")
         if isinstance(operation_id, str) and operation_id.strip():
-            reserved.add(operation_id.strip())
+            omitted[location] = operation_id.strip()
+            reserved.add(omitted[location])
     final_decisions: dict[tuple[str, str], str] = {}
     changed = 0
     for location in sorted(decisions, key=lambda item: (item[0], HTTP_METHODS.index(item[1]))):
@@ -236,7 +238,7 @@ def apply(spec_path: str, candidate_path: str, decisions_path: str, output_path:
         final_decisions[location] = final_id
         reserved.add(final_id)
 
-    merged = {**existing, **final_decisions}
+    merged = {**existing, **omitted, **final_decisions}
     candidate["operationIds"] = sorted_mappings(merged)
     atomic_write_json(spec_path, spec)
     atomic_write_json(output_path, ordered_document(candidate))

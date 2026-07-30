@@ -236,9 +236,11 @@ class OperationIdMappingTests(unittest.TestCase):
                 str(decisions), str(mappings)).stdout)
 
             generated = json.loads(spec.read_text(encoding="utf-8"))
+            persisted = json.loads(mappings.read_text(encoding="utf-8"))
             self.assertEqual(result["pending_count"], 1)
             self.assertEqual(generated["paths"]["/decided"]["post"]["operationId"], "listItems1")
             self.assertEqual(generated["paths"]["/omitted"]["get"]["operationId"], "listItems")
+            self.assertEqual(persisted["operationIds"]["/omitted"]["get"], "listItems")
 
     def test_duplicate_persisted_ids_are_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
