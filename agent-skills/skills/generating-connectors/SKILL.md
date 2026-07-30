@@ -46,7 +46,7 @@ When this skill is invoked:
    ```
    ╔══════════════════════════════════════════╗
    ║       Ballerina Connector Generator      ║
-   ╚════════════════════════════════ ᵥ₀․₂․₀ ══╝
+   ╚════════════════════════════════ ᵥ₀․₃․₀ ══╝
 
    I'll guide you through generating a Ballerina connector from your OpenAPI spec.
    This involves up to 5 stages: sanitize → client → tests → examples → docs.
