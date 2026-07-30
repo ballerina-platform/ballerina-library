@@ -489,9 +489,13 @@ class MigrationContractTests(unittest.TestCase):
         self.assertIn("/mcp", self.skill_text)
         self.assertIn("/reload-plugins", self.skill_text)
         self.assertIn("stop before creating artifacts", self.skill_text)
+        self.assertIn("CODE_SERVER_CREDENTIAL", self.skill_text)
         self.assertIn("CODE_SERVER_TOKEN", self.skill_text)
         self.assertIn("--auth password", self.skill_text)
         self.assertNotIn("--auth none", self.skill_text)
+        workflow = (self.skill / "references" / "connector-ui-workflow.md").read_text(encoding="utf-8")
+        self.assertIn("with `CODE_SERVER_CREDENTIAL` when reusing a server", workflow)
+        self.assertIn("with the per-run `CODE_SERVER_TOKEN`", workflow)
 
     def test_codex_packaging_is_not_migrated(self):
         self.assertFalse((self.skill / "agents" / "openai.yaml").exists())

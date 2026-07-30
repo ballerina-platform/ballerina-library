@@ -31,7 +31,7 @@ Treat workspace cleanup as a blocking gate. Do not begin connector work or take 
 
 ### Before opening WSO2 Integrator
 
-1. Navigate to the loopback code-server URL, authenticate its login page with the per-run `CODE_SERVER_TOKEN`, and wait for the VS Code interface to finish loading. Never expose the token in screenshots or generated artifacts.
+1. Navigate to the loopback code-server URL and authenticate its login page with `CODE_SERVER_CREDENTIAL` when reusing a server or with the per-run `CODE_SERVER_TOKEN` when using a server started by the current run. Wait for the VS Code interface to finish loading. Never expose either credential in screenshots or generated artifacts.
 2. If a **Git repository found on parent** popup appears, select **Never**.
 3. Close the global right-side secondary sidebar where GitHub Copilot or **Chat** is docked. Prefer its visible close control; otherwise press **Ctrl+Alt+B** or use **View → Appearance → Secondary Side Bar**.
 4. If a Chat or Copilot panel remains anywhere, select that panel's specific × close button or hide it from the **View** menu.
