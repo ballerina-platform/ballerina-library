@@ -15,7 +15,7 @@ from collect_screenshot import collect
 from crop_screenshots import crop_directory
 from inject_try_it_yourself import build_section, build_urls, inject_try_it_yourself
 from prepare_run import build_context, central_url, parse_coordinate, safe_slug
-from validate_output import validate
+from validate_output import BANNED, validate
 
 PNG = base64.b64decode(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
@@ -119,7 +119,7 @@ class CoordinateTests(unittest.TestCase):
             context = build_context(
                 "ballerinax/sap-business.one", Path(temp), {"version": "1.2.3"}
             )
-            self.assertEqual(context["sample_name"], "sap_business_one_connector_sample")
+            self.assertEqual(context["sample_name"], "ballerinax_sap_business_one_connector_sample")
             self.assertEqual(Path(context["sample_dir"]).name, context["sample_name"])
 
 
@@ -144,6 +144,8 @@ class WorkflowTests(unittest.TestCase):
             [f"{number:02d}" for number in range(1, 7)],
             [value for value in __import__("re").findall(r"_screenshot_(\d{2})_", template)],
         )
+        self.assertIn("{{SCREENSHOT_PREFIX}}_screenshot_05_operation_form.png", template)
+        self.assertNotIn("{{SCREENSHOT_PREFIX}}_screenshot_05_operation_filled.png", template)
         self.assertIn("assets/templates/connector-example-doc.md", contract)
         self.assertIn("Use **select**, not click", style)
 
@@ -281,9 +283,9 @@ class WorkflowTests(unittest.TestCase):
             self.assertTrue(inject_try_it_yourself(doc, sample, context["sample_name"]))
             self.assertFalse(inject_try_it_yourself(doc, sample, context["sample_name"]))
             self.assertEqual(doc.read_text(encoding="utf-8").count("## Try it yourself"), 1)
-            self.assertIn(build_section("mysql_connector_sample"), doc.read_text(encoding="utf-8"))
-            devant_url, github_url = build_urls("mysql_connector_sample")
-            expected_path = "integrator-default-profile/connectors/mysql_connector_sample"
+            self.assertIn(build_section(context["sample_name"]), doc.read_text(encoding="utf-8"))
+            devant_url, github_url = build_urls(context["sample_name"])
+            expected_path = "integrator-default-profile/connectors/ballerinax_mysql_connector_sample"
             self.assertTrue(devant_url.endswith(expected_path))
             self.assertTrue(github_url.endswith(expected_path))
 
@@ -325,9 +327,9 @@ class WorkflowTests(unittest.TestCase):
             self.assertTrue(run["try_it_yourself_added"])
             self.assertTrue(run["central_examples_found"])
             self.assertTrue(run["examples_added"])
-            self.assertEqual(run["sample_name"], "mysql_connector_sample")
-            self.assertTrue(run["devant_url"].endswith("/mysql_connector_sample"))
-            self.assertTrue(run["github_url"].endswith("/mysql_connector_sample"))
+            self.assertEqual(run["sample_name"], "ballerinax_mysql_connector_sample")
+            self.assertTrue(run["devant_url"].endswith("/ballerinax_mysql_connector_sample"))
+            self.assertTrue(run["github_url"].endswith("/ballerinax_mysql_connector_sample"))
             self.assertTrue(
                 Path(context["doc_path"]).read_text(encoding="utf-8").endswith(
                     "## More code examples\n\nUse Central.\n"
@@ -355,6 +357,18 @@ class WorkflowTests(unittest.TestCase):
             errors = validate(context)
             self.assertTrue(any("template placeholders" in error for error in errors))
             self.assertTrue(any("nonpreferred UI terminology" in error for error in errors))
+
+    def test_ui_terminology_distinguishes_verbs_from_nouns(self):
+        pattern = BANNED["nonpreferred UI terminology"]
+        for text in ("data type", "operation input", "input parameter"):
+            with self.subTest(text=text):
+                self.assertIsNone(pattern.search(text))
+        for text in (
+            "Click Save", "Choose a connection", "Press Enter", "Fill in the form",
+            "Uncheck the option", "Type the host name", "Input your account name",
+        ):
+            with self.subTest(text=text):
+                self.assertIsNotNone(pattern.search(text))
 
     def test_run_collision_is_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -388,6 +402,22 @@ class WorkflowTests(unittest.TestCase):
             self.assertEqual(append_central_examples(doc, metadata), (True, True))
             self.assertEqual(append_central_examples(doc, metadata), (True, False))
             self.assertEqual(doc.read_text(encoding="utf-8").count("## More code examples"), 1)
+
+    def test_crop_validates_every_image_before_modifying_any(self):
+        try:
+            from PIL import Image
+        except ImportError:
+            self.skipTest("Pillow is not installed")
+        with tempfile.TemporaryDirectory() as temp:
+            screenshots = Path(temp)
+            valid = screenshots / "01_valid.png"
+            invalid = screenshots / "02_invalid.png"
+            Image.new("RGB", (100, 80), "white").save(valid)
+            Image.new("RGB", (20, 20), "white").save(invalid)
+            with self.assertRaisesRegex(ValueError, "02_invalid.png"):
+                crop_directory(screenshots)
+            with Image.open(valid) as image:
+                self.assertEqual(image.size, (100, 80))
 
     def test_central_examples_cli_writes_sandbox_markdown(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -459,6 +489,9 @@ class MigrationContractTests(unittest.TestCase):
         self.assertIn("/mcp", self.skill_text)
         self.assertIn("/reload-plugins", self.skill_text)
         self.assertIn("stop before creating artifacts", self.skill_text)
+        self.assertIn("CODE_SERVER_TOKEN", self.skill_text)
+        self.assertIn("--auth password", self.skill_text)
+        self.assertNotIn("--auth none", self.skill_text)
 
     def test_codex_packaging_is_not_migrated(self):
         self.assertFalse((self.skill / "agents" / "openai.yaml").exists())

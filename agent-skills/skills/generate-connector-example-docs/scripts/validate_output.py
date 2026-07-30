@@ -27,7 +27,12 @@ BANNED = {
     "wordy phrasing": re.compile(
         r"\b(?:in order to|utili[sz]e|make use of|at this point in time|please note that)\b", re.I
     ),
-    "nonpreferred UI terminology": re.compile(r"\b(?:click|clicked|choose|chosen|press|type|input|fill in|uncheck)\b", re.I),
+    "nonpreferred UI terminology": re.compile(
+        r"\b(?:click|clicked|choose|chosen|press|fill in|uncheck)\b|"
+        r"(?<!data )\btype\s+(?=(?:a|an|the|your|this|that)\b|[`\"'{0-9])|"
+        r"(?<!operation )\binput\s+(?=(?:a|an|the|your|this|that)\b|[`\"'{0-9])",
+        re.I,
+    ),
     "nondescriptive link text": re.compile(r"\[(?:click here|here|this page|this guide|learn more)\]", re.I),
 }
 

@@ -21,12 +21,16 @@ def crop_directory(directory: Path, top: int = 32, bottom: int = 18, left: int =
     except ImportError as exc:
         raise RuntimeError("Pillow is required; install scripts/requirements.txt") from exc
     images = sorted(directory.glob("*.png"))
+    crop_boxes = []
     for path in images:
         with Image.open(path) as image:
             width, height = image.size
             box = (left, top, width - right, height - bottom)
             if box[0] >= box[2] or box[1] >= box[3]:
                 raise ValueError(f"Crop margins exceed dimensions for {path.name}")
+            crop_boxes.append((path, box))
+    for path, box in crop_boxes:
+        with Image.open(path) as image:
             cropped = image.crop(box)
             cropped.save(path, format="PNG")
     return len(images)

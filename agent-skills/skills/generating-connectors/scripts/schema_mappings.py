@@ -31,13 +31,22 @@ def fail(message: str) -> None:
     raise SystemExit(1)
 
 
-def read_json(path: str, default: Any = None) -> Any:
+def reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON key '{key}'")
+        result[key] = value
+    return result
+
+
+def read_json(path: str, default: Any = None, reject_duplicates: bool = False) -> Any:
     if not os.path.exists(path):
         return default
     try:
         with open(path, encoding="utf-8") as file:
-            return json.load(file)
-    except (OSError, json.JSONDecodeError) as exc:
+            return json.load(file, object_pairs_hook=reject_duplicate_keys if reject_duplicates else None)
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
         fail(f"could not read JSON file {path}: {exc}")
 
 
@@ -166,7 +175,7 @@ def prepare(spec_path: str, mappings_path: str, candidate_path: str) -> None:
 def apply(spec_path: str, candidate_path: str, decisions_path: str, output_path: str) -> None:
     spec = read_json(spec_path)
     candidate = load_mapping_document(candidate_path)
-    decisions = read_json(decisions_path)
+    decisions = read_json(decisions_path, reject_duplicates=True)
     if not isinstance(spec, dict) or not isinstance(decisions, dict):
         fail("spec and decisions must be JSON objects")
     current = schemas(spec)

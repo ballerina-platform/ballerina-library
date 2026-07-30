@@ -72,7 +72,7 @@ def build_context(coordinate: str, root: Path, metadata: dict) -> dict:
     resolved_version = str(metadata.get("version") or requested_version)
     slug = safe_slug(org, package)
     image_prefix = safe_slug(org, package, separator="_")
-    sample_name = f"{safe_slug(package, separator='_')}_connector_sample"
+    sample_name = f"{safe_slug(org, package, separator='_')}_connector_sample"
     run_dir = (root / "artifacts" / slug).resolve()
     if run_dir.exists() and any(run_dir.iterdir()):
         raise FileExistsError(

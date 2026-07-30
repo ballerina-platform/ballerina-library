@@ -11,7 +11,7 @@ If skipped, run `<PYTHON_CMD> <skill-root>/scripts/find_spec_output.py "<SPEC_DI
 
 Before running any new processing, check whether `<SPEC_DIR>/sanitations.md` already exists. If it does, read it and check whether it still contains the literal substring `TODO` (case-insensitive) — every unfilled marker the template ships with (`<!-- TODO: Add author name -->`, `<!-- TODO: Add date -->`, `(TODO: Add source link)`, `[//]: # (TODO: Add sanitation details)`, `# TODO: Add OpenAPI CLI command used to generate the client`) contains that substring, so its presence means the file is still an unfilled scaffold from `templates/sanitations_template.md` rather than real recorded content.
 
-**If the file doesn't exist**, skip Step 0 entirely and proceed to Step 0b.
+**If the file doesn't exist**, skip Step 0 entirely and proceed to Step 1.
 
 **If it exists with no `TODO` markers (real recorded content)**, offer the following 2+1 choice:
 

@@ -80,7 +80,7 @@ Select **Save** and verify that the connection appears in the **Connections** se
 
 - **{{OPERATION_FIELD_LABEL}}** : {{OPERATION_FIELD_DESCRIPTION}}
 
-![{{CONNECTOR_DISPLAY_NAME}} {{OPERATION_DISPLAY_NAME}} operation with all values entered before saving](../screenshots/{{SCREENSHOT_PREFIX}}_screenshot_05_operation_filled.png)
+![{{CONNECTOR_DISPLAY_NAME}} {{OPERATION_DISPLAY_NAME}} operation with all values entered before saving](../screenshots/{{SCREENSHOT_PREFIX}}_screenshot_05_operation_form.png)
 
 4. Select **Save**.
 

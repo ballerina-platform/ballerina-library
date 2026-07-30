@@ -92,6 +92,21 @@ class SchemaMappingTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("duplicate", result.stderr)
 
+    def test_duplicate_decision_keys_are_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            spec = self.write_spec(directory, {"A": {}})
+            mappings = directory / "mappings.json"
+            candidate = directory / "candidate.json"
+            decisions = directory / "decisions.json"
+            run("schema_mappings.py", "prepare", str(spec), str(mappings), str(candidate))
+            decisions.write_text('{"A": "A", "A": "Other"}', encoding="utf-8")
+            result = run(
+                "schema_mappings.py", "apply", str(spec), str(candidate),
+                str(decisions), str(mappings), check=False)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("duplicate JSON key", result.stderr)
+
     def test_schema_less_spec_prunes_stale_mappings(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             directory = Path(temp)
