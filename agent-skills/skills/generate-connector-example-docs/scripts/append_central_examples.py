@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+"""Append verified examples from cached Ballerina Central metadata to a guide."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from pathlib import Path
+from typing import Optional
+
+SECTION_HEADING = "## More code examples"
+
+
+def extract_examples(readme: str) -> Optional[str]:
+    lines = readme.splitlines()
+    start = None
+    heading_level = 0
+    for index, line in enumerate(lines):
+        match = re.match(r"^(#{1,6})\s+examples?\s*$", line.strip(), re.I)
+        if match:
+            start = index + 1
+            heading_level = len(match.group(1))
+            break
+    if start is None:
+        return None
+
+    body: list[str] = []
+    for line in lines[start:]:
+        heading = re.match(r"^(#{1,6})\s+", line)
+        if heading and len(heading.group(1)) <= heading_level:
+            break
+        body.append(line)
+    value = "\n".join(body).strip()
+    return value or None
+
+
+def examples_from_metadata(metadata_path: Path) -> Optional[str]:
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    readme = metadata.get("readme")
+    if readme is None:
+        return None
+    if not isinstance(readme, str):
+        raise ValueError("Ballerina Central metadata field 'readme' must be a string")
+    return extract_examples(readme)
+
+
+def append_central_examples(doc_path: Path, metadata_path: Path) -> tuple[bool, bool]:
+    if not doc_path.is_file():
+        raise FileNotFoundError(f"Missing guide: {doc_path}")
+    examples = examples_from_metadata(metadata_path)
+    text = doc_path.read_text(encoding="utf-8")
+    matches = list(re.finditer(r"^## More code examples\n\n(?P<body>.*?)(?=^## |\Z)", text, re.M | re.S))
+    if len(matches) > 1:
+        raise ValueError("Guide contains duplicate More code examples sections")
+    if matches:
+        if examples is None:
+            raise ValueError("Guide contains More code examples but Central metadata has no examples")
+        actual = matches[0].group("body").strip()
+        if actual != examples:
+            raise ValueError("Existing More code examples content does not match Ballerina Central")
+        return True, False
+    if examples is None:
+        return False, False
+    doc_path.write_text(f"{text.rstrip()}\n\n{SECTION_HEADING}\n\n{examples}\n", encoding="utf-8")
+    return True, True
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--context", required=True, type=Path)
+    args = parser.parse_args()
+    try:
+        context = json.loads(args.context.read_text(encoding="utf-8"))
+        found, added = append_central_examples(
+            Path(context["doc_path"]), Path(context["metadata_path"])
+        )
+    except (OSError, ValueError, json.JSONDecodeError, KeyError) as exc:
+        print(f"[ERROR] Could not append Central examples: {exc}", file=sys.stderr)
+        return 1
+    print(json.dumps({"examples_found": found, "examples_added": added}, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -92,6 +92,375 @@ class SchemaMappingTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("duplicate", result.stderr)
 
+    def test_duplicate_decision_keys_are_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            spec = self.write_spec(directory, {"A": {}})
+            mappings = directory / "mappings.json"
+            candidate = directory / "candidate.json"
+            decisions = directory / "decisions.json"
+            run("schema_mappings.py", "prepare", str(spec), str(mappings), str(candidate))
+            decisions.write_text('{"A": "A", "A": "Other"}', encoding="utf-8")
+            result = run(
+                "schema_mappings.py", "apply", str(spec), str(candidate),
+                str(decisions), str(mappings), check=False)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("duplicate JSON key", result.stderr)
+
+    def test_schema_less_spec_prunes_stale_mappings(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            spec = directory / "aligned.json"
+            mappings = directory / "ai-mappings.json"
+            candidate = directory / "candidate.json"
+            spec.write_text(json.dumps({"openapi": "3.0.0", "paths": {}}), encoding="utf-8")
+            mappings.write_text(json.dumps({
+                "operationIds": {"/items": {"get": "listItems"}},
+                "schemaNames": {"Removed": "Removed"},
+                "custom": {"keep": True},
+            }), encoding="utf-8")
+            prepared = json.loads(run(
+                "schema_mappings.py", "prepare", str(spec), str(mappings), str(candidate)).stdout)
+            self.assertEqual(prepared["unseen_schemas"], [])
+            self.assertEqual(prepared["pruned_schema_names"], ["Removed"])
+            persisted = json.loads(mappings.read_text(encoding="utf-8"))
+            self.assertEqual(persisted["schemaNames"], {})
+            self.assertEqual(persisted["operationIds"], {"/items": {"get": "listItems"}})
+            self.assertEqual(persisted["custom"], {"keep": True})
+            self.assertEqual(next(iter(persisted)), "_warning")
+
+    def test_schema_less_shapes_are_all_accepted(self) -> None:
+        variants = [
+            {},
+            {"components": {}},
+            {"components": {"schemas": []}},
+            {"components": {"schemas": {}}},
+        ]
+        for index, variant in enumerate(variants):
+            with self.subTest(index=index), tempfile.TemporaryDirectory() as temp:
+                directory = Path(temp)
+                spec = directory / "aligned.json"
+                mappings = directory / "mappings.json"
+                candidate = directory / "candidate.json"
+                document = {"openapi": "3.0.0", "paths": {}, **variant}
+                spec.write_text(json.dumps(document), encoding="utf-8")
+                prepared = json.loads(run(
+                    "schema_mappings.py", "prepare", str(spec), str(mappings),
+                    str(candidate)).stdout)
+                self.assertEqual(prepared["unseen_schemas"], [])
+                self.assertEqual(json.loads(mappings.read_text(encoding="utf-8"))["schemaNames"], {})
+
+
+class OperationIdMappingTests(unittest.TestCase):
+    def write_spec(self, directory: Path) -> Path:
+        path = directory / "aligned.json"
+        path.write_text(json.dumps({
+            "openapi": "3.0.0",
+            "paths": {
+                "/v1.0/users/{id}": {
+                    "get": {
+                        "operationId": "getV10UsersId",
+                        "summary": "Get a user",
+                        "parameters": [{"name": "id", "in": "path", "required": True}],
+                    },
+                    "post": {"operationId": "postV10UsersId", "summary": "Update a user"},
+                },
+                "/removed-on-next-run": {"delete": {"operationId": "deleteItem"}},
+            },
+            "components": {"schemas": {"User": {"type": "object"}}},
+        }), encoding="utf-8")
+        return path
+
+    def test_mappings_are_stable_partial_and_pruned(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            spec = self.write_spec(directory)
+            mappings = directory / "ai-mappings.json"
+            candidate = directory / "candidate.json"
+            decisions = directory / "decisions.json"
+            mappings.write_text(json.dumps({
+                "schemaNames": {"User": "User"},
+                "operationIds": {
+                    "/v1.0/users/{id}": {"get": "getUser"},
+                    "/stale": {"get": "staleId"},
+                },
+                "custom": "keep",
+            }), encoding="utf-8")
+            prepared = json.loads(run(
+                "operation_id_mappings.py", "prepare", str(spec), str(mappings), str(candidate)).stdout)
+            self.assertEqual(prepared["reused_count"], 1)
+            self.assertEqual(prepared["pruned_operations"], ["get /stale"])
+            unseen = {(item["path"], item["method"]) for item in prepared["unseen_operations"]}
+            self.assertEqual(unseen, {
+                ("/v1.0/users/{id}", "post"),
+                ("/removed-on-next-run", "delete"),
+            })
+            decisions.write_text(json.dumps({
+                "/v1.0/users/{id}": {"post": "getUser"},
+            }), encoding="utf-8")
+            result = json.loads(run(
+                "operation_id_mappings.py", "apply", str(spec), str(candidate),
+                str(decisions), str(mappings)).stdout)
+            self.assertEqual(result["applied_count"], 1)
+            self.assertEqual(result["pending_count"], 1)
+            generated = json.loads(spec.read_text(encoding="utf-8"))
+            self.assertEqual(generated["paths"]["/v1.0/users/{id}"]["get"]["operationId"], "getUser")
+            self.assertEqual(generated["paths"]["/v1.0/users/{id}"]["post"]["operationId"], "getUser1")
+            persisted = json.loads(mappings.read_text(encoding="utf-8"))
+            self.assertEqual(next(iter(persisted)), "_warning")
+            self.assertEqual(persisted["schemaNames"], {"User": "User"})
+            self.assertEqual(persisted["custom"], "keep")
+            self.assertNotIn("/stale", persisted["operationIds"])
+
+    def test_duplicate_persisted_ids_are_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            spec = self.write_spec(directory)
+            mappings = directory / "mappings.json"
+            candidate = directory / "candidate.json"
+            mappings.write_text(json.dumps({"operationIds": {
+                "/v1.0/users/{id}": {"get": "same", "post": "same"},
+            }}), encoding="utf-8")
+            result = run("operation_id_mappings.py", "prepare", str(spec), str(mappings),
+                         str(candidate), check=False)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("duplicate persisted", result.stderr)
+
+    def test_first_run_reviews_all_operations_and_persists_identity(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            spec = self.write_spec(directory)
+            mappings = directory / "mappings.json"
+            candidate = directory / "candidate.json"
+            decisions = directory / "decisions.json"
+            prepared = json.loads(run(
+                "operation_id_mappings.py", "prepare", str(spec), str(mappings), str(candidate)).stdout)
+            self.assertEqual(len(prepared["unseen_operations"]), 3)
+            decisions.write_text(json.dumps({
+                "/v1.0/users/{id}": {
+                    "get": "getV10UsersId",
+                    "post": "updateUser",
+                },
+                "/removed-on-next-run": {"delete": "deleteItem"},
+            }), encoding="utf-8")
+            result = json.loads(run(
+                "operation_id_mappings.py", "apply", str(spec), str(candidate),
+                str(decisions), str(mappings)).stdout)
+            self.assertEqual(result["applied_count"], 3)
+            self.assertEqual(result["pending_count"], 0)
+            persisted = json.loads(mappings.read_text(encoding="utf-8"))
+            self.assertEqual(
+                persisted["operationIds"]["/v1.0/users/{id}"]["get"], "getV10UsersId")
+
+    def test_malformed_and_unknown_decisions_are_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            spec = self.write_spec(directory)
+            mappings = directory / "mappings.json"
+            candidate = directory / "candidate.json"
+            decisions = directory / "decisions.json"
+            mappings.write_text(json.dumps({
+                "operationIds": {"/v1.0/users/{id}": {"FETCH": "bad"}},
+            }), encoding="utf-8")
+            malformed = run(
+                "operation_id_mappings.py", "prepare", str(spec), str(mappings),
+                str(candidate), check=False)
+            self.assertNotEqual(malformed.returncode, 0)
+            self.assertIn("unsupported", malformed.stderr)
+
+            mappings.write_text("{}", encoding="utf-8")
+            run("operation_id_mappings.py", "prepare", str(spec), str(mappings), str(candidate))
+            decisions.write_text(json.dumps({"/unknown": {"get": "unknown"}}), encoding="utf-8")
+            unknown = run(
+                "operation_id_mappings.py", "apply", str(spec), str(candidate),
+                str(decisions), str(mappings), check=False)
+            self.assertNotEqual(unknown.returncode, 0)
+            self.assertIn("unexpected operations", unknown.stderr)
+
+            decisions.write_text(
+                '{"/v1.0/users/{id}":{"get":"first","get":"second"}}',
+                encoding="utf-8")
+            duplicate = run(
+                "operation_id_mappings.py", "apply", str(spec), str(candidate),
+                str(decisions), str(mappings), check=False)
+            self.assertNotEqual(duplicate.returncode, 0)
+            self.assertIn("duplicate JSON key", duplicate.stderr)
+
+
+class DescriptionTests(unittest.TestCase):
+    def write_spec(self, directory: Path) -> Path:
+        path = directory / "aligned.json"
+        path.write_text(json.dumps({
+            "openapi": "3.0.0",
+            "info": {"title": "Files API", "description": "Manage files"},
+            "paths": {
+                "/files.v3/upload": {
+                    "post": {
+                        "operationId": "uploadFile",
+                        "summary": "Upload a file",
+                        "requestBody": {
+                            "required": True,
+                            "content": {
+                                "multipart/form-data": {
+                                    "schema": {"$ref": "#/components/schemas/FileUploadRequest"}
+                                }
+                            },
+                        },
+                    }
+                },
+                "/json": {
+                    "post": {
+                        "requestBody": {
+                            "description": "TBD",
+                            "content": {"application/json": {"schema": {
+                                "type": "object", "properties": {"name": {"type": "string"}}
+                            }}},
+                        }
+                    }
+                },
+                "/documented": {
+                    "post": {"requestBody": {"description": "Existing payload", "content": {}}}
+                },
+                "/reference": {
+                    "post": {"requestBody": {"$ref": "#/components/requestBodies/Upload"}}
+                },
+            },
+            "components": {
+                "schemas": {"FileUploadRequest": {"type": "object"}},
+                "securitySchemes": {
+                    "private.apps": {
+                        "type": "apiKey", "name": "private-app", "in": "header",
+                        "x-ballerina-name": "privateApp",
+                    },
+                    "queryKey": {
+                        "type": "apiKey", "name": "api_key", "in": "query", "description": "-",
+                    },
+                    "cookieKey": {
+                        "type": "apiKey", "name": "session_key", "in": "cookie",
+                    },
+                    "documented": {
+                        "type": "apiKey", "name": "key", "in": "cookie",
+                        "description": "Existing API key",
+                    },
+                    "oauth": {"type": "oauth2", "flows": {}},
+                },
+            },
+        }), encoding="utf-8")
+        return path
+
+    def test_prepare_and_partial_apply(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            spec = self.write_spec(directory)
+            requests = directory / "requests.json"
+            decisions = directory / "decisions.json"
+            prepared = json.loads(run(
+                "spec_descriptions.py", "prepare", str(spec), str(requests)).stdout)
+            self.assertEqual(prepared["request_body_count"], 2)
+            self.assertEqual(prepared["security_scheme_count"], 3)
+            self.assertEqual(
+                {item["context"]["in"] for item in prepared["requests"]
+                 if item["type"] == "securityScheme"},
+                {"header", "query", "cookie"})
+            multipart = next(item for item in prepared["requests"]
+                             if item["location"].get("path") == "/files.v3/upload")
+            self.assertTrue(multipart["context"]["required"])
+            self.assertEqual(multipart["context"]["content"][0]["media_type"], "multipart/form-data")
+            self.assertEqual(multipart["context"]["content"][0]["schema"]["reference"], "FileUploadRequest")
+            scheme = next(item for item in prepared["requests"]
+                          if item["location"].get("scheme_name") == "private.apps")
+            self.assertEqual(scheme["context"]["x_ballerina_name"], "privateApp")
+            decisions.write_text(json.dumps({
+                multipart["id"]: "File content and upload options.",
+                scheme["id"]: "Private app token supplied in the request header.",
+            }), encoding="utf-8")
+            result = json.loads(run(
+                "spec_descriptions.py", "apply", str(spec), str(requests), str(decisions)).stdout)
+            self.assertEqual(result["request_bodies_updated"], 1)
+            self.assertEqual(result["security_schemes_updated"], 1)
+            self.assertEqual(result["pending_count"], 3)
+            generated = json.loads(spec.read_text(encoding="utf-8"))
+            self.assertEqual(
+                generated["paths"]["/files.v3/upload"]["post"]["requestBody"]["description"],
+                "File content and upload options")
+            self.assertEqual(
+                generated["components"]["securitySchemes"]["private.apps"]["description"],
+                "Private app token supplied in the request header")
+            self.assertEqual(
+                generated["paths"]["/documented"]["post"]["requestBody"]["description"],
+                "Existing payload")
+            self.assertNotIn("description", generated["components"]["securitySchemes"]["oauth"])
+
+    def test_unknown_decision_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            spec = self.write_spec(directory)
+            requests = directory / "requests.json"
+            decisions = directory / "decisions.json"
+            run("spec_descriptions.py", "prepare", str(spec), str(requests))
+            decisions.write_text(json.dumps({"unknown": "Description"}), encoding="utf-8")
+            result = run("spec_descriptions.py", "apply", str(spec), str(requests),
+                         str(decisions), check=False)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("unknown description", result.stderr)
+
+    def test_apply_preserves_description_added_after_prepare_and_rejects_duplicates(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            spec = self.write_spec(directory)
+            requests = directory / "requests.json"
+            decisions = directory / "decisions.json"
+            prepared = json.loads(run(
+                "spec_descriptions.py", "prepare", str(spec), str(requests)).stdout)
+            body = next(item for item in prepared["requests"]
+                        if item["location"].get("path") == "/json")
+            generated = json.loads(spec.read_text(encoding="utf-8"))
+            generated["paths"]["/json"]["post"]["requestBody"]["description"] = "Added by another step"
+            spec.write_text(json.dumps(generated), encoding="utf-8")
+            decisions.write_text(json.dumps({body["id"]: "Replacement"}), encoding="utf-8")
+            result = json.loads(run(
+                "spec_descriptions.py", "apply", str(spec), str(requests), str(decisions)).stdout)
+            self.assertEqual(result["skipped_documented_count"], 1)
+            preserved = json.loads(spec.read_text(encoding="utf-8"))
+            self.assertEqual(
+                preserved["paths"]["/json"]["post"]["requestBody"]["description"],
+                "Added by another step")
+
+            decisions.write_text(
+                f'{{"{body["id"]}":"first","{body["id"]}":"second"}}',
+                encoding="utf-8")
+            duplicate = run(
+                "spec_descriptions.py", "apply", str(spec), str(requests),
+                str(decisions), check=False)
+            self.assertNotEqual(duplicate.returncode, 0)
+            self.assertIn("duplicate JSON key", duplicate.stderr)
+
+
+class MetadataTests(unittest.TestCase):
+    def test_request_bodies_security_schemes_and_no_schemas(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "spec.json"
+            path.write_text(json.dumps({
+                "openapi": "3.0.0",
+                "info": {"title": "API"},
+                "paths": {"/items": {"post": {"requestBody": {
+                    "required": True,
+                    "content": {"application/json": {
+                        "schema": {"$ref": "#/components/schemas/Input"}
+                    }},
+                }}}},
+                "components": {"securitySchemes": {"key": {
+                    "type": "apiKey", "name": "X-Key", "in": "header",
+                    "x-ballerina-name": "apiKey",
+                }}},
+            }), encoding="utf-8")
+            metadata = json.loads(run("parse_openapi_spec.py", str(path)).stdout)
+            self.assertEqual(metadata["schemas"], [])
+            self.assertTrue(metadata["paths"][0]["requestBody"]["required"])
+            self.assertEqual(
+                metadata["paths"][0]["requestBody"]["content"][0]["schema"]["reference"], "Input")
+            self.assertEqual(metadata["securitySchemes"][0]["xBallerinaName"], "apiKey")
+
 
 class VersionAndExampleTests(unittest.TestCase):
     def create_example(self, root: Path, name: str) -> Path:
@@ -132,6 +501,19 @@ class VersionAndExampleTests(unittest.TestCase):
             result = json.loads(run("manage_examples.py", "cleanup", str(root)).stdout)
             self.assertEqual(result["removed"], ["generated"])
             self.assertTrue(preserved.is_dir())
+
+    def test_example_names_are_snake_case_and_unique(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "file_upload_workflow").mkdir()
+            (root / "file_upload_workflow_2").write_text("reserved", encoding="utf-8")
+            result = json.loads(run(
+                "example_names.py", "resolve", str(root), " File--Upload Workflow! ", "example_1").stdout)
+            self.assertEqual(result["base_name"], "file_upload_workflow")
+            self.assertEqual(result["name"], "file_upload_workflow_3")
+            fallback = json.loads(run(
+                "example_names.py", "resolve", str(root), "---", "example_1").stdout)
+            self.assertEqual(fallback["name"], "example_1")
 
     def test_example_cleanup_restores_packages_when_quarantine_deletion_fails(self) -> None:
         module = load_script_module("manage_examples.py")

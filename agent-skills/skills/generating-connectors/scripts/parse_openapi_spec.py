@@ -3,7 +3,7 @@
 Extract structured metadata from an OpenAPI spec without dumping the raw spec into LLM context.
 
 Output (stdout): JSON object with:
-  title, version, description, paths, schemas, tags, servers
+  title, version, description, paths, schemas, securitySchemes, tags, servers
 """
 
 import sys
@@ -20,6 +20,23 @@ def load_spec(spec_path: str) -> dict:
     return json.loads(raw)
 
 
+def schema_context(schema: object) -> dict:
+    if not isinstance(schema, dict):
+        return {}
+    reference = schema.get("$ref")
+    if isinstance(reference, str):
+        return {"reference": reference.rsplit("/", 1)[-1]}
+    result = {}
+    if isinstance(schema.get("type"), str):
+        result["type"] = schema["type"]
+    properties = schema.get("properties")
+    if isinstance(properties, dict):
+        result["properties"] = list(properties)[:20]
+    if isinstance(schema.get("items"), dict):
+        result["items"] = schema_context(schema["items"])
+    return result
+
+
 def extract(spec: dict) -> dict:
     info = spec.get("info", {})
     result = {
@@ -31,6 +48,7 @@ def extract(spec: dict) -> dict:
         "tags": [t.get("name", "") for t in spec.get("tags", [])],
         "paths": [],
         "schemas": [],
+        "securitySchemes": [],
     }
 
     for path, path_item in (spec.get("paths") or {}).items():
@@ -43,7 +61,30 @@ def extract(spec: dict) -> dict:
             params = []
             for p in op.get("parameters", []):
                 if isinstance(p, dict) and "name" in p:
-                    params.append({"name": p["name"], "in": p.get("in", ""), "required": p.get("required", False)})
+                    params.append({
+                        "name": p["name"],
+                        "in": p.get("in", ""),
+                        "required": p.get("required", False),
+                        "description": (p.get("description") or "")[:200],
+                    })
+            request_body = op.get("requestBody")
+            request_body_metadata = None
+            if isinstance(request_body, dict):
+                content = request_body.get("content")
+                media = []
+                if isinstance(content, dict):
+                    for media_type, media_value in content.items():
+                        media_value = media_value if isinstance(media_value, dict) else {}
+                        media.append({
+                            "mediaType": media_type,
+                            "schema": schema_context(media_value.get("schema")),
+                        })
+                request_body_metadata = {
+                    "description": (request_body.get("description") or "")[:300],
+                    "required": bool(request_body.get("required", False)),
+                    "isReferenceOnly": "$ref" in request_body,
+                    "content": media,
+                }
             result["paths"].append({
                 "path": path,
                 "method": method.upper(),
@@ -52,6 +93,7 @@ def extract(spec: dict) -> dict:
                 "description": (op.get("description") or "")[:300],
                 "tags": op.get("tags", []),
                 "parameters": params,
+                "requestBody": request_body_metadata,
                 "deprecated": op.get("deprecated", False),
             })
 
@@ -66,6 +108,20 @@ def extract(spec: dict) -> dict:
                 "type": schema.get("type", "object"),
                 "description": (schema.get("description") or "")[:200],
                 "properties": list((schema.get("properties") or {}).keys())[:10],
+            })
+
+    security_schemes = components.get("securitySchemes") if isinstance(components, dict) else None
+    if isinstance(security_schemes, dict):
+        for name, scheme in security_schemes.items():
+            if not isinstance(scheme, dict):
+                continue
+            result["securitySchemes"].append({
+                "name": name,
+                "type": scheme.get("type", ""),
+                "wireName": scheme.get("name", ""),
+                "in": scheme.get("in", ""),
+                "description": (scheme.get("description") or "")[:300],
+                "xBallerinaName": scheme.get("x-ballerina-name", ""),
             })
 
     return result

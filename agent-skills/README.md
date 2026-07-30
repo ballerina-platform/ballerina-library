@@ -7,6 +7,7 @@ Skills that automate Ballerina library workflows. They are distributed as the `b
 | Skill | Description |
 |---|---|
 | [`generating-connectors`](skills/generating-connectors) | Generates a complete Ballerina connector from an OpenAPI specification — a five-stage pipeline (sanitize → client → tests → examples → docs) producing a production-ready connector package. |
+| [`generate-connector-example-docs`](skills/generate-connector-example-docs) | Creates a WSO2 Integrator connector sample through the low-code UI, captures six screenshots, and generates a validated example guide from a full Ballerina Central package coordinate. |
 
 ## Prerequisites
 
@@ -67,15 +68,25 @@ Auto-update is a client-side, per-user setting and is disabled by default for th
 
 For more details, see Anthropic's [plugin discovery and installation guide](https://code.claude.com/docs/en/discover-plugins).
 
+#### Bundled Playwright MCP server
+
+The plugin configures a pinned Playwright MCP server through `.mcp.json`. Claude Code starts it whenever `ballerina-libdev` is enabled, so Playwright is also available in sessions that use only `generating-connectors`. The first start can download `@playwright/mcp@0.0.78` through `npx -y`; browser installation remains an explicit prerequisite step.
+
+Use `/mcp` to inspect the connection. After changing `.mcp.json` or updating the plugin in an active session, run:
+
+```bash
+/reload-plugins
+```
+
 ### Other agents (Open Agent Skills CLI)
 
-Install the connector-generation skill for Codex, Cursor, Gemini CLI, GitHub Copilot, and other supported agents:
+Install the standard skill folders for Codex, Cursor, Gemini CLI, GitHub Copilot, and other supported agents:
 
 ```bash
 npx skills add ballerina-platform/ballerina-library
 ```
 
-Pass `--agent <name>` to target a specific agent. This channel installs the connector-generation skill only; Claude Code plugin artifacts such as MCP support and hooks are not included.
+Pass `--agent <name>` to target a specific agent. This channel does not install Claude plugin artifacts such as `.mcp.json`. `generating-connectors` can run with ordinary file and shell tools; `generate-connector-example-docs` additionally requires an equivalent Playwright MCP configuration. The Claude Code plugin is the supported turnkey installation for the documentation workflow.
 
 ### Manual installation fallback
 
@@ -97,9 +108,13 @@ git pull
 
 Repeat the symlink step for any additional directory under `agent-skills/skills/`.
 
+Symlinking `generate-connector-example-docs` alone does not install its Playwright MCP server. Use the plugin installation or configure an equivalent Playwright MCP server separately.
+
 ## Usage
 
-Start a Claude Code session in the directory where you want the connector generated (or where one already exists), then invoke the skill directly:
+Start a Claude Code session in the project where you want the generated output, then invoke the relevant skill directly.
+
+Generate a Ballerina connector:
 
 ```
 /ballerina-libdev:generating-connectors
@@ -111,6 +126,26 @@ Or describe your goal in natural language:
 Generate a Ballerina connector from this OpenAPI spec: ./hubspot-files.yaml
 ```
 
+Generate WSO2 Integrator connector example documentation with an explicit Central version:
+
+```text
+/ballerina-libdev:generate-connector-example-docs ballerinax/mysql:1.16.0
+```
+
+Omit the version to resolve the latest package:
+
+```text
+/ballerina-libdev:generate-connector-example-docs ballerinax/mysql
+```
+
+The documentation skill also activates from a matching natural-language request:
+
+```text
+Generate a WSO2 Integrator connector example guide for ballerinax/mysql.
+```
+
+Use `organization/package` or `organization/package:version`; bare package names are rejected. Output is preserved under `artifacts/<organization>-<package>/` in the Claude project directory.
+
 See each skill's own `SKILL.md` for its full stage breakdown and configuration options.
 
 ## Versioning and releases
@@ -119,7 +154,7 @@ Bump the `version` in `.claude-plugin/plugin.json` for every meaningful change u
 
 ## Using with other agents
 
-Each skill is just markdown instructions plus deterministic scripts — nothing here is Claude Code-specific. Any coding agent that can read files and execute shell commands can run one.
+The skills use markdown instructions plus deterministic scripts. `generating-connectors` is agent-neutral. `generate-connector-example-docs` uses Claude path variables and the plugin-bundled Playwright MCP server; another agent needs equivalent skill-root/project-root substitution and browser tools.
 
 ### Generic (any agent)
 
@@ -151,6 +186,9 @@ Point Antigravity's agent at the skill directory and ask it to follow `SKILL.md`
 
 ```
 agent-skills/
+  .claude-plugin/
+    plugin.json
+  .mcp.json
   skills/
     <skill-name>/
       SKILL.md              # Skill manifest and entry point
@@ -158,4 +196,5 @@ agent-skills/
       scripts/                # Python + shell scripts for deterministic operations
       templates/              # Markdown scaffolds for generated docs
       references/             # Fix procedures, workflow rules
+      assets/                 # Output templates and other static resources
 ```

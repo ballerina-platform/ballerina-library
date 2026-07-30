@@ -68,14 +68,21 @@ Add `REQUIRED_FUNCTIONS` to `USED_FUNCTIONS`.
 
 ### 3b: Derive a use-case name
 
-From `USE_CASE`, produce a kebab-case directory name:
-- Exactly 3–4 words, lowercase with hyphens
+From `USE_CASE`, suggest a snake_case directory name:
+- Exactly 3–4 words, lowercase with underscores
 - Scenario-focused — no "example", "demo", "test", or raw operation names
 
-Good: `sharepoint-tenant-configuration`, `admin-settings-update`
-Bad: `get-sharepoint-example`, `getSharepoint-demo`
+Good: `sharepoint_tenant_configuration`, `admin_settings_update`
+Bad: `get_sharepoint_example`, `getSharepoint_demo`
 
-Store as `EXAMPLE_NAME`.
+Store the raw suggestion as `SUGGESTED_EXAMPLE_NAME`, then normalize it and resolve collisions deterministically:
+
+```bash
+<PYTHON_CMD> <skill-root>/scripts/example_names.py resolve \
+  "<EXAMPLE_DIR>" "<SUGGESTED_EXAMPLE_NAME>" "example_<iteration-number>"
+```
+
+Parse the returned JSON and store `name` as `EXAMPLE_NAME`. Use this exact value for the directory, Ballerina package name, named documentation file, and aggregate documentation links. The helper converts arbitrary suggestions to snake_case and appends `_2`, `_3`, and so on when any existing filesystem entry already uses the name.
 
 ### 3c: Extract targeted code context
 
@@ -117,7 +124,7 @@ Rules:
 ```toml
 [package]
 org = "<BAL_ORG>"
-name = "<EXAMPLE_NAME with hyphens replaced by underscores>"
+name = "<EXAMPLE_NAME>"
 version = "0.1.0"
 distribution = "<TOML_META.distribution>"
 
