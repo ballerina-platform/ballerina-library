@@ -17,6 +17,15 @@ on:
         required: false
         type: string
         default: ""
+    secrets:
+      BALLERINA_BOT_EMAIL:
+        required: true
+      BALLERINA_BOT_TOKEN:
+        required: true
+      BALLERINA_BOT_USERNAME:
+        required: true
+      BALLERINA_CENTRAL_ACCESS_TOKEN:
+        required: true
 
 jobs:
   publish-release:

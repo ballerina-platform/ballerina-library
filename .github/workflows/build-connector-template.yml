@@ -18,6 +18,13 @@ on:
         required: false
         type: boolean
         default: false
+    secrets:
+      BALLERINA_BOT_TOKEN:
+        required: true
+      BALLERINA_BOT_USERNAME:
+        required: true
+      CODECOV_TOKEN:
+        required: false
 
 
 jobs:

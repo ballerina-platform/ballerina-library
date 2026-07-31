@@ -33,7 +33,9 @@ jobs:
     name: Run Auto-Generate Connector Workflow
     if: ${{ github.repository_owner == 'ballerina-platform' }}
     uses: ballerina-platform/ballerina-library/.github/workflows/auto_generate_connector_template.yml@connector-automation
-    secrets: inherit
+    secrets:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      BALLERINA_BOT_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
     with:
       openapi-url: ${{ inputs.openapi-url }}
       ballerina-version: ${{ inputs.ballerina-version }}

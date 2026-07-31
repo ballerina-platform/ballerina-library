@@ -19,6 +19,9 @@ on:
         required: false
         type: string
         default: ""
+    secrets:
+      CODECOV_TOKEN:
+        required: false
 
 
 # The `build` and `test` commands ran separately as the Ballerina Gradle plugin does not support skipping test groups

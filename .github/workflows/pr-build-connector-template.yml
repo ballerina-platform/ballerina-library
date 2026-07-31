@@ -11,6 +11,9 @@ on:
         required: false
         type: string
         default: ""
+    secrets:
+      CODECOV_TOKEN:
+        required: false
 
 jobs:
     ubuntu-build:

@@ -12,6 +12,15 @@ on:
       hana-connector-name:
         required: true
         type: string
+    secrets:
+      BALLERINA_BOT_TOKEN:
+        required: true
+      BALLERINA_BOT_USERNAME:
+        required: true
+      BALLERINA_CENTRAL_DEV_ACCESS_TOKEN:
+        required: true
+      BALLERINA_CENTRAL_STAGE_ACCESS_TOKEN:
+        required: true
 
 jobs:
   publish-release:

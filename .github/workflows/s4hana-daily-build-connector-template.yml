@@ -6,6 +6,9 @@ on:
       hana-connector-group:
         required: true
         type: string
+    secrets:
+      BALLERINA_BOT_TOKEN:
+        required: true
 
 jobs:
   build-examples:

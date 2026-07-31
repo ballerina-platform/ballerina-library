@@ -30,6 +30,13 @@ on:
                 required: false
                 type: string
                 default: ''
+        secrets:
+            CLIENT_ID:
+                required: false
+            CLIENT_SECRET:
+                required: false
+            REFRESH_TOKEN:
+                required: false
 
 jobs:
     ubuntu-build-with-bal-test-graalvm:
