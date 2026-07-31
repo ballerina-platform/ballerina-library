@@ -10,6 +10,7 @@ from pathlib import Path
 
 
 def validate(args: argparse.Namespace) -> dict[str, object]:
+    """Validate generated pages, images, and sidebar references."""
     repo = Path(args.docs_repo).resolve()
     doc_dir = repo / "en/docs/connectors/catalog" / args.category / args.module
     errors: list[str] = []
@@ -60,6 +61,7 @@ def validate(args: argparse.Namespace) -> dict[str, object]:
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse command-line arguments."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--docs-repo", required=True)
     parser.add_argument("--category", required=True)

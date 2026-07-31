@@ -8,13 +8,16 @@ import json
 import re
 import shutil
 from pathlib import Path
+from typing import NoReturn
 
 
-def fail(message: str) -> None:
+def fail(message: str) -> NoReturn:
+    """Raise an integration error while preserving type narrowing."""
     raise RuntimeError(message)
 
 
 def find_single_markdown(artifacts: Path) -> Path:
+    """Return the single generated workflow guide."""
     files = sorted((artifacts / "workflow-docs").glob("*.md"))
     if len(files) != 1:
         fail(f"Expected exactly one workflow guide, found {len(files)}")
@@ -22,6 +25,7 @@ def find_single_markdown(artifacts: Path) -> Path:
 
 
 def find_screenshots(artifacts: Path, expected: int) -> list[Path]:
+    """Return generated screenshots after enforcing the expected count."""
     files = sorted((artifacts / "screenshots").glob("*_screenshot_*.png"))
     if len(files) != expected:
         fail(f"Expected {expected} screenshots, found {len(files)}")
@@ -29,6 +33,7 @@ def find_screenshots(artifacts: Path, expected: int) -> list[Path]:
 
 
 def reconcile_example_sidebar(sidebar: Path, category: str, module: str) -> None:
+    """Add the example page to an existing connector sidebar category."""
     text = sidebar.read_text(encoding="utf-8")
     base = f"connectors/catalog/{category}/{module}"
     overview = f"{base}/overview"
@@ -60,12 +65,16 @@ def reconcile_example_sidebar(sidebar: Path, category: str, module: str) -> None
 
     indent_match = re.search(r"\n([ \t]+)'[^']+',", existing)
     indent = indent_match.group(1) if indent_match else "            "
+    trailing_indent = re.search(r"\n[ \t]*$", existing)
+    insertion_pos = trailing_indent.start() if trailing_indent else len(existing)
     insertion = f"\n{indent}'{example_id}',"
-    updated = text[:items_end] + insertion + text[items_end:]
+    reconciled = existing[:insertion_pos] + insertion + existing[insertion_pos:]
+    updated = text[:items_start] + reconciled + text[items_end:]
     sidebar.write_text(updated, encoding="utf-8")
 
 
 def integrate(args: argparse.Namespace) -> dict[str, object]:
+    """Validate and copy example artifacts into docs-integrator."""
     docs_repo = Path(args.docs_repo).resolve()
     artifacts = Path(args.artifacts_dir).resolve()
     target_dir = (
@@ -120,6 +129,7 @@ def integrate(args: argparse.Namespace) -> dict[str, object]:
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse command-line arguments."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--docs-repo", required=True)
     parser.add_argument("--artifacts-dir", required=True)

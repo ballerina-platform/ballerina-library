@@ -10,9 +10,12 @@ import subprocess
 
 
 OWNER_RE = re.compile(r"(?<!\S)@([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)?)")
+SOURCE_REPO_RE = re.compile(r"^ballerina-platform/[A-Za-z0-9_.-]+$")
+TARGET_REPO_RE = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
 
 
 def parse_owners(content: str) -> list[str]:
+    """Extract unique user and team handles from CODEOWNERS content."""
     owners: set[str] = set()
     for raw_line in content.splitlines():
         line = raw_line.split("#", 1)[0]
@@ -21,10 +24,12 @@ def parse_owners(content: str) -> list[str]:
 
 
 def gh(*args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
+    """Run the GitHub CLI without invoking a shell."""
     return subprocess.run(["gh", *args], text=True, capture_output=True, check=check)
 
 
 def load_codeowners(source_repo: str) -> str:
+    """Load CODEOWNERS from the first supported repository location."""
     for path in (".github/CODEOWNERS", "CODEOWNERS", "docs/CODEOWNERS"):
         result = gh("api", f"repos/{source_repo}/contents/{path}", "--jq", ".content", check=False)
         if result.returncode == 0:
@@ -34,6 +39,22 @@ def load_codeowners(source_repo: str) -> str:
 
 
 def request(args: argparse.Namespace) -> dict[str, list[str]]:
+    """Request eligible source CODEOWNERS on the target documentation PR."""
+    if not SOURCE_REPO_RE.fullmatch(args.source_repo):
+        raise ValueError("source-repo must match ballerina-platform/<repository>")
+    if not TARGET_REPO_RE.fullmatch(args.target_repo):
+        raise ValueError("target-repo must be an owner/repository pair")
+    pull = gh(
+        "api",
+        f"repos/{args.target_repo}/pulls/{args.pr_number}",
+        "--jq",
+        ".number",
+        check=False,
+    )
+    if pull.returncode != 0 or pull.stdout.strip() != str(args.pr_number):
+        raise ValueError(
+            f"pull request {args.pr_number} does not belong to {args.target_repo}"
+        )
     owners = parse_owners(load_codeowners(args.source_repo))
     requested: list[str] = []
     skipped: list[str] = []
@@ -58,10 +79,11 @@ def request(args: argparse.Namespace) -> dict[str, list[str]]:
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse and type-check command-line arguments."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--source-repo", required=True)
     parser.add_argument("--target-repo", default="wso2/docs-integrator")
-    parser.add_argument("--pr-number", required=True)
+    parser.add_argument("--pr-number", required=True, type=int)
     return parser.parse_args()
 
 

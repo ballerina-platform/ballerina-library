@@ -60,7 +60,9 @@ public function injectConnector(
         }
         string existingItems = text.substring(existingItemsStart, existingItemsEnd);
         boolean hasExample = existingItems.includes(basePath + "/example");
-        string reconciledItems = "\n" + buildItems(basePath, hasSetup, hasAction, hasTriggers, hasExample) + "          ";
+        string[] preservedItems = findUnknownItems(existingItems, basePath);
+        string reconciledItems = "\n" +
+            buildItems(basePath, hasSetup, hasAction, hasTriggers, hasExample, preservedItems) + "          ";
         string reconciledText = text.substring(0, existingItemsStart) + reconciledItems +
             text.substring(existingItemsEnd);
         io:Error? reconcileErr = io:fileWriteString(sidebarPath, reconciledText);
@@ -128,7 +130,8 @@ function buildItems(
         boolean hasSetup,
         boolean hasAction,
         boolean hasTriggers,
-        boolean hasExample
+        boolean hasExample,
+        string[] preservedItems = []
 ) returns string {
     string items = "";
     if hasSetup {
@@ -143,7 +146,41 @@ function buildItems(
     if hasExample {
         items += string `            '${basePath}/example',` + "\n";
     }
+    foreach string itemId in preservedItems {
+        items += string `            '${itemId}',` + "\n";
+    }
     return items;
+}
+
+// Return simple document IDs that are not managed by this generator so manual
+// and future page entries survive reconciliation.
+function findUnknownItems(string existingItems, string basePath) returns string[] {
+    string[] knownItems = [
+        basePath + "/setup-guide",
+        basePath + "/action-reference",
+        basePath + "/trigger-reference",
+        basePath + "/example"
+    ];
+    string[] unknownItems = [];
+    foreach string originalLine in re `\n`.split(existingItems) {
+        string line = originalLine.trim();
+        if line.length() < 3 {
+            continue;
+        }
+        string quote = line.substring(0, 1);
+        if quote != "'" && quote != "\"" {
+            continue;
+        }
+        int? closingQuote = line.indexOf(quote, 1);
+        if closingQuote is () {
+            continue;
+        }
+        string itemId = line.substring(1, closingQuote);
+        if knownItems.indexOf(itemId) is () && unknownItems.indexOf(itemId) is () {
+            unknownItems.push(itemId);
+        }
+    }
+    return unknownItems;
 }
 
 // Find the position of the closing "]" by counting bracket depth.

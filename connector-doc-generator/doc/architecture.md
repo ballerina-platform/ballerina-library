@@ -6,7 +6,7 @@ The generator runs a 7-step pipeline that derives connector metadata from its re
 clones the connector source, calls Claude in
 multiple focused phases, and writes Docusaurus-ready markdown to the docs repository.
 
-```
+```text
 [1/7] Read metadata        — bootstrap clone + Ballerina.toml ([package].org and name)
 [2/7] Resolve version      — Ballerina Central API or Config.toml
 [3/7] Check existing docs  — Determines fresh generation vs update mode

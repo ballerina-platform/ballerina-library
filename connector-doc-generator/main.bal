@@ -53,7 +53,7 @@ public function main() returns error? {
 
     // ── Step 1: Discover connector metadata ────────────────────────────────
     log("[1/7] Reading connector metadata from Ballerina.toml...");
-    string metadataRepoPath = check cloneMetadataRepo(githubRepo);
+    string metadataRepoPath = check cloneRepository(githubRepo, "metadata");
     ConnectorMetadata|error metadataResult = readConnectorMetadata(metadataRepoPath, githubRepo);
     file:Error? metadataCleanupErr = file:remove(metadataRepoPath, file:RECURSIVE);
     if metadataCleanupErr is file:Error {
@@ -127,7 +127,7 @@ public function main() returns error? {
 
     // ── Step 4: Clone source repository ─────────────────────────────────────
     log("[4/7] Cloning source repository (shallow)...");
-    string localRepoPath = check cloneSourceRepo(githubRepo, moduleSlug, resolvedVersion);
+    string localRepoPath = check cloneRepository(githubRepo, moduleSlug, string `v${resolvedVersion}`);
     log(string `      Cloned to: ${localRepoPath}`);
     log("");
 
@@ -453,21 +453,26 @@ function runPhase2b(string displayName, string promptText, string rawPath) retur
     return [section, result];
 }
 
-function cloneMetadataRepo(string repo) returns string|error {
-    int ts = <int>time:utcNow()[0];
-    string repoPath = string `/tmp/conn_doc_metadata_${ts}`;
+function cloneRepository(string repo, string tempPrefix, string? ref = ()) returns string|error {
+    time:Utc now = time:utcNow();
+    string repoPath = string `/tmp/conn_doc_${tempPrefix}_${now[0]}_${now[1]}`;
     string cloneUrl = string `https://github.com/ballerina-platform/${repo}`;
+    string[] arguments = ["clone", "--depth", "1"];
+    if ref is string {
+        arguments.push("--branch", ref);
+    }
+    arguments.push(cloneUrl, repoPath);
 
     os:Process|error proc = os:exec({
                                         value: "git",
-                                        arguments: ["clone", "--depth", "1", cloneUrl, repoPath]
+                                        arguments
                                     });
     if proc is error {
-        return error("Failed to start metadata git clone: " + proc.message());
+        return error("Failed to start git clone: " + proc.message());
     }
     int|error exitCode = proc.waitForExit();
     if exitCode is error {
-        return error("Metadata git clone error: " + exitCode.message());
+        return error("git clone error: " + exitCode.message());
     }
     if exitCode != 0 {
         return error(string `git clone failed (exit ${exitCode}) for ${cloneUrl}`);
@@ -513,12 +518,10 @@ function readConnectorMetadata(string repoPath, string repo) returns ConnectorMe
             continue;
         }
         string key = line.substring(0, equalsIndex).trim();
-        string value = line.substring(equalsIndex + 1).trim();
-        int? commentIndex = value.indexOf("#");
-        if commentIndex is int {
-            value = value.substring(0, commentIndex).trim();
-        }
-        if value.length() >= 2 && value.startsWith("\"") && value.endsWith("\"") {
+        string value = stripTomlComment(line.substring(equalsIndex + 1)).trim();
+        boolean doubleQuoted = value.length() >= 2 && value.startsWith("\"") && value.endsWith("\"");
+        boolean singleQuoted = value.length() >= 2 && value.startsWith("'") && value.endsWith("'");
+        if doubleQuoted || singleQuoted {
             value = value.substring(1, value.length() - 1);
         }
         if key == "org" {
@@ -530,30 +533,47 @@ function readConnectorMetadata(string repoPath, string repo) returns ConnectorMe
     if org is () || org.length() == 0 || name is () || name.length() == 0 {
         return error(string `Invalid [package] metadata in '${manifestPath}'. Both 'org' and 'name' are required`);
     }
-    return {connectorName: name, moduleSlug: name, packageName: string `${org}/${name}`};
+    return {
+        connectorName: toDisplayName(name),
+        moduleSlug: name,
+        packageName: string `${org}/${name}`
+    };
 }
 
-function cloneSourceRepo(string repo, string slug, string 'version) returns string|error {
-    int ts = <int>time:utcNow()[0];
-    string repoPath = string `/tmp/conn_doc_${slug}_${ts}`;
-    string cloneUrl = string `https://github.com/ballerina-platform/${repo}`;
-    string tag = string `v${'version}`;
+function stripTomlComment(string value) returns string {
+    boolean inSingleQuotes = false;
+    boolean inDoubleQuotes = false;
+    boolean escaped = false;
+    int index = 0;
+    while index < value.length() {
+        string character = value.substring(index, index + 1);
+        if escaped {
+            escaped = false;
+        } else if inDoubleQuotes && character == "\\" {
+            escaped = true;
+        } else if !inDoubleQuotes && character == "'" {
+            inSingleQuotes = !inSingleQuotes;
+        } else if !inSingleQuotes && character == "\"" {
+            inDoubleQuotes = !inDoubleQuotes;
+        } else if character == "#" && !inSingleQuotes && !inDoubleQuotes {
+            return value.substring(0, index);
+        }
+        index += 1;
+    }
+    return value;
+}
 
-    os:Process|error proc = os:exec({
-                                        value: "git",
-                                        arguments: ["clone", "--depth", "1", "--branch", tag, cloneUrl, repoPath]
-                                    });
-    if proc is error {
-        return error("Failed to start git clone: " + proc.message());
+function toDisplayName(string moduleName) returns string {
+    string normalized = re `[.\-]+`.replaceAll(moduleName, " ");
+    string[] words = re `\s+`.split(normalized.trim());
+    string[] titleWords = [];
+    foreach string word in words {
+        if word.length() == 0 {
+            continue;
+        }
+        titleWords.push(word.substring(0, 1).toUpperAscii() + word.substring(1).toLowerAscii());
     }
-    int|error exitCode = proc.waitForExit();
-    if exitCode is error {
-        return error("git clone error: " + exitCode.message());
-    }
-    if exitCode != 0 {
-        return error(string `git clone failed (exit ${exitCode}) for ${cloneUrl} at tag '${tag}'`);
-    }
-    return repoPath;
+    return string:'join(" ", ...titleWords);
 }
 
 function logClaudeStats(claude:ClaudeResult result) {

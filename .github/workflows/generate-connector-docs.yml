@@ -67,6 +67,8 @@ concurrency:
   group: connector-documentation-${{ inputs.github_repo }}
   cancel-in-progress: false
 
+permissions: {}
+
 jobs:
   prepare:
     name: Validate request and credentials, then create docs branch
@@ -249,16 +251,21 @@ jobs:
           MODULE: ${{ steps.metadata.outputs.module_slug }}
           PACKAGE: ${{ steps.metadata.outputs.package_name }}
           BRANCH: ${{ steps.branch.outputs.docs_branch }}
+          OVERVIEW_SETUP: ${{ inputs.generate_overview_setup }}
+          REFERENCE: ${{ inputs.generate_reference }}
+          EXAMPLES: ${{ inputs.generate_examples }}
+          EXAMPLE_MODE: ${{ inputs.mode }}
+          AI_MODEL: ${{ inputs.ai_model }}
         run: |
           {
             echo "## Connector documentation request"
             echo "- Module: $MODULE"
             echo "- Package: $PACKAGE"
             echo "- Docs branch: $BRANCH"
-            echo "- Overview & Setup Guide: ${{ inputs.generate_overview_setup }}"
-            echo "- Reference: ${{ inputs.generate_reference }}"
-            echo "- Examples: ${{ inputs.generate_examples }} (${{ inputs.mode }} mode)"
-            echo "- AI model: ${{ inputs.ai_model }}"
+            echo "- Overview & Setup Guide: $OVERVIEW_SETUP"
+            echo "- Reference: $REFERENCE"
+            echo "- Examples: $EXAMPLES ($EXAMPLE_MODE mode)"
+            echo "- AI model: $AI_MODEL"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Write run manifest
@@ -268,20 +275,27 @@ jobs:
           DISPLAY_NAME: ${{ steps.metadata.outputs.display_name }}
           BRANCH: ${{ steps.branch.outputs.docs_branch }}
           BASE_SHA: ${{ steps.branch.outputs.base_sha }}
+          SOURCE_REPO: ${{ inputs.github_repo }}
+          CATEGORY: ${{ inputs.category }}
+          EXAMPLE_MODE: ${{ inputs.mode }}
+          AI_MODEL: ${{ inputs.ai_model }}
+          OVERVIEW_SETUP: ${{ inputs.generate_overview_setup }}
+          REFERENCE: ${{ inputs.generate_reference }}
+          EXAMPLES: ${{ inputs.generate_examples }}
         run: |
           jq -n \
-            --arg repository "${{ inputs.github_repo }}" \
+            --arg repository "$SOURCE_REPO" \
             --arg package "$PACKAGE" \
             --arg moduleSlug "$MODULE" \
             --arg displayName "$DISPLAY_NAME" \
-            --arg category "${{ inputs.category }}" \
+            --arg category "$CATEGORY" \
             --arg baseSha "$BASE_SHA" \
             --arg docsBranch "$BRANCH" \
-            --arg mode "${{ inputs.mode }}" \
-            --arg aiModel "${{ inputs.ai_model }}" \
-            --argjson overviewSetup '${{ inputs.generate_overview_setup }}' \
-            --argjson reference '${{ inputs.generate_reference }}' \
-            --argjson examples '${{ inputs.generate_examples }}' \
+            --arg mode "$EXAMPLE_MODE" \
+            --arg aiModel "$AI_MODEL" \
+            --argjson overviewSetup "$OVERVIEW_SETUP" \
+            --argjson reference "$REFERENCE" \
+            --argjson examples "$EXAMPLES" \
             '{repository:$repository, package:$package, moduleSlug:$moduleSlug, displayName:$displayName, category:$category, baseSha:$baseSha, docsBranch:$docsBranch, mode:$mode, aiModel:$aiModel, selectedStages:{overviewSetup:$overviewSetup, reference:$reference, examples:$examples}}' \
             > run-manifest.json
 
@@ -324,7 +338,7 @@ jobs:
       - name: Set up Ballerina
         uses: ballerina-platform/setup-ballerina@v1.1.3
         with:
-          version: 2201.13.3
+          version: 2201.13.4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -338,15 +352,20 @@ jobs:
         working-directory: generator/connector-doc-generator
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SOURCE_REPO: ${{ inputs.github_repo }}
+          CATEGORY: ${{ inputs.category }}
+          GENERATE_OVERVIEW_SETUP: ${{ inputs.generate_overview_setup }}
+          GENERATE_REFERENCE: ${{ inputs.generate_reference }}
+          AI_MODEL: ${{ inputs.ai_model }}
         run: |
           test -n "$ANTHROPIC_API_KEY" || { echo "ANTHROPIC_API_KEY is required"; exit 1; }
           bal run -- \
-            -CgithubRepo="${{ inputs.github_repo }}" \
-            -Ccategory="${{ inputs.category }}" \
+            -CgithubRepo="$SOURCE_REPO" \
+            -Ccategory="$CATEGORY" \
             -CdocsRepoRoot="$GITHUB_WORKSPACE/docs-integrator" \
-            -CgenerateOverviewSetup="${{ inputs.generate_overview_setup }}" \
-            -CgenerateReference="${{ inputs.generate_reference }}" \
-            -CaiModel="${{ inputs.ai_model }}" \
+            -CgenerateOverviewSetup="$GENERATE_OVERVIEW_SETUP" \
+            -CgenerateReference="$GENERATE_REFERENCE" \
+            -CaiModel="$AI_MODEL" \
             -Cforce=true
 
       - name: Validate and commit connector documents
@@ -356,14 +375,11 @@ jobs:
           BRANCH: ${{ needs.prepare.outputs.docs_branch }}
           BASE_SHA: ${{ needs.prepare.outputs.base_sha }}
           MODULE: ${{ needs.prepare.outputs.module_slug }}
+          CATEGORY: ${{ inputs.category }}
         run: |
-          allowed='^(en/sidebars\.ts|en/docs/connectors/catalog/index\.mdx|en/docs/connectors/catalog/${{ inputs.category }}/'"$MODULE"'/|en/static/img/connectors/catalog/${{ inputs.category }}/'"$MODULE"'/)'
-          unexpected=$(git status --short | awk '{print $2}' | grep -Ev "$allowed" || true)
-          if [ -n "$unexpected" ]; then
-            echo "Unexpected generated paths:"
-            echo "$unexpected"
-            exit 1
-          fi
+          python3 ../generator/connector-doc-generator/scripts/validate_changed_paths.py \
+            --category "$CATEGORY" \
+            --module "$MODULE"
           git config user.name "ballerina-bot"
           git config user.email "ballerina-bot@ballerina.org"
           git add en/
@@ -390,7 +406,7 @@ jobs:
       - name: Set up Ballerina
         uses: ballerina-platform/setup-ballerina@v1.1.3
         with:
-          version: 2201.13.3
+          version: 2201.13.4
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -419,14 +435,18 @@ jobs:
           curl -fsSL https://code-server.dev/install.sh | sh
 
       - name: Configure example generator
+        env:
+          AI_MODEL: ${{ inputs.ai_model }}
         run: |
           python3 - <<'PY'
+          import os
           from pathlib import Path
+          model = os.environ["AI_MODEL"]
           Path("example-doc-generator/Config.toml").write_text(
-              'llmModel = "${{ inputs.ai_model }}"\ncodeServerPort = 8080\nagentServerPort = 8765\n', encoding="utf-8"
+              f'llmModel = "{model}"\ncodeServerPort = 8080\nagentServerPort = 8765\n', encoding="utf-8"
           )
           Path("example-doc-generator/.env").write_text(
-              "CODE_SERVER_PORT=8080\nAGENT_SERVER_PORT=8765\nAI_MODEL=${{ inputs.ai_model }}\n", encoding="utf-8"
+              f"CODE_SERVER_PORT=8080\nAGENT_SERVER_PORT=8765\nAI_MODEL={model}\n", encoding="utf-8"
           )
           PY
 
@@ -558,13 +578,16 @@ jobs:
 
       - name: Place example documentation
         if: ${{ inputs.generate_examples }}
+        env:
+          CATEGORY: ${{ inputs.category }}
+          EXAMPLE_MODE: ${{ inputs.mode }}
         run: |
           python3 generator/connector-doc-generator/scripts/integrate_example.py \
             --docs-repo docs-integrator \
             --artifacts-dir example-output \
-            --category "${{ inputs.category }}" \
+            --category "$CATEGORY" \
             --module "${{ needs.prepare.outputs.module_slug }}" \
-            --mode "${{ inputs.mode }}" \
+            --mode "$EXAMPLE_MODE" \
             --result integration-result.json
 
       - name: Validate, commit, and push final branch
@@ -574,20 +597,19 @@ jobs:
           BRANCH: ${{ needs.prepare.outputs.docs_branch }}
           EXPECTED_SHA: ${{ steps.lease.outputs.expected_sha }}
           MODULE: ${{ needs.prepare.outputs.module_slug }}
+          CATEGORY: ${{ inputs.category }}
+          GENERATE_REFERENCE: ${{ inputs.generate_reference }}
+          GENERATE_EXAMPLES: ${{ inputs.generate_examples }}
         run: |
-          allowed='^(en/sidebars\.ts|en/docs/connectors/catalog/index\.mdx|en/docs/connectors/catalog/${{ inputs.category }}/'"$MODULE"'/|en/static/img/connectors/catalog/${{ inputs.category }}/'"$MODULE"'/)'
-          unexpected=$(git status --short | awk '{print $2}' | grep -Ev "$allowed" || true)
-          if [ -n "$unexpected" ]; then
-            echo "Unexpected integration paths:"
-            echo "$unexpected"
-            exit 1
-          fi
+          python3 ../generator/connector-doc-generator/scripts/validate_changed_paths.py \
+            --category "$CATEGORY" \
+            --module "$MODULE"
           validation_args=()
-          if [ "${{ inputs.generate_reference }}" = "true" ]; then validation_args+=(--reference); fi
-          if [ "${{ inputs.generate_examples }}" = "true" ]; then validation_args+=(--examples); fi
+          if [ "$GENERATE_REFERENCE" = "true" ]; then validation_args+=(--reference); fi
+          if [ "$GENERATE_EXAMPLES" = "true" ]; then validation_args+=(--examples); fi
           python3 ../generator/connector-doc-generator/scripts/validate_docs.py \
             --docs-repo . \
-            --category "${{ inputs.category }}" \
+            --category "$CATEGORY" \
             --module "$MODULE" \
             "${validation_args[@]}"
           git add en/
@@ -664,6 +686,7 @@ jobs:
         continue-on-error: true
         env:
           MODULE: ${{ needs.prepare.outputs.module_slug }}
+          CATEGORY: ${{ inputs.category }}
         run: |
           cd docs-integrator
           npm run serve -- --port 3333 --no-open > ../docs-server.log 2>&1 &
@@ -674,7 +697,7 @@ jobs:
             echo "Waiting for docs server (${attempt}/60)..."
             sleep 1
           done
-          mapfile -t pages < <(git diff --name-only upstream/main...HEAD -- "en/docs/connectors/catalog/${{ inputs.category }}/${MODULE}/*.md")
+          mapfile -t pages < <(git diff --name-only upstream/main...HEAD -- "en/docs/connectors/catalog/${CATEGORY}/${MODULE}/*.md")
           args=()
           for page in "${pages[@]}"; do args+=(--page "$PWD/$page"); done
           cd ..
@@ -736,6 +759,7 @@ jobs:
           BRANCH: ${{ needs.prepare.outputs.docs_branch }}
           FORK_OWNER: ${{ needs.prepare.outputs.docs_fork_owner }}
           PREVIEWS: ${{ steps.previews.outputs.markdown }}
+          EXAMPLE_MODE: ${{ inputs.mode }}
         run: |
           changed=$(git diff --name-only upstream/main...HEAD | sed 's/^/- `/' | sed 's/$/`/')
           cat > /tmp/pr-body.md <<EOF
@@ -772,11 +796,11 @@ jobs:
 
           ## Samples
 
-          Example mode: ${{ inputs.mode }}. Generated sample artifacts are attached to the workflow run.
+          Example mode: ${EXAMPLE_MODE}. Generated sample artifacts are attached to the workflow run.
 
           ## Test environment
 
-          Ubuntu 22.04, Node.js 20, Chromium via Playwright, Ballerina 2201.13.3.
+          Ubuntu 22.04, Node.js 20, Chromium via Playwright, Ballerina 2201.13.4.
 
           ## Rendered page previews
           ${PREVIEWS:-No preview images were available; see the workflow result for warnings.}
@@ -796,11 +820,13 @@ jobs:
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
+          SOURCE_REPO: ballerina-platform/${{ inputs.github_repo }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
         run: |
           python3 generator/connector-doc-generator/scripts/request_reviewers.py \
-            --source-repo "ballerina-platform/${{ inputs.github_repo }}" \
+            --source-repo "$SOURCE_REPO" \
             --target-repo wso2/docs-integrator \
-            --pr-number "${{ steps.pr.outputs.number }}" | tee reviewers.json
+            --pr-number "$PR_NUMBER" | tee reviewers.json
           {
             echo "## Source CODEOWNERS review requests"
             echo '```json'

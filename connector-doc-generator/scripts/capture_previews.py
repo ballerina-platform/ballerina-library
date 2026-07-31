@@ -11,6 +11,7 @@ from urllib.parse import urljoin
 
 
 def page_route(docs_repo: Path, page: Path) -> str:
+    """Resolve the Docusaurus route for a Markdown page."""
     content = page.read_text(encoding="utf-8")
     frontmatter = re.match(r"^---\s*\n(.*?)\n---\s*\n", content, re.DOTALL)
     if frontmatter:
@@ -25,6 +26,7 @@ def page_route(docs_repo: Path, page: Path) -> str:
 
 
 def capture(args: argparse.Namespace) -> dict[str, list[object]]:
+    """Capture full-page previews and return successful and failed results."""
     from playwright.sync_api import sync_playwright
 
     docs_repo = Path(args.docs_repo).resolve()
@@ -40,7 +42,9 @@ def capture(args: argparse.Namespace) -> dict[str, list[object]]:
         for page_path in pages:
             route = page_route(docs_repo, page_path)
             url = urljoin(args.base_url.rstrip("/") + "/", route.lstrip("/"))
-            filename = f"{args.module}-{page_path.stem}.png".replace(".", "_")
+            safe_module = re.sub(r"[^A-Za-z0-9_-]+", "_", args.module)
+            safe_stem = re.sub(r"[^A-Za-z0-9_-]+", "_", page_path.stem)
+            filename = f"{safe_module}-{safe_stem}.png"
             destination = output / filename
             page = context.new_page()
             try:
@@ -63,6 +67,7 @@ def capture(args: argparse.Namespace) -> dict[str, list[object]]:
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse command-line arguments."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--docs-repo", required=True)
     parser.add_argument("--base-url", required=True)
