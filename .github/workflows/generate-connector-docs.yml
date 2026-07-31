@@ -581,12 +581,13 @@ jobs:
         env:
           CATEGORY: ${{ inputs.category }}
           EXAMPLE_MODE: ${{ inputs.mode }}
+          MODULE: ${{ needs.prepare.outputs.module_slug }}
         run: |
           python3 generator/connector-doc-generator/scripts/integrate_example.py \
             --docs-repo docs-integrator \
             --artifacts-dir example-output \
             --category "$CATEGORY" \
-            --module "${{ needs.prepare.outputs.module_slug }}" \
+            --module "$MODULE" \
             --mode "$EXAMPLE_MODE" \
             --result integration-result.json
 
@@ -728,16 +729,17 @@ jobs:
           GH_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
           MODULE: ${{ needs.prepare.outputs.module_slug }}
           BRANCH: ${{ needs.prepare.outputs.docs_branch }}
+          DOCS_FORK: ${{ needs.prepare.outputs.docs_fork }}
         run: |
           if ! compgen -G 'preview-screenshots/*.png' >/dev/null; then exit 0; fi
           tag="docs-preview-${MODULE//./_}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           gh release create "$tag" preview-screenshots/*.png \
-            --repo "${{ needs.prepare.outputs.docs_fork }}" \
+            --repo "$DOCS_FORK" \
             --target "$BRANCH" \
             --title "Documentation preview: $MODULE" \
             --notes "Rendered documentation previews for workflow run $GITHUB_RUN_ID." \
             --prerelease
-          owner_repo="${{ needs.prepare.outputs.docs_fork }}"
+          owner_repo="$DOCS_FORK"
           body=""
           for image in preview-screenshots/*.png; do
             name=$(basename "$image")
