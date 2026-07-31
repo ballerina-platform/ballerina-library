@@ -120,6 +120,61 @@ You are also a Technical Documentation Specialist — after automation, write th
 - If a step seems to require writing a script file, **do NOT do it** — use the corresponding Playwright MCP tool instead.
 </rules_playwright_mcp>
 
+<rules_nested_canvas_add_step>
+### Nested Canvas Add-Step Protocol (Mandatory)
+The small **+** node between **Start** and **Error Handler** is an unlabeled SVG inside the Automation canvas, which is nested inside the code-server extension iframe and the inner **WSO2 Integrator** iframe. A top-level selector can be correct and still match nothing because it is evaluated in the wrong frame scope.
+
+Whenever an Automation flow requires activating this **+** node, execute these micro-steps exactly:
+1. Call ${bt}browser_snapshot${bt} on the outer code-server page with ${bt}depth: 10${bt} and ${bt}boxes: true${bt}.
+2. Confirm that the snapshot traversed the extension iframe and the inner **WSO2 Integrator** iframe. Resolve the detailed Automation flow canvas containing **Start**, **+**, and **Error Handler**, and retain it as the resolved flow-canvas reference. Do not operate from the project-level Design overview.
+3. Treat the visible **+** as an unlabeled SVG, not an accessible button. Do not attempt a top-level ${bt}browser_click${bt} with the selector and do not activate it by coordinate.
+4. Call ${bt}browser_evaluate${bt} only against the resolved flow-canvas reference. Query ${bt}svg[data-testid='empty-node-add-button-1']${bt} within that canvas and dispatch the exact bubbling click below.
+
+${bt}(element) => {
+  const add = element.querySelector(
+    "svg[data-testid='empty-node-add-button-1']"
+  );
+
+  if (!add) {
+    return false;
+  }
+
+  add.dispatchEvent(
+    new MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+      view: element.ownerDocument.defaultView
+    })
+  );
+
+  return true;
+}${bt}
+
+5. Require the scoped evaluation to return ${bt}true${bt}. Bubbling is mandatory because the editor may attach the click handler to the SVG's parent container.
+6. If the scoped query returns ${bt}false${bt}, use current snapshot bounds only to discover the DOM:
+   1. Derive the visible **+** point from the current boxed snapshot; never reuse coordinates from another run.
+   2. Call ${bt}element.ownerDocument.elementFromPoint(x, y)${bt} from the resolved flow canvas.
+   3. Inspect the hit element and up to six ${bt}parentElement${bt} ancestors.
+   4. Find the ancestor whose ${bt}data-testid${bt} starts with ${bt}empty-node-add-button-${bt}.
+   5. Query that recovered test ID inside the same canvas and dispatch the same bubbling, cancelable ${bt}MouseEvent${bt}.
+   6. Stop with evidence if no matching ancestor exists. Coordinates are diagnostic only; never use them to activate the node.
+7. Immediately take a fresh deep ${bt}browser_snapshot${bt} of the outer page. Confirm that the **Add Node** panel is open and contains **Connections**, the saved client, or node-search controls. Treat every earlier element reference as stale.
+8. Select the saved connection using its new reference, then take another deep snapshot because expanding the connection creates new operation references.
+9. Select the chosen operation using its refreshed reference and confirm that the operation configuration form opens.
+
+Keep connection and operation names dynamic. Names such as ${bt}projectsClient${bt} and **List Project Managements** describe one run and must never become requirements.
+
+During this recovery, never use:
+- Hard-coded top-page ${bt}page.mouse${bt} coordinates.
+- Hard-coded or generated iframe names/UUIDs.
+- ${bt}browser_run_code_unsafe${bt}.
+- Sequence view as a workaround.
+- Repeated clicks using stale accessibility references.
+- Documentation or debug screenshots to understand the UI.
+
+Do not select a connection or operation until a fresh snapshot verifies that the **Add Node** panel opened.
+</rules_nested_canvas_add_step>
+
 <rules_snapshot_vs_screenshot>
 ### Snapshot vs Screenshot Rules (Mandatory)
 - **For ALL navigation and decision-making:** use ONLY ${bt}browser_snapshot${bt} — it returns the DOM accessibility tree, fast and lightweight, sufficient to identify elements and understand page state.
@@ -379,6 +434,7 @@ If the goal requires calling the connector on a schedule or as a standalone trig
 2. Configure the automation trigger if prompted (e.g., interval, cron expression — use a safe default like every 1 minute).
 3. Inside the automation body/flow, add a new step to call the connector remote function:
    - Look for an **"Add"**, **"+"**, or **"Call"** button within the automation flow body.
+   - For the **+** node between **Start** and **Error Handler**, follow the complete **Nested Canvas Add-Step Protocol** above. A completed click tool call is not success; a fresh snapshot showing the opened node palette is required before proceeding.
    - In the left sidebar **Connections** tree, expand the saved connection node to reveal its operations.
    - **MANDATORY screenshot 4**: After expanding the connection node in the right-side panel, take a screenshot showing all available operations listed under the connection — before selecting any operation.
      - **CRITICAL placement rule**: Embed in the step that describes expanding the connection node / opening the step-addition panel. Do NOT embed it in a step that describes selecting or configuring an operation. Alt text: e.g., ${bt}[ConnectorName] connection node expanded showing all available operations before selection${bt}.

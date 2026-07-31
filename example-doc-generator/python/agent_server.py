@@ -22,7 +22,7 @@ simple REST API so the Ballerina pipeline can submit jobs and stream logs.
 
 Routes
 ------
-POST /run          { "prompt_path": "<path>" }  → { "job_id": "<uuid>" }
+POST /run          { "prompt_path": "<path>", "model": "<model>" }  → { "job_id": "<uuid>" }
 GET  /jobs/<id>    → { "status": "running|done", "logs": [...] }
 GET  /health       → { "status": "ok" }
 POST /shutdown     → { "status": "shutting down" }
@@ -59,6 +59,7 @@ from claude_agent_sdk import (
 
 # CWD for the Claude agent is the project root (one level above this file)
 CWD = str(Path(__file__).parent.parent)
+AI_MODEL = os.environ.get("AI_MODEL", "claude-sonnet-4-6")
 
 jobs: dict[str, dict] = {}
 running_tasks: set[asyncio.Task] = set()
@@ -75,6 +76,47 @@ the execution prompt explicitly asks you to inspect or edit generated project
 files. Keep generated artifacts under the paths given in the execution prompt.
 Do not introduce extra setup notes, environment details, or undocumented
 workflow sections beyond what the execution prompt requires.
+
+CRITICAL — Never delegate this work to a sub-agent or Task tool:
+You MUST perform every step of the execution prompt yourself, in this session,
+using your own tool calls (Playwright MCP tools, Bash, Read, Write, Edit).
+Do NOT spawn a sub-agent, invoke a "Task"/"Agent" tool, or otherwise hand off
+the browser automation, file edits, or documentation writing to a separate
+agent session — regardless of how long the workflow is, how many stages it
+has, or how much time/output it may consume. There is no Task/Agent tool
+available to you for this job; if you find yourself considering delegating
+"given the scale of this task", stop and continue executing the remaining
+stages directly instead. Long-running, multi-hour, multi-stage workflows are
+expected and must be completed end-to-end in this same session.
+
+CRITICAL — Nested canvas Add Step protocol:
+The small "+" node between Start and Error Handler is rendered inside the
+WSO2 Integrator flow canvas and a browser_click can report success without
+opening the node palette. When adding a step to an Automation flow, follow
+this protocol exactly:
+1. Take a fresh browser_snapshot and confirm the detailed flow shows Start,
+   Error Handler, and the intervening "+" node.
+2. Try browser_click ONCE with the newest "+" reference. Take another
+   snapshot. The click succeeded only if the node palette is visible with
+   Connections, the saved client, or node-search controls.
+3. If the palette did not open, do not reuse either failed reference. Hover
+   Start, take a fresh boxed snapshot, and retry ONCE only if it exposes a new
+   reference for the intervening "+" node.
+4. If it is still closed, target the stable flow-canvas container with
+   browser_evaluate. Inspect descendant bounding boxes for the small SVG/path
+   centered vertically between Start and Error Handler. Use the center point
+   with the target element's ownerDocument.elementFromPoint(), ascend to the
+   nearest clickable ancestor, and call click() or dispatch a bubbling,
+   cancelable MouseEvent('click'). Derive all geometry from the current DOM.
+5. Take a fresh snapshot immediately. Continue only after the node palette is
+   visibly open. If verification fails, repeat DOM discovery from that new
+   snapshot; never reuse old references or coordinates.
+
+For this recovery, NEVER use hard-coded top-page page.mouse coordinates,
+hard-coded/generated iframe names or UUIDs, browser_run_code_unsafe, a switch
+to Sequence view, repeated stale-reference clicks, or screenshots to analyze
+the UI. Operate through browser_snapshot and a target-scoped browser_evaluate.
+Do not select a connection or operation until the opened palette is verified.
 """.strip()
 
 
@@ -97,7 +139,7 @@ def truncate_tool_input(tool_input: any, max_length: int = 500) -> str:
     return text
 
 
-async def run_agent(job_id: str, prompt_path: str) -> None:
+async def run_agent(job_id: str, prompt_path: str, model: str) -> None:
     jobs[job_id]["status"] = "running"
 
     def log(label: str, text: str) -> None:
@@ -113,7 +155,7 @@ async def run_agent(job_id: str, prompt_path: str) -> None:
         async for message in query(
             prompt=prompt,
             options=ClaudeAgentOptions(
-                model="claude-sonnet-4-6",
+                model=model,
                 cwd=CWD,
                 system_prompt=AGENT_SYSTEM_PROMPT,
                 allowed_tools=[
@@ -144,6 +186,14 @@ async def run_agent(job_id: str, prompt_path: str) -> None:
                     "mcp__playwright__browser_console_messages",
                     "mcp__playwright__browser_network_requests",
                 ],
+                # Structurally block sub-agent delegation. The agent must execute the
+                # entire workflow itself — see AGENT_SYSTEM_PROMPT. Some models will
+                # otherwise invoke Task/Agent to hand off long-running work to a fresh
+                # sub-agent session, which loses grounding built up via prior
+                # browser_snapshot calls and has caused UI-interaction regressions
+                # (e.g. failing to locate the "+" icon inside automation entry point
+                # nodes).
+                disallowed_tools=["Task", "Agent"],
                 mcp_servers={
                     "playwright": {
                         "command": "npx",
@@ -182,7 +232,6 @@ async def run_agent(job_id: str, prompt_path: str) -> None:
                 log("RESULT", message.result)
 
                 usage = getattr(message, "usage", None)
-                cost_usd = getattr(message, "total_cost_usd", None)
                 turns = getattr(message, "num_turns", None)
 
                 if usage:
@@ -198,15 +247,11 @@ async def run_agent(job_id: str, prompt_path: str) -> None:
                 else:
                     input_tokens = output_tokens = cache_read = cache_write = 0
 
-                if cost_usd is not None:
-                    log("USAGE", f"total_cost=${cost_usd:.6f}")
-
                 if turns is not None:
                     log("USAGE", f"turns={turns}")
 
-                # Store structured cost so it's returned in /jobs/<id> response
-                jobs[job_id]["cost"] = {
-                    "totalCostUsd": cost_usd,
+                # Store structured usage so it is returned in /jobs/<id> response.
+                jobs[job_id]["usage"] = {
                     "inputTokens": input_tokens,
                     "outputTokens": output_tokens,
                     "cacheReadTokens": cache_read,
@@ -223,6 +268,7 @@ async def run_agent(job_id: str, prompt_path: str) -> None:
 async def post_run(request: web.Request) -> web.Response:
     data = await request.json()
     prompt_path = data.get("prompt_path")
+    model = data.get("model", AI_MODEL)
     if not prompt_path:
         return web.json_response({"error": "prompt_path required"}, status=400)
     # Resolve relative paths against the project root (CWD) so callers can
@@ -236,8 +282,8 @@ async def post_run(request: web.Request) -> web.Response:
             {"error": f"prompt file not found: {resolved}"}, status=404
         )
     job_id = str(uuid.uuid4())
-    jobs[job_id] = {"logs": [], "status": "queued", "cost": None}
-    task = asyncio.create_task(run_agent(job_id, str(resolved)))
+    jobs[job_id] = {"logs": [], "status": "queued", "usage": None}
+    task = asyncio.create_task(run_agent(job_id, str(resolved), model))
     running_tasks.add(task)
     task.add_done_callback(running_tasks.discard)
     return web.json_response({"job_id": job_id})

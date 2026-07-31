@@ -37,7 +37,7 @@ Run all commands from `example-doc-generator/`.
 cp Config.toml.example Config.toml
 ```
 
-Set `llmApiKey` in `Config.toml`.
+Set the model and service ports in `Config.toml`, then provide the API key through the environment.
 
 2. Create the Python scripts config:
 
@@ -168,7 +168,7 @@ Single runs write to `artifacts/`:
 | `artifacts/execution-prompt/` | Generated execution prompt sent to the agent |
 | `artifacts/workflow-docs/` | Final Markdown guide |
 | `artifacts/screenshots/` | Captured and cropped screenshots |
-| `artifacts/run-log/` | Target name, project path, timing, costs, and output paths |
+| `artifacts/run-log/` | Target name, model, token usage, timing, and output paths |
 
 Batch runs move each item's `artifacts/` directory to `artifacts_archive/<slug>`
 or `artifacts_archive/<slug>_FAILED`. If a run produces no artifacts, the batch
@@ -203,59 +203,44 @@ automated yet, so review and publish trigger artifacts manually.
 
 ## Run In GitHub Actions
 
-Use the `Connector Documentation Automation` workflow from the Actions tab.
-The workflow file is:
+Example generation is coordinated by the combined `Generate Connector Documentation`
+workflow. The former example-only workflow has been removed so branch integration and
+pull-request creation have a single owner. The combined workflow file is:
 
 ```text
-.github/workflows/connector-example-doc-generation.yml
+.github/workflows/generate-connector-docs.yml
 ```
 
 Required repository/environment secrets:
 
 | Secret | Required for | Description |
 |--------|--------------|-------------|
-| `LLM_API_KEY` | generation | Anthropic API key used by Ballerina and Claude Code |
-| `DOCS_INTEGRATOR_TOKEN` | connector publishing only | Token with permission to push to the docs-integrator fork and create PRs |
+| `ANTHROPIC_API_KEY` | all generation | Anthropic API key used by both documentation generators and Claude Code |
+| `BALLERINA_BOT_TOKEN` | integration and PR | Token used to create or reuse the bot's docs-integrator fork, push the generated branch, and open the upstream PR |
+
+Configure `ANTHROPIC_API_KEY` as a repository or organization secret. The prepare job
+validates it against Anthropic's Models API before checking out repositories or creating
+the docs-integrator branch, so an environment-only secret is not sufficient.
 
 Workflow inputs:
 
 | Input | Value |
 |-------|-------|
+| `github_repo` | repository name under `ballerina-platform` |
 | `mode` | `connector` or `trigger` |
-| `name` | connector name like `mysql`, or trigger name like `trigger.twilio` |
-| `instructions` | optional extra guidance |
-| `publishConnector` | set to `true` only for connector runs that should publish docs |
-| `docsIntegratorFork` | required when `publishConnector` is `true` |
-| `docsIntegratorUpstream` | defaults to `wso2/docs-integrator` |
-| `docsIntegratorBaseBranch` | defaults to `main` |
+| `category` | docs-integrator connector category |
+| `generate_overview_setup` | publish the complete connector Phase 1 output |
+| `generate_reference` | publish the connector action reference |
+| `generate_examples` | run this example generator |
+| `ai_model` | model used by both documentation generators; defaults to `claude-sonnet-4-6` |
 
-Examples:
+The `mode` input applies only to this example generator. Selecting Overview & Setup Guide
+or Reference runs the connector-doc job regardless of example mode. When connector documents
+and Examples are selected, the two generators run in parallel and their output is integrated
+into one docs-integrator branch and PR.
 
-```text
-mode: connector
-name: mysql
-instructions:
-publishConnector: false
-```
-
-```text
-mode: trigger
-name: trigger.twilio
-instructions: Use the onReceived handler.
-publishConnector: false
-```
-
-```text
-mode: connector
-name: zoom.meetings
-instructions: Use BearerTokenConfig for authentication.
-publishConnector: true
-docsIntegratorFork: your-org/docs-integrator
-```
-
-After the workflow completes, open the workflow run summary and download the
-artifact named `example-doc-generator-<mode>-<name>`. It contains the generated
-Markdown guide, screenshots, run logs, and a README describing the output.
+After the workflow completes, the generated guide, screenshots, sample, and run logs remain
+available from the workflow artifacts in addition to the integrated docs PR.
 
 GitHub Actions intentionally does not support batch mode. Run batch queues
 locally with `bal run -- batch config=batch_items.json`.
@@ -282,7 +267,7 @@ The server API is:
 | Method | Path | Description |
 |--------|------|-------------|
 | `POST` | `/run` | Submit `{ "prompt_path": "..." }` |
-| `GET` | `/jobs/<id>` | Poll logs, status, and cost |
+| `GET` | `/jobs/<id>` | Poll logs, status, and token usage |
 | `GET` | `/health` | Health check |
 | `POST` | `/shutdown` | Stop the server |
 
@@ -310,7 +295,7 @@ make clean-artifacts
 
 | Problem | Fix |
 |---------|-----|
-| API key validation failed | Set `llmApiKey` in `Config.toml` and export `ANTHROPIC_API_KEY` |
+| API key validation failed | Export a valid `ANTHROPIC_API_KEY` before running the generator |
 | `claude` not found | Install Claude Code CLI and verify with `claude --version` |
 | Batch fails because `artifacts/` exists | Move or delete `artifacts/` after reviewing it |
 | Agent server not ready | Start `python/agent_server.py` manually and inspect the Python error |

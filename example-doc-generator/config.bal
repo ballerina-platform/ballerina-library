@@ -17,8 +17,7 @@
 // Pipeline configuration — all values are read from Config.toml at runtime.
 // Copy Config.toml.example → Config.toml and fill in the required fields.
 
-// === Required ===
-configurable string llmApiKey = ?;
+configurable string llmModel = "claude-sonnet-4-6";
 
 // === Service Ports ===
 configurable int codeServerPort = 8080;
