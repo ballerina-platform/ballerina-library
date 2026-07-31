@@ -666,7 +666,7 @@
     "extended_modules": [
         {
             "name": "module-ballerinax-cdc",
-            "module_version": "1.4.0-SNAPSHOT",
+            "module_version": "1.4.1-SNAPSHOT",
             "level": 11,
             "default_branch": "main",
             "version_key": "stdlibCdcVersion",
@@ -780,7 +780,7 @@
         },
         {
             "name": "module-ballerinax-aws.marketplace.mpe",
-            "module_version": "0.2.2-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAws.marketplace.mpeVersion",
@@ -790,7 +790,7 @@
         },
         {
             "name": "module-ballerinax-aws.marketplace.mpm",
-            "module_version": "0.2.2-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAws.marketplace.mpmVersion",
@@ -810,7 +810,7 @@
         },
         {
             "name": "module-ballerinax-aws.sns",
-            "module_version": "3.2.0-SNAPSHOT",
+            "module_version": "4.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAws.snsVersion",
@@ -895,7 +895,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "module_version": "1.18.1-SNAPSHOT",
+            "module_version": "1.19.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
@@ -907,7 +907,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "module_version": "1.18.1-SNAPSHOT",
+            "module_version": "1.19.0-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
@@ -939,7 +939,7 @@
         },
         {
             "name": "module-ballerinax-postgresql",
-            "module_version": "1.18.1-SNAPSHOT",
+            "module_version": "1.19.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
@@ -1753,7 +1753,7 @@
         },
         {
             "name": "module-ballerinax-mysql.cdc.driver",
-            "module_version": "1.1.0-SNAPSHOT",
+            "module_version": "1.1.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibMysql.cdc.driverVersion",
