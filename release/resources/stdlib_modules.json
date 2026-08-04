@@ -961,7 +961,7 @@
         },
         {
             "name": "module-ballerinax-redis",
-            "module_version": "3.4.1-SNAPSHOT",
+            "module_version": "3.4.2-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibRedisVersion",
