@@ -94,8 +94,17 @@ def patch_sidebar_example(sidebars_path: Path, category: str, module: str, displ
         items_text = text[items_start:items_end]
         if example_id in items_text:
             return False
-        insertion = f"\n            '{example_id}',"
-        new_text = text[:items_end] + insertion + text[items_end:]
+        # Insert right after the last item's own trailing comma, not blindly before the
+        # closing bracket — the array's existing trailing whitespace/indentation before
+        # `]` must be preserved as-is rather than duplicated or left dangling mid-line.
+        trimmed_len = len(items_text.rstrip())
+        insert_at = items_start + trimmed_len
+        new_text = (
+            text[:insert_at]
+            + f"\n            '{example_id}',"
+            + "\n          "
+            + text[items_end:]
+        )
         sidebars_path.write_text(new_text, encoding="utf-8")
         return True
 

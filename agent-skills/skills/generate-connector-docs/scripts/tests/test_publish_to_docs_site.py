@@ -151,6 +151,24 @@ class CopyScreenshotsTests(unittest.TestCase):
 
 
 class SidebarPatchTests(unittest.TestCase):
+    def test_appends_example_with_matching_sibling_indentation(self):
+        # Regression test: the item must land on its own line with the same indentation as
+        # its siblings, and the closing `],` must not be glued onto the new item's line.
+        with tempfile.TemporaryDirectory() as temp:
+            sidebars_path = Path(temp) / "sidebars.ts"
+            sidebars_path.write_text(SIDEBARS_WITH_OVERVIEW, encoding="utf-8")
+            patch_sidebar_example(sidebars_path, "crm-sales", "hubspot.events.completions", "HubSpot Events Completions")
+            text = sidebars_path.read_text(encoding="utf-8")
+            expected_block = (
+                "          items: [\n"
+                "            'connectors/catalog/crm-sales/hubspot.events.completions/setup-guide',\n"
+                "            'connectors/catalog/crm-sales/hubspot.events.completions/action-reference',\n"
+                "            'connectors/catalog/crm-sales/hubspot.events.completions/example',\n"
+                "          ],\n"
+                "        },"
+            )
+            self.assertIn(expected_block, text)
+
     def test_appends_example_to_existing_connector_block(self):
         with tempfile.TemporaryDirectory() as temp:
             sidebars_path = Path(temp) / "sidebars.ts"
