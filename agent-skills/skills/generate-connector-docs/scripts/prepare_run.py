@@ -106,25 +106,22 @@ def prerequisite_status() -> dict[str, bool]:
 
 
 def docs_site_paths(docs_repo_root: str, category: str, package: str) -> dict[str, str]:
-    """Compute docs-integrator target paths for a connector's example page.
+    """Compute the docs-integrator connector directory and its overview.md.
 
     `package` is used verbatim as the module slug — docs-integrator directories
     are named after the exact Ballerina package name (e.g. `hubspot.events.completions`),
-    matching connector-doc-generator's own convention.
+    matching connector-doc-generator's own convention. Everything else about where the
+    example page and its screenshots land is `connector-doc-generator/scripts/
+    integrate_example.py`'s own concern, computed from `--docs-repo`/`--category`/
+    `--module` — this only needs enough to check whether that tool has already run.
     """
     repo_root = Path(docs_repo_root).resolve()
     connector_dir = repo_root / "en" / "docs" / "connectors" / "catalog" / category / package
-    static_img_dir = repo_root / "en" / "static" / "img" / "connectors" / "catalog" / category / package
     return {
         "docs_repo_root": str(repo_root),
         "category_slug": category,
         "module_slug": package,
         "docs_connector_dir": str(connector_dir),
-        "docs_example_path": str(connector_dir / "example.md"),
-        "docs_static_img_dir": str(static_img_dir),
-        "docs_image_base_url": f"/img/connectors/catalog/{category}/{package}",
-        "docs_sidebars_path": str(repo_root / "en" / "sidebars.ts"),
-        "docs_catalog_index_path": str(repo_root / "en" / "docs" / "connectors" / "catalog" / "index.mdx"),
         "docs_overview_path": str(connector_dir / "overview.md"),
     }
 
@@ -205,11 +202,6 @@ def build_context(
             "category_slug": None,
             "module_slug": package,
             "docs_connector_dir": None,
-            "docs_example_path": None,
-            "docs_static_img_dir": None,
-            "docs_image_base_url": None,
-            "docs_sidebars_path": None,
-            "docs_catalog_index_path": None,
             "docs_overview_path": None,
         })
     else:
@@ -218,11 +210,6 @@ def build_context(
             "category_slug": None,
             "module_slug": None,
             "docs_connector_dir": None,
-            "docs_example_path": None,
-            "docs_static_img_dir": None,
-            "docs_image_base_url": None,
-            "docs_sidebars_path": None,
-            "docs_catalog_index_path": None,
             "docs_overview_path": None,
         })
     context_path.write_text(json.dumps(context, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -237,7 +224,8 @@ def main() -> int:
     parser.add_argument(
         "--docs-repo-root",
         help="Local checkout of wso2/docs-integrator. When set with --category, the example "
-        "page is published directly into it by publish_to_docs_site.py after finalization.",
+        "page is published directly into it by connector-doc-generator's own "
+        "scripts/integrate_example.py after finalization.",
     )
     parser.add_argument(
         "--category",

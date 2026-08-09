@@ -106,7 +106,7 @@ Describe the action with an imperative opening verb.
 ## Screenshot rules
 
 - Reference all six screenshots exactly once and in ascending order.
-- Use only `../screenshots/<filename>.png` paths. This is the authoring and validation form regardless of whether the run also publishes to docs-integrator — never hand-write the site's absolute `/img/connectors/catalog/<category>/<module>/...` form. `publish_to_docs_site.py` performs that rewrite mechanically after validation passes, so the two never drift.
+- Use only `../screenshots/<filename>.png` paths. This is the authoring and validation form regardless of whether the run also publishes to docs-integrator — never hand-write the site's absolute `/img/connectors/catalog/<category>/<module>/...` form. connector-doc-generator's `scripts/integrate_example.py` performs that rewrite mechanically after validation passes, so the two never drift.
 - Preserve the actual collected filenames.
 - Use meaningful alt text describing the visible UI and milestone.
 - Place each image in the step that performed the depicted action.

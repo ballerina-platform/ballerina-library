@@ -152,8 +152,11 @@ class DocsIntegrationTests(unittest.TestCase):
             )
             self.assertEqual(context["category_slug"], "crm-sales")
             self.assertEqual(context["module_slug"], "hubspot.events.completions")
-            self.assertTrue(context["docs_example_path"].endswith(
-                "docs-integrator/en/docs/connectors/catalog/crm-sales/hubspot.events.completions/example.md"
+            self.assertTrue(context["docs_connector_dir"].endswith(
+                "docs-integrator/en/docs/connectors/catalog/crm-sales/hubspot.events.completions"
+            ))
+            self.assertTrue(context["docs_overview_path"].endswith(
+                "docs-integrator/en/docs/connectors/catalog/crm-sales/hubspot.events.completions/overview.md"
             ))
             self.assertEqual(context["github_repo"], "module-ballerinax-hubspot.events.completions")
 
@@ -178,7 +181,8 @@ class DocsIntegrationTests(unittest.TestCase):
             )
             self.assertEqual(context["docs_repo_root"], str(docs_root.resolve()))
             self.assertIsNone(context["category_slug"])
-            self.assertIsNone(context["docs_example_path"])
+            self.assertIsNone(context["docs_connector_dir"])
+            self.assertIsNone(context["docs_overview_path"])
 
     def test_rejects_unknown_explicit_category(self):
         with tempfile.TemporaryDirectory() as temp:
