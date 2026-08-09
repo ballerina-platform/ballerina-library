@@ -21,6 +21,15 @@ COORDINATE_RE = re.compile(
     r"(?::(?P<version>[A-Za-z0-9][A-Za-z0-9_.+-]*))?$"
 )
 
+# Category slugs accepted by connector-doc-generator and used under
+# en/docs/connectors/catalog/<slug>/ in docs-integrator.
+DOCS_CATEGORY_SLUGS = {
+    "ai-ml", "built-in", "cloud-infrastructure", "communication", "crm-sales",
+    "database", "developer-tools", "ecommerce", "erp-business", "finance-accounting",
+    "healthcare", "hrms", "marketing-social", "messaging", "productivity-collaboration",
+    "security-identity", "storage-file",
+}
+
 
 def parse_coordinate(value: str) -> tuple[str, str, str]:
     match = COORDINATE_RE.fullmatch(value.strip())
@@ -67,7 +76,38 @@ def prerequisite_status() -> dict[str, bool]:
     }
 
 
-def build_context(coordinate: str, root: Path, metadata: dict) -> dict:
+def docs_site_paths(docs_repo_root: str, category: str, package: str) -> dict[str, str]:
+    """Compute docs-integrator target paths for a connector's example page.
+
+    `package` is used verbatim as the module slug — docs-integrator directories
+    are named after the exact Ballerina package name (e.g. `hubspot.events.completions`),
+    matching connector-doc-generator's own convention.
+    """
+    repo_root = Path(docs_repo_root).resolve()
+    connector_dir = repo_root / "en" / "docs" / "connectors" / "catalog" / category / package
+    static_img_dir = repo_root / "en" / "static" / "img" / "connectors" / "catalog" / category / package
+    return {
+        "docs_repo_root": str(repo_root),
+        "category_slug": category,
+        "module_slug": package,
+        "docs_connector_dir": str(connector_dir),
+        "docs_example_path": str(connector_dir / "example.md"),
+        "docs_static_img_dir": str(static_img_dir),
+        "docs_image_base_url": f"/img/connectors/catalog/{category}/{package}",
+        "docs_sidebars_path": str(repo_root / "en" / "sidebars.ts"),
+        "docs_catalog_index_path": str(repo_root / "en" / "docs" / "connectors" / "catalog" / "index.mdx"),
+        "docs_overview_path": str(connector_dir / "overview.md"),
+    }
+
+
+def build_context(
+    coordinate: str,
+    root: Path,
+    metadata: dict,
+    docs_repo_root: str | None = None,
+    category: str | None = None,
+    github_repo: str | None = None,
+) -> dict:
     org, package, requested_version = parse_coordinate(coordinate)
     resolved_version = str(metadata.get("version") or requested_version)
     slug = safe_slug(org, package)
@@ -79,6 +119,13 @@ def build_context(coordinate: str, root: Path, metadata: dict) -> dict:
             f"Refusing to overwrite existing run directory: {run_dir}. "
             "Move it or choose a clean invocation root."
         )
+
+    if category is not None and category not in DOCS_CATEGORY_SLUGS:
+        raise ValueError(
+            f"Unknown category '{category}'. Expected one of: {', '.join(sorted(DOCS_CATEGORY_SLUGS))}"
+        )
+    if docs_repo_root is not None and category is None:
+        raise ValueError("--category is required when --docs-repo-root is provided")
 
     paths = {
         "run_dir": run_dir,
@@ -115,7 +162,23 @@ def build_context(coordinate: str, root: Path, metadata: dict) -> dict:
         "prepared_at": datetime.now(timezone.utc).isoformat(),
         "prerequisites": prerequisite_status(),
         "code_server": {"port": 8080, "started_by_run": False, "pid": None},
+        "github_repo": github_repo or f"module-ballerinax-{package}",
     }
+    if docs_repo_root is not None and category is not None:
+        context.update(docs_site_paths(docs_repo_root, category, package))
+    else:
+        context.update({
+            "docs_repo_root": None,
+            "category_slug": None,
+            "module_slug": None,
+            "docs_connector_dir": None,
+            "docs_example_path": None,
+            "docs_static_img_dir": None,
+            "docs_image_base_url": None,
+            "docs_sidebars_path": None,
+            "docs_catalog_index_path": None,
+            "docs_overview_path": None,
+        })
     context_path.write_text(json.dumps(context, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return context
 
@@ -125,6 +188,21 @@ def main() -> int:
     parser.add_argument("coordinate", help="organization/package or organization/package:version")
     parser.add_argument("--root", type=Path, default=Path.cwd(), help="Invocation repository root")
     parser.add_argument("--metadata-file", type=Path, help="Use saved Central JSON (tests/offline replay)")
+    parser.add_argument(
+        "--docs-repo-root",
+        help="Local checkout of wso2/docs-integrator. When set with --category, the example "
+        "page is published directly into it by publish_to_docs_site.py after finalization.",
+    )
+    parser.add_argument(
+        "--category",
+        choices=sorted(DOCS_CATEGORY_SLUGS),
+        help="docs-integrator catalog category slug (required with --docs-repo-root).",
+    )
+    parser.add_argument(
+        "--github-repo",
+        help="Connector's GitHub repo name under github.com/ballerina-platform "
+        "(default: module-ballerinax-<package>).",
+    )
     args = parser.parse_args()
     try:
         org, package, version = parse_coordinate(args.coordinate)
@@ -133,7 +211,14 @@ def main() -> int:
             if args.metadata_file
             else fetch_metadata(central_url(org, package, version))
         )
-        context = build_context(args.coordinate, args.root, metadata)
+        context = build_context(
+            args.coordinate,
+            args.root,
+            metadata,
+            docs_repo_root=args.docs_repo_root,
+            category=args.category,
+            github_repo=args.github_repo,
+        )
     except (ValueError, RuntimeError, FileExistsError, OSError, json.JSONDecodeError) as exc:
         print(f"[ERROR] {exc}", file=sys.stderr)
         return 1
