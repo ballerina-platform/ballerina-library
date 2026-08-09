@@ -10,7 +10,12 @@ from pathlib import Path
 SCRIPTS = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SCRIPTS))
 
-from append_central_examples import append_central_examples, examples_from_metadata, extract_examples
+from append_central_examples import (
+    append_central_examples,
+    examples_from_metadata,
+    extract_examples,
+    rewrite_relative_links,
+)
 from collect_screenshot import collect
 from crop_screenshots import crop_directory
 from inject_try_it_yourself import build_section, build_urls, inject_try_it_yourself
@@ -324,6 +329,47 @@ class WorkflowTests(unittest.TestCase):
             metadata.write_text(json.dumps({"readme": ["invalid"]}), encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "must be a string"):
                 examples_from_metadata(metadata)
+
+    def test_rewrite_relative_links_resolves_against_ballerina_dir(self):
+        # Regression: this exact link 404s once copied verbatim into an unrelated site —
+        # caught after publishing ballerinax/hubspot.events.completions to docs-integrator.
+        text = "1. [Track purchases](../examples/track_customer_purchase_events/track_customer_purchase_events.md) — desc."
+        rewritten = rewrite_relative_links(text, "module-ballerinax-hubspot.events.completions")
+        self.assertEqual(
+            rewritten,
+            "1. [Track purchases]"
+            "(https://github.com/ballerina-platform/module-ballerinax-hubspot.events.completions/"
+            "blob/main/examples/track_customer_purchase_events/track_customer_purchase_events.md) — desc.",
+        )
+
+    def test_rewrite_relative_links_leaves_absolute_and_anchor_links_alone(self):
+        text = (
+            "See [examples](https://github.com/ballerina-platform/module-ballerinax-mysql/tree/main/examples/) "
+            "and [the API](#api) and [root-relative](/docs/x)."
+        )
+        self.assertEqual(rewrite_relative_links(text, "module-ballerinax-mysql"), text)
+
+    def test_examples_from_metadata_rewrites_relative_links_using_package_name(self):
+        with tempfile.TemporaryDirectory() as temp:
+            metadata_path = Path(temp) / "metadata.json"
+            metadata_path.write_text(
+                json.dumps({
+                    "name": "hubspot.events.completions",
+                    "readme": (
+                        "# Package\n\n## Examples\n\n"
+                        "1. [Track purchases](../examples/track_customer_purchase_events/"
+                        "track_customer_purchase_events.md) — desc.\n"
+                    ),
+                }),
+                encoding="utf-8",
+            )
+            examples = examples_from_metadata(metadata_path)
+            self.assertIn(
+                "https://github.com/ballerina-platform/module-ballerinax-hubspot.events.completions/"
+                "blob/main/examples/track_customer_purchase_events/track_customer_purchase_events.md",
+                examples,
+            )
+            self.assertNotIn("](../examples/", examples)
 
     def test_collect_and_validate_complete_run(self):
         with tempfile.TemporaryDirectory() as temp:

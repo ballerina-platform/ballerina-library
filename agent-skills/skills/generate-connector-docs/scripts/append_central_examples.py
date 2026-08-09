@@ -5,12 +5,39 @@ from __future__ import annotations
 
 import argparse
 import json
+import posixpath
 import re
 import sys
 from pathlib import Path
 from typing import Optional
 
 SECTION_HEADING = "## More code examples"
+_MD_LINK_RE = re.compile(r"(?<!!)\[([^\]]+)\]\(([^)\s]+)\)")
+
+
+def _is_relative_link(url: str) -> bool:
+    return not re.match(r"^(?:[a-zA-Z][a-zA-Z0-9+.\-]*:|#|/)", url)
+
+
+def rewrite_relative_links(text: str, github_repo: str) -> str:
+    """Rewrite README-relative links to absolute GitHub blob URLs.
+
+    The extracted "Examples" section is copied verbatim from a package's README as
+    cached on Ballerina Central — that README lives at `ballerina/README.md` in the
+    connector's own repo, so a relative link like `../examples/x.md` only resolves
+    from there. Copied verbatim into an unrelated site (e.g. docs-integrator), the
+    same relative path silently 404s. Rewrite every relative link against that fixed
+    known base instead of leaving it to resolve against whatever page it lands on.
+    """
+
+    def _replace(match: re.Match) -> str:
+        label, url = match.group(1), match.group(2)
+        if not _is_relative_link(url):
+            return match.group(0)
+        resolved = posixpath.normpath(posixpath.join("ballerina", url))
+        return f"[{label}](https://github.com/ballerina-platform/{github_repo}/blob/main/{resolved})"
+
+    return _MD_LINK_RE.sub(_replace, text)
 
 
 def extract_examples(readme: str) -> Optional[str]:
@@ -43,7 +70,13 @@ def examples_from_metadata(metadata_path: Path) -> Optional[str]:
         return None
     if not isinstance(readme, str):
         raise ValueError("Ballerina Central metadata field 'readme' must be a string")
-    return extract_examples(readme)
+    examples = extract_examples(readme)
+    if examples is None:
+        return None
+    package_name = metadata.get("name")
+    if not package_name:
+        return examples
+    return rewrite_relative_links(examples, f"module-ballerinax-{package_name}")
 
 
 def append_central_examples(doc_path: Path, metadata_path: Path) -> tuple[bool, bool]:
