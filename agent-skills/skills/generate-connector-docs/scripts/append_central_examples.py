@@ -12,7 +12,9 @@ from pathlib import Path
 from typing import Optional
 
 SECTION_HEADING = "## More code examples"
-_MD_LINK_RE = re.compile(r"(?<!!)\[([^\]]+)\]\(([^)\s]+)\)")
+# Optional quoted title per CommonMark, e.g. [label](../path.md "title").
+_MD_LINK_RE = re.compile(r'(?<!!)\[([^\]]+)\]\((\S+?)(\s+"[^"]*")?\)')
+_FENCE_RE = re.compile(r"^```.*?^```", re.M | re.S)
 
 
 def _is_relative_link(url: str) -> bool:
@@ -28,16 +30,29 @@ def rewrite_relative_links(text: str, github_repo: str) -> str:
     from there. Copied verbatim into an unrelated site (e.g. docs-integrator), the
     same relative path silently 404s. Rewrite every relative link against that fixed
     known base instead of leaving it to resolve against whatever page it lands on.
+
+    Fenced code blocks are left untouched — sample Ballerina source inside them can
+    coincidentally contain bracket/paren sequences that look like Markdown links, and
+    rewriting those would corrupt the sample rather than fix a link.
     """
 
     def _replace(match: re.Match) -> str:
-        label, url = match.group(1), match.group(2)
+        label, url, title = match.group(1), match.group(2), match.group(3) or ""
         if not _is_relative_link(url):
             return match.group(0)
         resolved = posixpath.normpath(posixpath.join("ballerina", url))
-        return f"[{label}](https://github.com/ballerina-platform/{github_repo}/blob/main/{resolved})"
+        return f"[{label}](https://github.com/ballerina-platform/{github_repo}/blob/main/{resolved}{title})"
 
-    return _MD_LINK_RE.sub(_replace, text)
+    # split()/findall() on a group-less pattern separate fenced blocks from the prose
+    # around them; only the prose parts are ever passed through the link rewrite.
+    parts = _FENCE_RE.split(text)
+    fences = _FENCE_RE.findall(text)
+    rewritten_parts = [_MD_LINK_RE.sub(_replace, part) for part in parts]
+    result = [rewritten_parts[0]]
+    for fence, part in zip(fences, rewritten_parts[1:]):
+        result.append(fence)
+        result.append(part)
+    return "".join(result)
 
 
 def extract_examples(readme: str) -> Optional[str]:
@@ -63,6 +78,21 @@ def extract_examples(readme: str) -> Optional[str]:
     return value or None
 
 
+def github_repo_from_metadata(metadata: dict) -> Optional[str]:
+    """Derive `module-<org>-<package>` from a package's own Central metadata.
+
+    Uses the package's actual `organization` field rather than assuming
+    `ballerinax` — stdlib packages (org `ballerina`) and any other org otherwise
+    get a repository name that doesn't exist, silently pointing every rewritten
+    link at the wrong GitHub repo.
+    """
+    package_name = metadata.get("name")
+    if not package_name:
+        return None
+    organization = metadata.get("organization") or "ballerinax"
+    return f"module-{organization}-{package_name}"
+
+
 def examples_from_metadata(metadata_path: Path) -> Optional[str]:
     metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
     readme = metadata.get("readme")
@@ -73,15 +103,16 @@ def examples_from_metadata(metadata_path: Path) -> Optional[str]:
     examples = extract_examples(readme)
     if examples is None:
         return None
-    package_name = metadata.get("name")
-    if not package_name:
+    github_repo = github_repo_from_metadata(metadata)
+    if github_repo is None:
         return examples
-    return rewrite_relative_links(examples, f"module-ballerinax-{package_name}")
+    return rewrite_relative_links(examples, github_repo)
 
 
 def append_central_examples(doc_path: Path, metadata_path: Path) -> tuple[bool, bool]:
     if not doc_path.is_file():
         raise FileNotFoundError(f"Missing guide: {doc_path}")
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
     examples = examples_from_metadata(metadata_path)
     text = doc_path.read_text(encoding="utf-8")
     matches = list(re.finditer(r"^## More code examples\n\n(?P<body>.*?)(?=^## |\Z)", text, re.M | re.S))
@@ -92,7 +123,13 @@ def append_central_examples(doc_path: Path, metadata_path: Path) -> tuple[bool, 
             raise ValueError("Guide contains More code examples but Central metadata has no examples")
         actual = matches[0].group("body").strip()
         if actual != examples:
-            raise ValueError("Existing More code examples content does not match Ballerina Central")
+            # A guide written by a version of this script that predates the relative-link
+            # rewrite (or the standalone/no-name skip path) still has the raw README links.
+            # Normalize before concluding the Central content itself has actually drifted.
+            github_repo = github_repo_from_metadata(metadata)
+            normalized_actual = rewrite_relative_links(actual, github_repo) if github_repo else actual
+            if normalized_actual != examples:
+                raise ValueError("Existing More code examples content does not match Ballerina Central")
         return True, False
     if examples is None:
         return False, False

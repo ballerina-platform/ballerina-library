@@ -127,6 +127,32 @@ class CoordinateTests(unittest.TestCase):
             self.assertEqual(context["sample_name"], "ballerinax_sap_business_one_connector_sample")
             self.assertEqual(Path(context["sample_dir"]).name, context["sample_name"])
 
+    def test_github_repo_default_uses_coordinate_organization_not_ballerinax(self):
+        # Regression: hardcoding "ballerinax" gave a nonexistent repo name for any other
+        # organization, e.g. stdlib packages published under "ballerina".
+        with tempfile.TemporaryDirectory() as temp:
+            context = build_context("ballerina/http", Path(temp), {"version": "2.11.0"})
+            self.assertEqual(context["github_repo"], "module-ballerina-http")
+
+    def test_cli_rejects_non_object_offline_metadata(self):
+        # Regression: a JSON array is valid JSON but build_context() calls metadata.get(...)
+        # on it, which previously raised an uncaught AttributeError instead of a clean error.
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            metadata_file = root / "metadata.json"
+            metadata_file.write_text("[]", encoding="utf-8")
+            result = subprocess.run(
+                [
+                    sys.executable, str(SCRIPTS / "prepare_run.py"), "ballerinax/mysql",
+                    "--root", str(root), "--metadata-file", str(metadata_file),
+                ],
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("must be a JSON object", result.stderr)
+            self.assertNotIn("Traceback", result.stderr)
+
 
 class DocsIntegrationTests(unittest.TestCase):
     def test_derives_category_from_area_keyword(self):
@@ -354,6 +380,7 @@ class WorkflowTests(unittest.TestCase):
             metadata_path = Path(temp) / "metadata.json"
             metadata_path.write_text(
                 json.dumps({
+                    "organization": "ballerinax",
                     "name": "hubspot.events.completions",
                     "readme": (
                         "# Package\n\n## Examples\n\n"
@@ -370,6 +397,69 @@ class WorkflowTests(unittest.TestCase):
                 examples,
             )
             self.assertNotIn("](../examples/", examples)
+
+    def test_examples_from_metadata_uses_actual_organization_not_ballerinax(self):
+        # Regression: hardcoding "ballerinax" pointed non-ballerinax packages
+        # (e.g. stdlib org "ballerina") at a GitHub repo that doesn't exist.
+        with tempfile.TemporaryDirectory() as temp:
+            metadata_path = Path(temp) / "metadata.json"
+            metadata_path.write_text(
+                json.dumps({
+                    "organization": "ballerina",
+                    "name": "http",
+                    "readme": "# Package\n\n## Examples\n\nSee [guide](../examples/x.md).\n",
+                }),
+                encoding="utf-8",
+            )
+            examples = examples_from_metadata(metadata_path)
+            self.assertIn("https://github.com/ballerina-platform/module-ballerina-http/", examples)
+
+    def test_rewrite_relative_links_ignores_fenced_code_blocks(self):
+        # A Ballerina array/tuple literal inside a sample can coincidentally look like a
+        # Markdown link — must not be rewritten, or the sample code gets corrupted.
+        text = (
+            "Intro [guide](../docs/x.md).\n\n"
+            "```ballerina\n"
+            "string[] pair = [\"label\"](\"../not/a/link\");\n"
+            "```\n\n"
+            "Outro [another](../docs/y.md)."
+        )
+        rewritten = rewrite_relative_links(text, "module-ballerinax-mysql")
+        self.assertIn('string[] pair = ["label"]("../not/a/link");', rewritten)
+        self.assertIn("https://github.com/ballerina-platform/module-ballerinax-mysql/blob/main/docs/x.md", rewritten)
+        self.assertIn("https://github.com/ballerina-platform/module-ballerinax-mysql/blob/main/docs/y.md", rewritten)
+
+    def test_rewrite_relative_links_handles_titled_links(self):
+        text = '[guide](../docs/x.md "Setup guide")'
+        rewritten = rewrite_relative_links(text, "module-ballerinax-mysql")
+        self.assertEqual(
+            rewritten,
+            '[guide](https://github.com/ballerina-platform/module-ballerinax-mysql/blob/main/docs/x.md "Setup guide")',
+        )
+
+    def test_append_central_examples_tolerates_pre_rewrite_content_on_rerun(self):
+        # A guide written before this rewrite existed still has the raw relative link;
+        # re-running append_central_examples against it must not raise, since the
+        # underlying Central content hasn't actually changed.
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            metadata_path = root / "metadata.json"
+            metadata_path.write_text(
+                json.dumps({
+                    "organization": "ballerinax",
+                    "name": "hubspot.events.completions",
+                    "readme": "# Package\n\n## Examples\n\nSee [guide](../examples/x.md).\n",
+                }),
+                encoding="utf-8",
+            )
+            doc_path = root / "guide.md"
+            doc_path.write_text(
+                "# Example\n\n## Operation\n\nDone.\n\n"
+                "## More code examples\n\nSee [guide](../examples/x.md).\n",
+                encoding="utf-8",
+            )
+            found, added = append_central_examples(doc_path, metadata_path)
+            self.assertEqual((found, added), (True, False))
 
     def test_collect_and_validate_complete_run(self):
         with tempfile.TemporaryDirectory() as temp:

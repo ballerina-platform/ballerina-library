@@ -188,7 +188,7 @@ def build_context(
         "prepared_at": datetime.now(timezone.utc).isoformat(),
         "prerequisites": prerequisite_status(),
         "code_server": {"port": 8080, "started_by_run": False, "pid": None},
-        "github_repo": github_repo or f"module-ballerinax-{package}",
+        "github_repo": github_repo or f"module-{org}-{package}",
     }
     if docs_repo_root is not None and category is not None:
         context.update(docs_site_paths(docs_repo_root, category, package))
@@ -237,7 +237,7 @@ def main() -> int:
     parser.add_argument(
         "--github-repo",
         help="Connector's GitHub repo name under github.com/ballerina-platform "
-        "(default: module-ballerinax-<package>).",
+        "(default: module-<organization>-<package>).",
     )
     args = parser.parse_args()
     try:
@@ -247,6 +247,8 @@ def main() -> int:
             if args.metadata_file
             else fetch_metadata(central_url(org, package, version))
         )
+        if not isinstance(metadata, dict):
+            raise ValueError("Ballerina Central metadata must be a JSON object")
         context = build_context(
             args.coordinate,
             args.root,
