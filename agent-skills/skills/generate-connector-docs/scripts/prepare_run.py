@@ -22,13 +22,42 @@ COORDINATE_RE = re.compile(
 )
 
 # Category slugs accepted by connector-doc-generator and used under
-# en/docs/connectors/catalog/<slug>/ in docs-integrator.
-DOCS_CATEGORY_SLUGS = {
-    "ai-ml", "built-in", "cloud-infrastructure", "communication", "crm-sales",
-    "database", "developer-tools", "ecommerce", "erp-business", "finance-accounting",
-    "healthcare", "hrms", "marketing-social", "messaging", "productivity-collaboration",
-    "security-identity", "storage-file",
+# en/docs/connectors/catalog/<slug>/ in docs-integrator. Names match the
+# "Area/<Name>" package keyword docs-integrator connectors are tagged with
+# (see connector-doc-generator/modules/category's CATALOG_CATEGORIES), so a
+# package's own Central metadata is enough to derive its category slug.
+DOCS_CATEGORIES = {
+    "ai-ml": "AI & ML",
+    "built-in": "Built-in",
+    "cloud-infrastructure": "Cloud & Infrastructure",
+    "communication": "Communication",
+    "crm-sales": "CRM & Sales",
+    "database": "Database",
+    "developer-tools": "Developer Tools",
+    "ecommerce": "E-Commerce",
+    "erp-business": "ERP & Business",
+    "finance-accounting": "Finance & Accounting",
+    "healthcare": "Healthcare",
+    "hrms": "HRMS",
+    "marketing-social": "Marketing & Social",
+    "messaging": "Messaging",
+    "productivity-collaboration": "Productivity & Collaboration",
+    "security-identity": "Security & Identity",
+    "storage-file": "Storage & Files",
 }
+DOCS_CATEGORY_SLUGS = set(DOCS_CATEGORIES)
+_AREA_NAME_TO_SLUG = {name.casefold(): slug for slug, name in DOCS_CATEGORIES.items()}
+_AREA_KEYWORD_RE = re.compile(r"^Area/(.+)$")
+
+
+def derive_category_from_keywords(metadata: dict) -> str | None:
+    """Return the docs-integrator category slug implied by a package's own
+    `Area/<Name>` Central keyword, or None if absent or unrecognized."""
+    for keyword in metadata.get("keywords") or []:
+        match = _AREA_KEYWORD_RE.match(str(keyword).strip())
+        if match:
+            return _AREA_NAME_TO_SLUG.get(match.group(1).strip().casefold())
+    return None
 
 
 def parse_coordinate(value: str) -> tuple[str, str, str]:
@@ -125,7 +154,7 @@ def build_context(
             f"Unknown category '{category}'. Expected one of: {', '.join(sorted(DOCS_CATEGORY_SLUGS))}"
         )
     if docs_repo_root is not None and category is None:
-        raise ValueError("--category is required when --docs-repo-root is provided")
+        category = derive_category_from_keywords(metadata)
 
     paths = {
         "run_dir": run_dir,
@@ -166,6 +195,23 @@ def build_context(
     }
     if docs_repo_root is not None and category is not None:
         context.update(docs_site_paths(docs_repo_root, category, package))
+    elif docs_repo_root is not None:
+        # A docs-integrator target was requested, but no category could be derived from
+        # this package's own Central keywords. Preserve docs_repo_root (distinct from the
+        # "no docs target at all" case below) so the caller knows to ask for --category
+        # explicitly and re-run, rather than silently falling back to a scratch-only run.
+        context.update({
+            "docs_repo_root": str(Path(docs_repo_root).resolve()),
+            "category_slug": None,
+            "module_slug": package,
+            "docs_connector_dir": None,
+            "docs_example_path": None,
+            "docs_static_img_dir": None,
+            "docs_image_base_url": None,
+            "docs_sidebars_path": None,
+            "docs_catalog_index_path": None,
+            "docs_overview_path": None,
+        })
     else:
         context.update({
             "docs_repo_root": None,
@@ -196,7 +242,9 @@ def main() -> int:
     parser.add_argument(
         "--category",
         choices=sorted(DOCS_CATEGORY_SLUGS),
-        help="docs-integrator catalog category slug (required with --docs-repo-root).",
+        help="docs-integrator catalog category slug. Auto-derived from the package's own "
+        "Area/... Central keyword when omitted; pass explicitly to override or to supply "
+        "one when the package has no Area/... keyword.",
     )
     parser.add_argument(
         "--github-repo",

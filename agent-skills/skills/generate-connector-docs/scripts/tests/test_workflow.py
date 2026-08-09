@@ -14,7 +14,7 @@ from append_central_examples import append_central_examples, examples_from_metad
 from collect_screenshot import collect
 from crop_screenshots import crop_directory
 from inject_try_it_yourself import build_section, build_urls, inject_try_it_yourself
-from prepare_run import build_context, central_url, parse_coordinate, safe_slug
+from prepare_run import build_context, central_url, derive_category_from_keywords, parse_coordinate, safe_slug
 from validate_output import BANNED, validate
 
 PNG = base64.b64decode(
@@ -121,6 +121,76 @@ class CoordinateTests(unittest.TestCase):
             )
             self.assertEqual(context["sample_name"], "ballerinax_sap_business_one_connector_sample")
             self.assertEqual(Path(context["sample_dir"]).name, context["sample_name"])
+
+
+class DocsIntegrationTests(unittest.TestCase):
+    def test_derives_category_from_area_keyword(self):
+        metadata = {"keywords": ["Cost/Paid", "Vendor/HubSpot", "Area/CRM & Sales", "Type/Connector"]}
+        self.assertEqual(derive_category_from_keywords(metadata), "crm-sales")
+
+    def test_returns_none_without_area_keyword(self):
+        self.assertIsNone(derive_category_from_keywords({"keywords": ["Type/Connector"]}))
+        self.assertIsNone(derive_category_from_keywords({}))
+
+    def test_returns_none_for_unrecognized_area_name(self):
+        self.assertIsNone(derive_category_from_keywords({"keywords": ["Area/Not A Real Category"]}))
+
+    def test_without_docs_repo_root_no_docs_fields_are_set(self):
+        with tempfile.TemporaryDirectory() as temp:
+            context = build_context("ballerinax/mysql", Path(temp), {"version": "1.2.3"})
+            self.assertIsNone(context["docs_repo_root"])
+            self.assertIsNone(context["category_slug"])
+
+    def test_category_is_auto_derived_when_omitted(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            context = build_context(
+                "ballerinax/hubspot.events.completions",
+                root,
+                {"version": "1.0.0", "keywords": ["Area/CRM & Sales"]},
+                docs_repo_root=str(root / "docs-integrator"),
+            )
+            self.assertEqual(context["category_slug"], "crm-sales")
+            self.assertEqual(context["module_slug"], "hubspot.events.completions")
+            self.assertTrue(context["docs_example_path"].endswith(
+                "docs-integrator/en/docs/connectors/catalog/crm-sales/hubspot.events.completions/example.md"
+            ))
+            self.assertEqual(context["github_repo"], "module-ballerinax-hubspot.events.completions")
+
+    def test_explicit_category_overrides_derivation(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            context = build_context(
+                "ballerinax/hubspot.events.completions",
+                root,
+                {"version": "1.0.0", "keywords": ["Area/CRM & Sales"]},
+                docs_repo_root=str(root / "docs-integrator"),
+                category="marketing-social",
+            )
+            self.assertEqual(context["category_slug"], "marketing-social")
+
+    def test_docs_repo_root_without_derivable_category_is_preserved_as_partial(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            docs_root = root / "docs-integrator"
+            context = build_context(
+                "ballerinax/mysql", root, {"version": "1.2.3", "keywords": []}, docs_repo_root=str(docs_root)
+            )
+            self.assertEqual(context["docs_repo_root"], str(docs_root.resolve()))
+            self.assertIsNone(context["category_slug"])
+            self.assertIsNone(context["docs_example_path"])
+
+    def test_rejects_unknown_explicit_category(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            with self.assertRaises(ValueError):
+                build_context(
+                    "ballerinax/mysql",
+                    root,
+                    {"version": "1.2.3"},
+                    docs_repo_root=str(root / "docs-integrator"),
+                    category="not-a-real-category",
+                )
 
 
 class WorkflowTests(unittest.TestCase):
