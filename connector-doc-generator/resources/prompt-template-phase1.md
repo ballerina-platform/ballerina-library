@@ -45,7 +45,7 @@ title: "{{name}}"
 description: "Overview of the {{packageName}} connector for WSO2 Integrator."
 ---
 
-{2-3 sentence narrative describing what the connector does and what service it integrates with}
+{2-3 sentence narrative describing what the connector does and what service it integrates with. Refer to the connector by name — do not mention the Ballerina package identifier ({{packageName}}) here; that belongs only in code blocks and the GitHub repository link below.}
 
 ## Key Features
 

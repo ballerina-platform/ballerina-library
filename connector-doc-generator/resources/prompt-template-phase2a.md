@@ -56,7 +56,7 @@ toc_max_heading_level: 4
 
 # Actions
 
-{If single package: "The `ballerinax/{{module}}` package exposes the following clients:"}
+{If single package: "The {{name}} connector exposes the following clients:" — refer to the connector by name here, not by its Ballerina package identifier}
 {If multiple packages:
 "The {{name}} connector spans {N} packages:
 - `ballerinax/{{module}}`
