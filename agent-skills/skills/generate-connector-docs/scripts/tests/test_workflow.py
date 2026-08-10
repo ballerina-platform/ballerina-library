@@ -124,8 +124,17 @@ class CoordinateTests(unittest.TestCase):
             context = build_context(
                 "ballerinax/sap-business.one", Path(temp), {"version": "1.2.3"}
             )
-            self.assertEqual(context["sample_name"], "ballerinax_sap_business_one_connector_sample")
+            self.assertEqual(context["sample_name"], "sap-business.one_connector_sample")
             self.assertEqual(Path(context["sample_dir"]).name, context["sample_name"])
+
+    def test_sample_name_has_no_org_prefix(self):
+        # Regression: every existing sample directory in wso2/integration-samples drops the
+        # org (e.g. "hubspot.crm.pipelines_connector_sample", "aws.s3_connector_sample", not
+        # "ballerinax_..."). Caught after actually publishing a sample with the org prefix.
+        with tempfile.TemporaryDirectory() as temp:
+            context = build_context("ballerinax/hubspot.events.completions", Path(temp), {"version": "1.0.0"})
+            self.assertEqual(context["sample_name"], "hubspot.events.completions_connector_sample")
+            self.assertNotIn("ballerinax", context["sample_name"])
 
     def test_github_repo_default_uses_coordinate_organization_not_ballerinax(self):
         # Regression: hardcoding "ballerinax" gave a nonexistent repo name for any other
@@ -495,7 +504,7 @@ class WorkflowTests(unittest.TestCase):
             self.assertEqual(doc.read_text(encoding="utf-8").count("## Try it yourself"), 1)
             self.assertIn(build_section(context["sample_name"]), doc.read_text(encoding="utf-8"))
             devant_url, github_url = build_urls(context["sample_name"])
-            expected_path = "integrator-default-profile/connectors/ballerinax_mysql_connector_sample"
+            expected_path = "integrator-default-profile/connectors/mysql_connector_sample"
             self.assertTrue(devant_url.endswith(expected_path))
             self.assertTrue(github_url.endswith(expected_path))
 
@@ -537,9 +546,9 @@ class WorkflowTests(unittest.TestCase):
             self.assertTrue(run["try_it_yourself_added"])
             self.assertTrue(run["central_examples_found"])
             self.assertTrue(run["examples_added"])
-            self.assertEqual(run["sample_name"], "ballerinax_mysql_connector_sample")
-            self.assertTrue(run["devant_url"].endswith("/ballerinax_mysql_connector_sample"))
-            self.assertTrue(run["github_url"].endswith("/ballerinax_mysql_connector_sample"))
+            self.assertEqual(run["sample_name"], "mysql_connector_sample")
+            self.assertTrue(run["devant_url"].endswith("/mysql_connector_sample"))
+            self.assertTrue(run["github_url"].endswith("/mysql_connector_sample"))
             self.assertTrue(
                 Path(context["doc_path"]).read_text(encoding="utf-8").endswith(
                     "## More code examples\n\nUse Central.\n"
@@ -741,7 +750,7 @@ class MigrationContractTests(unittest.TestCase):
         required = [
             "Never start a nested agent",
             "run git commands",
-            "do not publish the sample",
+            "without the user's explicit, per-run confirmation",
             "Do not support trigger packages or batch queues",
         ]
         self.assertTrue(all(value in self.skill_text for value in required))

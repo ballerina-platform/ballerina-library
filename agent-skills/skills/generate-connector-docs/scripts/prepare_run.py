@@ -138,7 +138,11 @@ def build_context(
     resolved_version = str(metadata.get("version") or requested_version)
     slug = safe_slug(org, package)
     image_prefix = safe_slug(org, package, separator="_")
-    sample_name = f"{safe_slug(org, package, separator='_')}_connector_sample"
+    # No org prefix, and dots preserved: matches every existing sample directory name in
+    # wso2/integration-samples (e.g. "hubspot.crm.pipelines_connector_sample",
+    # "aws.s3_connector_sample") — `package` is already constrained to a safe character set
+    # by COORDINATE_RE, so it needs no further sanitizing for use as a directory name.
+    sample_name = f"{package}_connector_sample"
     run_dir = (root / "artifacts" / slug).resolve()
     if run_dir.exists() and any(run_dir.iterdir()):
         raise FileExistsError(
