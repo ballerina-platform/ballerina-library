@@ -32,6 +32,19 @@ def find_screenshots(artifacts: Path, expected: int) -> list[Path]:
     return files
 
 
+def connector_display_name(overview_text: str, fallback: str) -> str:
+    """Extract the connector's own display name from overview.md's frontmatter title.
+
+    The title itself is "<Name> Overview" (matching WSO2's own documentation convention,
+    confirmed across mi.docs.wso2.com and docs-integrator's pre-existing Twilio/HTTP pages),
+    so strip that suffix back off to get the bare name for use in prose or other titles.
+    """
+    title_match = re.search(r'^title:\s*"([^"]+)"', overview_text, re.M)
+    if not title_match:
+        return fallback
+    return re.sub(r"\s+Overview$", "", title_match.group(1))
+
+
 def add_example_link_to_overview(overview: Path, module: str) -> bool:
     """Add an Example bullet to overview.md's Documentation section.
 
@@ -47,8 +60,7 @@ def add_example_link_to_overview(overview: Path, module: str) -> bool:
     if re.search(r"\(example\.md\)", text):
         return False
 
-    title_match = re.search(r'^title:\s*"([^"]+)"', text, re.M)
-    display_name = title_match.group(1) if title_match else module
+    display_name = connector_display_name(text, module)
     bullet = (
         f"\n* **[Example](example.md)**: Learn how to build and configure an integration "
         f"using the **{display_name}** connector, including connection setup, operation "
@@ -63,6 +75,27 @@ def add_example_link_to_overview(overview: Path, module: str) -> bool:
     updated = text[:insertion_pos].rstrip("\n") + "\n" + bullet + text[insertion_pos:]
     overview.write_text(updated, encoding="utf-8")
     return True
+
+
+def ensure_example_frontmatter(content: str, display_name: str, module: str) -> str:
+    """Prepend a frontmatter block to example.md if it doesn't already have one.
+
+    The example-generator's own template is deliberately site-agnostic — it doesn't know at
+    authoring time whether its output is headed for docs-integrator or staying as a scratch
+    preview — so it never writes frontmatter itself. Add the docs-integrator-specific title
+    here, at the point this content is actually placed into the site, matching the same
+    "<Name> <Section>" title convention as the other three generated pages.
+    """
+    if content.lstrip().startswith("---"):
+        return content
+    frontmatter = (
+        "---\n"
+        "connector: true\n"
+        f'connector_name: "{module}"\n'
+        f'title: "{display_name} Example"\n'
+        "---\n\n"
+    )
+    return frontmatter + content
 
 
 def reconcile_example_sidebar(sidebar: Path, category: str, module: str) -> None:
@@ -129,6 +162,9 @@ def integrate(args: argparse.Namespace) -> dict[str, object]:
     content = content.replace("../screenshots/", static_prefix)
     if "../screenshots/" in content:
         fail("Generated guide contains unresolved screenshot paths")
+
+    display_name = connector_display_name(overview.read_text(encoding="utf-8"), args.module)
+    content = ensure_example_frontmatter(content, display_name, args.module)
 
     target_dir.mkdir(parents=True, exist_ok=True)
     target_doc = target_dir / "example.md"

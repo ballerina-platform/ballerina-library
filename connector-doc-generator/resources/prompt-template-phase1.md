@@ -41,7 +41,7 @@ The connector source code is cloned at `{{localRepoPath}}`. Use the `Read`, `Glo
 ---
 connector: true
 connector_name: "{{module}}"
-title: "{{name}}"
+title: "{{name}} Overview"
 description: "Overview of the {{packageName}} connector for WSO2 Integrator."
 ---
 
@@ -106,7 +106,7 @@ Check the issue tracker for open issues that interest you. We look forward to re
 ---
 connector: true
 connector_name: "{{module}}"
-title: "Setup Guide"
+title: "{{name}} Setup Guide"
 description: "How to set up and configure the {{packageName}} connector."
 ---
 
@@ -150,6 +150,7 @@ description: "How to set up and configure the {{packageName}} connector."
 ---
 connector: true
 connector_name: "{{module}}"
+title: "{{name}} Trigger Reference"
 ---
 
 # Triggers

@@ -6,11 +6,53 @@ from pathlib import Path
 SCRIPTS = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SCRIPTS))
 
-from integrate_example import add_example_link_to_overview
+from integrate_example import add_example_link_to_overview, connector_display_name, ensure_example_frontmatter
 from validate_docs import validate
 
 
+class ConnectorDisplayNameTests(unittest.TestCase):
+    def test_strips_overview_suffix(self):
+        text = '---\ntitle: "HubSpot Events Completions Overview"\n---\n'
+        self.assertEqual(connector_display_name(text, "fallback"), "HubSpot Events Completions")
+
+    def test_leaves_title_without_suffix_untouched(self):
+        text = '---\ntitle: "HubSpot Events Completions"\n---\n'
+        self.assertEqual(connector_display_name(text, "fallback"), "HubSpot Events Completions")
+
+    def test_falls_back_when_no_title_field(self):
+        self.assertEqual(connector_display_name("---\nconnector: true\n---\n", "hubspot.events.completions"), "hubspot.events.completions")
+
+
+class EnsureExampleFrontmatterTests(unittest.TestCase):
+    def test_adds_frontmatter_when_absent(self):
+        content = "# Example\n\n## What you'll build\n\nDoes a thing.\n"
+        updated = ensure_example_frontmatter(content, "HubSpot Events Completions", "hubspot.events.completions")
+        self.assertTrue(updated.startswith("---\n"))
+        self.assertIn('title: "HubSpot Events Completions Example"', updated)
+        self.assertIn('connector_name: "hubspot.events.completions"', updated)
+        self.assertIn("# Example", updated)
+
+    def test_leaves_existing_frontmatter_untouched(self):
+        content = '---\ntitle: "Custom"\n---\n\n# Example\n'
+        self.assertEqual(ensure_example_frontmatter(content, "HubSpot Events Completions", "hubspot.events.completions"), content)
+
+
 class AddExampleLinkTests(unittest.TestCase):
+    def test_uses_display_name_with_overview_suffix_stripped(self):
+        # Regression: overview.md's title is now "<Name> Overview" (WSO2's own convention,
+        # confirmed against mi.docs.wso2.com and docs-integrator's own Twilio/HTTP pages) —
+        # the bullet must use the bare name, not repeat "Overview" as part of it.
+        with tempfile.TemporaryDirectory() as temp:
+            overview = Path(temp) / "overview.md"
+            overview.write_text(
+                '---\ntitle: "HubSpot Events Completions Overview"\n---\n\n'
+                "Intro.\n\n## Documentation\n\n* **[Setup Guide](setup-guide.md)**: Guide.\n",
+                encoding="utf-8",
+            )
+            add_example_link_to_overview(overview, "hubspot.events.completions")
+            text = overview.read_text(encoding="utf-8")
+            self.assertIn("using the **HubSpot Events Completions** connector", text)
+            self.assertNotIn("HubSpot Events Completions Overview** connector", text)
     def test_adds_bullet_before_next_heading_using_frontmatter_title(self):
         with tempfile.TemporaryDirectory() as temp:
             overview = Path(temp) / "overview.md"

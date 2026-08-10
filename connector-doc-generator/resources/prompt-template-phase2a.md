@@ -52,6 +52,7 @@ Everything before the first `## ClientName` section:
 connector: true
 connector_name: "{{module}}"
 toc_max_heading_level: 4
+title: "{{name}} Action Reference"
 ---
 
 # Actions
