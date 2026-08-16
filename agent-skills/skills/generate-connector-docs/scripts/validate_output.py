@@ -141,7 +141,7 @@ def validate(context: dict) -> list[str]:
     )
     expected_setup = (
         "> **New to WSO2 Integrator?** Follow the [Create a New Integration]"
-        "(../../../../develop/create-integrations/create-new-integration.md) guide to set up "
+        "(../../../../develop/create-integrations/create-a-new-integration.md) guide to set up "
         "your integration first, then return here to add the connector."
     )
     if not setup_match or setup_match.group("body").strip() != expected_setup:

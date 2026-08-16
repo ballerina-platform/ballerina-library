@@ -25,6 +25,11 @@ def validate(args: argparse.Namespace) -> dict[str, object]:
         if not path.exists() or not path.read_text(encoding="utf-8").strip():
             errors.append(f"Required page is missing or empty: {path}")
 
+    if args.examples:
+        overview_path = doc_dir / "overview.md"
+        if overview_path.exists() and "(example.md)" not in overview_path.read_text(encoding="utf-8"):
+            errors.append(f"overview.md does not link to example.md: {overview_path}")
+
     local_path = re.compile(r"\.\./screenshots/|(?:^|[\s(])/(?:home|Users|private|tmp)/")
     image_pattern = re.compile(
         rf"/img/connectors/catalog/{re.escape(args.category)}/{re.escape(args.module)}/([^\s)\"']+)"
