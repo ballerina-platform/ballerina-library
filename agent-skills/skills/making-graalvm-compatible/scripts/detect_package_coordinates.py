@@ -93,8 +93,14 @@ def _parse_with_regex(text: str) -> dict:
         pk, section = m.group(1), m.group(2)
 
         def field(key: str, section: str) -> str:
-            fm = re.search(rf'^{key}\s*=\s*"?([^"\n]*)"?', section, re.MULTILINE)
-            return fm.group(1).strip().strip('"') if fm else ""
+            # TOML values may be double-quoted, single-quoted (literal string),
+            # or bare; try each in turn and strip only the matching delimiter.
+            fm = re.search(rf'^{key}\s*=\s*(?:"([^"\n]*)"|\'([^\'\n]*)\'|([^\n]*))',
+                           section, re.MULTILINE)
+            if not fm:
+                return ""
+            value = next(g for g in fm.groups() if g is not None)
+            return value.strip()
 
         java_dependencies.append({
             "platform": pk,
