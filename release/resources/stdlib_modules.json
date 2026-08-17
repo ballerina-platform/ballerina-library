@@ -361,7 +361,7 @@
         },
         {
             "name": "module-ballerina-edi",
-            "module_version": "1.6.0-SNAPSHOT",
+            "module_version": "1.6.1-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibEdiVersion",
@@ -442,7 +442,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "module_version": "2.20.2-SNAPSHOT",
+            "module_version": "2.20.3-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
@@ -464,7 +464,7 @@
         },
         {
             "name": "module-ballerina-smb",
-            "module_version": "1.1.0-SNAPSHOT",
+            "module_version": "2.0.2-SNAPSHOT",
             "level": 5,
             "default_branch": "main",
             "version_key": "stdlibSmbVersion",
@@ -542,7 +542,7 @@
         },
         {
             "name": "module-ballerina-ai",
-            "module_version": "1.13.0-SNAPSHOT",
+            "module_version": "1.14.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibAiVersion",
@@ -554,7 +554,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "module_version": "1.14.8-SNAPSHOT",
+            "module_version": "1.15.0-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
@@ -666,7 +666,7 @@
     "extended_modules": [
         {
             "name": "module-ballerinax-cdc",
-            "module_version": "1.4.0-SNAPSHOT",
+            "module_version": "1.4.1-SNAPSHOT",
             "level": 11,
             "default_branch": "main",
             "version_key": "stdlibCdcVersion",
@@ -770,7 +770,7 @@
         },
         {
             "name": "module-ballerinax-aws.dynamodbstreams",
-            "module_version": "1.1.0-SNAPSHOT",
+            "module_version": "2.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAws.dynamodbstreamsVersion",
@@ -780,7 +780,7 @@
         },
         {
             "name": "module-ballerinax-aws.marketplace.mpe",
-            "module_version": "0.2.2-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAws.marketplace.mpeVersion",
@@ -790,7 +790,7 @@
         },
         {
             "name": "module-ballerinax-aws.marketplace.mpm",
-            "module_version": "0.2.2-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAws.marketplace.mpmVersion",
@@ -810,7 +810,7 @@
         },
         {
             "name": "module-ballerinax-aws.sns",
-            "module_version": "3.2.0-SNAPSHOT",
+            "module_version": "4.0.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAws.snsVersion",
@@ -895,7 +895,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "module_version": "1.18.1-SNAPSHOT",
+            "module_version": "1.19.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
@@ -907,7 +907,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "module_version": "1.18.1-SNAPSHOT",
+            "module_version": "1.19.0-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
@@ -929,7 +929,7 @@
         },
         {
             "name": "module-ballerinax-oracledb",
-            "module_version": "1.16.1-SNAPSHOT",
+            "module_version": "1.17.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibOracledbVersion",
@@ -939,7 +939,7 @@
         },
         {
             "name": "module-ballerinax-postgresql",
-            "module_version": "1.18.1-SNAPSHOT",
+            "module_version": "1.19.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
@@ -961,7 +961,7 @@
         },
         {
             "name": "module-ballerinax-redis",
-            "module_version": "3.4.1-SNAPSHOT",
+            "module_version": "3.4.2-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibRedisVersion",
@@ -1095,7 +1095,7 @@
         },
         {
             "name": "module-ballerinax-github",
-            "module_version": "6.0.1-SNAPSHOT",
+            "module_version": "6.1.0-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibGithubVersion",
@@ -1753,7 +1753,7 @@
         },
         {
             "name": "module-ballerinax-mysql.cdc.driver",
-            "module_version": "1.1.0-SNAPSHOT",
+            "module_version": "1.1.1-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibMysql.cdc.driverVersion",
@@ -1873,7 +1873,7 @@
         },
         {
             "name": "openapi-tools",
-            "module_version": "2.4.2-SNAPSHOT",
+            "module_version": "2.4.3-SNAPSHOT",
             "level": 10,
             "default_branch": "master",
             "version_key": "stdlibOpenapi-toolsVersion",

@@ -57,7 +57,8 @@ example_link = relative path from <BALLERINA_DIR> to example_doc, with path sepa
 For example, when `EXAMPLE_DIR` is `./examples`, `example_link` is `examples/<name>/<name>.md`; a custom example directory may yield `custom-examples/<name>/<name>.md` or `../examples/<name>/<name>.md`.
 
 Replace each `[//]: # (TODO: ...)` section with generated content:
-- **Overview**: 3–5 sentences describing what the API does and what this connector enables. Derived from `SPEC_METADATA.description` and title.
+- **Overview**: 3–5 sentences describing what the API does and what this connector enables. Derived from `SPEC_METADATA.description`, title, and `SPEC_METADATA.version` (state the supported REST API version(s), e.g. "supports version 3 of the API"). Refer to the connector by its plain name (e.g. "The Acme connector" or "This connector"), never by its Ballerina package identifier (`<BAL_ORG>/<BAL_PACKAGE>`) — that identifier is an implementation detail that belongs only in the Quickstart's `import` statement and the Useful links section, not in narrative prose. This applies to `Module.md` in Step 3 too, since it shares this content.
+- **Key Features**: A bulleted list of 3–5 capabilities, derived from `CLIENT_ANALYSIS.methods` — group related operations into capability-level statements (e.g. "Manage contact records" covering create/read/update/delete on one resource) rather than listing every operation name one-for-one. Phrase each bullet as something a reader evaluating the connector cares about, matching the style of existing entries on the [WSO2 Integration Platform connector catalog](https://wso2.com/integration-platform/connectors) (e.g. "Make and receive phone calls programmatically", not "Calls the `/calls` resource").
 - **Setup guide**: Numbered steps to obtain credentials and configure the connector. Derived from `SPEC_METADATA.securitySchemes` — list the required fields (API keys, OAuth tokens, etc.) and how to get them.
 - **Quickstart**: One short Ballerina code snippet showing a single representative API call. Use a simple GET or list operation from `CLIENT_ANALYSIS.methods`. Include the `Config.toml` snippet needed.
 - **Examples**: Bullet list of documented example names and one-line descriptions. Format: `[example-name](<example_link>) — <one liner>`. Include only packages whose named document exists.
@@ -76,7 +77,7 @@ Check if `<BALLERINA_DIR>/Module.md` already exists:
 
 Replace all `{{PLACEHOLDER}}` variables using the mapping above.
 
-Replace each `[//]: # (TODO: ...)` section with generated content using the same content as Step 2 (Overview, Setup guide, Quickstart, Examples) — the module README mirrors the root README but is shorter (no build/contribute sections).
+Replace each `[//]: # (TODO: ...)` section with generated content using the same content as Step 2 (Overview, Key Features, Setup guide, Quickstart, Examples) — the module README mirrors the root README but is shorter (no build/contribute sections).
 
 Write to `<BALLERINA_DIR>/Module.md`.
 

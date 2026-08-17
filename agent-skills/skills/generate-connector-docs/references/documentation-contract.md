@@ -52,7 +52,7 @@ Include only connector-specific external requirements. Do not mention WSO2 Integ
 
 Use exactly this blockquote and no other content:
 
-> **New to WSO2 Integrator?** Follow the [Create a New Integration](../../../../develop/create-integrations/create-new-integration.md) guide to set up your integration first, then return here to add the connector.
+> **New to WSO2 Integrator?** Follow the [Create a New Integration](../../../../develop/create-integrations/create-a-new-integration.md) guide to set up your integration first, then return here to add the connector.
 
 ### Adding the connector
 
@@ -106,7 +106,7 @@ Describe the action with an imperative opening verb.
 ## Screenshot rules
 
 - Reference all six screenshots exactly once and in ascending order.
-- Use only `../screenshots/<filename>.png` paths.
+- Use only `../screenshots/<filename>.png` paths. This is the authoring and validation form regardless of whether the run also publishes to docs-integrator — never hand-write the site's absolute `/img/connectors/catalog/<category>/<module>/...` form. connector-doc-generator's `scripts/integrate_example.py` performs that rewrite mechanically after validation passes, so the two never drift.
 - Preserve the actual collected filenames.
 - Use meaningful alt text describing the visible UI and milestone.
 - Place each image in the step that performed the depicted action.

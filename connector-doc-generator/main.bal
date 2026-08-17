@@ -29,39 +29,64 @@ import wso2/connector_doc_generator.sidebar;
 
 const string OUTPUT_DIR = "./output";
 
+type ConnectorMetadata record {|
+    string connectorName;
+    string moduleSlug;
+    string packageName;
+|};
+
 # Connector documentation generation pipeline.
 #
-# Reads connector identity from Config.toml and runs a 5-step pipeline:
-#   1. Fetch latest version from Ballerina Central (unless already set)
-#   2. Clone source repository locally (shallow, no web browsing during generation)
-#   3. Call Claude Code CLI with local Read/Glob/Grep tools (two phases)
-#   4. Write the generated markdown files to the docs directory
-#   5. Patch sidebars.ts and catalog/index.md
+# Reads the repository name and category from Config.toml, derives connector metadata from
+# its Ballerina.toml, and runs the documentation pipeline.
 #
 # + return - an error if any step fails
 public function main() returns error? {
+    if !generateOverviewSetup && !generateReference {
+        return error("At least one connector documentation stage must be enabled");
+    }
     log("=== Connector Doc Generator ===");
-    log(string `Connector: ${connectorName}  |  Module: ${moduleSlug}  |  Category: ${category}`);
+    log(string `Repository: ballerina-platform/${githubRepo}  |  Category: ${category}`);
     log("");
 
     time:Utc startTime = time:utcNow();
 
-    // ── Step 1: Resolve version ─────────────────────────────────────────────
+    // ── Step 1: Discover connector metadata ────────────────────────────────
+    log("[1/7] Reading connector metadata from Ballerina.toml...");
+    string metadataRepoPath = check cloneRepository(githubRepo, "metadata");
+    ConnectorMetadata|error metadataResult = readConnectorMetadata(metadataRepoPath, githubRepo);
+    file:Error? metadataCleanupErr = file:remove(metadataRepoPath, file:RECURSIVE);
+    if metadataCleanupErr is file:Error {
+        log(string `WARN  Failed to remove temporary metadata clone: ${metadataCleanupErr.message()}`);
+    }
+    ConnectorMetadata metadata = check metadataResult;
+    string connectorName = metadata.connectorName;
+    string moduleSlug = metadata.moduleSlug;
+    string packageName = metadata.packageName;
+    log(string `      Package: ${packageName}  |  Module: ${moduleSlug}`);
+    log("");
+
+    // ── Step 2: Resolve version ─────────────────────────────────────────────
     string resolvedVersion = connectorVersion;
     if resolvedVersion == "" {
-        log(string `[1/6] Fetching latest version for ${packageName} from Ballerina Central...`);
+        log(string `[2/7] Fetching latest version for ${packageName} from Ballerina Central...`);
         resolvedVersion = check central:fetchLatestVersion(packageName);
         log(string `      Latest version: ${resolvedVersion}`);
     } else {
-        log(string `[1/6] Using configured version: ${resolvedVersion}`);
+        log(string `[2/7] Using configured version: ${resolvedVersion}`);
     }
     log("");
 
-    // ── Step 2: Load existing docs + build prompt ───────────────────────────
-    log("[2/6] Checking for existing docs...");
+    // ── Step 3: Load existing docs + build prompt ───────────────────────────
+    log("[3/7] Checking for existing docs...");
 
     string connectorDocDir = docsRoot + "/catalog/" + category + "/" + moduleSlug;
     boolean docsExist = check file:test(connectorDocDir, file:EXISTS);
+    boolean overviewExists = check file:test(connectorDocDir + "/overview.md", file:EXISTS);
+    if !generateOverviewSetup && !overviewExists {
+        return error("Overview & Setup Guide was not selected, but no existing connector overview was found at " +
+            connectorDocDir + "/overview.md");
+    }
     string existingDocsDir = docsExist ? connectorDocDir : "";
     if docsExist {
         log(string `      Found existing docs at: ${connectorDocDir} — running in UPDATE mode`);
@@ -86,19 +111,23 @@ public function main() returns error? {
         string connectorDir = docsRoot + "/catalog/" + category + "/" + moduleSlug;
         string indexPath = docsRoot + "/catalog/index.mdx";
         log("[DRY RUN] Would execute the following steps:");
-        log(string `  [3/6] Clone https://github.com/ballerina-platform/${githubRepo} to /tmp/`);
-        log(string `  [4a/6] Phase 1 — overview, setup guide, trigger reference (prompt: ${dryPromptText.length()} chars)`);
-        log(string `  [4b/6] Phase 2 — action reference (2a discovery + 2b per-client in parallel)`);
-        log(string `  [5/6] Write doc files to: ${connectorDir}/`);
-        log(string `  [6/6] Patch ${sidebarPath} and ${indexPath}`);
+        log(string `  [4/7] Clone https://github.com/ballerina-platform/${githubRepo} at v${resolvedVersion} to /tmp/`);
+        log(string `  [5a/7] Phase 1 — ${generateOverviewSetup ? "publish complete output" : "internal context only"} (prompt: ${dryPromptText.length()} chars)`);
+        if generateReference {
+            log(string `  [5b/7] Phase 2 — action reference (2a discovery + 2b per-client in parallel)`);
+        } else {
+            log("  [5b/7] Phase 2 — skipped");
+        }
+        log(string `  [6/7] Write doc files to: ${connectorDir}/`);
+        log(string `  [7/7] Patch ${sidebarPath} and ${indexPath}`);
         log("");
         log(string `  Prompt saved to: ${promptPath}`);
         return;
     }
 
-    // ── Step 2b: Clone source repository ────────────────────────────────────
-    log("[3/6] Cloning source repository (shallow)...");
-    string localRepoPath = check cloneSourceRepo(githubRepo, moduleSlug, resolvedVersion);
+    // ── Step 4: Clone source repository ─────────────────────────────────────
+    log("[4/7] Cloning source repository (shallow)...");
+    string localRepoPath = check cloneRepository(githubRepo, moduleSlug, string `v${resolvedVersion}`);
     log(string `      Cloned to: ${localRepoPath}`);
     log("");
 
@@ -118,7 +147,7 @@ public function main() returns error? {
     log(string `      Prompt saved: ${promptPath}  (${promptText.length()} chars)`);
     log("");
 
-    // ── Step 3: Call Claude Code CLI (two phases) ───────────────────────────
+    // ── Step 5: Call Claude Code CLI (two phases) ───────────────────────────
     if !claude:isClaudeInstalled() {
         file:Error? removeErr = file:remove(localRepoPath, file:RECURSIVE);
         if removeErr is file:Error {
@@ -135,11 +164,11 @@ public function main() returns error? {
     decimal totalCostUsd = 0.0d;
 
     // ── Phase 1: overview, setup-guide, trigger-reference ───────────────────
-    log("[4a/6] Phase 1 — overview, setup guide, trigger reference...");
+    log("[5a/7] Phase 1 — overview, setup guide, trigger reference...");
     log("       Claude is reading local source files...");
 
     string phase1RawPath = OUTPUT_DIR + "/" + moduleSlug + "-phase1-raw.txt";
-    claude:ClaudeResult phase1Result = check claude:callClaude(promptText, maxTurns = claude:MAX_TURNS_PHASE1);
+    claude:ClaudeResult phase1Result = check claude:callClaude(promptText, model = aiModel, maxTurns = claude:MAX_TURNS_PHASE1);
     check io:fileWriteString(phase1RawPath, phase1Result.text);
     totalCalls += 1;
     totalInputTokens += phase1Result.inputTokens ?: 0;
@@ -151,7 +180,7 @@ public function main() returns error? {
     string phase1Overview = phase1Extracted.files["overview.md"] ?: "";
 
     // ── Download setup-guide images into static assets ───────────────────────
-    if phase1Extracted.images.length() > 0 {
+    if generateOverviewSetup && phase1Extracted.images.length() > 0 {
         log(string `      Downloading ${phase1Extracted.images.length()} image(s) to static assets...`);
         string imgDir = staticImgRoot + "/" + category + "/" + moduleSlug;
         check file:createDir(imgDir, file:RECURSIVE);
@@ -183,126 +212,143 @@ public function main() returns error? {
         }
     }
 
-    // ── Phase 2a: action-reference header + client discovery ─────────────────
-    log("[4b/6] Phase 2a — discovering packages and clients...");
+    string phase2aPromptPath = "";
+    string phase2aRawPath = "";
+    string actionRefContent = "";
 
-    prompts:ConnectorInput phase2aInput = {
-        name: connectorName,
-        module: moduleSlug,
-        packageName: packageName,
-        githubRepo: githubRepo,
-        category: category,
-        'version: resolvedVersion,
-        phase: 2,
-        phase1Overview: phase1Overview,
-        existingDocsDir: existingDocsDir,
-        localRepoPath: localRepoPath
-    };
-    string phase2aPromptText = check prompts:buildPrompt(phase2aInput);
-    string phase2aPromptPath = OUTPUT_DIR + "/" + moduleSlug + "-phase2a-prompt.md";
-    check io:fileWriteString(phase2aPromptPath, phase2aPromptText);
+    if generateReference {
+        // ── Phase 2a: action-reference header + client discovery ─────────────────
+        log("[5b/7] Phase 2a — discovering packages and clients...");
 
-    string phase2aRawPath = OUTPUT_DIR + "/" + moduleSlug + "-phase2a-raw.txt";
-    claude:ClaudeResult phase2aResult = check claude:callClaude(phase2aPromptText, maxTurns = claude:MAX_TURNS_PHASE2A);
-    check io:fileWriteString(phase2aRawPath, phase2aResult.text);
-    totalCalls += 1;
-    totalInputTokens += phase2aResult.inputTokens ?: 0;
-    totalOutputTokens += phase2aResult.outputTokens ?: 0;
-    totalCostUsd += phase2aResult.costUsd ?: 0.0d;
-    logClaudeStats(phase2aResult);
-
-    string actionHeader = extractor:extractActionHeader(phase2aResult.text);
-    extractor:ClientInfo[] clients = extractor:extractClients(phase2aResult.text);
-    log(string `      Discovered ${clients.length()} client(s): ${string:'join(", ", ...clients.map(c => c.displayName))}`);
-
-    // ── Phase 2b: per-client sections (parallel) ──────────────────────────────
-    log(string `[4c/6] Phase 2b — generating ${clients.length()} client section(s) in parallel...`);
-
-    // Build all prompts and launch all Claude calls concurrently
-    future<[string, claude:ClaudeResult]|error>[] phase2bFutures = [];
-    string[] phase2bDisplayNames = [];
-
-    foreach extractor:ClientInfo clientInfo in clients {
-        prompts:ConnectorInput phase2bInput = {
+        prompts:ConnectorInput phase2aInput = {
             name: connectorName,
             module: moduleSlug,
             packageName: packageName,
             githubRepo: githubRepo,
             category: category,
             'version: resolvedVersion,
-            phase: 3,
+            phase: 2,
             phase1Overview: phase1Overview,
-            targetClient: clientInfo,
             existingDocsDir: existingDocsDir,
             localRepoPath: localRepoPath
         };
-        string phase2bPromptText = check prompts:buildPrompt(phase2bInput);
-        string safeDisplayName = re ` `.replaceAll(clientInfo.displayName.toLowerAscii(), "-");
-        string phase2bPromptPath = OUTPUT_DIR + "/" + moduleSlug + "-phase2b-" + safeDisplayName + "-prompt.md";
-        check io:fileWriteString(phase2bPromptPath, phase2bPromptText);
+        string phase2aPromptText = check prompts:buildPrompt(phase2aInput);
+        phase2aPromptPath = OUTPUT_DIR + "/" + moduleSlug + "-phase2a-prompt.md";
+        check io:fileWriteString(phase2aPromptPath, phase2aPromptText);
 
-        string phase2bRawPath = OUTPUT_DIR + "/" + moduleSlug + "-phase2b-" + safeDisplayName + "-raw.txt";
-        future<[string, claude:ClaudeResult]|error> f = start runPhase2b(clientInfo.displayName, phase2bPromptText, phase2bRawPath);
-        phase2bFutures.push(f);
-        phase2bDisplayNames.push(clientInfo.displayName);
-    }
-
-    // Collect results in order (logging already happened as each call completed)
-    string[] clientSections = [];
-    foreach int i in 0 ..< phase2bFutures.length() {
-        [string, claude:ClaudeResult]|error phase2bResult = wait phase2bFutures[i];
-        if phase2bResult is error {
-            log(string `      WARN  Phase 2b failed for '${phase2bDisplayNames[i]}': ${phase2bResult.message()}`);
-            continue;
-        }
-        var [section, claudeResult] = phase2bResult;
+        phase2aRawPath = OUTPUT_DIR + "/" + moduleSlug + "-phase2a-raw.txt";
+        claude:ClaudeResult phase2aResult = check claude:callClaude(phase2aPromptText, model = aiModel, maxTurns = claude:MAX_TURNS_PHASE2A);
+        check io:fileWriteString(phase2aRawPath, phase2aResult.text);
         totalCalls += 1;
-        totalInputTokens += claudeResult.inputTokens ?: 0;
-        totalOutputTokens += claudeResult.outputTokens ?: 0;
-        totalCostUsd += claudeResult.costUsd ?: 0.0d;
-        if section.length() > 0 {
-            clientSections.push(section);
-        } else {
-            log(string `      WARN  No <client_section> found for '${phase2bDisplayNames[i]}'`);
-        }
-    }
+        totalInputTokens += phase2aResult.inputTokens ?: 0;
+        totalOutputTokens += phase2aResult.outputTokens ?: 0;
+        totalCostUsd += phase2aResult.costUsd ?: 0.0d;
+        logClaudeStats(phase2aResult);
 
-    // Assemble action-reference.md from header + all client sections
-    string actionRefContent = actionHeader;
-    if clientSections.length() > 0 {
-        if actionRefContent.length() > 0 {
-            actionRefContent += "\n\n";
+        string actionHeader = extractor:extractActionHeader(phase2aResult.text);
+        extractor:ClientInfo[] clients = extractor:extractClients(phase2aResult.text);
+        log(string `      Discovered ${clients.length()} client(s): ${string:'join(", ", ...clients.map(c => c.displayName))}`);
+
+        // ── Phase 2b: per-client sections (parallel) ──────────────────────────────
+        log(string `[5c/7] Phase 2b — generating ${clients.length()} client section(s) in parallel...`);
+
+        // Build all prompts and launch all Claude calls concurrently
+        future<[string, claude:ClaudeResult]|error>[] phase2bFutures = [];
+        string[] phase2bDisplayNames = [];
+
+        foreach extractor:ClientInfo clientInfo in clients {
+            prompts:ConnectorInput phase2bInput = {
+                name: connectorName,
+                module: moduleSlug,
+                packageName: packageName,
+                githubRepo: githubRepo,
+                category: category,
+                'version: resolvedVersion,
+                phase: 3,
+                phase1Overview: phase1Overview,
+                targetClient: clientInfo,
+                existingDocsDir: existingDocsDir,
+                localRepoPath: localRepoPath
+            };
+            string phase2bPromptText = check prompts:buildPrompt(phase2bInput);
+            string safeDisplayName = re ` `.replaceAll(clientInfo.displayName.toLowerAscii(), "-");
+            string phase2bPromptPath = OUTPUT_DIR + "/" + moduleSlug + "-phase2b-" + safeDisplayName + "-prompt.md";
+            check io:fileWriteString(phase2bPromptPath, phase2bPromptText);
+
+            string phase2bRawPath = OUTPUT_DIR + "/" + moduleSlug + "-phase2b-" + safeDisplayName + "-raw.txt";
+            future<[string, claude:ClaudeResult]|error> f = start runPhase2b(clientInfo.displayName, phase2bPromptText, phase2bRawPath);
+            phase2bFutures.push(f);
+            phase2bDisplayNames.push(clientInfo.displayName);
         }
-        actionRefContent += string:'join("\n\n---\n\n", ...clientSections);
+
+        // Collect results in order (logging already happened as each call completed)
+        string[] clientSections = [];
+        foreach int i in 0 ..< phase2bFutures.length() {
+            [string, claude:ClaudeResult]|error phase2bResult = wait phase2bFutures[i];
+            if phase2bResult is error {
+                log(string `      WARN  Phase 2b failed for '${phase2bDisplayNames[i]}': ${phase2bResult.message()}`);
+                continue;
+            }
+            var [section, claudeResult] = phase2bResult;
+            totalCalls += 1;
+            totalInputTokens += claudeResult.inputTokens ?: 0;
+            totalOutputTokens += claudeResult.outputTokens ?: 0;
+            totalCostUsd += claudeResult.costUsd ?: 0.0d;
+            if section.length() > 0 {
+                clientSections.push(section);
+            } else {
+                log(string `      WARN  No <client_section> found for '${phase2bDisplayNames[i]}'`);
+            }
+        }
+
+        // Assemble action-reference.md from header + all client sections
+        actionRefContent = actionHeader;
+        if clientSections.length() > 0 {
+            if actionRefContent.length() > 0 {
+                actionRefContent += "\n\n";
+            }
+            actionRefContent += string:'join("\n\n---\n\n", ...clientSections);
+        }
+    } else {
+        log("[5b/7] Phase 2 — skipped (Reference not selected)");
     }
 
     // Merge all phases
     map<string> allFiles = {};
-    foreach string fileName in phase1Extracted.files.keys() {
-        allFiles[fileName] = phase1Extracted.files.get(fileName);
+    if generateOverviewSetup {
+        foreach string fileName in phase1Extracted.files.keys() {
+            allFiles[fileName] = phase1Extracted.files.get(fileName);
+        }
     }
     if actionRefContent.length() > 0 {
         allFiles["action-reference.md"] = actionRefContent;
     }
 
+    extractor:CategoryEntry? selectedCategoryEntry = generateOverviewSetup ? phase1Extracted.categoryEntry : ();
     extractor:ExtractionResult extracted = {
         files: allFiles,
-        categoryEntry: phase1Extracted.categoryEntry,
+        categoryEntry: selectedCategoryEntry,
         images: []
     };
 
     log("");
 
-    // ── Step 4: Extract and write files ────────────────────────────────────
-    log("[5/6] Extracting and writing documentation files...");
+    // ── Step 6: Extract and write files ────────────────────────────────────
+    log("[6/7] Extracting and writing documentation files...");
 
     if extracted.files.length() == 0 {
         file:Error? removeErr = file:remove(localRepoPath, file:RECURSIVE);
         if removeErr is file:Error {
             // best-effort cleanup — ignore
         }
-        return error(string `No <file> blocks found in Claude's response. ` +
+        return error(string `No selected documentation files were generated. ` +
             string `Check phase1: ${phase1RawPath}  phase2: ${phase2aRawPath}`);
+    }
+    if generateOverviewSetup && !extracted.files.hasKey("overview.md") {
+        return error("Overview & Setup Guide was selected, but Phase 1 did not generate overview.md");
+    }
+    if generateReference && !extracted.files.hasKey("action-reference.md") {
+        return error("Reference was selected, but Phase 2 did not generate action-reference.md");
     }
 
     string connectorDir = docsRoot + "/catalog/" + category + "/" + moduleSlug;
@@ -332,14 +378,15 @@ public function main() returns error? {
     }
     log("");
 
-    // ── Step 5: Patch sidebar and category index ────────────────────────────
-    log("[6/6] Patching sidebars.ts and category index...");
+    // ── Step 7: Patch sidebar and category index ────────────────────────────
+    log("[7/7] Patching sidebars.ts and category index...");
 
-    boolean hasSetup = extracted.files.hasKey("setup-guide.md");
-    boolean hasTriggers = extracted.files.hasKey("trigger-reference.md");
+    boolean hasSetup = check file:test(connectorDir + "/setup-guide.md", file:EXISTS);
+    boolean hasAction = check file:test(connectorDir + "/action-reference.md", file:EXISTS);
+    boolean hasTriggers = check file:test(connectorDir + "/trigger-reference.md", file:EXISTS);
 
     error? sidebarErr = sidebar:injectConnector(
-        sidebarPath, connectorName, moduleSlug, category, hasSetup, hasTriggers);
+            sidebarPath, connectorName, moduleSlug, category, hasSetup, hasAction, hasTriggers);
     if sidebarErr is error {
         log(string `      SKIP  sidebar patch: ${sidebarErr.message()}`);
     } else {
@@ -347,21 +394,23 @@ public function main() returns error? {
     }
 
     extractor:CategoryEntry? catEntry = extracted.categoryEntry;
-    if catEntry is extractor:CategoryEntry {
+    if generateOverviewSetup && catEntry is extractor:CategoryEntry {
         string indexPath = docsRoot + "/catalog/index.mdx";
         string[] pkgParts = re `/`.split(packageName);
         string pkgOrg = pkgParts.length() > 0 ? pkgParts[0] : "ballerinax";
         error? catErr = category:insertConnectorEntry(
-            indexPath, connectorName, moduleSlug, category,
-            catEntry.description, catEntry.operations, catEntry.auth,
-            pkgOrg, resolvedVersion);
+                indexPath, connectorName, moduleSlug, category,
+                catEntry.description, catEntry.operations, catEntry.auth,
+                pkgOrg, resolvedVersion);
         if catErr is error {
             log(string `      SKIP  catalog patch: ${catErr.message()}`);
         } else {
             log(string `      PATCH ${indexPath}  (added '${connectorName}' entry)`);
         }
-    } else {
+    } else if generateOverviewSetup {
         log("      SKIP  catalog patch: no <category_entry> found in Claude's response");
+    } else {
+        log("      SKIP  catalog patch: Overview & Setup Guide not selected");
     }
     log("");
 
@@ -383,16 +432,20 @@ public function main() returns error? {
     log(string `  Total tokens:    ${totalInputTokens + totalOutputTokens}`);
     log(string `  Total cost:      $${totalCostUsd}`);
     log(string `  Phase 1 prompt:  ${promptPath}`);
-    log(string `  Phase 2a prompt: ${phase2aPromptPath}`);
+    if generateReference {
+        log(string `  Phase 2a prompt: ${phase2aPromptPath}`);
+    }
     log(string `  Phase 1 raw:     ${phase1RawPath}`);
-    log(string `  Phase 2a raw:    ${phase2aRawPath}`);
+    if generateReference {
+        log(string `  Phase 2a raw:    ${phase2aRawPath}`);
+    }
     log(string `  Docs:            ${connectorDir}/`);
 }
 
 // Runs a single phase 2b Claude call and logs stats immediately on completion.
 // Called via `start` so multiple clients run concurrently.
 function runPhase2b(string displayName, string promptText, string rawPath) returns [string, claude:ClaudeResult]|error {
-    claude:ClaudeResult result = check claude:callClaude(promptText, model = claude:FAST_MODEL, maxTurns = claude:MAX_TURNS_PHASE2B);
+    claude:ClaudeResult result = check claude:callClaude(promptText, model = aiModel, maxTurns = claude:MAX_TURNS_PHASE2B);
     check io:fileWriteString(rawPath, result.text);
     log(string `      Completed: '${displayName}'`);
     logClaudeStats(result);
@@ -400,16 +453,20 @@ function runPhase2b(string displayName, string promptText, string rawPath) retur
     return [section, result];
 }
 
-function cloneSourceRepo(string repo, string slug, string 'version) returns string|error {
-    int ts = <int>time:utcNow()[0];
-    string repoPath = string `/tmp/conn_doc_${slug}_${ts}`;
+function cloneRepository(string repo, string tempPrefix, string? ref = ()) returns string|error {
+    time:Utc now = time:utcNow();
+    string repoPath = string `/tmp/conn_doc_${tempPrefix}_${now[0]}_${now[1]}`;
     string cloneUrl = string `https://github.com/ballerina-platform/${repo}`;
-    string tag = string `v${'version}`;
+    string[] arguments = ["clone", "--depth", "1"];
+    if ref is string {
+        arguments.push("--branch", ref);
+    }
+    arguments.push(cloneUrl, repoPath);
 
     os:Process|error proc = os:exec({
-        value: "git",
-        arguments: ["clone", "--depth", "1", "--branch", tag, cloneUrl, repoPath]
-    });
+                                        value: "git",
+                                        arguments
+                                    });
     if proc is error {
         return error("Failed to start git clone: " + proc.message());
     }
@@ -418,14 +475,110 @@ function cloneSourceRepo(string repo, string slug, string 'version) returns stri
         return error("git clone error: " + exitCode.message());
     }
     if exitCode != 0 {
-        return error(string `git clone failed (exit ${exitCode}) for ${cloneUrl} at tag '${tag}'`);
+        return error(string `git clone failed (exit ${exitCode}) for ${cloneUrl}`);
     }
     return repoPath;
 }
 
+function readConnectorMetadata(string repoPath, string repo) returns ConnectorMetadata|error {
+    string[] manifestPaths = [
+        repoPath + "/Ballerina.toml",
+        repoPath + "/ballerina/Ballerina.toml",
+        repoPath + "/ballerina/ballerina.toml"
+    ];
+    string? manifestPath = ();
+    foreach string path in manifestPaths {
+        if check file:test(path, file:EXISTS) {
+            manifestPath = path;
+            break;
+        }
+    }
+    if manifestPath is () {
+        return error(string `No Ballerina.toml found in repository '${repo}'. Expected it at the repository root or in the ballerina directory`);
+    }
+
+    string manifest = check io:fileReadString(manifestPath);
+    string? org = ();
+    string? name = ();
+    boolean inPackage = false;
+    foreach string originalLine in re `\n`.split(manifest) {
+        string line = originalLine.trim();
+        if line == "" || line.startsWith("#") {
+            continue;
+        }
+        if line.startsWith("[") && line.endsWith("]") {
+            inPackage = line == "[package]";
+            continue;
+        }
+        if !inPackage {
+            continue;
+        }
+        int? equalsIndex = line.indexOf("=");
+        if equalsIndex is () {
+            continue;
+        }
+        string key = line.substring(0, equalsIndex).trim();
+        string value = stripTomlComment(line.substring(equalsIndex + 1)).trim();
+        boolean doubleQuoted = value.length() >= 2 && value.startsWith("\"") && value.endsWith("\"");
+        boolean singleQuoted = value.length() >= 2 && value.startsWith("'") && value.endsWith("'");
+        if doubleQuoted || singleQuoted {
+            value = value.substring(1, value.length() - 1);
+        }
+        if key == "org" {
+            org = value;
+        } else if key == "name" {
+            name = value;
+        }
+    }
+    if org is () || org.length() == 0 || name is () || name.length() == 0 {
+        return error(string `Invalid [package] metadata in '${manifestPath}'. Both 'org' and 'name' are required`);
+    }
+    return {
+        connectorName: toDisplayName(name),
+        moduleSlug: name,
+        packageName: string `${org}/${name}`
+    };
+}
+
+function stripTomlComment(string value) returns string {
+    boolean inSingleQuotes = false;
+    boolean inDoubleQuotes = false;
+    boolean escaped = false;
+    int index = 0;
+    while index < value.length() {
+        string character = value.substring(index, index + 1);
+        if escaped {
+            escaped = false;
+        } else if inDoubleQuotes && character == "\\" {
+            escaped = true;
+        } else if !inDoubleQuotes && character == "'" {
+            inSingleQuotes = !inSingleQuotes;
+        } else if !inSingleQuotes && character == "\"" {
+            inDoubleQuotes = !inDoubleQuotes;
+        } else if character == "#" && !inSingleQuotes && !inDoubleQuotes {
+            return value.substring(0, index);
+        }
+        index += 1;
+    }
+    return value;
+}
+
+function toDisplayName(string moduleName) returns string {
+    string normalized = re `[.\-]+`.replaceAll(moduleName, " ");
+    string[] words = re `\s+`.split(normalized.trim());
+    string[] titleWords = [];
+    foreach string word in words {
+        if word.length() == 0 {
+            continue;
+        }
+        titleWords.push(word.substring(0, 1).toUpperAscii() + word.substring(1).toLowerAscii());
+    }
+    return string:'join(" ", ...titleWords);
+}
+
 function logClaudeStats(claude:ClaudeResult result) {
     log("      ── Claude stats ──────────────────────");
-    log(string `      Model:    ${result.model ?: "claude-opus-4-6"}`);
+    log(string `      Model:    ${result.model ?: aiModel}`);
     decimal? dur = result.durationMs;
     if dur is decimal {
         log(string `      Duration: ${dur / 1000.0d}s`);

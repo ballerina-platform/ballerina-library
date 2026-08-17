@@ -18,9 +18,7 @@
 // Copy Config.toml.example → Config.toml and fill in the required fields.
 
 // === Required ===
-configurable string connectorName = ?;
-configurable string moduleSlug = ?;
-configurable string packageName = ?;
+// The repository is always resolved under github.com/ballerina-platform.
 configurable string githubRepo = ?;
 configurable string category = ?;
 
@@ -29,6 +27,10 @@ configurable string connectorVersion = "";
 configurable string docsRepoRoot = "..";
 configurable boolean dryRun = false;
 configurable boolean force = false;
+configurable string aiModel = "claude-sonnet-4-6";
+// Dispatcher stage controls. Defaults preserve the existing standalone behavior.
+configurable boolean generateOverviewSetup = true;
+configurable boolean generateReference = true;
 
 // Derived paths
 final string docsRoot = docsRepoRoot + "/en/docs/connectors";

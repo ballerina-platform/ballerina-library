@@ -10,11 +10,16 @@ from pathlib import Path
 SCRIPTS = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SCRIPTS))
 
-from append_central_examples import append_central_examples, examples_from_metadata, extract_examples
+from append_central_examples import (
+    append_central_examples,
+    examples_from_metadata,
+    extract_examples,
+    rewrite_relative_links,
+)
 from collect_screenshot import collect
 from crop_screenshots import crop_directory
 from inject_try_it_yourself import build_section, build_urls, inject_try_it_yourself
-from prepare_run import build_context, central_url, parse_coordinate, safe_slug
+from prepare_run import build_context, central_url, derive_category_from_keywords, parse_coordinate, safe_slug
 from validate_output import BANNED, validate
 
 PNG = base64.b64decode(
@@ -53,7 +58,7 @@ flowchart LR
 
 ## Setting up the MySQL integration
 
-> **New to WSO2 Integrator?** Follow the [Create a New Integration](../../../../develop/create-integrations/create-new-integration.md) guide to set up your integration first, then return here to add the connector.
+> **New to WSO2 Integrator?** Follow the [Create a New Integration](../../../../develop/create-integrations/create-a-new-integration.md) guide to set up your integration first, then return here to add the connector.
 
 ## Adding the MySQL connector
 
@@ -119,8 +124,117 @@ class CoordinateTests(unittest.TestCase):
             context = build_context(
                 "ballerinax/sap-business.one", Path(temp), {"version": "1.2.3"}
             )
-            self.assertEqual(context["sample_name"], "ballerinax_sap_business_one_connector_sample")
+            self.assertEqual(context["sample_name"], "sap-business.one_connector_sample")
             self.assertEqual(Path(context["sample_dir"]).name, context["sample_name"])
+
+    def test_sample_name_has_no_org_prefix(self):
+        # Regression: every existing sample directory in wso2/integration-samples drops the
+        # org (e.g. "hubspot.crm.pipelines_connector_sample", "aws.s3_connector_sample", not
+        # "ballerinax_..."). Caught after actually publishing a sample with the org prefix.
+        with tempfile.TemporaryDirectory() as temp:
+            context = build_context("ballerinax/hubspot.events.completions", Path(temp), {"version": "1.0.0"})
+            self.assertEqual(context["sample_name"], "hubspot.events.completions_connector_sample")
+            self.assertNotIn("ballerinax", context["sample_name"])
+
+    def test_github_repo_default_uses_coordinate_organization_not_ballerinax(self):
+        # Regression: hardcoding "ballerinax" gave a nonexistent repo name for any other
+        # organization, e.g. stdlib packages published under "ballerina".
+        with tempfile.TemporaryDirectory() as temp:
+            context = build_context("ballerina/http", Path(temp), {"version": "2.11.0"})
+            self.assertEqual(context["github_repo"], "module-ballerina-http")
+
+    def test_cli_rejects_non_object_offline_metadata(self):
+        # Regression: a JSON array is valid JSON but build_context() calls metadata.get(...)
+        # on it, which previously raised an uncaught AttributeError instead of a clean error.
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            metadata_file = root / "metadata.json"
+            metadata_file.write_text("[]", encoding="utf-8")
+            result = subprocess.run(
+                [
+                    sys.executable, str(SCRIPTS / "prepare_run.py"), "ballerinax/mysql",
+                    "--root", str(root), "--metadata-file", str(metadata_file),
+                ],
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("must be a JSON object", result.stderr)
+            self.assertNotIn("Traceback", result.stderr)
+
+
+class DocsIntegrationTests(unittest.TestCase):
+    def test_derives_category_from_area_keyword(self):
+        metadata = {"keywords": ["Cost/Paid", "Vendor/HubSpot", "Area/CRM & Sales", "Type/Connector"]}
+        self.assertEqual(derive_category_from_keywords(metadata), "crm-sales")
+
+    def test_returns_none_without_area_keyword(self):
+        self.assertIsNone(derive_category_from_keywords({"keywords": ["Type/Connector"]}))
+        self.assertIsNone(derive_category_from_keywords({}))
+
+    def test_returns_none_for_unrecognized_area_name(self):
+        self.assertIsNone(derive_category_from_keywords({"keywords": ["Area/Not A Real Category"]}))
+
+    def test_without_docs_repo_root_no_docs_fields_are_set(self):
+        with tempfile.TemporaryDirectory() as temp:
+            context = build_context("ballerinax/mysql", Path(temp), {"version": "1.2.3"})
+            self.assertIsNone(context["docs_repo_root"])
+            self.assertIsNone(context["category_slug"])
+
+    def test_category_is_auto_derived_when_omitted(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            context = build_context(
+                "ballerinax/hubspot.events.completions",
+                root,
+                {"version": "1.0.0", "keywords": ["Area/CRM & Sales"]},
+                docs_repo_root=str(root / "docs-integrator"),
+            )
+            self.assertEqual(context["category_slug"], "crm-sales")
+            self.assertEqual(context["module_slug"], "hubspot.events.completions")
+            self.assertTrue(context["docs_connector_dir"].endswith(
+                "docs-integrator/en/docs/connectors/catalog/crm-sales/hubspot.events.completions"
+            ))
+            self.assertTrue(context["docs_overview_path"].endswith(
+                "docs-integrator/en/docs/connectors/catalog/crm-sales/hubspot.events.completions/overview.md"
+            ))
+            self.assertEqual(context["github_repo"], "module-ballerinax-hubspot.events.completions")
+
+    def test_explicit_category_overrides_derivation(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            context = build_context(
+                "ballerinax/hubspot.events.completions",
+                root,
+                {"version": "1.0.0", "keywords": ["Area/CRM & Sales"]},
+                docs_repo_root=str(root / "docs-integrator"),
+                category="marketing-social",
+            )
+            self.assertEqual(context["category_slug"], "marketing-social")
+
+    def test_docs_repo_root_without_derivable_category_is_preserved_as_partial(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            docs_root = root / "docs-integrator"
+            context = build_context(
+                "ballerinax/mysql", root, {"version": "1.2.3", "keywords": []}, docs_repo_root=str(docs_root)
+            )
+            self.assertEqual(context["docs_repo_root"], str(docs_root.resolve()))
+            self.assertIsNone(context["category_slug"])
+            self.assertIsNone(context["docs_connector_dir"])
+            self.assertIsNone(context["docs_overview_path"])
+
+    def test_rejects_unknown_explicit_category(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            with self.assertRaises(ValueError):
+                build_context(
+                    "ballerinax/mysql",
+                    root,
+                    {"version": "1.2.3"},
+                    docs_repo_root=str(root / "docs-integrator"),
+                    category="not-a-real-category",
+                )
 
 
 class WorkflowTests(unittest.TestCase):
@@ -251,6 +365,111 @@ class WorkflowTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "must be a string"):
                 examples_from_metadata(metadata)
 
+    def test_rewrite_relative_links_resolves_against_ballerina_dir(self):
+        # Regression: this exact link 404s once copied verbatim into an unrelated site —
+        # caught after publishing ballerinax/hubspot.events.completions to docs-integrator.
+        text = "1. [Track purchases](../examples/track_customer_purchase_events/track_customer_purchase_events.md) — desc."
+        rewritten = rewrite_relative_links(text, "module-ballerinax-hubspot.events.completions")
+        self.assertEqual(
+            rewritten,
+            "1. [Track purchases]"
+            "(https://github.com/ballerina-platform/module-ballerinax-hubspot.events.completions/"
+            "blob/main/examples/track_customer_purchase_events/track_customer_purchase_events.md) — desc.",
+        )
+
+    def test_rewrite_relative_links_leaves_absolute_and_anchor_links_alone(self):
+        text = (
+            "See [examples](https://github.com/ballerina-platform/module-ballerinax-mysql/tree/main/examples/) "
+            "and [the API](#api) and [root-relative](/docs/x)."
+        )
+        self.assertEqual(rewrite_relative_links(text, "module-ballerinax-mysql"), text)
+
+    def test_examples_from_metadata_rewrites_relative_links_using_package_name(self):
+        with tempfile.TemporaryDirectory() as temp:
+            metadata_path = Path(temp) / "metadata.json"
+            metadata_path.write_text(
+                json.dumps({
+                    "organization": "ballerinax",
+                    "name": "hubspot.events.completions",
+                    "readme": (
+                        "# Package\n\n## Examples\n\n"
+                        "1. [Track purchases](../examples/track_customer_purchase_events/"
+                        "track_customer_purchase_events.md) — desc.\n"
+                    ),
+                }),
+                encoding="utf-8",
+            )
+            examples = examples_from_metadata(metadata_path)
+            self.assertIn(
+                "https://github.com/ballerina-platform/module-ballerinax-hubspot.events.completions/"
+                "blob/main/examples/track_customer_purchase_events/track_customer_purchase_events.md",
+                examples,
+            )
+            self.assertNotIn("](../examples/", examples)
+
+    def test_examples_from_metadata_uses_actual_organization_not_ballerinax(self):
+        # Regression: hardcoding "ballerinax" pointed non-ballerinax packages
+        # (e.g. stdlib org "ballerina") at a GitHub repo that doesn't exist.
+        with tempfile.TemporaryDirectory() as temp:
+            metadata_path = Path(temp) / "metadata.json"
+            metadata_path.write_text(
+                json.dumps({
+                    "organization": "ballerina",
+                    "name": "http",
+                    "readme": "# Package\n\n## Examples\n\nSee [guide](../examples/x.md).\n",
+                }),
+                encoding="utf-8",
+            )
+            examples = examples_from_metadata(metadata_path)
+            self.assertIn("https://github.com/ballerina-platform/module-ballerina-http/", examples)
+
+    def test_rewrite_relative_links_ignores_fenced_code_blocks(self):
+        # A Ballerina array/tuple literal inside a sample can coincidentally look like a
+        # Markdown link — must not be rewritten, or the sample code gets corrupted.
+        text = (
+            "Intro [guide](../docs/x.md).\n\n"
+            "```ballerina\n"
+            "string[] pair = [\"label\"](\"../not/a/link\");\n"
+            "```\n\n"
+            "Outro [another](../docs/y.md)."
+        )
+        rewritten = rewrite_relative_links(text, "module-ballerinax-mysql")
+        self.assertIn('string[] pair = ["label"]("../not/a/link");', rewritten)
+        self.assertIn("https://github.com/ballerina-platform/module-ballerinax-mysql/blob/main/docs/x.md", rewritten)
+        self.assertIn("https://github.com/ballerina-platform/module-ballerinax-mysql/blob/main/docs/y.md", rewritten)
+
+    def test_rewrite_relative_links_handles_titled_links(self):
+        text = '[guide](../docs/x.md "Setup guide")'
+        rewritten = rewrite_relative_links(text, "module-ballerinax-mysql")
+        self.assertEqual(
+            rewritten,
+            '[guide](https://github.com/ballerina-platform/module-ballerinax-mysql/blob/main/docs/x.md "Setup guide")',
+        )
+
+    def test_append_central_examples_tolerates_pre_rewrite_content_on_rerun(self):
+        # A guide written before this rewrite existed still has the raw relative link;
+        # re-running append_central_examples against it must not raise, since the
+        # underlying Central content hasn't actually changed.
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            metadata_path = root / "metadata.json"
+            metadata_path.write_text(
+                json.dumps({
+                    "organization": "ballerinax",
+                    "name": "hubspot.events.completions",
+                    "readme": "# Package\n\n## Examples\n\nSee [guide](../examples/x.md).\n",
+                }),
+                encoding="utf-8",
+            )
+            doc_path = root / "guide.md"
+            doc_path.write_text(
+                "# Example\n\n## Operation\n\nDone.\n\n"
+                "## More code examples\n\nSee [guide](../examples/x.md).\n",
+                encoding="utf-8",
+            )
+            found, added = append_central_examples(doc_path, metadata_path)
+            self.assertEqual((found, added), (True, False))
+
     def test_collect_and_validate_complete_run(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -285,7 +504,7 @@ class WorkflowTests(unittest.TestCase):
             self.assertEqual(doc.read_text(encoding="utf-8").count("## Try it yourself"), 1)
             self.assertIn(build_section(context["sample_name"]), doc.read_text(encoding="utf-8"))
             devant_url, github_url = build_urls(context["sample_name"])
-            expected_path = "integrator-default-profile/connectors/ballerinax_mysql_connector_sample"
+            expected_path = "integrator-default-profile/connectors/mysql_connector_sample"
             self.assertTrue(devant_url.endswith(expected_path))
             self.assertTrue(github_url.endswith(expected_path))
 
@@ -327,9 +546,9 @@ class WorkflowTests(unittest.TestCase):
             self.assertTrue(run["try_it_yourself_added"])
             self.assertTrue(run["central_examples_found"])
             self.assertTrue(run["examples_added"])
-            self.assertEqual(run["sample_name"], "ballerinax_mysql_connector_sample")
-            self.assertTrue(run["devant_url"].endswith("/ballerinax_mysql_connector_sample"))
-            self.assertTrue(run["github_url"].endswith("/ballerinax_mysql_connector_sample"))
+            self.assertEqual(run["sample_name"], "mysql_connector_sample")
+            self.assertTrue(run["devant_url"].endswith("/mysql_connector_sample"))
+            self.assertTrue(run["github_url"].endswith("/mysql_connector_sample"))
             self.assertTrue(
                 Path(context["doc_path"]).read_text(encoding="utf-8").endswith(
                     "## More code examples\n\nUse Central.\n"
@@ -531,7 +750,7 @@ class MigrationContractTests(unittest.TestCase):
         required = [
             "Never start a nested agent",
             "run git commands",
-            "do not publish the sample",
+            "without the user's explicit, per-run confirmation",
             "Do not support trigger packages or batch queues",
         ]
         self.assertTrue(all(value in self.skill_text for value in required))

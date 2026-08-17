@@ -24,10 +24,8 @@ type StartResponse record {
     string job_id;
 };
 
-# Structured cost data returned by the agent server once the job completes.
-public type AgentCost record {
-    # Total USD cost reported by the Claude Agent SDK (nil if not available)
-    decimal? totalCostUsd;
+# Structured usage data returned by the agent server once the job completes.
+public type AgentUsage record {
     # Input tokens consumed across the entire agent run
     int inputTokens;
     # Output tokens generated across the entire agent run
@@ -46,8 +44,8 @@ type JobStatus record {
     string status;
     # Accumulated log lines in "[LABEL] text" format
     string[] logs;
-    # Structured cost data — present only after the job completes
-    AgentCost? cost;
+    # Structured usage data — present only after the job completes
+    AgentUsage? usage;
 };
 
 # Submits the execution prompt to the Python agent server and streams its log
@@ -55,12 +53,13 @@ type JobStatus record {
 #
 # + promptPath - absolute or relative path to the generated execution prompt file
 # + agentUrl   - base URL of the Python agent server (e.g. http://localhost:8765)
-# + return     - AgentCost if available, nil if cost data was absent, or an error
-public function runClaudeAgent(string promptPath, string agentUrl) returns AgentCost?|error {
+# + model      - Claude model to use for the agent run
+# + return     - AgentUsage if available, nil if usage data was absent, or an error
+public function runClaudeAgent(string promptPath, string agentUrl, string model) returns AgentUsage?|error {
     http:Client agentClient = check new (agentUrl, timeout = 600);
 
     // Submit the job
-    json payload = {"prompt_path": promptPath};
+    json payload = {"prompt_path": promptPath, "model": model};
     http:Response startResp = check agentClient->post("/run", payload);
     if startResp.statusCode < 200 || startResp.statusCode >= 300 {
         string|error errBody = startResp.getTextPayload();
@@ -98,7 +97,7 @@ public function runClaudeAgent(string promptPath, string agentUrl) returns Agent
 
         if jobStatus.status == "done" {
             utils:log("\t[INFO] Claude agent finished.");
-            return jobStatus.cost;
+            return jobStatus.usage;
         }
         if jobStatus.status == "error" {
             return error(string `Agent job ${jobId} failed. Check agent logs for details.`);
