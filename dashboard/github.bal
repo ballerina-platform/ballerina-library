@@ -52,14 +52,15 @@ isolated function getRepoBadges(Module module) returns RepoBadges|error {
         bugs: check getBugsBadge(moduleName)
     };
 
+    string[] workflowFileNames = [];
+    string? buildWorkflow = ();
+    string? graalvmCheckWorkflow = ();
+
     foreach github:Workflow workflow in workflowResponse.workflows {
         string workflowFileName = getWorkflowFileName(workflow.path);
+        workflowFileNames.push(workflowFileName);
         if workflowFileName == WORKFLOW_MASTER_BUILD || workflowFileName == WORKFLOW_MASTER_CI_BUILD {
-            repoBadges.buildStatus = {
-                name: "Build",
-                badgeUrl: getBadgeUrl(moduleName, workflowFileName, defaultBranch),
-                htmlUrl: getWorkflowUrl(moduleName, workflowFileName)
-            };
+            buildWorkflow = workflowFileName;
         }
         if workflowFileName == WORKFLOW_TRIVY {
             string workflowUrl = getWorkflowUrl(moduleName, workflowFileName);
@@ -85,12 +86,31 @@ isolated function getRepoBadges(Module module) returns RepoBadges|error {
             };
         }
         if workflowFileName == WORKFLOW_BAL_TEST_GRAALVM {
-            repoBadges.graalvmCheck = {
-                name: "GraalVM Check",
-                badgeUrl: getBadgeUrl(moduleName, workflowFileName, defaultBranch),
-                htmlUrl: getWorkflowUrl(moduleName, workflowFileName)
-            };
+            graalvmCheckWorkflow = workflowFileName;
         }
+    }
+
+    // The standard names are always preferred; the connector-style names are picked only when those are absent
+    if buildWorkflow is () && workflowFileNames.indexOf(WORKFLOW_CONNECTOR_BUILD) is int {
+        buildWorkflow = WORKFLOW_CONNECTOR_BUILD;
+    }
+    if graalvmCheckWorkflow is () && workflowFileNames.indexOf(WORKFLOW_BAL_TEST_NATIVE) is int {
+        graalvmCheckWorkflow = WORKFLOW_BAL_TEST_NATIVE;
+    }
+
+    if buildWorkflow is string {
+        repoBadges.buildStatus = {
+            name: "Build",
+            badgeUrl: getBadgeUrl(moduleName, buildWorkflow, defaultBranch),
+            htmlUrl: getWorkflowUrl(moduleName, buildWorkflow)
+        };
+    }
+    if graalvmCheckWorkflow is string {
+        repoBadges.graalvmCheck = {
+            name: "GraalVM Check",
+            badgeUrl: getBadgeUrl(moduleName, graalvmCheckWorkflow, defaultBranch),
+            htmlUrl: getWorkflowUrl(moduleName, graalvmCheckWorkflow)
+        };
     }
     return repoBadges;
 }
