@@ -159,6 +159,9 @@
         },
         {
             "name": "module-ballerina-yaml"
+        },
+        {
+            "name": "module-ballerina-zip"
         }
     ],
     "extended_modules": [
