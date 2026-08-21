@@ -1,0 +1,102 @@
+[
+  {
+    "id": "st-01",
+    "query": "can you make my Ballerina library GraalVM compatible? it's the ballerinax/redis module",
+    "should_trigger": true
+  },
+  {
+    "id": "st-02",
+    "query": "bal build --graalvm is failing on my package with a class initialization error, help me fix it",
+    "should_trigger": true
+  },
+  {
+    "id": "st-03",
+    "query": "my Ballerina package builds native fine but bal test --graalvm crashes with a reflection error — run the tracing agent to collect metadata",
+    "should_trigger": true
+  },
+  {
+    "id": "st-04",
+    "query": "I need to pack the native-image reachability metadata into META-INF for my Ballerina connector and mark it graalvmCompatible",
+    "should_trigger": true
+  },
+  {
+    "id": "st-05",
+    "query": "the build prints 'Package is not verified with GraalVM' — how do I resolve that for my ballerina module",
+    "should_trigger": true
+  },
+  {
+    "id": "st-06",
+    "query": "set graalvmCompatible = true in Ballerina.toml after verifying the native executable works",
+    "should_trigger": true
+  },
+  {
+    "id": "st-07",
+    "query": "run the GraalVM tracing agent against my Ballerina tests using BTestMain and add the generated config",
+    "should_trigger": true
+  },
+  {
+    "id": "st-08",
+    "query": "check if the third-party Java deps in my ballerina package already have configs in the graalvm-reachability-metadata repo, then make the package native-ready",
+    "should_trigger": true
+  },
+  {
+    "id": "st-09",
+    "query": "we're preparing ballerinax/mysql for a native image build — walk it through the graalvm compatibility workflow and pack the metadata",
+    "should_trigger": true
+  },
+  {
+    "id": "st-10",
+    "query": "my bal test --graalvm throws MissingReflectionRegistrationError, figure out the metadata and ship it with the library",
+    "should_trigger": true
+  },
+  {
+    "id": "sn-01",
+    "query": "generate a Ballerina connector from this OpenAPI spec at docs/spec/openapi.json",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-02",
+    "query": "make my Java Spring Boot app into a GraalVM native image with the native-maven-plugin",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-03",
+    "query": "just run bal build for my project and show me the output",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-04",
+    "query": "how do I install GraalVM with SDKMAN on macOS",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-05",
+    "query": "explain what AOT compilation is and how it differs from JIT",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-06",
+    "query": "write a reachability-metadata.json by hand for the h2 database Java library for my Gradle project",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-07",
+    "query": "review my client.bal for style issues and suggest improvements",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-08",
+    "query": "what does the closed-world assumption mean in GraalVM native image",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-09",
+    "query": "add a new remote function to my existing Ballerina HTTP client",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-10",
+    "query": "convert my Ballerina.toml keywords list to include more search terms",
+    "should_trigger": false
+  }
+]

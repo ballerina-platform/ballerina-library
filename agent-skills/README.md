@@ -8,6 +8,7 @@ Skills that automate Ballerina library workflows. They are distributed as the `b
 |---|---|
 | [`generating-connectors`](skills/generating-connectors) | Generates a complete Ballerina connector from an OpenAPI specification — a five-stage pipeline (sanitize → client → tests → examples → docs) producing a production-ready connector package. |
 | [`generate-connector-docs`](skills/generate-connector-docs) | Generates the full connector documentation set (overview, setup guide, action reference) plus a validated example guide with six low-code UI screenshots, from a full Ballerina Central package coordinate — publishing directly into a local docs-integrator checkout when one is available. |
+| [`making-graalvm-compatible`](skills/making-graalvm-compatible) | Takes a Ballerina library to a verified, warning-free `bal build --graalvm` / `bal test --graalvm` — build/test baseline, class-init fixes, reachability metadata (repo-sourced first, then the tracing agent), META-INF packing, and marking the package `graalvmCompatible`. |
 
 ## Prerequisites
 
