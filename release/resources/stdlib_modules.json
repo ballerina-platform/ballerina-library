@@ -1863,7 +1863,7 @@
         },
         {
             "name": "edi-tools",
-            "module_version": "2.2.0",
+            "module_version": "2.2.2",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibEdi-toolsVersion",
