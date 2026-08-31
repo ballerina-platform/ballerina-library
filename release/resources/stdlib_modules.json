@@ -780,7 +780,7 @@
         },
         {
             "name": "module-ballerinax-aws.dynamodbstreams",
-            "module_version": "2.0.0-SNAPSHOT",
+            "module_version": "2.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAws.dynamodbstreamsVersion",
@@ -983,7 +983,7 @@
         },
         {
             "name": "module-ballerinax-salesforce",
-            "module_version": "8.7.0-SNAPSHOT",
+            "module_version": "8.7.1-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibSalesforceVersion",
