@@ -1,0 +1,6 @@
+{
+  "comment": "Unified native-image metadata (GraalVM). Remove this comment key before use. On older GraalVM distributions, split files are used instead in the same directory: reflect-config.json (list), resource-config.json ({resources:{includes:[...]}}), jni-config.json (list), proxy-config.json (list of {interfaces:[...]}), serialization-config.json. Pack this at native/src/main/resources/META-INF/native-image/<groupId>/<artifactId>/reachability-metadata.json. See references/reachability-metadata.md.",
+  "reflection": [],
+  "resources": [],
+  "bundles": []
+}

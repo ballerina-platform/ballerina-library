@@ -1,0 +1,42 @@
+[
+  {
+    "id": "st-07",
+    "query": "run the GraalVM tracing agent against my Ballerina tests using BTestMain and add the generated config",
+    "should_trigger": true
+  },
+  {
+    "id": "st-08",
+    "query": "check if the third-party Java deps in my ballerina package already have configs in the graalvm-reachability-metadata repo, then make the package native-ready",
+    "should_trigger": true
+  },
+  {
+    "id": "st-09",
+    "query": "we're preparing ballerinax/mysql for a native image build — walk it through the graalvm compatibility workflow and pack the metadata",
+    "should_trigger": true
+  },
+  {
+    "id": "st-10",
+    "query": "my bal test --graalvm throws MissingReflectionRegistrationError, figure out the metadata and ship it with the library",
+    "should_trigger": true
+  },
+  {
+    "id": "sn-07",
+    "query": "review my client.bal for style issues and suggest improvements",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-08",
+    "query": "what does the closed-world assumption mean in GraalVM native image",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-09",
+    "query": "add a new remote function to my existing Ballerina HTTP client",
+    "should_trigger": false
+  },
+  {
+    "id": "sn-10",
+    "query": "convert my Ballerina.toml keywords list to include more search terms",
+    "should_trigger": false
+  }
+]
