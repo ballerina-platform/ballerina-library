@@ -770,7 +770,7 @@
         },
         {
             "name": "module-ballerinax-aws.dynamodb",
-            "module_version": "2.4.0-SNAPSHOT",
+            "module_version": "3.0.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAws.dynamodbVersion",
@@ -820,7 +820,7 @@
         },
         {
             "name": "module-ballerinax-aws.sns",
-            "module_version": "4.0.2-SNAPSHOT",
+            "module_version": "4.0.3-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAws.snsVersion",
