@@ -399,7 +399,7 @@ Add the module to the relevant array based on the type of the module.
 
 >**Note:** Do not edit the `stdlib_modules.json` file manually. It will be auto-generated once the `module_list.json` file is updated.
 
-The JSON entry has three fields.
+The JSON entry supports the following fields.
 
 #### The `name` field
 
