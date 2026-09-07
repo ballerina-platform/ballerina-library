@@ -4,7 +4,8 @@
             "name": "module-ballerina-ai"
         },
         {
-            "name": "module-ballerina-ai.np"
+            "name": "module-ballerina-ai.np",
+            "version_key": "stdlibAiNpVersion"
         },
         {
             "name": "module-ballerina-auth"
@@ -79,6 +80,9 @@
             "version_key": "stdlibMathVectorVersion"
         },
         {
+            "name": "module-ballerina-mcp"
+        },
+        {
             "name": "module-ballerina-messaging"
         },
         {
@@ -95,7 +99,8 @@
             "name": "module-ballerina-os"
         },
         {
-            "name": "module-ballerina-pdf"
+            "name": "module-ballerina-pdf",
+            "packed_with_distribution": false
         },
         {
             "name": "module-ballerina-persist"
@@ -107,7 +112,8 @@
             "name": "module-ballerina-random"
         },
         {
-            "name": "module-ballerina-smb"
+            "name": "module-ballerina-smb",
+            "packed_with_distribution": false
         },
         {
             "name": "module-ballerina-soap"
@@ -149,7 +155,8 @@
             "name": "module-ballerina-websubhub"
         },
         {
-            "name": "module-ballerina-xlsx"
+            "name": "module-ballerina-xlsx",
+            "packed_with_distribution": false
         },
         {
             "name": "module-ballerina-xmldata"
@@ -161,7 +168,8 @@
             "name": "module-ballerina-yaml"
         },
         {
-            "name": "module-ballerina-zip"
+            "name": "module-ballerina-zip",
+            "packed_with_distribution": false
         }
     ],
     "extended_modules": [

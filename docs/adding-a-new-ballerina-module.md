@@ -389,8 +389,8 @@ This step is required only if the module is a part of the Ballerina library and 
 
 To add a module to the Ballerina library, add an entry in the [`module_list.json`](https://github.com/ballerina-platform/ballerina-library/blob/main/release/resources/module_list.json) file in the [`ballerina-library`](https://github.com/ballerina-platform/ballerina-library) repository. This JSON file has 4 main fields.
 
-* `library_modules` - The modules published under the `ballerina` organization that are packed with the Ballerina distribution
-* `extended_modules` - The protocol modules that are not packed with the Ballerina distribution
+* `library_modules` - The modules published under the `ballerina` organization
+* `extended_modules` - The modules that extend the Ballerina library capabilities, published under the `ballerinax` organization
 * `handwritten_connectors` - The connector modules that are handwritten and published to the Ballerina central
 * `generated_connectors` - The connector modules that are generated using the Ballerina OpenAPI tool and published to the Ballerina central
 * `tools` - The `ballerina` CLI tools
@@ -399,7 +399,7 @@ Add the module to the relevant array based on the type of the module.
 
 >**Note:** Do not edit the `stdlib_modules.json` file manually. It will be auto-generated once the `module_list.json` file is updated.
 
-The JSON entry has two fields.
+The JSON entry supports the following fields.
 
 #### The `name` field
 
@@ -414,6 +414,12 @@ Version key is derived by default using the convention `stdlib<ModuleShortName>V
 This field is optional. It is only required if the version key cannot be inferred from the module name (e.g., `module-ballerina-jballerina.java.arrays` -> `stdlibJavaArraysVersion`, `module-ballerina-oauth2` -> `stdlibOAuth2Version`).
 
 >**Note:** The version key is case-sensitive and should be in the camel case format.
+
+#### The `packed_with_distribution` field
+
+This field defines whether the module is packed with the Ballerina distribution or published to Ballerina Central only. It applies to the `library_modules` array, and it decides which of the two dashboard tables (`Ballerina Modules` or `Ballerina Central-Only Modules`) the module is listed under.
+
+This field is optional and defaults to `true`. As per the [distribution strategy for `ballerina/*` modules](https://github.com/ballerina-platform/ballerina-spec/issues/1462), a new module is Central-only unless it is judged foundational, so a new entry usually needs `"packed_with_distribution": false`.
 
 Once the `module_list.json` file is updated, the [`Update Library Dependency Graph`](https://github.com/ballerina-platform/ballerina-library/actions/workflows/update_dependencies.yml) workflow will run automatically to update the Ballerina library Dashboard.
 
