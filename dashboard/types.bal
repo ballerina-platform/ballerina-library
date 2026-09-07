@@ -33,6 +33,7 @@ type Module record {|
     string[] dependents?;
     string gradle_properties?;
     boolean is_multiple_connectors?; 
+    boolean packed_with_distribution?;
 |};
 
 type WorkflowBadge record {|

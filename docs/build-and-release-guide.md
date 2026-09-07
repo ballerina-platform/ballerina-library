@@ -180,7 +180,7 @@ The Ballerina Library Release Manager will use [Library Release](https://github.
 7. Once the module list is updated, notify the team to refrain from merging any PRs to the default branches, including the post-release PRs.
 8. Then the release manager can trigger the [Library Release Workflow](https://github.com/ballerina-platform/ballerina-library/actions/workflows/release_pipeline.yml) to trigger the release.
     This workflow expects the following inputs:
-    - `release_libs`: To release the library (`module-ballerina-*` modules that are packed with the distribution) modules. These modules are listed under the `modules` field in the `module_list.json` file. The default value is `true`.
+    - `release_libs`: To release the library (`module-ballerina-*`) modules, whether or not they are packed with the distribution. These modules are listed under the `library_modules` field in the `module_list.json` file. The default value is `true`.
     - `release_extensions`: To release the ballerina extended (`module-ballerinax-persist.*`, and `copybook`) modules. These modules are listed under the `extended_modules` field in the `module_list.json` file. The default value is `false`.
     - `release_tools`: To release the ballerina tools (`*-tool`) modules. These modules are listed under the `tools` field in the `module_list.json` file. The default value is `false`.
     - `release_handwritten_connectors`: To release the ballerina handwritten connector modules. These modules are listed under the `handwritten_connectors` field in the `module_list.json` file. The default value is `false`.
