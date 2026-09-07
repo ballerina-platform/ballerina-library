@@ -76,7 +76,7 @@ function sortModuleArray(Module[] moduleArray) returns Module[] {
 
 function initializeModuleDetails(List moduleNameList) returns List|error {
     return {
-        library_modules: check initializeModuleList(moduleNameList.library_modules),
+        library_modules: check initializeModuleList(moduleNameList.library_modules, isLibraryModule = true),
         extended_modules: check initializeModuleList(moduleNameList.extended_modules),
         handwritten_connectors: check initializeModuleList(moduleNameList.handwritten_connectors, MAX_LEVEL),
         generated_connectors: check initializeModuleList(moduleNameList.generated_connectors, MAX_LEVEL),
@@ -85,22 +85,24 @@ function initializeModuleDetails(List moduleNameList) returns List|error {
     };
 }
 
-function initializeModuleList(Module[] modules, int defaultModuleLevel = 1) returns Module[]|error {
+function initializeModuleList(Module[] modules, int defaultModuleLevel = 1, boolean isLibraryModule = false)
+        returns Module[]|error {
     Module[] moduleList = [];
     foreach Module module in modules {
-        Module initialModule = check initializeModuleInfo(module, defaultModuleLevel);
+        Module initialModule = check initializeModuleInfo(module, defaultModuleLevel, isLibraryModule);
         moduleList.push(initialModule);
     }
     return moduleList;
 }
 
-function initializeModuleInfo(Module module, int defaultModuleLevel = 1) returns Module|error {
+function initializeModuleInfo(Module module, int defaultModuleLevel = 1, boolean isLibraryModule = false)
+        returns Module|error {
     string moduleName = module.name;
     log:printInfo(string `Initializing module: ${moduleName}`);
     string defaultBranch = check getDefaultBranch(moduleName);
     string gradleProperties = check getGradlePropertiesFile(moduleName);
     string moduleVersion = check getVersion(moduleName, gradleProperties);
-    return {
+    Module initializedModule = {
         name: moduleName,
         module_version: moduleVersion,
         level: defaultModuleLevel,
@@ -111,6 +113,12 @@ function initializeModuleInfo(Module module, int defaultModuleLevel = 1) returns
         gradle_properties: gradleProperties,
         is_multiple_connectors: module.is_multiple_connectors ?: false
     };
+    // Only `ballerina` organization modules are candidates for the distribution, so the flag is left unset
+    // elsewhere rather than claiming a connector or a tool is packed with it
+    if isLibraryModule {
+        initializedModule.packed_with_distribution = module.packed_with_distribution ?: true;
+    }
+    return initializedModule;
 }
 
 function getVersionKey(Module module) returns string {
@@ -283,7 +291,11 @@ function updateDashboard(List moduleDetails) returns error? {
         }
     }
 
-    updatedReadmeFile += check getLibraryModulesDashboard(moduleDetails.library_modules);
+    Module[] libraryModules = moduleDetails.library_modules;
+    updatedReadmeFile += check getLibraryModulesDashboard(
+            from Module module in libraryModules where isPackedWithDistribution(module) select module);
+    updatedReadmeFile += check getCentralOnlyModulesDashboard(
+            from Module module in libraryModules where !isPackedWithDistribution(module) select module);
     updatedReadmeFile += check getExtendedModulesDashboard(moduleDetails.extended_modules);
     updatedReadmeFile += check getHandwrittenConnectorDashboard(moduleDetails.handwritten_connectors);
     updatedReadmeFile += check getGeneratedConnectorDashboard(moduleDetails.generated_connectors);
@@ -297,21 +309,36 @@ function updateDashboard(List moduleDetails) returns error? {
     log:printInfo("Dashboard Updated");
 }
 
+isolated function isPackedWithDistribution(Module module) returns boolean {
+    return module.packed_with_distribution ?: true;
+}
+
 isolated function getLibraryModulesDashboard(Module[] modules) returns string|error {
+    return getDashboard(TITLE_LIBRARY_MODULES, DESCRIPTION_LIBRARY_MODULES, HEADER_LIBRARY_MODULES_DASHBOARD,
+            HEADER_SEPARATOR_LIBRARY_MODULES, check getLeveledDashboardRows(modules));
+}
+
+isolated function getCentralOnlyModulesDashboard(Module[] modules) returns string|error {
+    return getDashboard(TITLE_CENTRAL_ONLY_MODULES, DESCRIPTION_CENTRAL_ONLY_MODULES,
+            HEADER_LIBRARY_MODULES_DASHBOARD, HEADER_SEPARATOR_LIBRARY_MODULES,
+            check getLeveledDashboardRows(modules));
+}
+
+isolated function getLeveledDashboardRows(Module[] modules) returns string|error {
     string data = "";
-    string levelColumn = "1";
-    int currentLevel = 1;
+    // The level is printed only on the first row of each level. It is derived from the module's own level
+    // rather than a running counter, which would mislabel a list that does not start at level 1.
+    int currentLevel = 0;
     foreach Module module in modules {
-        int? moduleLevel = module.level;
-        if moduleLevel is int && moduleLevel > currentLevel {
+        string levelColumn = "";
+        int moduleLevel = module.level ?: currentLevel;
+        if moduleLevel > currentLevel {
             currentLevel = moduleLevel;
             levelColumn = currentLevel.toString();
         }
         data += check getLibraryDashboardRow(module, levelColumn) + "\n";
-        levelColumn = "";
     }
-    return getDashboard(TITLE_LIBRARY_MODULES, DESCRIPTION_LIBRARY_MODULES, HEADER_LIBRARY_MODULES_DASHBOARD,
-            HEADER_SEPARATOR_LIBRARY_MODULES, data);
+    return data;
 }
 
 isolated function getExtendedModulesDashboard(Module[] modules) returns string|error {
