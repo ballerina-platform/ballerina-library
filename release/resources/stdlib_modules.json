@@ -305,7 +305,7 @@
         },
         {
             "name": "module-ballerina-udp",
-            "module_version": "1.13.8-SNAPSHOT",
+            "module_version": "1.13.9-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibUdpVersion",
@@ -614,7 +614,7 @@
         },
         {
             "name": "module-ballerina-websub",
-            "module_version": "2.15.1-SNAPSHOT",
+            "module_version": "2.15.2-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibWebsubVersion",
@@ -882,7 +882,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "module_version": "4.6.6-SNAPSHOT",
+            "module_version": "4.6.7-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
@@ -905,7 +905,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "module_version": "1.19.1-SNAPSHOT",
+            "module_version": "1.19.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
@@ -917,7 +917,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "module_version": "1.19.1-SNAPSHOT",
+            "module_version": "1.19.2-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
@@ -929,7 +929,7 @@
         },
         {
             "name": "module-ballerinax-nats",
-            "module_version": "3.3.2-SNAPSHOT",
+            "module_version": "3.3.3-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibNatsVersion",
@@ -939,7 +939,7 @@
         },
         {
             "name": "module-ballerinax-oracledb",
-            "module_version": "1.17.2-SNAPSHOT",
+            "module_version": "1.17.3-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibOracledbVersion",
@@ -983,7 +983,7 @@
         },
         {
             "name": "module-ballerinax-salesforce",
-            "module_version": "8.7.2-SNAPSHOT",
+            "module_version": "8.7.3-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibSalesforceVersion",
