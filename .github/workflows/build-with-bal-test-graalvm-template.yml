@@ -71,7 +71,7 @@ jobs:
                   # used to test a tier above the module's current one against a real distribution
                   # for that tier, not just the current distribution rebuilt under a newer JDK.
                   JAVA_TIERS=(11 17 21 25)
-                  DEFAULT_LANG_VERSIONS=("" "2201.8.0" "2201.11.0" "2201.14.0-20260910-100500-01eff714")
+                  DEFAULT_LANG_VERSIONS=("" "2201.8.0" "2201.11.0" "2201.14.0-20260910-140900-2decb0f3")
 
                   CURRENT_JAVA="${{ steps.current.outputs.java-version }}"
                   CURRENT_INDEX=0

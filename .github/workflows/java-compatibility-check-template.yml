@@ -49,7 +49,7 @@ jobs:
                 run: |
                   # Each JDK tier's entry is the first Ballerina lang version that requires it.
                   JAVA_TIERS=(11 17 21 25)
-                  DEFAULT_LANG_VERSIONS=("" "2201.8.0" "2201.11.0" "2201.14.0-20260910-100500-01eff714")
+                  DEFAULT_LANG_VERSIONS=("" "2201.8.0" "2201.11.0" "2201.14.0-20260910-140900-2decb0f3")
 
                   LANG_VERSION="${{ inputs.lang-version }}"
                   if [ -z "$LANG_VERSION" ]; then
@@ -95,7 +95,7 @@ jobs:
                 run: |
                   # Each JDK tier's entry is the first Ballerina lang version that requires it.
                   JAVA_TIERS=(11 17 21 25)
-                  DEFAULT_LANG_VERSIONS=("" "2201.8.0" "2201.11.0" "2201.14.0-20260910-100500-01eff714")
+                  DEFAULT_LANG_VERSIONS=("" "2201.8.0" "2201.11.0" "2201.14.0-20260910-140900-2decb0f3")
 
                   LANG_VERSION="${{ inputs.lang-version }}"
                   if [ -z "$LANG_VERSION" ]; then
