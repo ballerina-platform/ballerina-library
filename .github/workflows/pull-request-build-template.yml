@@ -48,34 +48,39 @@ jobs:
                     IS_DEFAULT_BRANCH=true
                   fi
 
-                  CURRENT_JAVA="${{ steps.current.outputs.java-version }}"
-                  if [ "$IS_DEFAULT_BRANCH" = "true" ] && [ "${{ steps.current.outputs.is-java25 }}" = "false" ]; then
-                    # default branch, not yet bumped to 2201.14.0 -> prove every JDK tier from the
-                    # module's current one up through 25 still works (usually just [current, 25],
-                    # but a module several tiers behind gets a leg for every tier in between too)
-                    JAVA_TIERS=(11 17 21 25)
-                    CURRENT_INDEX=0
-                    for i in "${!JAVA_TIERS[@]}"; do
-                      if [ "${JAVA_TIERS[$i]}" = "$CURRENT_JAVA" ]; then
-                        CURRENT_INDEX=$i
-                      fi
-                    done
+                  # Each JDK tier's entry is the first Ballerina lang version that requires it -
+                  # used to test a tier above the module's current one against a real distribution
+                  # for that tier, not just the current distribution rebuilt under a newer JDK.
+                  JAVA_TIERS=(11 17 21 25)
+                  DEFAULT_LANG_VERSIONS=("" "2201.8.0" "2201.11.0" "2201.14.0")
 
+                  CURRENT_JAVA="${{ steps.current.outputs.java-version }}"
+                  CURRENT_INDEX=0
+                  for i in "${!JAVA_TIERS[@]}"; do
+                    if [ "${JAVA_TIERS[$i]}" = "$CURRENT_JAVA" ]; then
+                      CURRENT_INDEX=$i
+                    fi
+                  done
+                  LAST_INDEX=$(( ${#JAVA_TIERS[@]} - 1 ))
+
+                  if [ "$IS_DEFAULT_BRANCH" = "true" ] && [ "$CURRENT_INDEX" -lt "$LAST_INDEX" ]; then
+                    # default branch, not yet on the newest JDK tier -> prove every tier from the
+                    # module's current one up through the newest tier still works (usually just
+                    # [current, 25], but a module several tiers behind gets a leg per tier in between)
                     LEGS=""
-                    for i in $(seq "$CURRENT_INDEX" 3); do
+                    for i in $(seq "$CURRENT_INDEX" "$LAST_INDEX"); do
                       JV="${JAVA_TIERS[$i]}"
-                      if [ "$JV" = "25" ]; then
-                        LEG="{\"java-version\":\"25\",\"lang-version\":\"2201.14.0\",\"report-coverage\":false}"
+                      if [ "$i" = "$CURRENT_INDEX" ]; then
+                        LEG="{\"java-version\":\"$JV\",\"lang-version\":\"\",\"report-coverage\":true}"
                       else
-                        REPORT="false"
-                        [ "$i" = "$CURRENT_INDEX" ] && REPORT="true"
-                        LEG="{\"java-version\":\"$JV\",\"lang-version\":\"\",\"report-coverage\":$REPORT}"
+                        LEG="{\"java-version\":\"$JV\",\"lang-version\":\"${DEFAULT_LANG_VERSIONS[$i]}\",\"report-coverage\":false}"
                       fi
                       LEGS="${LEGS:+$LEGS,}$LEG"
                     done
                     MATRIX="[$LEGS]"
                   else
-                    # non-default branch, or default branch already >= 2201.14.0 -> single leg matching what's pinned
+                    # non-default branch, or default branch already on the newest tier -> single leg
+                    # matching what's pinned
                     MATRIX="[{\"java-version\":\"$CURRENT_JAVA\",\"lang-version\":\"\",\"report-coverage\":true}]"
                   fi
                   echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"

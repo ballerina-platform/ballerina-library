@@ -16,9 +16,6 @@ outputs:
   java-version:
     description: Required JDK version for that lang version
     value: ${{ steps.resolve.outputs.java-version }}
-  is-java25:
-    description: "'true' if the resolved lang version requires Java 25"
-    value: ${{ steps.resolve.outputs.is-java25 }}
 runs:
   using: composite
   steps:
@@ -45,5 +42,4 @@ runs:
         fi
 
         echo "java-version=$JAVA_VERSION" >> "$GITHUB_OUTPUT"
-        echo "is-java25=$([ "$JAVA_VERSION" = "25" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
         echo "lang-version=$LANG_VERSION" >> "$GITHUB_OUTPUT"
