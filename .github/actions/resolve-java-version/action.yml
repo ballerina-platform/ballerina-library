@@ -1,0 +1,49 @@
+name: 'Resolve Java Version'
+description: 'Resolves the required JDK version from a Ballerina lang version'
+inputs:
+  gradle-properties-path:
+    description: Path to the gradle.properties file to read ballerinaLangVersion from
+    required: false
+    default: gradle.properties
+  lang-version-override:
+    description: Explicit lang version to use instead of reading gradle.properties
+    required: false
+    default: ''
+outputs:
+  lang-version:
+    description: Resolved effective Ballerina lang version
+    value: ${{ steps.resolve.outputs.lang-version }}
+  java-version:
+    description: Required JDK version for that lang version
+    value: ${{ steps.resolve.outputs.java-version }}
+  is-java25:
+    description: "'true' if the resolved lang version requires Java 25"
+    value: ${{ steps.resolve.outputs.is-java25 }}
+runs:
+  using: composite
+  steps:
+    - id: resolve
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.lang-version-override }}" ]; then
+          LANG_VERSION="${{ inputs.lang-version-override }}"
+        else
+          LANG_VERSION=$(grep -w 'ballerinaLangVersion' "${{ inputs.gradle-properties-path }}" | cut -d= -f2 | tr -d '[:space:]')
+        fi
+
+        # Ballerina lang versions are "2201.<minor>.<patch>" (Swan Lake update line);
+        # <minor> maps to the JDK that update line was built/tested against.
+        MINOR=$(echo "$LANG_VERSION" | cut -d. -f2)
+        if [ "$MINOR" -le 7 ]; then
+          JAVA_VERSION="11"
+        elif [ "$MINOR" -le 10 ]; then
+          JAVA_VERSION="17"
+        elif [ "$MINOR" -le 13 ]; then
+          JAVA_VERSION="21"
+        else
+          JAVA_VERSION="25"
+        fi
+
+        echo "java-version=$JAVA_VERSION" >> "$GITHUB_OUTPUT"
+        echo "is-java25=$([ "$JAVA_VERSION" = "25" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+        echo "lang-version=$LANG_VERSION" >> "$GITHUB_OUTPUT"

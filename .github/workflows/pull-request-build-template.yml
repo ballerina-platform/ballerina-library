@@ -27,21 +27,62 @@ on:
 # The `build` and `test` commands ran separately as the Ballerina Gradle plugin does not support skipping test groups
 # when the `gradlew build` is used. It is only supported for `gradlew test`.
 jobs:
+    determine-matrix:
+        name: Determine Java/Lang Version Matrix
+        runs-on: ubuntu-latest
+        outputs:
+            matrix: ${{ steps.set-matrix.outputs.matrix }}
+        steps:
+            -   name: Checkout Repository
+                uses: actions/checkout@v3
+
+            -   name: Resolve current Java version
+                id: current
+                uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
+
+            -   name: Determine matrix
+                id: set-matrix
+                run: |
+                  IS_DEFAULT_BRANCH=false
+                  if [ "${{ github.base_ref }}" = "${{ github.event.repository.default_branch }}" ]; then
+                    IS_DEFAULT_BRANCH=true
+                  fi
+
+                  CURRENT_JAVA="${{ steps.current.outputs.java-version }}"
+                  if [ "$IS_DEFAULT_BRANCH" = "true" ] && [ "${{ steps.current.outputs.is-java25 }}" = "false" ]; then
+                    # default branch, not yet bumped to 2201.14.0 -> prove both the module's current JDK
+                    # and Java 25 work
+                    MATRIX="[{\"java-version\":\"$CURRENT_JAVA\",\"lang-version\":\"\",\"report-coverage\":true},{\"java-version\":\"25\",\"lang-version\":\"2201.14.0\",\"report-coverage\":false}]"
+                  else
+                    # non-default branch, or default branch already >= 2201.14.0 -> single leg matching what's pinned
+                    MATRIX="[{\"java-version\":\"$CURRENT_JAVA\",\"lang-version\":\"\",\"report-coverage\":true}]"
+                  fi
+                  echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+
     ubuntu-build:
         name: Build on Ubuntu
+        needs: determine-matrix
         runs-on: ubuntu-22.04
+        strategy:
+          fail-fast: false
+          matrix:
+            include: ${{ fromJSON(needs.determine-matrix.outputs.matrix) }}
         concurrency:
-          group: ${{ github.head_ref }}-ubuntu-build
+          group: ${{ github.head_ref }}-ubuntu-build-${{ matrix.java-version }}
           cancel-in-progress: true
         steps:
             -   name: Checkout Repository
                 uses: actions/checkout@v3
 
-            -   name: Set up JDK 21
+            -   name: Set up JDK ${{ matrix.java-version }}
                 uses: actions/setup-java@v3
                 with:
                     distribution: 'temurin'
-                    java-version: 21.0.3
+                    java-version: ${{ matrix.java-version }}
+
+            -   name: Override Ballerina Lang version
+                if: ${{ matrix.lang-version != '' }}
+                run: perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ matrix.lang-version }}/" gradle.properties
 
             - name: Set ENV Variables
               run: |
@@ -56,6 +97,7 @@ jobs:
                   ./gradlew test ${{ inputs.additional-ubuntu-test-flags }}
 
             - name: Generate CodeCov Report
+              if: ${{ matrix.report-coverage }}
               uses: codecov/codecov-action@v5
               with:
                 token: ${{ secrets.CODECOV_TOKEN }}
@@ -63,19 +105,28 @@ jobs:
 
     windows-build:
         name: Build on Windows
+        needs: determine-matrix
         runs-on: windows-latest
+        strategy:
+          fail-fast: false
+          matrix:
+            include: ${{ fromJSON(needs.determine-matrix.outputs.matrix) }}
         concurrency:
-          group: ${{ github.head_ref }}-windows-build
+          group: ${{ github.head_ref }}-windows-build-${{ matrix.java-version }}
           cancel-in-progress: true
         steps:
             -   name: Checkout Repository
                 uses: actions/checkout@v3
 
-            -   name: Set up JDK 21
+            -   name: Set up JDK ${{ matrix.java-version }}
                 uses: actions/setup-java@v3
                 with:
                     distribution: 'temurin'
-                    java-version: 21.0.3
+                    java-version: ${{ matrix.java-version }}
+
+            -   name: Override Ballerina Lang version
+                if: ${{ matrix.lang-version != '' }}
+                run: perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ matrix.lang-version }}/" gradle.properties
 
             - name: Set ENV Variables
               run: |

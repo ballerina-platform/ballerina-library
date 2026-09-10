@@ -1,0 +1,84 @@
+name: Java 25 Compatibility Check
+
+on:
+  workflow_call:
+    inputs:
+      additional-ubuntu-build-flags:
+        required: false
+        type: string
+        default: ""
+      additional-ubuntu-test-flags:
+        required: false
+        type: string
+        default: ""
+      additional-windows-build-flags:
+        required: false
+        type: string
+        default: ""
+      additional-windows-test-flags:
+        required: false
+        type: string
+        default: ""
+
+# On-demand check for modules still pinned below Ballerina lang 2201.14.0: builds and tests the
+# module against JDK 25 with ballerinaLangVersion overridden to 2201.14.0, without touching the
+# module's own gradle.properties. Once a module's default branch is bumped to 2201.14.0+, the
+# regular pull-request-build-template.yml matrix already covers this and this workflow becomes
+# unnecessary for that module.
+jobs:
+    ubuntu-build:
+        name: Build on Ubuntu (Java 25)
+        runs-on: ubuntu-22.04
+        steps:
+            -   name: Checkout Repository
+                uses: actions/checkout@v3
+
+            -   name: Set up JDK 25
+                uses: actions/setup-java@v3
+                with:
+                    distribution: 'temurin'
+                    java-version: '25'
+
+            -   name: Override Ballerina Lang version
+                run: perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=2201.14.0/" gradle.properties
+
+            - name: Set ENV Variables
+              run: |
+                echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
+
+            -   name: Build the Package
+                env:
+                    packageUser: ${{ github.actor }}
+                    packagePAT: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                  ./gradlew build -x test ${{ inputs.additional-ubuntu-build-flags }}
+                  ./gradlew test ${{ inputs.additional-ubuntu-test-flags }}
+
+    windows-build:
+        name: Build on Windows (Java 25)
+        runs-on: windows-latest
+        steps:
+            -   name: Checkout Repository
+                uses: actions/checkout@v3
+
+            -   name: Set up JDK 25
+                uses: actions/setup-java@v3
+                with:
+                    distribution: 'temurin'
+                    java-version: '25'
+
+            -   name: Override Ballerina Lang version
+                run: perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=2201.14.0/" gradle.properties
+
+            - name: Set ENV Variables
+              run: |
+                echo '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' | Out-File -FilePath $env:GITHUB_ENV -Append
+
+            -   name: Build the Project
+                env:
+                    packageUser: ${{ github.actor }}
+                    packagePAT: ${{ secrets.GITHUB_TOKEN }}
+                    JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8
+                run: |
+                  ./gradlew.bat build -x test ${{ inputs.additional-windows-build-flags }}
+                  ./gradlew.bat test ${{ inputs.additional-windows-test-flags }}

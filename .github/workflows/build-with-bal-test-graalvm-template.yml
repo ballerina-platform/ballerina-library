@@ -39,17 +39,61 @@ on:
                 required: false
 
 jobs:
+    determine-matrix:
+        name: Determine Java/Lang Version Matrix
+        runs-on: ubuntu-latest
+        outputs:
+            matrix: ${{ steps.set-matrix.outputs.matrix }}
+        steps:
+            -   name: Checkout Repository
+                uses: actions/checkout@v3
+
+            -   name: Resolve current Java version
+                id: current
+                uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
+
+            -   name: Determine matrix
+                id: set-matrix
+                run: |
+                  if [ "${{ github.event_name }}" != "pull_request" ]; then
+                    # Manual/dispatch runs build Ballerina lang from source using the explicit
+                    # lang_tag/lang_version inputs below - leave that path untouched.
+                    echo 'matrix=[{"java-version":"21","lang-version":""}]' >> "$GITHUB_OUTPUT"
+                    exit 0
+                  fi
+
+                  IS_DEFAULT_BRANCH=false
+                  if [ "${{ github.base_ref }}" = "${{ github.event.repository.default_branch }}" ]; then
+                    IS_DEFAULT_BRANCH=true
+                  fi
+
+                  CURRENT_JAVA="${{ steps.current.outputs.java-version }}"
+                  if [ "$IS_DEFAULT_BRANCH" = "true" ] && [ "${{ steps.current.outputs.is-java25 }}" = "false" ]; then
+                    # default branch, not yet bumped to 2201.14.0 -> prove both the module's current JDK
+                    # and Java 25 work
+                    MATRIX="[{\"java-version\":\"$CURRENT_JAVA\",\"lang-version\":\"\"},{\"java-version\":\"25\",\"lang-version\":\"2201.14.0\"}]"
+                  else
+                    # non-default branch, or default branch already >= 2201.14.0 -> single leg matching what's pinned
+                    MATRIX="[{\"java-version\":\"$CURRENT_JAVA\",\"lang-version\":\"\"}]"
+                  fi
+                  echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+
     ubuntu-build-with-bal-test-graalvm:
         name: Build with bal test graalvm on Ubuntu
+        needs: determine-matrix
         runs-on: ubuntu-22.04
         if: github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'Skip GraalVM Check')
+        strategy:
+          fail-fast: false
+          matrix:
+            include: ${{ fromJSON(needs.determine-matrix.outputs.matrix) }}
 
         steps:
-            - name: Set up JDK 21
+            - name: Set up JDK ${{ matrix.java-version }}
               uses: actions/setup-java@v3
               with:
                   distribution: 'temurin'
-                  java-version: '21'
+                  java-version: ${{ matrix.java-version }}
 
             - name: Checkout Ballerina Lang Repository
               if: ${{ inputs.lang_version == '' && github.event_name != 'pull_request' }}
@@ -79,7 +123,7 @@ jobs:
             - name: Set up GraalVM
               uses: graalvm/setup-graalvm@v1
               with:
-                  java-version: '21'
+                  java-version: ${{ matrix.java-version }}
                   distribution: 'graalvm-community'
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   set-java-home: 'false'
@@ -92,6 +136,10 @@ jobs:
 
             - name: Checkout Module Repository
               uses: actions/checkout@v3
+
+            - name: Override Ballerina Lang version
+              if: ${{ matrix.lang-version != '' }}
+              run: perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ matrix.lang-version }}/" gradle.properties
 
             - name: Set default native-image options
               if: ${{  inputs.native_image_options != '' }}
@@ -116,20 +164,25 @@ jobs:
 
     windows-build-with-bal-test-graalvm:
         name: Build with bal test graalvm on Windows
+        needs: determine-matrix
         runs-on: windows-latest
         if: github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'Skip GraalVM Check')
+        strategy:
+          fail-fast: false
+          matrix:
+            include: ${{ fromJSON(needs.determine-matrix.outputs.matrix) }}
 
         steps:
-            - name: Set up JDK 21
+            - name: Set up JDK ${{ matrix.java-version }}
               uses: actions/setup-java@v3
               with:
                   distribution: 'temurin'
-                  java-version: '21'
+                  java-version: ${{ matrix.java-version }}
 
             - name: Git configure long path
               run: |
                   git config --global core.longpaths true
-                
+
             - name: Checkout Ballerina Lang Repository
               if: ${{ inputs.lang_version == '' && github.event_name != 'pull_request' }}
               uses: actions/checkout@v3
@@ -169,7 +222,7 @@ jobs:
             - name: Set up GraalVM
               uses: graalvm/setup-graalvm@v1
               with:
-                  java-version: '21'
+                  java-version: ${{ matrix.java-version }}
                   distribution: 'graalvm-community'
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   set-java-home: 'false'
@@ -183,6 +236,10 @@ jobs:
 
             - name: Checkout Module Repository
               uses: actions/checkout@v3
+
+            - name: Override Ballerina Lang version
+              if: ${{ matrix.lang-version != '' }}
+              run: perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ matrix.lang-version }}/" gradle.properties
 
             - name: Set default native-image options
               if: ${{  inputs.native_image_options != '' }}
