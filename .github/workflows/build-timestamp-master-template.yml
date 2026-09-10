@@ -25,7 +25,7 @@ jobs:
 
       - name: Resolve Java version
         id: resolve-java
-        uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
+        uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@dev
 
       - name: Set up JDK ${{ steps.resolve-java.outputs.java-version }}
         uses: actions/setup-java@v3

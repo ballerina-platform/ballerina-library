@@ -23,7 +23,7 @@ jobs:
 
       - name: Resolve Java version
         id: resolve-java
-        uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
+        uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@dev
 
       - name: Resolve Ballerina version
         run: |

@@ -38,7 +38,7 @@ jobs:
 
             -   name: Resolve current Java version
                 id: current
-                uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
+                uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@dev
 
             -   name: Determine matrix
                 id: set-matrix
