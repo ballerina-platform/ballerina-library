@@ -50,9 +50,30 @@ jobs:
 
                   CURRENT_JAVA="${{ steps.current.outputs.java-version }}"
                   if [ "$IS_DEFAULT_BRANCH" = "true" ] && [ "${{ steps.current.outputs.is-java25 }}" = "false" ]; then
-                    # default branch, not yet bumped to 2201.14.0 -> prove both the module's current JDK
-                    # and Java 25 work
-                    MATRIX="[{\"java-version\":\"$CURRENT_JAVA\",\"lang-version\":\"\",\"report-coverage\":true},{\"java-version\":\"25\",\"lang-version\":\"2201.14.0\",\"report-coverage\":false}]"
+                    # default branch, not yet bumped to 2201.14.0 -> prove every JDK tier from the
+                    # module's current one up through 25 still works (usually just [current, 25],
+                    # but a module several tiers behind gets a leg for every tier in between too)
+                    JAVA_TIERS=(11 17 21 25)
+                    CURRENT_INDEX=0
+                    for i in "${!JAVA_TIERS[@]}"; do
+                      if [ "${JAVA_TIERS[$i]}" = "$CURRENT_JAVA" ]; then
+                        CURRENT_INDEX=$i
+                      fi
+                    done
+
+                    LEGS=""
+                    for i in $(seq "$CURRENT_INDEX" 3); do
+                      JV="${JAVA_TIERS[$i]}"
+                      if [ "$JV" = "25" ]; then
+                        LEG="{\"java-version\":\"25\",\"lang-version\":\"2201.14.0\",\"report-coverage\":false}"
+                      else
+                        REPORT="false"
+                        [ "$i" = "$CURRENT_INDEX" ] && REPORT="true"
+                        LEG="{\"java-version\":\"$JV\",\"lang-version\":\"\",\"report-coverage\":$REPORT}"
+                      fi
+                      LEGS="${LEGS:+$LEGS,}$LEG"
+                    done
+                    MATRIX="[$LEGS]"
                   else
                     # non-default branch, or default branch already >= 2201.14.0 -> single leg matching what's pinned
                     MATRIX="[{\"java-version\":\"$CURRENT_JAVA\",\"lang-version\":\"\",\"report-coverage\":true}]"
