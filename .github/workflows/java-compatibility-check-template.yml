@@ -1,8 +1,18 @@
-name: Java 25 Compatibility Check
+name: Java Compatibility Check
 
 on:
   workflow_call:
     inputs:
+      java-version:
+        description: JDK version to check compatibility against
+        required: false
+        type: string
+        default: '25'
+      lang-version:
+        description: Ballerina lang version to build with instead of the module's own pinned version (auto-derived from java-version when left empty)
+        required: false
+        type: string
+        default: ''
       additional-ubuntu-build-flags:
         required: false
         type: string
@@ -20,27 +30,46 @@ on:
         type: string
         default: ""
 
-# On-demand check for modules still pinned below Ballerina lang 2201.14.0: builds and tests the
-# module against JDK 25 with ballerinaLangVersion overridden to 2201.14.0, without touching the
-# module's own gradle.properties. Once a module's default branch is bumped to 2201.14.0+, the
+# On-demand check for a module still on a Ballerina lang version older than the one required by
+# inputs.java-version: builds and tests the module against that JDK with ballerinaLangVersion
+# overridden to a version that requires it, without touching the module's own gradle.properties.
+# Once a module's default branch is bumped to a lang version that already requires this JDK, the
 # regular pull-request-build-template.yml matrix already covers this and this workflow becomes
 # unnecessary for that module.
 jobs:
     ubuntu-build:
-        name: Build on Ubuntu (Java 25)
+        name: Build on Ubuntu (JDK ${{ inputs.java-version }})
         runs-on: ubuntu-22.04
         steps:
             -   name: Checkout Repository
                 uses: actions/checkout@v3
 
-            -   name: Set up JDK 25
+            -   name: Resolve lang version override
+                id: resolve-lang
+                run: |
+                  # Each JDK tier's entry is the first Ballerina lang version that requires it.
+                  JAVA_TIERS=(11 17 21 25)
+                  DEFAULT_LANG_VERSIONS=("" "2201.8.0" "2201.11.0" "2201.14.0")
+
+                  LANG_VERSION="${{ inputs.lang-version }}"
+                  if [ -z "$LANG_VERSION" ]; then
+                    for i in "${!JAVA_TIERS[@]}"; do
+                      if [ "${JAVA_TIERS[$i]}" = "${{ inputs.java-version }}" ]; then
+                        LANG_VERSION="${DEFAULT_LANG_VERSIONS[$i]}"
+                      fi
+                    done
+                  fi
+                  echo "lang-version=$LANG_VERSION" >> "$GITHUB_OUTPUT"
+
+            -   name: Set up JDK ${{ inputs.java-version }}
                 uses: actions/setup-java@v3
                 with:
                     distribution: 'temurin'
-                    java-version: '25'
+                    java-version: ${{ inputs.java-version }}
 
             -   name: Override Ballerina Lang version
-                run: perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=2201.14.0/" gradle.properties
+                if: ${{ steps.resolve-lang.outputs.lang-version != '' }}
+                run: perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ steps.resolve-lang.outputs.lang-version }}/" gradle.properties
 
             - name: Set ENV Variables
               run: |
@@ -55,20 +84,39 @@ jobs:
                   ./gradlew test ${{ inputs.additional-ubuntu-test-flags }}
 
     windows-build:
-        name: Build on Windows (Java 25)
+        name: Build on Windows (JDK ${{ inputs.java-version }})
         runs-on: windows-latest
         steps:
             -   name: Checkout Repository
                 uses: actions/checkout@v3
 
-            -   name: Set up JDK 25
+            -   name: Resolve lang version override
+                id: resolve-lang
+                run: |
+                  # Each JDK tier's entry is the first Ballerina lang version that requires it.
+                  JAVA_TIERS=(11 17 21 25)
+                  DEFAULT_LANG_VERSIONS=("" "2201.8.0" "2201.11.0" "2201.14.0")
+
+                  LANG_VERSION="${{ inputs.lang-version }}"
+                  if [ -z "$LANG_VERSION" ]; then
+                    for i in "${!JAVA_TIERS[@]}"; do
+                      if [ "${JAVA_TIERS[$i]}" = "${{ inputs.java-version }}" ]; then
+                        LANG_VERSION="${DEFAULT_LANG_VERSIONS[$i]}"
+                      fi
+                    done
+                  fi
+                  echo "lang-version=$LANG_VERSION" >> "$GITHUB_OUTPUT"
+                shell: bash
+
+            -   name: Set up JDK ${{ inputs.java-version }}
                 uses: actions/setup-java@v3
                 with:
                     distribution: 'temurin'
-                    java-version: '25'
+                    java-version: ${{ inputs.java-version }}
 
             -   name: Override Ballerina Lang version
-                run: perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=2201.14.0/" gradle.properties
+                if: ${{ steps.resolve-lang.outputs.lang-version != '' }}
+                run: perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ steps.resolve-lang.outputs.lang-version }}/" gradle.properties
 
             - name: Set ENV Variables
               run: |
