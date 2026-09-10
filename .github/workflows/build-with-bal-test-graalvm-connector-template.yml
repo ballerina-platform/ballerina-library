@@ -21,6 +21,10 @@ jobs:
       - name: Checkout the Repository
         uses: actions/checkout@v3
 
+      - name: Resolve Java version
+        id: resolve-java
+        uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@dev
+
       - name: Resolve Ballerina version
         run: |
           BAL_VERSION="nightly"
@@ -41,7 +45,7 @@ jobs:
       - name: Set up GraalVM
         uses: graalvm/setup-graalvm@v1
         with:
-          java-version: "21"
+          java-version: ${{ steps.resolve-java.outputs.java-version }}
           distribution: "graalvm-community"
           set-java-home: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
