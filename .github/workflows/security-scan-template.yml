@@ -14,43 +14,8 @@ on:
         default: "ballerina"
 
 jobs:
-  trivy-scan:
-    name: Trivy Vulnerability Scan
-    runs-on: ubuntu-22.04
-    if: github.repository_owner == 'ballerina-platform'
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 21
-        uses: actions/setup-java@v3
-        with:
-          distribution: "temurin"
-          java-version: 21.0.3
-
-      - name: Build with Gradle
-        env:
-          packageUser: ${{ github.actor }}
-          packagePAT: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew build -x test ${{ inputs.additional-build-flags }}
-
-      - name: Create lib directory if not exists
-        run: mkdir -p ballerina/lib
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        env:
-          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
-          TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
-        with:
-          scan-type: "rootfs"
-          scan-ref: "${{ github.workspace }}/ballerina/lib"
-          format: "table"
-          timeout: "10m0s"
-          exit-code: "1"
-          scanners: "vuln"
-          cache-dir: "/tmp/trivy-cache"
-
-  bal-scan:
-    name: Ballerina Static Code Analysis
+  security-scan:
+    name: Security Scan
     runs-on: ubuntu-22.04
     if: github.repository_owner == 'ballerina-platform'
     steps:
@@ -75,14 +40,36 @@ jobs:
           distribution: "temurin"
           java-version: 21.0.3
 
-      # bal scan needs the package to compile, which for Java-interop modules means the
-      # native jar(s) referenced under [[platform.javaXX.dependency]] in Ballerina.toml
-      # must already be built.
+      # Built once and shared by both scans below: Trivy scans the built jars under
+      # ballerina/lib, and bal scan needs the native jar(s) referenced under
+      # [[platform.javaXX.dependency]] in Ballerina.toml to already be built in order
+      # to compile the package.
       - name: Build with Gradle
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew build -x test ${{ inputs.additional-build-flags }}
+
+      - name: Create lib directory if not exists
+        run: mkdir -p ballerina/lib
+
+      # continue-on-error so a Trivy finding doesn't skip the bal scan steps below;
+      # its outcome is checked explicitly in the final step instead.
+      - name: Run Trivy vulnerability scanner
+        id: trivy
+        continue-on-error: true
+        uses: aquasecurity/trivy-action@master
+        env:
+          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+          TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
+        with:
+          scan-type: "rootfs"
+          scan-ref: "${{ github.workspace }}/ballerina/lib"
+          format: "table"
+          timeout: "10m0s"
+          exit-code: "1"
+          scanners: "vuln"
+          cache-dir: "/tmp/trivy-cache"
 
       - name: Pull the bal scan tool
         run: bal tool pull scan
@@ -102,15 +89,26 @@ jobs:
 
       # bal scan always exits 0, so pass/fail is derived from the report: real
       # VULNERABILITY findings fail the job, CODE_SMELL findings are reported only
-      # (via the uploaded artifact) since existing style debt shouldn't break nightly runs.
+      # (via the uploaded artifact) since existing style debt shouldn't break nightly
+      # runs. Combined here with the Trivy outcome so the job fails if either scanner
+      # found something, regardless of order.
       - name: Fail the job if vulnerabilities are found
         working-directory: ${{ inputs.scan-path }}
         run: |
           VULN_COUNT=$(jq '[.[] | select(.rule.ruleKind == "VULNERABILITY")] | length' target/report/scan_results.json)
           SMELL_COUNT=$(jq '[.[] | select(.rule.ruleKind == "CODE_SMELL")] | length' target/report/scan_results.json)
           echo "bal scan found $VULN_COUNT vulnerability finding(s) and $SMELL_COUNT code smell finding(s). See the bal-scan-report artifact for details."
+
+          FAIL=0
           if [ "$VULN_COUNT" -gt 0 ]; then
             jq '[.[] | select(.rule.ruleKind == "VULNERABILITY")]' target/report/scan_results.json
-            echo "::error::bal scan found $VULN_COUNT vulnerability finding(s). Failing the job."
+            echo "::error::bal scan found $VULN_COUNT vulnerability finding(s)."
+            FAIL=1
+          fi
+          if [ "${{ steps.trivy.outcome }}" == "failure" ]; then
+            echo "::error::Trivy vulnerability scanner found issue(s). See the 'Run Trivy vulnerability scanner' step above."
+            FAIL=1
+          fi
+          if [ "$FAIL" -eq 1 ]; then
             exit 1
           fi
