@@ -162,6 +162,9 @@
         },
         {
             "name": "module-ballerina-zip"
+        },
+        {
+            "name": "module-ballerina-otel"
         }
     ],
     "extended_modules": [
