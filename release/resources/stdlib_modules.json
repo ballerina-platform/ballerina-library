@@ -300,7 +300,9 @@
             "default_branch": "master",
             "version_key": "stdlibTcpVersion",
             "release": true,
-            "dependents": [],
+            "dependents": [
+                "module-ballerina-otel"
+            ],
             "is_multiple_connectors": false
         },
         {
@@ -539,6 +541,7 @@
             "dependents": [
                 "module-ballerina-ai",
                 "module-ballerina-grpc",
+                "module-ballerina-otel",
                 "module-ballerina-soap",
                 "module-ballerinai-transaction",
                 "module-ballerina-websocket",
@@ -552,7 +555,7 @@
         },
         {
             "name": "module-ballerina-ai",
-            "module_version": "1.15.0-SNAPSHOT",
+            "module_version": "1.15.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibAiVersion",
@@ -572,6 +575,16 @@
             "dependents": [
                 "openapi-tools"
             ],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerina-otel",
+            "module_version": "0.9.0-SNAPSHOT",
+            "level": 8,
+            "default_branch": "main",
+            "version_key": "stdlibOtelVersion",
+            "release": true,
+            "dependents": [],
             "is_multiple_connectors": false
         },
         {
@@ -1903,7 +1916,7 @@
         },
         {
             "name": "wsdl-tools",
-            "module_version": "1.3.0-SNAPSHOT",
+            "module_version": "1.3.1-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibWsdl-toolsVersion",
