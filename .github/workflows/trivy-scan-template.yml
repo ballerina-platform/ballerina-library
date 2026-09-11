@@ -1,3 +1,7 @@
+# Deprecated: kept only so existing callers referencing trivy-scan-template.yml@main
+# keep working. This forwards to security-scan-template.yml, which is now the source
+# of truth. New callers should reference security-scan-template.yml directly instead.
+# Remove this file once every caller has migrated to security-scan-template.yml.
 name: Trivy
 
 on:
@@ -9,37 +13,8 @@ on:
         default: ""
 
 jobs:
-  ubuntu-build:
-    name: Build on Ubuntu
-    runs-on: ubuntu-22.04
-    if: github.repository_owner == 'ballerina-platform'
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 21
-        uses: actions/setup-java@v3
-        with:
-          distribution: "temurin"
-          java-version: 21.0.3
-
-      - name: Build with Gradle
-        env:
-          packageUser: ${{ github.actor }}
-          packagePAT: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew build -x test ${{ inputs.additional-build-flags }}
-
-      - name: Create lib directory if not exists
-        run: mkdir -p ballerina/lib
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        env:
-          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
-          TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
-        with:
-          scan-type: "rootfs"
-          scan-ref: "${{ github.workspace }}/ballerina/lib"
-          format: "table"
-          timeout: "10m0s"
-          exit-code: "1"
-          scanners: "vuln"
-          cache-dir: "/tmp/trivy-cache"
+  forward:
+    uses: ./.github/workflows/security-scan-template.yml
+    secrets: inherit
+    with:
+      additional-build-flags: ${{ inputs.additional-build-flags }}
