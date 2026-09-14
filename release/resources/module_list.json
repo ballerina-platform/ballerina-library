@@ -102,8 +102,7 @@
             "name": "module-ballerina-otel"
         },
         {
-            "name": "module-ballerina-pdf",
-            "packed_with_distribution": false
+            "name": "module-ballerina-pdf"
         },
         {
             "name": "module-ballerina-persist"
@@ -115,8 +114,7 @@
             "name": "module-ballerina-random"
         },
         {
-            "name": "module-ballerina-smb",
-            "packed_with_distribution": false
+            "name": "module-ballerina-smb"
         },
         {
             "name": "module-ballerina-soap"
@@ -158,8 +156,7 @@
             "name": "module-ballerina-websubhub"
         },
         {
-            "name": "module-ballerina-xlsx",
-            "packed_with_distribution": false
+            "name": "module-ballerina-xlsx"
         },
         {
             "name": "module-ballerina-xmldata"
@@ -171,8 +168,7 @@
             "name": "module-ballerina-yaml"
         },
         {
-            "name": "module-ballerina-zip",
-            "packed_with_distribution": false
+            "name": "module-ballerina-zip"
         }
     ],
     "extended_modules": [
@@ -559,5 +555,11 @@
         {
             "name": "xsd-tools"
         }
+    ],
+    "central_only_modules": [
+        "module-ballerina-pdf",
+        "module-ballerina-smb",
+        "module-ballerina-xlsx",
+        "module-ballerina-zip"
     ]
 }
