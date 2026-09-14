@@ -389,17 +389,21 @@ This step is required only if the module is a part of the Ballerina library and 
 
 To add a module to the Ballerina library, add an entry in the [`module_list.json`](https://github.com/ballerina-platform/ballerina-library/blob/main/release/resources/module_list.json) file in the [`ballerina-library`](https://github.com/ballerina-platform/ballerina-library) repository. This JSON file has 4 main fields.
 
-* `library_modules` - The modules published under the `ballerina` organization that are packed with the Ballerina distribution
-* `extended_modules` - The protocol modules that are not packed with the Ballerina distribution
+* `library_modules` - The modules published under the `ballerina` organization
+* `extended_modules` - The modules that extend the Ballerina library capabilities, published under the `ballerinax` organization
 * `handwritten_connectors` - The connector modules that are handwritten and published to the Ballerina central
 * `generated_connectors` - The connector modules that are generated using the Ballerina OpenAPI tool and published to the Ballerina central
 * `tools` - The `ballerina` CLI tools
 
 Add the module to the relevant array based on the type of the module.
 
+The file also has a `central_only_modules` array, which lists the `library_modules` entries that are published to Ballerina Central only and not packed with the Ballerina distribution. It holds module names, and it decides which of the two dashboard tables (`Ballerina Modules` or `Ballerina Central-Only Modules`) a module is listed under. It is kept out of the module entries because `stdlib_modules.json` is consumed by other build tools, which do not expect an extra field on each module.
+
+As per the [distribution strategy for `ballerina/*` modules](https://github.com/ballerina-platform/ballerina-spec/issues/1462), a new module is Central-only unless it is judged foundational, so a new `library_modules` entry usually needs its name added to `central_only_modules` as well.
+
 >**Note:** Do not edit the `stdlib_modules.json` file manually. It will be auto-generated once the `module_list.json` file is updated.
 
-The JSON entry has two fields.
+The JSON entry supports the following fields.
 
 #### The `name` field
 

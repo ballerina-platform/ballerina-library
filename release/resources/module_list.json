@@ -1,10 +1,17 @@
 {
+    "central_only_modules": [
+        "module-ballerina-pdf",
+        "module-ballerina-smb",
+        "module-ballerina-xlsx",
+        "module-ballerina-zip"
+    ],
     "library_modules": [
         {
             "name": "module-ballerina-ai"
         },
         {
-            "name": "module-ballerina-ai.np"
+            "name": "module-ballerina-ai.np",
+            "version_key": "stdlibAiNpVersion"
         },
         {
             "name": "module-ballerina-auth"
@@ -77,6 +84,9 @@
         {
             "name": "module-ballerina-math.vector",
             "version_key": "stdlibMathVectorVersion"
+        },
+        {
+            "name": "module-ballerina-mcp"
         },
         {
             "name": "module-ballerina-messaging"

@@ -23,6 +23,11 @@ type List record {|
     Module[] tools;
 |};
 
+type ModuleNameList record {|
+    *List;
+    string[] central_only_modules;
+|};
+
 type Module record {|
     string name;
     string module_version?;
