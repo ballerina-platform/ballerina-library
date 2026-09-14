@@ -27,8 +27,84 @@ on:
 # The `build` and `test` commands ran separately as the Ballerina Gradle plugin does not support skipping test groups
 # when the `gradlew build` is used. It is only supported for `gradlew test`.
 jobs:
-    determine-matrix:
-        name: Determine Java/Lang Version Matrix
+    ubuntu-build:
+        name: Build on Ubuntu
+        runs-on: ubuntu-22.04
+        concurrency:
+          group: ${{ github.head_ref }}-ubuntu-build
+          cancel-in-progress: true
+        steps:
+            -   name: Checkout Repository
+                uses: actions/checkout@v3
+
+            -   name: Resolve Java version
+                id: resolve-java
+                uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@dev
+
+            -   name: Set up JDK ${{ steps.resolve-java.outputs.java-version }}
+                uses: actions/setup-java@v3
+                with:
+                    distribution: 'temurin'
+                    java-version: ${{ steps.resolve-java.outputs.java-version }}
+
+            - name: Set ENV Variables
+              run: |
+                echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
+
+            -   name: Build the Package
+                env:
+                    packageUser: ${{ github.actor }}
+                    packagePAT: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                  ./gradlew build -x test ${{ inputs.additional-ubuntu-build-flags }}
+                  ./gradlew test ${{ inputs.additional-ubuntu-test-flags }}
+
+            - name: Generate CodeCov Report
+              uses: codecov/codecov-action@v5
+              with:
+                token: ${{ secrets.CODECOV_TOKEN }}
+                slug: ballerina-platform/${{ github.event.repository.name }}
+
+    windows-build:
+        name: Build on Windows
+        runs-on: windows-latest
+        concurrency:
+          group: ${{ github.head_ref }}-windows-build
+          cancel-in-progress: true
+        steps:
+            -   name: Checkout Repository
+                uses: actions/checkout@v3
+
+            -   name: Resolve Java version
+                id: resolve-java
+                uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@dev
+
+            -   name: Set up JDK ${{ steps.resolve-java.outputs.java-version }}
+                uses: actions/setup-java@v3
+                with:
+                    distribution: 'temurin'
+                    java-version: ${{ steps.resolve-java.outputs.java-version }}
+
+            - name: Set ENV Variables
+              run: |
+                echo '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' | Out-File -FilePath $env:GITHUB_ENV -Append
+
+            -   name: Build the Project
+                env:
+                    packageUser: ${{ github.actor }}
+                    packagePAT: ${{ secrets.GITHUB_TOKEN }}
+                    JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8
+                run: |
+                  ./gradlew.bat build -x test ${{ inputs.additional-windows-build-flags }}
+                  ./gradlew.bat test ${{ inputs.additional-windows-test-flags }}
+
+    # ubuntu-build/windows-build above stay exactly as they were pre-Java25 (single job, no
+    # matrix, fixed check name) so existing required-status-check config in consuming repos keeps
+    # working unchanged. Extra JDK-tier compatibility legs (only added on the default branch while
+    # it isn't yet on the newest tier) run here instead, as separate matrixed jobs nothing depends
+    # on as a required check.
+    determine-extra-matrix:
+        name: Determine Extra Java/Lang Version Matrix
         runs-on: ubuntu-latest
         outputs:
             matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -63,39 +139,27 @@ jobs:
                   done
                   LAST_INDEX=$(( ${#JAVA_TIERS[@]} - 1 ))
 
-                  if [ "$IS_DEFAULT_BRANCH" = "true" ] && [ "$CURRENT_INDEX" -lt "$LAST_INDEX" ]; then
-                    # default branch, not yet on the newest JDK tier -> prove every tier from the
-                    # module's current one up through the newest tier still works (usually just
-                    # [current, 25], but a module several tiers behind gets a leg per tier in between)
-                    LEGS=""
-                    for i in $(seq "$CURRENT_INDEX" "$LAST_INDEX"); do
+                  LEGS=""
+                  if [ "$IS_DEFAULT_BRANCH" = "true" ]; then
+                    # every tier strictly above the module's current one, up through the newest tier
+                    # (seq prints nothing, without erroring, when current is already the newest)
+                    for i in $(seq $(( CURRENT_INDEX + 1 )) "$LAST_INDEX"); do
                       JV="${JAVA_TIERS[$i]}"
-                      if [ "$i" = "$CURRENT_INDEX" ]; then
-                        LEG="{\"java-version\":\"$JV\",\"lang-version\":\"\",\"report-coverage\":true}"
-                      else
-                        LEG="{\"java-version\":\"$JV\",\"lang-version\":\"${DEFAULT_LANG_VERSIONS[$i]}\",\"report-coverage\":false}"
-                      fi
+                      LEG="{\"java-version\":\"$JV\",\"lang-version\":\"${DEFAULT_LANG_VERSIONS[$i]}\"}"
                       LEGS="${LEGS:+$LEGS,}$LEG"
                     done
-                    MATRIX="[$LEGS]"
-                  else
-                    # non-default branch, or default branch already on the newest tier -> single leg
-                    # matching what's pinned
-                    MATRIX="[{\"java-version\":\"$CURRENT_JAVA\",\"lang-version\":\"\",\"report-coverage\":true}]"
                   fi
-                  echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+                  echo "matrix=[$LEGS]" >> "$GITHUB_OUTPUT"
 
-    ubuntu-build:
-        name: Build on Ubuntu
-        needs: determine-matrix
+    ubuntu-build-extra:
+        name: Build on Ubuntu (Extra JDK Compatibility)
+        needs: determine-extra-matrix
         runs-on: ubuntu-22.04
+        if: ${{ needs.determine-extra-matrix.outputs.matrix != '[]' }}
         strategy:
           fail-fast: false
           matrix:
-            include: ${{ fromJSON(needs.determine-matrix.outputs.matrix) }}
-        concurrency:
-          group: ${{ github.head_ref }}-ubuntu-build-${{ matrix.java-version }}
-          cancel-in-progress: true
+            include: ${{ fromJSON(needs.determine-extra-matrix.outputs.matrix) }}
         steps:
             -   name: Checkout Repository
                 uses: actions/checkout@v3
@@ -107,7 +171,6 @@ jobs:
                     java-version: ${{ matrix.java-version }}
 
             -   name: Override Ballerina Lang version
-                if: ${{ matrix.lang-version != '' }}
                 run: perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ matrix.lang-version }}/" gradle.properties
 
             - name: Set ENV Variables
@@ -122,24 +185,15 @@ jobs:
                   ./gradlew build -x test ${{ inputs.additional-ubuntu-build-flags }}
                   ./gradlew test ${{ inputs.additional-ubuntu-test-flags }}
 
-            - name: Generate CodeCov Report
-              if: ${{ matrix.report-coverage }}
-              uses: codecov/codecov-action@v5
-              with:
-                token: ${{ secrets.CODECOV_TOKEN }}
-                slug: ballerina-platform/${{ github.event.repository.name }}
-
-    windows-build:
-        name: Build on Windows
-        needs: determine-matrix
+    windows-build-extra:
+        name: Build on Windows (Extra JDK Compatibility)
+        needs: determine-extra-matrix
         runs-on: windows-latest
+        if: ${{ needs.determine-extra-matrix.outputs.matrix != '[]' }}
         strategy:
           fail-fast: false
           matrix:
-            include: ${{ fromJSON(needs.determine-matrix.outputs.matrix) }}
-        concurrency:
-          group: ${{ github.head_ref }}-windows-build-${{ matrix.java-version }}
-          cancel-in-progress: true
+            include: ${{ fromJSON(needs.determine-extra-matrix.outputs.matrix) }}
         steps:
             -   name: Checkout Repository
                 uses: actions/checkout@v3
@@ -151,7 +205,6 @@ jobs:
                     java-version: ${{ matrix.java-version }}
 
             -   name: Override Ballerina Lang version
-                if: ${{ matrix.lang-version != '' }}
                 run: perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ matrix.lang-version }}/" gradle.properties
 
             - name: Set ENV Variables
@@ -166,20 +219,3 @@ jobs:
                 run: |
                   ./gradlew.bat build -x test ${{ inputs.additional-windows-build-flags }}
                   ./gradlew.bat test ${{ inputs.additional-windows-test-flags }}
-
-    # Matrix jobs get their check name suffixed with matrix values (and can vary in count), so
-    # this fixed-name job is what repos should point their required status checks at instead of
-    # ubuntu-build/windows-build directly.
-    build-status:
-        name: PR Build Status
-        if: always()
-        needs: [ubuntu-build, windows-build]
-        runs-on: ubuntu-latest
-        steps:
-            -   name: Check build results
-                run: |
-                  if [ "${{ needs.ubuntu-build.result }}" != "success" ] || [ "${{ needs.windows-build.result }}" != "success" ]; then
-                    echo "Build failed on at least one platform/JDK combination."
-                    exit 1
-                  fi
-                  echo "All builds passed."
