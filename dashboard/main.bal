@@ -20,7 +20,7 @@ import ballerina/lang.array;
 import ballerina/log;
 
 public function main() returns error? {
-    List moduleNameList = check getSortedModuleNameList();
+    ModuleNameList moduleNameList = check getSortedModuleNameList();
     List moduleDetails = check initializeModuleDetails(moduleNameList);
 
     Module[] libraryModules = moduleDetails.library_modules;
@@ -48,20 +48,21 @@ public function main() returns error? {
     moduleDetails.library_modules = libraryModules.sort(array:ASCENDING, a => a.level);
 
     check writeToFile(STDLIB_MODULES_JSON, moduleDetails);
-    check updateDashboard(moduleDetails);
+    check updateDashboard(moduleDetails, moduleNameList.central_only_modules);
 }
 
 //  Sorts the Ballerina library module list in ascending order
-function getSortedModuleNameList() returns List|error {
-    List moduleList = check (check io:fileReadJson(MODULE_LIST_JSON)).fromJsonWithType();
+function getSortedModuleNameList() returns ModuleNameList|error {
+    ModuleNameList moduleList = check (check io:fileReadJson(MODULE_LIST_JSON)).fromJsonWithType();
 
-    List sortedList = {
+    ModuleNameList sortedList = {
         library_modules: sortModuleArray(moduleList.library_modules),
         extended_modules: sortModuleArray(moduleList.extended_modules),
         handwritten_connectors: sortModuleArray(moduleList.handwritten_connectors),
         generated_connectors: sortModuleArray(moduleList.generated_connectors),
         driver_modules: sortModuleArray(moduleList.driver_modules),
-        tools: sortModuleArray(moduleList.tools)
+        tools: sortModuleArray(moduleList.tools),
+        central_only_modules: moduleList.central_only_modules.sort()
     };
 
     check writeToFile(MODULE_LIST_JSON, sortedList);
@@ -74,9 +75,9 @@ function sortModuleArray(Module[] moduleArray) returns Module[] {
         select module;
 }
 
-function initializeModuleDetails(List moduleNameList) returns List|error {
+function initializeModuleDetails(ModuleNameList moduleNameList) returns List|error {
     return {
-        library_modules: check initializeModuleList(moduleNameList.library_modules, isLibraryModule = true),
+        library_modules: check initializeModuleList(moduleNameList.library_modules),
         extended_modules: check initializeModuleList(moduleNameList.extended_modules),
         handwritten_connectors: check initializeModuleList(moduleNameList.handwritten_connectors, MAX_LEVEL),
         generated_connectors: check initializeModuleList(moduleNameList.generated_connectors, MAX_LEVEL),
@@ -85,24 +86,22 @@ function initializeModuleDetails(List moduleNameList) returns List|error {
     };
 }
 
-function initializeModuleList(Module[] modules, int defaultModuleLevel = 1, boolean isLibraryModule = false)
-        returns Module[]|error {
+function initializeModuleList(Module[] modules, int defaultModuleLevel = 1) returns Module[]|error {
     Module[] moduleList = [];
     foreach Module module in modules {
-        Module initialModule = check initializeModuleInfo(module, defaultModuleLevel, isLibraryModule);
+        Module initialModule = check initializeModuleInfo(module, defaultModuleLevel);
         moduleList.push(initialModule);
     }
     return moduleList;
 }
 
-function initializeModuleInfo(Module module, int defaultModuleLevel = 1, boolean isLibraryModule = false)
-        returns Module|error {
+function initializeModuleInfo(Module module, int defaultModuleLevel = 1) returns Module|error {
     string moduleName = module.name;
     log:printInfo(string `Initializing module: ${moduleName}`);
     string defaultBranch = check getDefaultBranch(moduleName);
     string gradleProperties = check getGradlePropertiesFile(moduleName);
     string moduleVersion = check getVersion(moduleName, gradleProperties);
-    Module initializedModule = {
+    return {
         name: moduleName,
         module_version: moduleVersion,
         level: defaultModuleLevel,
@@ -113,12 +112,6 @@ function initializeModuleInfo(Module module, int defaultModuleLevel = 1, boolean
         gradle_properties: gradleProperties,
         is_multiple_connectors: module.is_multiple_connectors ?: false
     };
-    // Only `ballerina` organization modules are candidates for the distribution, so the flag is left unset
-    // elsewhere rather than claiming a connector or a tool is packed with it
-    if isLibraryModule {
-        initializedModule.packed_with_distribution = module.packed_with_distribution ?: true;
-    }
-    return initializedModule;
 }
 
 function getVersionKey(Module module) returns string {
@@ -279,7 +272,7 @@ function removeModulesInIntermediatePaths(DiGraph dependencyGraph, string source
 }
 
 // Updates the stdlib dashboard in README.md
-function updateDashboard(List moduleDetails) returns error? {
+function updateDashboard(List moduleDetails, string[] centralOnlyModules) returns error? {
     string readmeFile = check io:fileReadString(README_FILE);
     string[] readmeFileLines = re `\n`.split(readmeFile);
     string updatedReadmeFile = "";
@@ -293,9 +286,9 @@ function updateDashboard(List moduleDetails) returns error? {
 
     Module[] libraryModules = moduleDetails.library_modules;
     updatedReadmeFile += check getLibraryModulesDashboard(
-            from Module module in libraryModules where isPackedWithDistribution(module) select module);
+            from Module module in libraryModules where centralOnlyModules.indexOf(module.name) is () select module);
     updatedReadmeFile += check getCentralOnlyModulesDashboard(
-            from Module module in libraryModules where !isPackedWithDistribution(module) select module);
+            from Module module in libraryModules where centralOnlyModules.indexOf(module.name) !is () select module);
     updatedReadmeFile += check getExtendedModulesDashboard(moduleDetails.extended_modules);
     updatedReadmeFile += check getHandwrittenConnectorDashboard(moduleDetails.handwritten_connectors);
     updatedReadmeFile += check getGeneratedConnectorDashboard(moduleDetails.generated_connectors);
@@ -307,10 +300,6 @@ function updateDashboard(List moduleDetails) returns error? {
         log:printError(string `Failed to write to the ${README_FILE}`);
     }
     log:printInfo("Dashboard Updated");
-}
-
-isolated function isPackedWithDistribution(Module module) returns boolean {
-    return module.packed_with_distribution ?: true;
 }
 
 isolated function getLibraryModulesDashboard(Module[] modules) returns string|error {

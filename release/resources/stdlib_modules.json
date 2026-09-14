@@ -18,8 +18,7 @@
                 "wsdl-tools",
                 "xsd-tools"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-jballerina.java.arrays",
@@ -29,8 +28,7 @@
             "version_key": "stdlibJavaArraysVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-math.vector",
@@ -42,8 +40,7 @@
             "dependents": [
                 "module-ballerina-ai"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-persist",
@@ -58,8 +55,7 @@
                 "module-ballerinax-persist.redis",
                 "module-ballerinax-persist.sql"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-time",
@@ -78,8 +74,7 @@
                 "module-ballerinax-aws.marketplace.mpe",
                 "module-ballerinax-aws.marketplace.mpm"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-url",
@@ -91,8 +86,7 @@
             "dependents": [
                 "module-ballerina-oauth2"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-xmldata",
@@ -104,8 +98,7 @@
             "dependents": [
                 "module-ballerina-mcp"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-zip",
@@ -115,8 +108,7 @@
             "version_key": "stdlibZipVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": false
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-avro",
@@ -129,8 +121,7 @@
                 "module-ballerinax-confluent.cavroserdes",
                 "module-ballerinax-kafka"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-constraint",
@@ -148,8 +139,7 @@
                 "module-ballerina-xlsx",
                 "module-ballerinax-nats"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-crypto",
@@ -164,8 +154,7 @@
                 "module-ballerina-uuid",
                 "module-ballerinax-nats"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-log",
@@ -188,8 +177,7 @@
                 "module-ballerinax-java.jms",
                 "module-ballerinax-nats"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-os",
@@ -201,8 +189,7 @@
             "dependents": [
                 "module-ballerina-file"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-pdf",
@@ -212,8 +199,7 @@
             "version_key": "stdlibPdfVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": false
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-protobuf",
@@ -225,8 +211,7 @@
             "dependents": [
                 "module-ballerina-grpc"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-random",
@@ -246,8 +231,7 @@
                 "module-ballerinax-kafka",
                 "module-ballerinax-rabbitmq"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-xslt",
@@ -257,8 +241,7 @@
             "version_key": "stdlibXsltVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-data.yaml",
@@ -268,8 +251,7 @@
             "version_key": "stdlibDataYamlVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-file",
@@ -288,8 +270,7 @@
                 "module-ballerina-xlsx",
                 "module-ballerina-yaml"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-ldap",
@@ -299,8 +280,7 @@
             "version_key": "stdlibLdapVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-mime",
@@ -313,8 +293,7 @@
                 "module-ballerina-email",
                 "module-ballerina-http"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-tcp",
@@ -324,8 +303,7 @@
             "version_key": "stdlibTcpVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-udp",
@@ -335,8 +313,7 @@
             "version_key": "stdlibUdpVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-uuid",
@@ -351,8 +328,7 @@
                 "module-ballerinax-ibm.ibmmq",
                 "module-ballerinax-java.jms"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-data.csv",
@@ -365,8 +341,7 @@
                 "module-ballerina-ftp",
                 "module-ballerina-smb"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-data.jsondata",
@@ -380,8 +355,7 @@
                 "module-ballerina-http",
                 "module-ballerina-smb"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-data.xmldata",
@@ -395,8 +369,7 @@
                 "asyncapi-tools",
                 "openapi-tools"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-edi",
@@ -406,8 +379,7 @@
             "version_key": "stdlibEdiVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-mqtt",
@@ -417,8 +389,7 @@
             "version_key": "stdlibMqttVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-task",
@@ -433,8 +404,7 @@
                 "module-ballerina-messaging",
                 "module-ballerina-smb"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-toml",
@@ -444,8 +414,7 @@
             "version_key": "stdlibTomlVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-xlsx",
@@ -455,8 +424,7 @@
             "version_key": "stdlibXlsxVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": false
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-yaml",
@@ -468,8 +436,7 @@
             "dependents": [
                 "module-ballerina-mcp"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-cache",
@@ -483,8 +450,7 @@
                 "module-ballerina-jwt",
                 "module-ballerina-oauth2"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-ftp",
@@ -494,8 +460,7 @@
             "version_key": "stdlibFtpVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-messaging",
@@ -507,8 +472,7 @@
             "dependents": [
                 "module-ballerinax-rabbitmq"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-smb",
@@ -518,8 +482,7 @@
             "version_key": "stdlibSmbVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": false
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-auth",
@@ -531,8 +494,7 @@
             "dependents": [
                 "module-ballerina-http"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-jwt",
@@ -544,8 +506,7 @@
             "dependents": [
                 "module-ballerina-http"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-oauth2",
@@ -558,8 +519,7 @@
                 "module-ballerina-email",
                 "module-ballerina-http"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-email",
@@ -569,8 +529,7 @@
             "version_key": "stdlibEmailVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-http",
@@ -591,8 +550,7 @@
                 "module-ballerinax-confluent.cavroserdes",
                 "edi-tools"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-grpc",
@@ -604,8 +562,7 @@
             "dependents": [
                 "openapi-tools"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-mcp",
@@ -617,8 +574,7 @@
             "dependents": [
                 "module-ballerina-ai"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-soap",
@@ -628,8 +584,7 @@
             "version_key": "stdlibSoapVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerinai-transaction",
@@ -644,8 +599,7 @@
                 "module-ballerinax-kafka",
                 "module-ballerinax-rabbitmq"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-websocket",
@@ -658,8 +612,7 @@
                 "module-ballerina-graphql",
                 "asyncapi-tools"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-websub",
@@ -671,8 +624,7 @@
             "dependents": [
                 "openapi-tools"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-websubhub",
@@ -682,8 +634,7 @@
             "version_key": "stdlibWebsubhubVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-ai",
@@ -695,8 +646,7 @@
             "dependents": [
                 "module-ballerina-ai.np"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-graphql",
@@ -709,8 +659,7 @@
                 "graphql-tools",
                 "openapi-tools"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-sql",
@@ -725,8 +674,7 @@
                 "module-ballerinax-oracledb",
                 "module-ballerinax-snowflake"
             ],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-ai.np",
@@ -736,8 +684,7 @@
             "version_key": "stdlibAiNpVersion",
             "release": true,
             "dependents": [],
-            "is_multiple_connectors": false,
-            "packed_with_distribution": true
+            "is_multiple_connectors": false
         }
     ],
     "extended_modules": [
