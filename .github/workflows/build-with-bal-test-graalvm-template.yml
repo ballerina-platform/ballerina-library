@@ -51,7 +51,7 @@ jobs:
 
             -   name: Resolve current Java version
                 id: current
-                uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@dev
+                uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
 
             -   name: Determine extra matrix
                 id: set-matrix
