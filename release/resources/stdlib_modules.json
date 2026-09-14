@@ -59,7 +59,7 @@
         },
         {
             "name": "module-ballerina-time",
-            "module_version": "2.8.1-SNAPSHOT",
+            "module_version": "2.8.2-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibTimeVersion",
@@ -78,7 +78,7 @@
         },
         {
             "name": "module-ballerina-url",
-            "module_version": "2.6.2-SNAPSHOT",
+            "module_version": "2.6.3-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibUrlVersion",
@@ -255,7 +255,7 @@
         },
         {
             "name": "module-ballerina-file",
-            "module_version": "1.13.1-SNAPSHOT",
+            "module_version": "1.13.2-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibFileVersion",
@@ -297,17 +297,19 @@
         },
         {
             "name": "module-ballerina-tcp",
-            "module_version": "1.13.10-SNAPSHOT",
+            "module_version": "1.14.0-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibTcpVersion",
             "release": true,
-            "dependents": [],
+            "dependents": [
+                "module-ballerina-otel"
+            ],
             "is_multiple_connectors": false
         },
         {
             "name": "module-ballerina-udp",
-            "module_version": "1.13.8-SNAPSHOT",
+            "module_version": "1.13.9-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibUdpVersion",
@@ -383,7 +385,7 @@
         },
         {
             "name": "module-ballerina-mqtt",
-            "module_version": "1.4.2-SNAPSHOT",
+            "module_version": "1.4.3-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibMqttVersion",
@@ -454,7 +456,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "module_version": "2.20.3-SNAPSHOT",
+            "module_version": "2.20.4-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
@@ -476,7 +478,7 @@
         },
         {
             "name": "module-ballerina-smb",
-            "module_version": "2.0.2-SNAPSHOT",
+            "module_version": "2.0.3-SNAPSHOT",
             "level": 5,
             "default_branch": "main",
             "version_key": "stdlibSmbVersion",
@@ -533,7 +535,7 @@
         },
         {
             "name": "module-ballerina-http",
-            "module_version": "2.17.0-SNAPSHOT",
+            "module_version": "2.18.0-SNAPSHOT",
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibHttpVersion",
@@ -541,6 +543,7 @@
             "dependents": [
                 "module-ballerina-grpc",
                 "module-ballerina-mcp",
+                "module-ballerina-otel",
                 "module-ballerina-soap",
                 "module-ballerinai-transaction",
                 "module-ballerina-websocket",
@@ -554,7 +557,7 @@
         },
         {
             "name": "module-ballerina-grpc",
-            "module_version": "1.15.0-SNAPSHOT",
+            "module_version": "1.16.0-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibGrpcVersion",
@@ -566,7 +569,7 @@
         },
         {
             "name": "module-ballerina-mcp",
-            "module_version": "1.3.0-SNAPSHOT",
+            "module_version": "1.3.1-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibMcpVersion",
@@ -574,6 +577,16 @@
             "dependents": [
                 "module-ballerina-ai"
             ],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerina-otel",
+            "module_version": "0.9.0-SNAPSHOT",
+            "level": 8,
+            "default_branch": "main",
+            "version_key": "stdlibOtelVersion",
+            "release": true,
+            "dependents": [],
             "is_multiple_connectors": false
         },
         {
@@ -603,7 +616,7 @@
         },
         {
             "name": "module-ballerina-websocket",
-            "module_version": "2.15.7-SNAPSHOT",
+            "module_version": "2.16.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibWebsocketVersion",
@@ -616,7 +629,7 @@
         },
         {
             "name": "module-ballerina-websub",
-            "module_version": "2.15.1-SNAPSHOT",
+            "module_version": "2.15.2-SNAPSHOT",
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibWebsubVersion",
@@ -628,7 +641,7 @@
         },
         {
             "name": "module-ballerina-websubhub",
-            "module_version": "1.16.1-SNAPSHOT",
+            "module_version": "1.16.2-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibWebsubhubVersion",
@@ -638,7 +651,7 @@
         },
         {
             "name": "module-ballerina-ai",
-            "module_version": "1.15.0-SNAPSHOT",
+            "module_version": "1.15.1-SNAPSHOT",
             "level": 9,
             "default_branch": "main",
             "version_key": "stdlibAiVersion",
@@ -650,7 +663,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "module_version": "1.18.0-SNAPSHOT",
+            "module_version": "1.18.1-SNAPSHOT",
             "level": 9,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
@@ -774,7 +787,7 @@
     "handwritten_connectors": [
         {
             "name": "module-ballerinax-asb",
-            "module_version": "3.10.1-SNAPSHOT",
+            "module_version": "3.10.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibAsbVersion",
@@ -864,7 +877,7 @@
         },
         {
             "name": "module-ballerinax-ibm.ibmmq",
-            "module_version": "1.4.5-SNAPSHOT",
+            "module_version": "1.4.6-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibIbm.ibmmqVersion",
@@ -896,7 +909,7 @@
         },
         {
             "name": "module-ballerinax-kafka",
-            "module_version": "4.6.6-SNAPSHOT",
+            "module_version": "4.6.7-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibKafkaVersion",
@@ -919,7 +932,7 @@
         },
         {
             "name": "module-ballerinax-mssql",
-            "module_version": "1.19.0-SNAPSHOT",
+            "module_version": "1.19.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibMssqlVersion",
@@ -931,7 +944,7 @@
         },
         {
             "name": "module-ballerinax-mysql",
-            "module_version": "1.19.0-SNAPSHOT",
+            "module_version": "1.19.2-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibMysqlVersion",
@@ -943,7 +956,7 @@
         },
         {
             "name": "module-ballerinax-nats",
-            "module_version": "3.3.2-SNAPSHOT",
+            "module_version": "3.3.3-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibNatsVersion",
@@ -953,7 +966,7 @@
         },
         {
             "name": "module-ballerinax-oracledb",
-            "module_version": "1.17.1-SNAPSHOT",
+            "module_version": "1.17.3-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibOracledbVersion",
@@ -963,7 +976,7 @@
         },
         {
             "name": "module-ballerinax-postgresql",
-            "module_version": "1.19.0-SNAPSHOT",
+            "module_version": "1.19.2-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPostgresqlVersion",
@@ -975,7 +988,7 @@
         },
         {
             "name": "module-ballerinax-rabbitmq",
-            "module_version": "3.6.0-SNAPSHOT",
+            "module_version": "3.6.2-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibRabbitmqVersion",
@@ -997,7 +1010,7 @@
         },
         {
             "name": "module-ballerinax-salesforce",
-            "module_version": "8.7.2-SNAPSHOT",
+            "module_version": "8.7.3-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibSalesforceVersion",
@@ -1917,7 +1930,7 @@
         },
         {
             "name": "wsdl-tools",
-            "module_version": "1.3.0-SNAPSHOT",
+            "module_version": "1.3.1-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibWsdl-toolsVersion",

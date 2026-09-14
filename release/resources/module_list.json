@@ -1,4 +1,10 @@
 {
+    "central_only_modules": [
+        "module-ballerina-pdf",
+        "module-ballerina-smb",
+        "module-ballerina-xlsx",
+        "module-ballerina-zip"
+    ],
     "library_modules": [
         {
             "name": "module-ballerina-ai"
@@ -97,6 +103,9 @@
         },
         {
             "name": "module-ballerina-os"
+        },
+        {
+            "name": "module-ballerina-otel"
         },
         {
             "name": "module-ballerina-pdf"
@@ -552,11 +561,5 @@
         {
             "name": "xsd-tools"
         }
-    ],
-    "central_only_modules": [
-        "module-ballerina-pdf",
-        "module-ballerina-smb",
-        "module-ballerina-xlsx",
-        "module-ballerina-zip"
     ]
 }
