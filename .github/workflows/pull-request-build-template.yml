@@ -52,7 +52,7 @@ jobs:
                   # used to test a tier above the module's current one against a real distribution
                   # for that tier, not just the current distribution rebuilt under a newer JDK.
                   JAVA_TIERS=(11 17 21 25)
-                  DEFAULT_LANG_VERSIONS=("" "2201.8.0" "2201.11.0" "2201.14.0-20260910-140900-2decb0f3")
+                  DEFAULT_LANG_VERSIONS=("" "2201.8.0" "2201.11.0" "2201.14.0-20260911-112100-0f421c6f")
 
                   CURRENT_JAVA="${{ steps.current.outputs.java-version }}"
                   CURRENT_INDEX=0
@@ -166,3 +166,20 @@ jobs:
                 run: |
                   ./gradlew.bat build -x test ${{ inputs.additional-windows-build-flags }}
                   ./gradlew.bat test ${{ inputs.additional-windows-test-flags }}
+
+    # Matrix jobs get their check name suffixed with matrix values (and can vary in count), so
+    # this fixed-name job is what repos should point their required status checks at instead of
+    # ubuntu-build/windows-build directly.
+    build-status:
+        name: PR Build Status
+        if: always()
+        needs: [ubuntu-build, windows-build]
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Check build results
+                run: |
+                  if [ "${{ needs.ubuntu-build.result }}" != "success" ] || [ "${{ needs.windows-build.result }}" != "success" ]; then
+                    echo "Build failed on at least one platform/JDK combination."
+                    exit 1
+                  fi
+                  echo "All builds passed."
