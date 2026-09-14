@@ -28,9 +28,19 @@ runs:
           LANG_VERSION=$(grep -w 'ballerinaLangVersion' "${{ inputs.gradle-properties-path }}" | cut -d= -f2 | tr -d '[:space:]')
         fi
 
+        if [ -z "$LANG_VERSION" ]; then
+          echo "::error::Could not resolve a Ballerina lang version (no lang-version-override given and ballerinaLangVersion not found in ${{ inputs.gradle-properties-path }})"
+          exit 1
+        fi
+
         # Ballerina lang versions are "2201.<minor>.<patch>" (Swan Lake update line);
         # <minor> maps to the JDK that update line was built/tested against.
         MINOR=$(echo "$LANG_VERSION" | cut -d. -f2)
+        if ! [[ "$MINOR" =~ ^[0-9]+$ ]]; then
+          echo "::error::Could not parse a numeric minor version from lang version '$LANG_VERSION'"
+          exit 1
+        fi
+
         if [ "$MINOR" -le 7 ]; then
           JAVA_VERSION="11"
         elif [ "$MINOR" -le 10 ]; then

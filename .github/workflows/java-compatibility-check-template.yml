@@ -53,11 +53,17 @@ jobs:
 
                   LANG_VERSION="${{ inputs.lang-version }}"
                   if [ -z "$LANG_VERSION" ]; then
+                    MATCHED=false
                     for i in "${!JAVA_TIERS[@]}"; do
                       if [ "${JAVA_TIERS[$i]}" = "${{ inputs.java-version }}" ]; then
                         LANG_VERSION="${DEFAULT_LANG_VERSIONS[$i]}"
+                        MATCHED=true
                       fi
                     done
+                    if [ "$MATCHED" = false ]; then
+                      echo "::error::java-version '${{ inputs.java-version }}' has no default lang-version mapping; pass an explicit lang-version input"
+                      exit 1
+                    fi
                   fi
                   echo "lang-version=$LANG_VERSION" >> "$GITHUB_OUTPUT"
 
@@ -99,11 +105,17 @@ jobs:
 
                   LANG_VERSION="${{ inputs.lang-version }}"
                   if [ -z "$LANG_VERSION" ]; then
+                    MATCHED=false
                     for i in "${!JAVA_TIERS[@]}"; do
                       if [ "${JAVA_TIERS[$i]}" = "${{ inputs.java-version }}" ]; then
                         LANG_VERSION="${DEFAULT_LANG_VERSIONS[$i]}"
+                        MATCHED=true
                       fi
                     done
+                    if [ "$MATCHED" = false ]; then
+                      echo "::error::java-version '${{ inputs.java-version }}' has no default lang-version mapping; pass an explicit lang-version input"
+                      exit 1
+                    fi
                   fi
                   echo "lang-version=$LANG_VERSION" >> "$GITHUB_OUTPUT"
                 shell: bash
