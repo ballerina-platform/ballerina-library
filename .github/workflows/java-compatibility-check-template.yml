@@ -46,24 +46,23 @@ jobs:
 
             -   name: Resolve lang version override
                 id: resolve-lang
+                env:
+                    JAVA_VERSION: ${{ inputs.java-version }}
                 run: |
-                  # Each JDK tier's entry is the first Ballerina lang version that requires it.
-                  JAVA_TIERS=(11 17 21 25)
-                  DEFAULT_LANG_VERSIONS=("" "2201.8.0" "2201.11.0" "2201.14.0-20260911-112100-0f421c6f")
-
                   LANG_VERSION="${{ inputs.lang-version }}"
                   if [ -z "$LANG_VERSION" ]; then
-                    MATCHED=false
-                    for i in "${!JAVA_TIERS[@]}"; do
-                      if [ "${JAVA_TIERS[$i]}" = "${{ inputs.java-version }}" ]; then
-                        LANG_VERSION="${DEFAULT_LANG_VERSIONS[$i]}"
-                        MATCHED=true
-                      fi
-                    done
-                    if [ "$MATCHED" = false ]; then
-                      echo "::error::java-version '${{ inputs.java-version }}' has no default lang-version mapping; pass an explicit lang-version input"
-                      exit 1
-                    fi
+                    # Each case is the first Ballerina lang version that requires that JDK tier;
+                    # the case statement itself is the validation against supported JDK versions.
+                    case "$JAVA_VERSION" in
+                      11) LANG_VERSION="" ;;
+                      17) LANG_VERSION="2201.8.0" ;;
+                      21) LANG_VERSION="2201.11.0" ;;
+                      25) LANG_VERSION="2201.14.0-20260911-112100-0f421c6f" ;;
+                      *)
+                        echo "::error::java-version '$JAVA_VERSION' has no default lang-version mapping; pass an explicit lang-version input"
+                        exit 1
+                        ;;
+                    esac
                   fi
                   echo "lang-version=$LANG_VERSION" >> "$GITHUB_OUTPUT"
 
@@ -98,24 +97,23 @@ jobs:
 
             -   name: Resolve lang version override
                 id: resolve-lang
+                env:
+                    JAVA_VERSION: ${{ inputs.java-version }}
                 run: |
-                  # Each JDK tier's entry is the first Ballerina lang version that requires it.
-                  JAVA_TIERS=(11 17 21 25)
-                  DEFAULT_LANG_VERSIONS=("" "2201.8.0" "2201.11.0" "2201.14.0-20260911-112100-0f421c6f")
-
                   LANG_VERSION="${{ inputs.lang-version }}"
                   if [ -z "$LANG_VERSION" ]; then
-                    MATCHED=false
-                    for i in "${!JAVA_TIERS[@]}"; do
-                      if [ "${JAVA_TIERS[$i]}" = "${{ inputs.java-version }}" ]; then
-                        LANG_VERSION="${DEFAULT_LANG_VERSIONS[$i]}"
-                        MATCHED=true
-                      fi
-                    done
-                    if [ "$MATCHED" = false ]; then
-                      echo "::error::java-version '${{ inputs.java-version }}' has no default lang-version mapping; pass an explicit lang-version input"
-                      exit 1
-                    fi
+                    # Each case is the first Ballerina lang version that requires that JDK tier;
+                    # the case statement itself is the validation against supported JDK versions.
+                    case "$JAVA_VERSION" in
+                      11) LANG_VERSION="" ;;
+                      17) LANG_VERSION="2201.8.0" ;;
+                      21) LANG_VERSION="2201.11.0" ;;
+                      25) LANG_VERSION="2201.14.0-20260911-112100-0f421c6f" ;;
+                      *)
+                        echo "::error::java-version '$JAVA_VERSION' has no default lang-version mapping; pass an explicit lang-version input"
+                        exit 1
+                        ;;
+                    esac
                   fi
                   echo "lang-version=$LANG_VERSION" >> "$GITHUB_OUTPUT"
                 shell: bash
