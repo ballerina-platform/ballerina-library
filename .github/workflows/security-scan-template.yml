@@ -32,9 +32,6 @@ jobs:
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew build -x test ${{ inputs.additional-build-flags }}
 
-      - name: Create lib directory if not exists
-        run: mkdir -p ballerina/lib
-
       # Shared with the trivy-scan and bal-scan jobs below so the package is only built
       # once: ballerina/lib is what Trivy scans, and **/build/libs/*.jar covers every
       # subproject's packaged jar (e.g. a module's own native implementation jar), which
@@ -60,6 +57,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
+
+      # Modules with no platform-level third-party dependencies (e.g. no
+      # externalJars) produce an empty ballerina/lib, and upload-artifact/
+      # download-artifact don't preserve empty directories -- so it may not exist
+      # at all here even though the build job created it. Trivy fails hard on a
+      # missing path (unlike an empty existing one), so recreate it defensively.
+      - name: Create lib directory if not exists
+        run: mkdir -p ballerina/lib
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
