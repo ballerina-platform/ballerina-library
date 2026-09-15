@@ -143,6 +143,20 @@ jobs:
           retention-days: 30
           if-no-files-found: ignore
 
+      # bal scan reports artifactLocation.uri relative to the package directory it
+      # ran in (e.g. "abstract_cache.bal"), not the repository root (the real path
+      # is "ballerina/abstract_cache.bal"). GitHub resolves SARIF locations against
+      # the repo root and silently drops any result it can't map to a real file, so
+      # without this the upload registers as an analysis but produces zero visible
+      # alerts. Rewriting a copy for the upload keeps the original untouched for the
+      # artifact and the gate below.
+      - name: Rewrite SARIF paths relative to the repository root
+        working-directory: ${{ inputs.scan-path }}
+        run: |
+          jq --arg prefix "${{ inputs.scan-path }}/" '
+            (.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |= ($prefix + .)
+          ' target/report/scan_results.sarif > target/report/scan_results_github.sarif
+
       # Publishes findings to the repo's Security > Code scanning tab, where they're
       # tracked and auto-closed across runs. Non-blocking: some caller repos may not
       # grant security-events: write to the token (permissions here are a ceiling, not
@@ -151,7 +165,7 @@ jobs:
         continue-on-error: true
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: ${{ inputs.scan-path }}/target/report/scan_results.sarif
+          sarif_file: ${{ inputs.scan-path }}/target/report/scan_results_github.sarif
           category: bal-scan
 
       # bal scan derives SARIF `level` from rule kind, not true severity:
