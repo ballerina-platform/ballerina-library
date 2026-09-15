@@ -284,11 +284,10 @@ function updateDashboard(List moduleDetails, string[] centralOnlyModules) return
         }
     }
 
-    Module[] libraryModules = moduleDetails.library_modules;
-    updatedReadmeFile += check getLibraryModulesDashboard(
-            from Module module in libraryModules where centralOnlyModules.indexOf(module.name) is () select module);
-    updatedReadmeFile += check getCentralOnlyModulesDashboard(
-            from Module module in libraryModules where centralOnlyModules.indexOf(module.name) !is () select module);
+    LibraryModulesByPackaging partitionedModules =
+        partitionByDistributionPackaging(moduleDetails.library_modules, centralOnlyModules);
+    updatedReadmeFile += check getLibraryModulesDashboard(partitionedModules.packaged);
+    updatedReadmeFile += check getCentralOnlyModulesDashboard(partitionedModules.centralOnly);
     updatedReadmeFile += check getExtendedModulesDashboard(moduleDetails.extended_modules);
     updatedReadmeFile += check getHandwrittenConnectorDashboard(moduleDetails.handwritten_connectors);
     updatedReadmeFile += check getGeneratedConnectorDashboard(moduleDetails.generated_connectors);
@@ -300,6 +299,19 @@ function updateDashboard(List moduleDetails, string[] centralOnlyModules) return
         log:printError(string `Failed to write to the ${README_FILE}`);
     }
     log:printInfo("Dashboard Updated");
+}
+
+// Splits the library modules into those packed with the distribution and those published to
+// Ballerina Central only, so each is rendered under its own dashboard table.
+isolated function partitionByDistributionPackaging(Module[] libraryModules, string[] centralOnlyModules)
+        returns LibraryModulesByPackaging {
+    Module[] packaged = from Module module in libraryModules
+        where centralOnlyModules.indexOf(module.name) is ()
+        select module;
+    Module[] centralOnly = from Module module in libraryModules
+        where centralOnlyModules.indexOf(module.name) !is ()
+        select module;
+    return {packaged, centralOnly};
 }
 
 isolated function getLibraryModulesDashboard(Module[] modules) returns string|error {

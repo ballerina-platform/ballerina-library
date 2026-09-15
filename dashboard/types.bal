@@ -28,6 +28,11 @@ type ModuleNameList record {|
     string[] central_only_modules;
 |};
 
+type LibraryModulesByPackaging record {|
+    Module[] packaged;
+    Module[] centralOnly;
+|};
+
 type Module record {|
     string name;
     string module_version?;

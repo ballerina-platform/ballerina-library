@@ -387,7 +387,7 @@ After creating the module repository with the above structure, the following ste
 
 This step is required only if the module is a part of the Ballerina library and if it should be added to the Ballerina library dashboard and release process.
 
-To add a module to the Ballerina library, add an entry in the [`module_list.json`](https://github.com/ballerina-platform/ballerina-library/blob/main/release/resources/module_list.json) file in the [`ballerina-library`](https://github.com/ballerina-platform/ballerina-library) repository. This JSON file has 4 main fields.
+To add a module to the Ballerina library, add an entry in the [`module_list.json`](https://github.com/ballerina-platform/ballerina-library/blob/main/release/resources/module_list.json) file in the [`ballerina-library`](https://github.com/ballerina-platform/ballerina-library) repository. This JSON file has 5 main fields.
 
 * `library_modules` - The modules published under the `ballerina` organization
 * `extended_modules` - The modules that extend the Ballerina library capabilities, published under the `ballerinax` organization
