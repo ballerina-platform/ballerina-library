@@ -20,11 +20,14 @@ jobs:
     if: github.repository_owner == 'ballerina-platform'
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 21
+      - name: Resolve Java version
+        id: resolve-java
+        uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
+      - name: Set up JDK ${{ steps.resolve-java.outputs.java-version }}
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
-          java-version: 21.0.3
+          java-version: ${{ steps.resolve-java.outputs.java-version }}
 
       # additional-build-flags is passed through env and read as a shell variable
       # rather than spliced directly into the run: script, since GitHub substitutes
@@ -108,18 +111,14 @@ jobs:
         with:
           name: build-output
 
-      - name: Get Ballerina Version
-        run: |
-          BAL_VERSION=$(grep -w 'ballerinaLangVersion' gradle.properties | cut -d= -f2 | rev | cut --complement -d- -f1 | rev)
-          if [ -z "$BAL_VERSION" ]; then
-            BAL_VERSION="latest"
-          fi
-          echo "BAL_VERSION=$BAL_VERSION" >> $GITHUB_ENV
+      - name: Resolve Ballerina version
+        id: resolve-bal
+        uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
 
       - name: Set up Ballerina
         uses: ballerina-platform/setup-ballerina@v1.1.3
         with:
-          version: ${{ env.BAL_VERSION }}
+          version: ${{ steps.resolve-bal.outputs.lang-version }}
 
       - name: Pull the bal scan tool
         run: bal tool pull scan
