@@ -26,11 +26,19 @@ jobs:
           distribution: "temurin"
           java-version: 21.0.3
 
+      # additional-build-flags is passed through env and read as a shell variable
+      # rather than spliced directly into the run: script, since GitHub substitutes
+      # ${{ }} expressions into the literal script text before the shell runs it --
+      # a caller-controlled value containing shell metacharacters would otherwise be
+      # interpreted as code, not data.
       - name: Build with Gradle
         env:
           packageUser: ${{ github.actor }}
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew build -x test ${{ inputs.additional-build-flags }}
+          ADDITIONAL_BUILD_FLAGS: ${{ inputs.additional-build-flags }}
+        run: |
+          read -ra BUILD_FLAGS <<< "$ADDITIONAL_BUILD_FLAGS"
+          ./gradlew build -x test "${BUILD_FLAGS[@]}"
 
       # Shared with the trivy-scan and bal-scan jobs below so the package is only built
       # once: ballerina/lib is what Trivy scans, and **/build/libs/*.jar covers every
@@ -67,7 +75,7 @@ jobs:
         run: mkdir -p ballerina/lib
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         env:
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
           TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
@@ -152,8 +160,10 @@ jobs:
       # artifact and the gate below.
       - name: Rewrite SARIF paths relative to the repository root
         working-directory: ${{ inputs.scan-path }}
+        env:
+          SCAN_PATH: ${{ inputs.scan-path }}
         run: |
-          jq --arg prefix "${{ inputs.scan-path }}/" '
+          jq --arg prefix "$SCAN_PATH/" '
             (.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |= ($prefix + .)
           ' target/report/scan_results.sarif > target/report/scan_results_github.sarif
 
