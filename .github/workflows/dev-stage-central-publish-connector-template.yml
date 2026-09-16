@@ -10,6 +10,11 @@ on:
         required: false
         type: string
         default: ""
+      additional-env-variables:
+        description: 'JSON object of extra environment variables to set for the build/publish steps, e.g. {"CENTRAL_VERBOSE_ENABLED": "true"}'
+        required: false
+        type: string
+        default: ""
     secrets:
       BALLERINA_BOT_TOKEN:
         required: true
@@ -50,7 +55,12 @@ jobs:
   
       - name: Set ENV Variables
         run: |
-          echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV 
+          echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
+
+      - name: Set Additional ENV Variables
+        if: ${{ inputs.additional-env-variables != '' }}
+        run: |
+          echo -e '${{ inputs.additional-env-variables }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
 
       - name: Ballerina Central Dev Push
         if: ${{ inputs.environment == 'DEV CENTRAL' }}
