@@ -95,6 +95,9 @@
             "name": "module-ballerina-os"
         },
         {
+            "name": "module-ballerina-otel"
+        },
+        {
             "name": "module-ballerina-pdf"
         },
         {
@@ -162,9 +165,6 @@
         },
         {
             "name": "module-ballerina-zip"
-        },
-        {
-            "name": "module-ballerina-otel"
         }
     ],
     "extended_modules": [

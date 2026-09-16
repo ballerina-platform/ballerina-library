@@ -40,11 +40,15 @@ jobs:
               with:
                 version: ${{ env.BAL_VERSION }}
 
-            - name: Set up JDK 21
+            - name: Resolve Java version
+              id: resolve-java
+              uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
+
+            - name: Set up JDK ${{ steps.resolve-java.outputs.java-version }}
               uses: actions/setup-java@v3
               with:
                 distribution: 'temurin'
-                java-version: 21.0.3
+                java-version: ${{ steps.resolve-java.outputs.java-version }}
 
             - name: Set ENV Variables
               run: |
@@ -64,3 +68,96 @@ jobs:
               with:
                 token: ${{ secrets.CODECOV_TOKEN }}
                 slug: ballerina-platform/${{ github.event.repository.name }}
+
+    # ubuntu-build above stays exactly as it was pre-Java25 (single job, no matrix, fixed check
+    # name) so existing required-status-check config in consuming repos keeps working unchanged.
+    # Extra JDK-tier compatibility legs (only added for PRs targeting the default branch while it
+    # isn't yet on the newest tier) run here instead, as a separate matrixed job nothing depends on
+    # as a required check.
+    determine-extra-matrix:
+        name: Determine Extra Java/Lang Version Matrix
+        runs-on: ubuntu-latest
+        outputs:
+            matrix: ${{ steps.set-matrix.outputs.matrix }}
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v3
+
+            - name: Resolve current Java version
+              id: current
+              uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
+
+            - name: Determine matrix
+              id: set-matrix
+              run: |
+                IS_DEFAULT_BRANCH=false
+                if [ "${{ github.base_ref }}" = "${{ github.event.repository.default_branch }}" ]; then
+                  IS_DEFAULT_BRANCH=true
+                fi
+
+                # Each JDK tier's entry is the first Ballerina lang version that requires it - used
+                # to test a tier above the module's current one against a real distribution for
+                # that tier, not just the current distribution rebuilt under a newer JDK.
+                JAVA_TIERS=(11 17 21 25)
+                DEFAULT_LANG_VERSIONS=("" "2201.8.0" "2201.11.0" "2201.14.0-20260911-112100-0f421c6f")
+
+                CURRENT_JAVA="${{ steps.current.outputs.java-version }}"
+                CURRENT_INDEX=0
+                for i in "${!JAVA_TIERS[@]}"; do
+                  if [ "${JAVA_TIERS[$i]}" = "$CURRENT_JAVA" ]; then
+                    CURRENT_INDEX=$i
+                  fi
+                done
+                LAST_INDEX=$(( ${#JAVA_TIERS[@]} - 1 ))
+
+                LEGS=""
+                if [ "$IS_DEFAULT_BRANCH" = "true" ]; then
+                  # every tier strictly above the module's current one, up through the newest tier
+                  # (seq prints nothing, without erroring, when current is already the newest)
+                  for i in $(seq $(( CURRENT_INDEX + 1 )) "$LAST_INDEX"); do
+                    JV="${JAVA_TIERS[$i]}"
+                    LEG="{\"java-version\":\"$JV\",\"lang-version\":\"${DEFAULT_LANG_VERSIONS[$i]}\"}"
+                    LEGS="${LEGS:+$LEGS,}$LEG"
+                  done
+                fi
+                echo "matrix=[$LEGS]" >> "$GITHUB_OUTPUT"
+
+    ubuntu-build-extra:
+        name: Build (Extra JDK Compatibility)
+        needs: determine-extra-matrix
+        runs-on: ubuntu-22.04
+        if: ${{ needs.determine-extra-matrix.outputs.matrix != '[]' }}
+        strategy:
+          fail-fast: false
+          matrix:
+            include: ${{ fromJSON(needs.determine-extra-matrix.outputs.matrix) }}
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v3
+
+            - name: Override Ballerina Lang version
+              run: perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ matrix.lang-version }}/" gradle.properties
+
+            - name: Set Up Ballerina
+              uses: ballerina-platform/setup-ballerina@v1.1.3
+              with:
+                version: ${{ matrix.lang-version }}
+
+            - name: Set up JDK ${{ matrix.java-version }}
+              uses: actions/setup-java@v3
+              with:
+                distribution: 'temurin'
+                java-version: ${{ matrix.java-version }}
+
+            - name: Set ENV Variables
+              run: |
+                echo -e '${{ toJson(secrets) }}' | jq -r 'to_entries[] | .key + "=" + .value' >> $GITHUB_ENV
+                echo "CENTRAL_VERBOSE_ENABLED=true" >> $GITHUB_ENV
+
+            - name: Build the Package
+              env:
+                packageUser: ${{ github.actor }}
+                packagePAT: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                ./gradlew build -x test ${{ inputs.additional-build-flags }}
+                ./gradlew test ${{ inputs.additional-test-flags }}
