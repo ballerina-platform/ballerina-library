@@ -8,10 +8,15 @@ on:
         type: string
         default: ""
       scan-path:
-        description: "Path to the Ballerina package to run 'bal scan' against"
+        description: "Path to the main Ballerina package to run 'bal scan' against"
         required: false
         type: string
         default: "ballerina"
+      additional-scan-paths:
+        description: "Comma-separated list of additional Ballerina package paths to scan with 'bal scan', beyond scan-path and any examples/*/ packages found automatically"
+        required: false
+        type: string
+        default: ""
 
 jobs:
   build:
@@ -43,6 +48,17 @@ jobs:
           read -ra BUILD_FLAGS <<< "$ADDITIONAL_BUILD_FLAGS"
           ./gradlew build -x test "${BUILD_FLAGS[@]}"
 
+      # Guarantees at least one file always matches below: a module with no native
+      # subproject and no externalJars (e.g. module-ballerinax-aws.dynamodb) produces
+      # zero files for both patterns, and upload-artifact creates no artifact at all
+      # when nothing matches (if-no-files-found: warn only suppresses the failure, not
+      # the missing artifact) -- which would then fail download-artifact in both scan
+      # jobs with "Artifact not found".
+      - name: Ensure build output is never empty
+        run: |
+          mkdir -p ballerina/lib
+          touch ballerina/lib/.keep
+
       # Shared with the trivy-scan and bal-scan jobs below so the package is only built
       # once: ballerina/lib is what Trivy scans, and **/build/libs/*.jar covers every
       # subproject's packaged jar (e.g. a module's own native implementation jar), which
@@ -64,18 +80,16 @@ jobs:
     runs-on: ubuntu-22.04
     if: github.repository_owner == 'ballerina-platform'
     steps:
+      # Needed so a repo-root .trivyignore (used by several repos, e.g.
+      # module-ballerinax-salesforce, to suppress a specific already-triaged CVE) is
+      # present -- Trivy reads it from the working directory by default. Without this,
+      # previously-suppressed CVEs would resurface as new failures.
+      - uses: actions/checkout@v3
+
       - name: Download build output
         uses: actions/download-artifact@v4
         with:
           name: build-output
-
-      # Modules with no platform-level third-party dependencies (e.g. no
-      # externalJars) produce an empty ballerina/lib, and upload-artifact/
-      # download-artifact don't preserve empty directories -- so it may not exist
-      # at all here even though the build job created it. Trivy fails hard on a
-      # missing path (unlike an empty existing one), so recreate it defensively.
-      - name: Create lib directory if not exists
-        run: mkdir -p ballerina/lib
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
@@ -111,6 +125,38 @@ jobs:
         with:
           name: build-output
 
+      # Scans the main package (scan-path), every examples/*/ subdirectory that is its
+      # own Ballerina package (examples/ itself usually isn't a package -- it's a
+      # folder of them, e.g. examples/petclinic, examples/snowpeak), and any
+      # caller-supplied additional-scan-paths.
+      - name: Discover Ballerina packages to scan
+        env:
+          SCAN_PATH: ${{ inputs.scan-path }}
+          ADDITIONAL_SCAN_PATHS: ${{ inputs.additional-scan-paths }}
+        run: |
+          declare -a PACKAGES=()
+          [ -d "$SCAN_PATH" ] && PACKAGES+=("$SCAN_PATH")
+
+          if [ -d "examples" ]; then
+            while IFS= read -r toml; do
+              PACKAGES+=("$(dirname "$toml")")
+            done < <(find examples \( -path '*/target/*' -o -path '*/.git/*' -o -path '*/build/*' \) -prune -o -iname 'Ballerina.toml' -print | sort)
+          fi
+
+          IFS=',' read -ra EXTRA <<< "$ADDITIONAL_SCAN_PATHS"
+          for p in "${EXTRA[@]}"; do
+            p="$(echo "$p" | xargs)"
+            [ -n "$p" ] && PACKAGES+=("$p")
+          done
+
+          if [ "${#PACKAGES[@]}" -eq 0 ]; then
+            echo "::error::No Ballerina packages found to scan"
+            exit 1
+          fi
+
+          printf '%s\n' "${PACKAGES[@]}" | tee packages.txt
+          echo "Discovered ${#PACKAGES[@]} package(s) to scan."
+
       - name: Resolve Ballerina version
         id: resolve-bal
         uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
@@ -124,47 +170,55 @@ jobs:
         run: bal tool pull scan
 
       # --format=sarif and the default (JSON) report are mutually exclusive per
-      # invocation, so we standardize on SARIF alone: it's what both the code
-      # scanning upload and the vulnerability gate below need, and --scan-report
-      # still gives us the HTML report in the same run.
+      # invocation, so we standardize on SARIF alone: it's what both the code scanning
+      # upload and the vulnerability gate below need, and --scan-report still gives us
+      # the HTML report in the same run. Runs once per discovered package; bal scan
+      # always exits 0 even if it fails to produce a report, so an empty/missing SARIF
+      # is treated as an error per package rather than silently read as "no findings".
       - name: Run bal scan
-        working-directory: ${{ inputs.scan-path }}
-        run: bal scan --format=sarif --scan-report
-
-      # bal scan always exits 0 even if it fails to produce a report, so an
-      # empty/missing SARIF must be treated as an error rather than silently
-      # uploaded as "no findings" (which would read as "everything fixed").
-      - name: Verify the SARIF was produced
-        working-directory: ${{ inputs.scan-path }}
         run: |
-          f=target/report/scan_results.sarif
-          test -f "$f" || { echo "::error::$f was not produced"; exit 1; }
-          jq -e '.runs[0]' "$f" > /dev/null || { echo "::error::$f has no runs"; exit 1; }
+          mkdir -p scan-reports scan-sarif-for-upload
+          while IFS= read -r pkg; do
+            [ -z "$pkg" ] && continue
+            echo "::group::bal scan $pkg"
+            (cd "$pkg" && bal scan --format=sarif --scan-report)
+
+            f="$pkg/target/report/scan_results.sarif"
+            test -f "$f" || { echo "::error::$f was not produced for package '$pkg'"; exit 1; }
+            jq -e '.runs[0]' "$f" > /dev/null || { echo "::error::$f has no runs for package '$pkg'"; exit 1; }
+
+            name="$(echo "$pkg" | tr '/' '_')"
+            mkdir -p "scan-reports/$name"
+            cp -r "$pkg/target/report/." "scan-reports/$name/"
+            echo "::endgroup::"
+          done < packages.txt
 
       - name: Upload bal scan report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: bal-scan-report
-          path: ${{ inputs.scan-path }}/target/report
+          path: scan-reports
           retention-days: 30
           if-no-files-found: ignore
 
-      # bal scan reports artifactLocation.uri relative to the package directory it
-      # ran in (e.g. "abstract_cache.bal"), not the repository root (the real path
-      # is "ballerina/abstract_cache.bal"). GitHub resolves SARIF locations against
-      # the repo root and silently drops any result it can't map to a real file, so
-      # without this the upload registers as an analysis but produces zero visible
-      # alerts. Rewriting a copy for the upload keeps the original untouched for the
-      # artifact and the gate below.
+      # bal scan reports artifactLocation.uri relative to the package directory it ran
+      # in (e.g. "abstract_cache.bal"), not the repository root (the real path is
+      # "ballerina/abstract_cache.bal"). GitHub resolves SARIF locations against the
+      # repo root and silently drops any result it can't map to a real file, so without
+      # this the upload registers as an analysis but produces zero visible alerts.
+      # Rewrites a copy per package (prefixed with that package's own path) into one
+      # shared directory, since upload-sarif accepts either a single file or a
+      # directory of SARIF files.
       - name: Rewrite SARIF paths relative to the repository root
-        working-directory: ${{ inputs.scan-path }}
-        env:
-          SCAN_PATH: ${{ inputs.scan-path }}
         run: |
-          jq --arg prefix "$SCAN_PATH/" '
-            (.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |= ($prefix + .)
-          ' target/report/scan_results.sarif > target/report/scan_results_github.sarif
+          while IFS= read -r pkg; do
+            [ -z "$pkg" ] && continue
+            name="$(echo "$pkg" | tr '/' '_')"
+            jq --arg prefix "$pkg/" '
+              (.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |= ($prefix + .)
+            ' "$pkg/target/report/scan_results.sarif" > "scan-sarif-for-upload/$name.sarif"
+          done < packages.txt
 
       # Publishes findings to the repo's Security > Code scanning tab, where they're
       # tracked and auto-closed across runs. Non-blocking: some caller repos may not
@@ -172,24 +226,36 @@ jobs:
       # a guarantee), and that shouldn't fail the scan itself -- only the gate below does.
       - name: Upload SARIF to GitHub code scanning
         continue-on-error: true
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: ${{ inputs.scan-path }}/target/report/scan_results_github.sarif
+          sarif_file: scan-sarif-for-upload
           category: bal-scan
 
       # bal scan derives SARIF `level` from rule kind, not true severity:
       # VULNERABILITY rules -> warning, CODE_SMELL rules -> note, and nothing is ever
-      # `error` (no rule is classified BUG yet). Fail only on `warning`; code smells
-      # are visible in the uploaded report but don't fail the job, since existing
-      # style debt shouldn't break nightly runs across the org.
+      # `error` (no rule is classified BUG yet). Fail only on `warning`, summed across
+      # every scanned package; code smells are visible in the uploaded report but don't
+      # fail the job, since existing style debt shouldn't break nightly runs across the
+      # org.
       - name: Fail the job if vulnerabilities are found
-        working-directory: ${{ inputs.scan-path }}
         run: |
-          VULN_COUNT=$(jq '[.runs[].results[] | select(.level == "warning")] | length' target/report/scan_results.sarif)
-          SMELL_COUNT=$(jq '[.runs[].results[] | select(.level == "note")] | length' target/report/scan_results.sarif)
-          echo "bal scan found $VULN_COUNT vulnerability finding(s) and $SMELL_COUNT code smell finding(s). See the bal-scan-report artifact for details."
-          if [ "$VULN_COUNT" -gt 0 ]; then
-            jq '[.runs[].results[] | select(.level == "warning")]' target/report/scan_results.sarif
-            echo "::error::bal scan found $VULN_COUNT vulnerability finding(s). Failing the job."
+          TOTAL_VULN=0
+          TOTAL_SMELL=0
+          while IFS= read -r pkg; do
+            [ -z "$pkg" ] && continue
+            f="$pkg/target/report/scan_results.sarif"
+            v=$(jq '[.runs[].results[] | select(.level == "warning")] | length' "$f")
+            s=$(jq '[.runs[].results[] | select(.level == "note")] | length' "$f")
+            echo "$pkg: $v vulnerability finding(s), $s code smell finding(s)"
+            if [ "$v" -gt 0 ]; then
+              jq '[.runs[].results[] | select(.level == "warning")]' "$f"
+            fi
+            TOTAL_VULN=$((TOTAL_VULN + v))
+            TOTAL_SMELL=$((TOTAL_SMELL + s))
+          done < packages.txt
+
+          echo "Total across $(wc -l < packages.txt) package(s): $TOTAL_VULN vulnerability finding(s), $TOTAL_SMELL code smell finding(s). See the bal-scan-report artifact for details."
+          if [ "$TOTAL_VULN" -gt 0 ]; then
+            echo "::error::bal scan found $TOTAL_VULN vulnerability finding(s). Failing the job."
             exit 1
           fi
