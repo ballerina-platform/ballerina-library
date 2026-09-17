@@ -121,7 +121,7 @@ jobs:
                   if ${{ inputs.lang_version != '' }}; then
                       LANG_VERSION=${{ inputs.lang_version }}
                   else
-                      VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties | rev | cut --complement -d- -f1 | rev)
+                      VERSION=$((grep -E '^version=' | cut -d= -f2) < gradle.properties | rev | cut --complement -d- -f1 | rev)
                       LANG_VERSION=$VERSION-NATIVE
                   fi
                   echo "BALLERINA_LANG_VERSION=$LANG_VERSION" >> $GITHUB_ENV

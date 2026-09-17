@@ -53,7 +53,7 @@ jobs:
           git config --global user.name ${{ secrets.BALLERINA_BOT_USERNAME }}
           git config --global user.email ${{ secrets.BALLERINA_BOT_EMAIL }}
           CONNECTOR_VERSION=$((grep -w '${{ inputs.hana-connector-name }}Version' | cut -d= -f2) < gradle.properties)
-          VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties)
+          VERSION=$((grep -E '^version=' | cut -d= -f2) < gradle.properties)
           if [[ "$VERSION" == "$CONNECTOR_VERSION" ]]; then
             echo "Version is already up to date"
             exit 0
@@ -84,7 +84,7 @@ jobs:
           cache-dir: "/tmp/trivy-cache"
 
       - name: Get Release Version
-        run: echo "VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties | rev | cut -d- -f2 | rev)" >> $GITHUB_ENV
+        run: echo "VERSION=$((grep -E '^version=' | cut -d= -f2) < gradle.properties | rev | cut -d- -f2 | rev)" >> $GITHUB_ENV
 
       - name: Checkout to Release Branch
         run: |
