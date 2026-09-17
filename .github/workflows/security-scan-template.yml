@@ -125,37 +125,44 @@ jobs:
         with:
           name: build-output
 
-      # Scans the main package (scan-path), every examples/*/ subdirectory that is its
-      # own Ballerina package (examples/ itself usually isn't a package -- it's a
-      # folder of them, e.g. examples/petclinic, examples/snowpeak), and any
-      # caller-supplied additional-scan-paths.
+      # Kept as two separate lists, scanned and reported separately below: library
+      # findings are a direct risk to consumers of the published package, while
+      # examples findings are about the quality of our own reference samples --
+      # different audiences, worth tracking as distinct reports rather than one
+      # combined signal. "library" here is scan-path plus any caller-supplied
+      # additional-scan-paths; "examples" is every examples/*/ subdirectory that is
+      # its own Ballerina package (examples/ itself usually isn't a package -- it's a
+      # folder of them, e.g. examples/petclinic, examples/snowpeak).
       - name: Discover Ballerina packages to scan
         env:
           SCAN_PATH: ${{ inputs.scan-path }}
           ADDITIONAL_SCAN_PATHS: ${{ inputs.additional-scan-paths }}
         run: |
-          declare -a PACKAGES=()
-          [ -d "$SCAN_PATH" ] && PACKAGES+=("$SCAN_PATH")
-
-          if [ -d "examples" ]; then
-            while IFS= read -r toml; do
-              PACKAGES+=("$(dirname "$toml")")
-            done < <(find examples \( -path '*/target/*' -o -path '*/.git/*' -o -path '*/build/*' \) -prune -o -iname 'Ballerina.toml' -print | sort)
-          fi
+          declare -a LIBRARY_PACKAGES=()
+          [ -d "$SCAN_PATH" ] && LIBRARY_PACKAGES+=("$SCAN_PATH")
 
           IFS=',' read -ra EXTRA <<< "$ADDITIONAL_SCAN_PATHS"
           for p in "${EXTRA[@]}"; do
             p="$(echo "$p" | xargs)"
-            [ -n "$p" ] && PACKAGES+=("$p")
+            [ -n "$p" ] && LIBRARY_PACKAGES+=("$p")
           done
 
-          if [ "${#PACKAGES[@]}" -eq 0 ]; then
+          declare -a EXAMPLE_PACKAGES=()
+          if [ -d "examples" ]; then
+            while IFS= read -r toml; do
+              EXAMPLE_PACKAGES+=("$(dirname "$toml")")
+            done < <(find examples \( -path '*/target/*' -o -path '*/.git/*' -o -path '*/build/*' \) -prune -o -iname 'Ballerina.toml' -print | sort)
+          fi
+
+          if [ "${#LIBRARY_PACKAGES[@]}" -eq 0 ] && [ "${#EXAMPLE_PACKAGES[@]}" -eq 0 ]; then
             echo "::error::No Ballerina packages found to scan"
             exit 1
           fi
 
-          printf '%s\n' "${PACKAGES[@]}" | tee packages.txt
-          echo "Discovered ${#PACKAGES[@]} package(s) to scan."
+          printf '%s\n' "${LIBRARY_PACKAGES[@]}" > library-packages.txt
+          printf '%s\n' "${EXAMPLE_PACKAGES[@]}" > example-packages.txt
+          echo "Library package(s):"; cat library-packages.txt
+          echo "Example package(s):"; cat example-packages.txt
 
       - name: Resolve Ballerina version
         id: resolve-bal
@@ -172,33 +179,48 @@ jobs:
       # --format=sarif and the default (JSON) report are mutually exclusive per
       # invocation, so we standardize on SARIF alone: it's what both the code scanning
       # upload and the vulnerability gate below need, and --scan-report still gives us
-      # the HTML report in the same run. Runs once per discovered package; bal scan
-      # always exits 0 even if it fails to produce a report, so an empty/missing SARIF
-      # is treated as an error per package rather than silently read as "no findings".
+      # the HTML report in the same run. Runs once per discovered package, organized
+      # under scan-reports/<group>/ so the library and examples artifacts (uploaded
+      # separately below) stay independent. bal scan always exits 0 even if it fails to
+      # produce a report, so an empty/missing SARIF is treated as an error per package
+      # rather than silently read as "no findings".
       - name: Run bal scan
         run: |
-          mkdir -p scan-reports scan-sarif-for-upload
-          while IFS= read -r pkg; do
-            [ -z "$pkg" ] && continue
-            echo "::group::bal scan $pkg"
-            (cd "$pkg" && bal scan --format=sarif --scan-report)
+          scan_group() {
+            local group="$1" list="$2"
+            while IFS= read -r pkg; do
+              [ -z "$pkg" ] && continue
+              echo "::group::bal scan $pkg"
+              (cd "$pkg" && bal scan --format=sarif --scan-report)
 
-            f="$pkg/target/report/scan_results.sarif"
-            test -f "$f" || { echo "::error::$f was not produced for package '$pkg'"; exit 1; }
-            jq -e '.runs[0]' "$f" > /dev/null || { echo "::error::$f has no runs for package '$pkg'"; exit 1; }
+              f="$pkg/target/report/scan_results.sarif"
+              test -f "$f" || { echo "::error::$f was not produced for package '$pkg'"; exit 1; }
+              jq -e '.runs[0]' "$f" > /dev/null || { echo "::error::$f has no runs for package '$pkg'"; exit 1; }
 
-            name="$(echo "$pkg" | tr '/' '_')"
-            mkdir -p "scan-reports/$name"
-            cp -r "$pkg/target/report/." "scan-reports/$name/"
-            echo "::endgroup::"
-          done < packages.txt
+              name="$(echo "$pkg" | tr '/' '_')"
+              mkdir -p "scan-reports/$group/$name"
+              cp -r "$pkg/target/report/." "scan-reports/$group/$name/"
+              echo "::endgroup::"
+            done < "$list"
+          }
+          scan_group library library-packages.txt
+          scan_group examples example-packages.txt
 
-      - name: Upload bal scan report
+      - name: Upload library scan report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: bal-scan-report
-          path: scan-reports
+          name: bal-scan-report-library
+          path: scan-reports/library
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Upload examples scan report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bal-scan-report-examples
+          path: scan-reports/examples
           retention-days: 30
           if-no-files-found: ignore
 
@@ -207,55 +229,90 @@ jobs:
       # "ballerina/abstract_cache.bal"). GitHub resolves SARIF locations against the
       # repo root and silently drops any result it can't map to a real file, so without
       # this the upload registers as an analysis but produces zero visible alerts.
-      # Rewrites a copy per package (prefixed with that package's own path) into one
-      # shared directory, since upload-sarif accepts either a single file or a
+      # Rewrites a copy per package (prefixed with that package's own path) into
+      # per-group directories, since upload-sarif accepts either a single file or a
       # directory of SARIF files.
       - name: Rewrite SARIF paths relative to the repository root
         run: |
-          while IFS= read -r pkg; do
-            [ -z "$pkg" ] && continue
-            name="$(echo "$pkg" | tr '/' '_')"
-            jq --arg prefix "$pkg/" '
-              (.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |= ($prefix + .)
-            ' "$pkg/target/report/scan_results.sarif" > "scan-sarif-for-upload/$name.sarif"
-          done < packages.txt
+          rewrite_group() {
+            local group="$1" list="$2"
+            while IFS= read -r pkg; do
+              [ -z "$pkg" ] && continue
+              name="$(echo "$pkg" | tr '/' '_')"
+              mkdir -p "scan-sarif-for-upload/$group"
+              jq --arg prefix "$pkg/" '
+                (.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |= ($prefix + .)
+              ' "$pkg/target/report/scan_results.sarif" > "scan-sarif-for-upload/$group/$name.sarif"
+            done < "$list"
+          }
+          rewrite_group library library-packages.txt
+          rewrite_group examples example-packages.txt
 
-      # Publishes findings to the repo's Security > Code scanning tab, where they're
-      # tracked and auto-closed across runs. Non-blocking: some caller repos may not
-      # grant security-events: write to the token (permissions here are a ceiling, not
-      # a guarantee), and that shouldn't fail the scan itself -- only the gate below does.
-      - name: Upload SARIF to GitHub code scanning
+      # Publishes findings to the repo's Security > Code scanning tab under separate
+      # categories, where they're tracked and auto-closed across runs independently:
+      # library findings are a direct risk to consumers of the published package,
+      # while examples findings are about the quality of our own reference samples.
+      # Non-blocking: some caller repos may not grant security-events: write to the
+      # token (permissions here are a ceiling, not a guarantee), and that shouldn't
+      # fail the scan itself -- only the gate below does.
+      - name: Upload library SARIF to GitHub code scanning
         continue-on-error: true
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: scan-sarif-for-upload
-          category: bal-scan
+          sarif_file: scan-sarif-for-upload/library
+          category: bal-scan-library
+
+      - name: Upload examples SARIF to GitHub code scanning
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: scan-sarif-for-upload/examples
+          category: bal-scan-examples
 
       # bal scan derives SARIF `level` from rule kind, not true severity:
       # VULNERABILITY rules -> warning, CODE_SMELL rules -> note, and nothing is ever
-      # `error` (no rule is classified BUG yet). Fail only on `warning`, summed across
-      # every scanned package; code smells are visible in the uploaded report but don't
-      # fail the job, since existing style debt shouldn't break nightly runs across the
-      # org.
+      # `error` (no rule is classified BUG yet). Fails on `warning` from either group --
+      # a real vulnerability in an example is still a real vulnerability, just reported
+      # separately from the library's own -- while `note` (code smells) are visible in
+      # the uploaded reports but never fail the job, since existing style debt
+      # shouldn't break nightly runs across the org.
       - name: Fail the job if vulnerabilities are found
         run: |
-          TOTAL_VULN=0
-          TOTAL_SMELL=0
-          while IFS= read -r pkg; do
-            [ -z "$pkg" ] && continue
-            f="$pkg/target/report/scan_results.sarif"
-            v=$(jq '[.runs[].results[] | select(.level == "warning")] | length' "$f")
-            s=$(jq '[.runs[].results[] | select(.level == "note")] | length' "$f")
-            echo "$pkg: $v vulnerability finding(s), $s code smell finding(s)"
-            if [ "$v" -gt 0 ]; then
-              jq '[.runs[].results[] | select(.level == "warning")]' "$f"
-            fi
-            TOTAL_VULN=$((TOTAL_VULN + v))
-            TOTAL_SMELL=$((TOTAL_SMELL + s))
-          done < packages.txt
+          # Diagnostics go to stderr so the $(...) capture below only ever sees the
+          # final "vuln smell" line on stdout -- otherwise `read` would parse the
+          # first diagnostic line instead of the actual counts.
+          count_group() {
+            local group="$1" list="$2"
+            local vuln=0 smell=0
+            while IFS= read -r pkg; do
+              [ -z "$pkg" ] && continue
+              f="$pkg/target/report/scan_results.sarif"
+              v=$(jq '[.runs[].results[] | select(.level == "warning")] | length' "$f")
+              s=$(jq '[.runs[].results[] | select(.level == "note")] | length' "$f")
+              echo "$pkg: $v vulnerability finding(s), $s code smell finding(s)" >&2
+              if [ "$v" -gt 0 ]; then
+                jq '[.runs[].results[] | select(.level == "warning")]' "$f" >&2
+              fi
+              vuln=$((vuln + v))
+              smell=$((smell + s))
+            done < "$list"
+            echo "$vuln $smell"
+          }
 
-          echo "Total across $(wc -l < packages.txt) package(s): $TOTAL_VULN vulnerability finding(s), $TOTAL_SMELL code smell finding(s). See the bal-scan-report artifact for details."
-          if [ "$TOTAL_VULN" -gt 0 ]; then
-            echo "::error::bal scan found $TOTAL_VULN vulnerability finding(s). Failing the job."
-            exit 1
+          read -r LIB_VULN LIB_SMELL <<< "$(count_group library library-packages.txt)"
+          read -r EX_VULN EX_SMELL <<< "$(count_group examples example-packages.txt)"
+
+          echo "Library: $LIB_VULN vulnerability finding(s), $LIB_SMELL code smell finding(s). See the bal-scan-report-library artifact for details."
+          echo "Examples: $EX_VULN vulnerability finding(s), $EX_SMELL code smell finding(s). See the bal-scan-report-examples artifact for details."
+
+          FAIL=0
+          if [ "$LIB_VULN" -gt 0 ]; then
+            echo "::error::bal scan found $LIB_VULN vulnerability finding(s) in the library. Failing the job."
+            FAIL=1
           fi
+          if [ "$EX_VULN" -gt 0 ]; then
+            echo "::error::bal scan found $EX_VULN vulnerability finding(s) in examples. Failing the job."
+            FAIL=1
+          fi
+          [ "$FAIL" -eq 1 ] && exit 1
+          exit 0
