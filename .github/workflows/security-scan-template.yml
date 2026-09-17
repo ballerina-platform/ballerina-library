@@ -1,0 +1,354 @@
+name: Security Scan
+
+on:
+  workflow_call:
+    inputs:
+      additional-build-flags:
+        required: false
+        type: string
+        default: ""
+      scan-path:
+        description: "Path to the main Ballerina package to run 'bal scan' against"
+        required: false
+        type: string
+        default: "ballerina"
+      additional-scan-paths:
+        description: "Comma-separated list of additional Ballerina package paths to scan with 'bal scan', beyond scan-path and any examples/*/ packages found automatically"
+        required: false
+        type: string
+        default: ""
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-22.04
+    if: github.repository_owner == 'ballerina-platform'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Resolve Java version
+        id: resolve-java
+        uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
+      - name: Set up JDK ${{ steps.resolve-java.outputs.java-version }}
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: "temurin"
+          java-version: ${{ steps.resolve-java.outputs.java-version }}
+
+      # additional-build-flags is passed through env and read as a shell variable
+      # rather than spliced directly into the run: script, since GitHub substitutes
+      # ${{ }} expressions into the literal script text before the shell runs it --
+      # a caller-controlled value containing shell metacharacters would otherwise be
+      # interpreted as code, not data.
+      - name: Build with Gradle
+        env:
+          packageUser: ${{ github.actor }}
+          packagePAT: ${{ secrets.GITHUB_TOKEN }}
+          ADDITIONAL_BUILD_FLAGS: ${{ inputs.additional-build-flags }}
+        run: |
+          read -ra BUILD_FLAGS <<< "$ADDITIONAL_BUILD_FLAGS"
+          ./gradlew build -x test "${BUILD_FLAGS[@]}"
+
+      # Guarantees at least one file always matches below: a module with no native
+      # subproject and no externalJars (e.g. module-ballerinax-aws.dynamodb) produces
+      # zero files for both patterns, and upload-artifact creates no artifact at all
+      # when nothing matches (if-no-files-found: warn only suppresses the failure, not
+      # the missing artifact) -- which would then fail download-artifact in both scan
+      # jobs with "Artifact not found". Must NOT be a dotfile: upload-artifact excludes
+      # hidden files by default (include-hidden-files defaults to false), so a filename
+      # like ".keep" would silently fail to fix the problem it's there to fix.
+      - name: Ensure build output is never empty
+        run: |
+          mkdir -p ballerina/lib
+          touch ballerina/lib/artifact-placeholder
+
+      # Shared with the trivy-scan and bal-scan jobs below so the package is only built
+      # once: ballerina/lib is what Trivy scans, and **/build/libs/*.jar covers every
+      # subproject's packaged jar (e.g. a module's own native implementation jar), which
+      # bal scan needs to resolve the platform dependencies declared in Ballerina.toml
+      # in order to compile the package.
+      - name: Upload build output
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: build-output
+          path: |
+            ballerina/lib/**
+            **/build/libs/*.jar
+          if-no-files-found: warn
+          retention-days: 1
+
+  trivy-scan:
+    name: Trivy Vulnerability Scan
+    needs: build
+    runs-on: ubuntu-22.04
+    if: github.repository_owner == 'ballerina-platform'
+    steps:
+      # Needed so a repo-root .trivyignore (used by several repos, e.g.
+      # module-ballerinax-salesforce, to suppress a specific already-triaged CVE) is
+      # present -- Trivy reads it from the working directory by default. Without this,
+      # previously-suppressed CVEs would resurface as new failures.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download build output
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: build-output
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        env:
+          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
+          TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
+        with:
+          scan-type: "rootfs"
+          scan-ref: "${{ github.workspace }}/ballerina/lib"
+          format: "table"
+          timeout: "10m0s"
+          exit-code: "1"
+          scanners: "vuln"
+          cache-dir: "/tmp/trivy-cache"
+
+  bal-scan:
+    name: Ballerina Static Code Analysis
+    needs: build
+    runs-on: ubuntu-22.04
+    if: github.repository_owner == 'ballerina-platform'
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Overlays the jars built once by the build job onto this fresh checkout, at the
+      # same relative paths Ballerina.toml expects (e.g. ballerina/lib/*.jar,
+      # native/build/libs/*.jar), so bal scan can compile without rebuilding.
+      - name: Download build output
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: build-output
+
+      # Kept as two separate lists, scanned and reported separately below: library
+      # findings are a direct risk to consumers of the published package, while
+      # examples findings are about the quality of our own reference samples --
+      # different audiences, worth tracking as distinct reports rather than one
+      # combined signal. "library" here is scan-path plus any caller-supplied
+      # additional-scan-paths; "examples" is every examples/*/ subdirectory that is
+      # its own Ballerina package (examples/ itself usually isn't a package -- it's a
+      # folder of them, e.g. examples/petclinic, examples/snowpeak).
+      - name: Discover Ballerina packages to scan
+        env:
+          SCAN_PATH: ${{ inputs.scan-path }}
+          ADDITIONAL_SCAN_PATHS: ${{ inputs.additional-scan-paths }}
+        run: |
+          declare -a LIBRARY_PACKAGES=()
+          [ -d "$SCAN_PATH" ] && LIBRARY_PACKAGES+=("$SCAN_PATH")
+
+          IFS=',' read -ra EXTRA <<< "$ADDITIONAL_SCAN_PATHS"
+          for p in "${EXTRA[@]}"; do
+            p="$(echo "$p" | xargs)"
+            [ -n "$p" ] && LIBRARY_PACKAGES+=("$p")
+          done
+
+          declare -a EXAMPLE_PACKAGES=()
+          if [ -d "examples" ]; then
+            while IFS= read -r toml; do
+              EXAMPLE_PACKAGES+=("$(dirname "$toml")")
+            done < <(find examples \( -path '*/target/*' -o -path '*/.git/*' -o -path '*/build/*' \) -prune -o -iname 'Ballerina.toml' -print | sort)
+          fi
+
+          if [ "${#LIBRARY_PACKAGES[@]}" -eq 0 ] && [ "${#EXAMPLE_PACKAGES[@]}" -eq 0 ]; then
+            echo "::error::No Ballerina packages found to scan"
+            exit 1
+          fi
+
+          printf '%s\n' "${LIBRARY_PACKAGES[@]}" > library-packages.txt
+          printf '%s\n' "${EXAMPLE_PACKAGES[@]}" > example-packages.txt
+          echo "Library package(s):"; cat library-packages.txt
+          echo "Example package(s):"; cat example-packages.txt
+
+      - name: Resolve Ballerina version
+        id: resolve-bal
+        uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
+
+      - name: Set up Ballerina
+        uses: ballerina-platform/setup-ballerina@v1.1.3
+        with:
+          version: ${{ steps.resolve-bal.outputs.lang-version }}
+
+      - name: Pull the bal scan tool
+        run: bal tool pull scan
+
+      # --format=sarif and the default (JSON) report are mutually exclusive per
+      # invocation, so we standardize on SARIF alone: it's what both the code scanning
+      # upload and the vulnerability gate below need, and --scan-report still gives us
+      # the HTML report in the same run. Runs once per discovered package, organized
+      # under scan-reports/<group>/ so the library and examples artifacts (uploaded
+      # separately below) stay independent. bal scan always exits 0 even if it fails to
+      # produce a report, so an empty/missing SARIF is treated as an error per package
+      # rather than silently read as "no findings".
+      - name: Run bal scan
+        run: |
+          scan_group() {
+            local group="$1" list="$2"
+            while IFS= read -r pkg; do
+              [ -z "$pkg" ] && continue
+              echo "::group::bal scan $pkg"
+              (cd "$pkg" && bal scan --format=sarif --scan-report)
+
+              f="$pkg/target/report/scan_results.sarif"
+              test -f "$f" || { echo "::error::$f was not produced for package '$pkg'"; exit 1; }
+              jq -e '.runs[0]' "$f" > /dev/null || { echo "::error::$f has no runs for package '$pkg'"; exit 1; }
+
+              name="$(echo "$pkg" | tr '/' '_')"
+              mkdir -p "scan-reports/$group/$name"
+              cp -r "$pkg/target/report/." "scan-reports/$group/$name/"
+              echo "::endgroup::"
+            done < "$list"
+          }
+          scan_group library library-packages.txt
+          scan_group examples example-packages.txt
+
+      - name: Upload library scan report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: bal-scan-report-library
+          path: scan-reports/library
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Upload examples scan report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: bal-scan-report-examples
+          path: scan-reports/examples
+          retention-days: 30
+          if-no-files-found: ignore
+
+      # bal scan reports artifactLocation.uri relative to the package directory it ran
+      # in (e.g. "abstract_cache.bal"), not the repository root (the real path is
+      # "ballerina/abstract_cache.bal"). GitHub resolves SARIF locations against the
+      # repo root and silently drops any result it can't map to a real file, so without
+      # this the upload registers as an analysis but produces zero visible alerts.
+      #
+      # Merges every package in a group into ONE SARIF run rather than uploading one
+      # file per package: GitHub's code scanning no longer supports uploading multiple
+      # SARIF runs under the same category (as of July 2025), which a multi-package
+      # group -- any repo with more than one examples/*/ package, or more than one
+      # additional-scan-paths entry -- would otherwise hit, silently producing zero
+      # alerts for that group despite the upload step reporting success (confirmed
+      # against module-ballerina-http's 6 example packages: the upload "succeeded" via
+      # continue-on-error, but no analysis was ever recorded for the examples
+      # category). Tool.driver.rules is deduped by id since different packages can
+      # each report only the subset of rules that actually fired for them.
+      - name: Rewrite SARIF paths relative to the repository root
+        run: |
+          rewrite_group() {
+            local group="$1" list="$2"
+            local tmpdir
+            tmpdir="$(mktemp -d)"
+            while IFS= read -r pkg; do
+              [ -z "$pkg" ] && continue
+              name="$(echo "$pkg" | tr '/' '_')"
+              jq --arg prefix "$pkg/" '
+                (.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |= ($prefix + .)
+              ' "$pkg/target/report/scan_results.sarif" > "$tmpdir/$name.sarif"
+            done < "$list"
+
+            if [ -n "$(ls -A "$tmpdir" 2>/dev/null)" ]; then
+              jq -s '
+                . as $all
+                | {
+                    "$schema": $all[0]["$schema"],
+                    version: $all[0].version,
+                    runs: [{
+                      tool: ($all[0].runs[0].tool | .driver.rules = ($all | map(.runs[0].tool.driver.rules[]?) | unique_by(.id))),
+                      results: ($all | map(.runs[0].results[]?))
+                    }]
+                  }
+              ' "$tmpdir"/*.sarif > "scan-sarif-for-upload-$group.sarif"
+            fi
+            rm -rf "$tmpdir"
+          }
+          rewrite_group library library-packages.txt
+          rewrite_group examples example-packages.txt
+
+      # Publishes findings to the repo's Security > Code scanning tab under separate
+      # categories, where they're tracked and auto-closed across runs independently:
+      # library findings are a direct risk to consumers of the published package,
+      # while examples findings are about the quality of our own reference samples.
+      # Non-blocking: some caller repos may not grant security-events: write to the
+      # token (permissions here are a ceiling, not a guarantee), and that shouldn't
+      # fail the scan itself -- only the gate below does. Skipped entirely for a group
+      # with zero packages (e.g. a repo with no examples/ dir), since there's nothing
+      # to upload.
+      - name: Upload library SARIF to GitHub code scanning
+        if: hashFiles('scan-sarif-for-upload-library.sarif') != ''
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
+        with:
+          sarif_file: scan-sarif-for-upload-library.sarif
+          category: bal-scan-library
+
+      - name: Upload examples SARIF to GitHub code scanning
+        if: hashFiles('scan-sarif-for-upload-examples.sarif') != ''
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
+        with:
+          sarif_file: scan-sarif-for-upload-examples.sarif
+          category: bal-scan-examples
+
+      # bal scan derives SARIF `level` from rule kind, not true severity:
+      # VULNERABILITY rules -> warning, CODE_SMELL rules -> note, and nothing is ever
+      # `error` (no rule is classified BUG yet). Fails on `warning` from either group --
+      # a real vulnerability in an example is still a real vulnerability, just reported
+      # separately from the library's own -- while `note` (code smells) are visible in
+      # the uploaded reports but never fail the job, since existing style debt
+      # shouldn't break nightly runs across the org.
+      - name: Fail the job if vulnerabilities are found
+        run: |
+          # Diagnostics go to stderr so the $(...) capture below only ever sees the
+          # final "vuln smell" line on stdout -- otherwise `read` would parse the
+          # first diagnostic line instead of the actual counts.
+          count_group() {
+            local group="$1" list="$2"
+            local vuln=0 smell=0
+            while IFS= read -r pkg; do
+              [ -z "$pkg" ] && continue
+              f="$pkg/target/report/scan_results.sarif"
+              v=$(jq '[.runs[].results[] | select(.level == "warning")] | length' "$f")
+              s=$(jq '[.runs[].results[] | select(.level == "note")] | length' "$f")
+              echo "$pkg: $v vulnerability finding(s), $s code smell finding(s)" >&2
+              if [ "$v" -gt 0 ]; then
+                jq '[.runs[].results[] | select(.level == "warning")]' "$f" >&2
+              fi
+              vuln=$((vuln + v))
+              smell=$((smell + s))
+            done < "$list"
+            echo "$vuln $smell"
+          }
+
+          read -r LIB_VULN LIB_SMELL <<< "$(count_group library library-packages.txt)"
+          read -r EX_VULN EX_SMELL <<< "$(count_group examples example-packages.txt)"
+
+          echo "Library: $LIB_VULN vulnerability finding(s), $LIB_SMELL code smell finding(s). See the bal-scan-report-library artifact for details."
+          echo "Examples: $EX_VULN vulnerability finding(s), $EX_SMELL code smell finding(s). See the bal-scan-report-examples artifact for details."
+
+          FAIL=0
+          if [ "$LIB_VULN" -gt 0 ]; then
+            echo "::error::bal scan found $LIB_VULN vulnerability finding(s) in the library. Failing the job."
+            FAIL=1
+          fi
+          if [ "$EX_VULN" -gt 0 ]; then
+            echo "::error::bal scan found $EX_VULN vulnerability finding(s) in examples. Failing the job."
+            FAIL=1
+          fi
+          [ "$FAIL" -eq 1 ] && exit 1
+          exit 0
