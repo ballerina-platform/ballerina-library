@@ -237,21 +237,45 @@ jobs:
       # "ballerina/abstract_cache.bal"). GitHub resolves SARIF locations against the
       # repo root and silently drops any result it can't map to a real file, so without
       # this the upload registers as an analysis but produces zero visible alerts.
-      # Rewrites a copy per package (prefixed with that package's own path) into
-      # per-group directories, since upload-sarif accepts either a single file or a
-      # directory of SARIF files.
+      #
+      # Merges every package in a group into ONE SARIF run rather than uploading one
+      # file per package: GitHub's code scanning no longer supports uploading multiple
+      # SARIF runs under the same category (as of July 2025), which a multi-package
+      # group -- any repo with more than one examples/*/ package, or more than one
+      # additional-scan-paths entry -- would otherwise hit, silently producing zero
+      # alerts for that group despite the upload step reporting success (confirmed
+      # against module-ballerina-http's 6 example packages: the upload "succeeded" via
+      # continue-on-error, but no analysis was ever recorded for the examples
+      # category). Tool.driver.rules is deduped by id since different packages can
+      # each report only the subset of rules that actually fired for them.
       - name: Rewrite SARIF paths relative to the repository root
         run: |
           rewrite_group() {
             local group="$1" list="$2"
+            local tmpdir
+            tmpdir="$(mktemp -d)"
             while IFS= read -r pkg; do
               [ -z "$pkg" ] && continue
               name="$(echo "$pkg" | tr '/' '_')"
-              mkdir -p "scan-sarif-for-upload/$group"
               jq --arg prefix "$pkg/" '
                 (.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |= ($prefix + .)
-              ' "$pkg/target/report/scan_results.sarif" > "scan-sarif-for-upload/$group/$name.sarif"
+              ' "$pkg/target/report/scan_results.sarif" > "$tmpdir/$name.sarif"
             done < "$list"
+
+            if [ -n "$(ls -A "$tmpdir" 2>/dev/null)" ]; then
+              jq -s '
+                . as $all
+                | {
+                    "$schema": $all[0]["$schema"],
+                    version: $all[0].version,
+                    runs: [{
+                      tool: ($all[0].runs[0].tool | .driver.rules = ($all | map(.runs[0].tool.driver.rules[]?) | unique_by(.id))),
+                      results: ($all | map(.runs[0].results[]?))
+                    }]
+                  }
+              ' "$tmpdir"/*.sarif > "scan-sarif-for-upload-$group.sarif"
+            fi
+            rm -rf "$tmpdir"
           }
           rewrite_group library library-packages.txt
           rewrite_group examples example-packages.txt
@@ -262,19 +286,23 @@ jobs:
       # while examples findings are about the quality of our own reference samples.
       # Non-blocking: some caller repos may not grant security-events: write to the
       # token (permissions here are a ceiling, not a guarantee), and that shouldn't
-      # fail the scan itself -- only the gate below does.
+      # fail the scan itself -- only the gate below does. Skipped entirely for a group
+      # with zero packages (e.g. a repo with no examples/ dir), since there's nothing
+      # to upload.
       - name: Upload library SARIF to GitHub code scanning
+        if: hashFiles('scan-sarif-for-upload-library.sarif') != ''
         continue-on-error: true
         uses: github/codeql-action/upload-sarif@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
         with:
-          sarif_file: scan-sarif-for-upload/library
+          sarif_file: scan-sarif-for-upload-library.sarif
           category: bal-scan-library
 
       - name: Upload examples SARIF to GitHub code scanning
+        if: hashFiles('scan-sarif-for-upload-examples.sarif') != ''
         continue-on-error: true
         uses: github/codeql-action/upload-sarif@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
         with:
-          sarif_file: scan-sarif-for-upload/examples
+          sarif_file: scan-sarif-for-upload-examples.sarif
           category: bal-scan-examples
 
       # bal scan derives SARIF `level` from rule kind, not true severity:
