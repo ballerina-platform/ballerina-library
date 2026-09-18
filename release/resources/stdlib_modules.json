@@ -579,7 +579,7 @@
         },
         {
             "name": "module-ballerina-otel",
-            "module_version": "0.9.0-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibOtelVersion",
@@ -659,7 +659,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "module_version": "1.18.1-SNAPSHOT",
+            "module_version": "1.18.2-SNAPSHOT",
             "level": 9,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
