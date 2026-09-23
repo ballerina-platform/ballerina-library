@@ -114,4 +114,5 @@ jobs:
         run: |
           gh release create v$VERSION --title "module-${{ inputs.package-org }}-${{ inputs.package-name }}-v$VERSION"
           git push origin release-${VERSION}
-          gh pr create --base ${GITHUB_REF##*/} --title "[Automated] Sync ${GITHUB_REF##*/} after $VERSION release" --body "Sync ${GITHUB_REF##*/} after $VERSION release"
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          gh pr create --base "$BRANCH_NAME" --title "[Automated] Sync $BRANCH_NAME after $VERSION release" --body "Sync $BRANCH_NAME after $VERSION release"
