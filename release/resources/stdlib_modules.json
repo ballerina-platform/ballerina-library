@@ -112,7 +112,7 @@
         },
         {
             "name": "module-ballerina-avro",
-            "module_version": "1.2.3-SNAPSHOT",
+            "module_version": "1.2.4-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibAvroVersion",
@@ -143,7 +143,7 @@
         },
         {
             "name": "module-ballerina-crypto",
-            "module_version": "2.12.2-SNAPSHOT",
+            "module_version": "2.13.0-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibCryptoVersion",
@@ -193,7 +193,7 @@
         },
         {
             "name": "module-ballerina-pdf",
-            "module_version": "0.9.1-SNAPSHOT",
+            "module_version": "0.9.2-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibPdfVersion",
@@ -255,7 +255,7 @@
         },
         {
             "name": "module-ballerina-file",
-            "module_version": "1.13.2-SNAPSHOT",
+            "module_version": "1.14.0-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibFileVersion",
@@ -309,7 +309,7 @@
         },
         {
             "name": "module-ballerina-udp",
-            "module_version": "1.13.9-SNAPSHOT",
+            "module_version": "1.14.0-SNAPSHOT",
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibUdpVersion",
@@ -334,7 +334,7 @@
         },
         {
             "name": "module-ballerina-data.csv",
-            "module_version": "0.8.3-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibDataCsvVersion",
@@ -361,7 +361,7 @@
         },
         {
             "name": "module-ballerina-data.xmldata",
-            "module_version": "1.6.3-SNAPSHOT",
+            "module_version": "1.7.0-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibDataXmldataVersion",
@@ -456,7 +456,7 @@
         },
         {
             "name": "module-ballerina-ftp",
-            "module_version": "2.20.4-SNAPSHOT",
+            "module_version": "2.22.0-SNAPSHOT",
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibFtpVersion",
@@ -581,7 +581,7 @@
         },
         {
             "name": "module-ballerina-otel",
-            "module_version": "0.9.0-SNAPSHOT",
+            "module_version": "1.0.0-SNAPSHOT",
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibOtelVersion",
@@ -663,7 +663,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "module_version": "1.18.1-SNAPSHOT",
+            "module_version": "1.18.2-SNAPSHOT",
             "level": 9,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
@@ -1020,7 +1020,7 @@
         },
         {
             "name": "module-ballerinax-sap",
-            "module_version": "1.3.2-SNAPSHOT",
+            "module_version": "1.4.0-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibSapVersion",

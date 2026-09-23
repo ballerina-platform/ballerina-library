@@ -67,7 +67,7 @@ jobs:
 
       - name: Setup Ballerina
         if: inputs.distribution-zip == ''
-        uses: ballerina-platform/setup-ballerina@v1.1.3
+        uses: ballerina-platform/setup-ballerina@v1.1.5
         with:
           version: ${{ inputs.ballerina-version }}
 

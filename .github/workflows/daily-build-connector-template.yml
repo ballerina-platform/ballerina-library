@@ -30,15 +30,19 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set Up Ballerina
-        uses: ballerina-platform/setup-ballerina@v1.1.0
+        uses: ballerina-platform/setup-ballerina@v1.1.5
         with:
           version: latest
 
-      - name: Set up JDK 21
+      - name: Resolve Java version
+        id: resolve-java
+        uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
+
+      - name: Set up JDK ${{ steps.resolve-java.outputs.java-version }}
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
-          java-version: 21.0.3
+          java-version: ${{ steps.resolve-java.outputs.java-version }}
 
       - name: Set ENV Variables
         run: |

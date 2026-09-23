@@ -23,17 +23,21 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up JDK 21
+      - name: Resolve Java version
+        id: resolve-java
+        uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
+
+      - name: Set up JDK ${{ steps.resolve-java.outputs.java-version }}
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
-          java-version: 21.0.3
+          java-version: ${{ steps.resolve-java.outputs.java-version }}
 
       - name: Change to Timestamped Version
         run: |
           startTime=$(TZ="Asia/Kolkata" date +'%Y%m%d-%H%M00')
           latestCommit=$(git log -n 1 --pretty=format:"%h")
-          VERSION=$((grep -w 'version' | cut -d= -f2) < gradle.properties | rev | cut --complement -d- -f1 | rev)
+          VERSION=$((grep -E '^version=' | cut -d= -f2) < gradle.properties | rev | cut --complement -d- -f1 | rev)
           updatedVersion=$VERSION-$startTime-$latestCommit
           echo $updatedVersion
           sed -i "s/version=\(.*\)/version=$updatedVersion/g" gradle.properties

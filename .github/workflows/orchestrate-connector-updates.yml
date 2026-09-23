@@ -119,7 +119,7 @@ jobs:
 
       - name: Set up Ballerina for email
         if: steps.trigger_connectors.outputs.triggered_count > 0 && steps.check_email_secrets.outputs.email_configured == 'true'
-        uses: ballerina-platform/setup-ballerina@v1.1.3
+        uses: ballerina-platform/setup-ballerina@v1.1.5
         with:
           version: latest
 
