@@ -109,4 +109,5 @@ jobs:
         run: |
           git push origin release-${{ inputs.hana-connector-name }}-${VERSION}
           gh release create ${{ inputs.hana-connector-name }}-v$VERSION --title "${{ inputs.hana-connector-name }}-v$VERSION"
-          gh pr create --base ${GITHUB_REF##*/} --title "[Automated] Sync ${GITHUB_REF##*/} after ${{ inputs.hana-connector-name }}-$VERSION release" --body "Sync ${GITHUB_REF##*/} after ${{ inputs.hana-connector-name }}-$VERSION release"
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          gh pr create --base "$BRANCH_NAME" --title "[Automated] Sync $BRANCH_NAME after ${{ inputs.hana-connector-name }}-$VERSION release" --body "Sync $BRANCH_NAME after ${{ inputs.hana-connector-name }}-$VERSION release"
