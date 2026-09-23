@@ -36,7 +36,7 @@ jobs:
                 echo "Ballerina Version: $BAL_VERSION"
 
             - name: Set Up Ballerina
-              uses: ballerina-platform/setup-ballerina@v1.1.3
+              uses: ballerina-platform/setup-ballerina@v1.1.5
               with:
                 version: ${{ env.BAL_VERSION }}
 
@@ -100,6 +100,11 @@ jobs:
                 # that tier, not just the current distribution rebuilt under a newer JDK.
                 JAVA_TIERS=(11 17 21 25)
                 DEFAULT_LANG_VERSIONS=("" "2201.8.0" "2201.11.0" "2201.14.0-20260911-112100-0f421c6f")
+                # setup-ballerina downloads a real dist.ballerina.io release for a released
+                # lang-version, but the newest tier's lang-version above is a timestamped snapshot
+                # used only to resolve the ballerina-runtime Gradle dependency - no such distribution
+                # zip is published, so that tier's CLI must come from the "nightly" build instead.
+                SETUP_BALLERINA_VERSIONS=("" "2201.8.0" "2201.11.0" "nightly")
 
                 CURRENT_JAVA="${{ steps.current.outputs.java-version }}"
                 CURRENT_INDEX=0
@@ -116,7 +121,7 @@ jobs:
                   # (seq prints nothing, without erroring, when current is already the newest)
                   for i in $(seq $(( CURRENT_INDEX + 1 )) "$LAST_INDEX"); do
                     JV="${JAVA_TIERS[$i]}"
-                    LEG="{\"java-version\":\"$JV\",\"lang-version\":\"${DEFAULT_LANG_VERSIONS[$i]}\"}"
+                    LEG="{\"java-version\":\"$JV\",\"lang-version\":\"${DEFAULT_LANG_VERSIONS[$i]}\",\"setup-ballerina-version\":\"${SETUP_BALLERINA_VERSIONS[$i]}\"}"
                     LEGS="${LEGS:+$LEGS,}$LEG"
                   done
                 fi
@@ -139,9 +144,9 @@ jobs:
               run: perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ matrix.lang-version }}/" gradle.properties
 
             - name: Set Up Ballerina
-              uses: ballerina-platform/setup-ballerina@v1.1.3
+              uses: ballerina-platform/setup-ballerina@v1.1.5
               with:
-                version: ${{ matrix.lang-version }}
+                version: ${{ matrix.setup-ballerina-version }}
 
             - name: Set up JDK ${{ matrix.java-version }}
               uses: actions/setup-java@v3
