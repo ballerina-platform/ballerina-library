@@ -984,7 +984,7 @@
         },
         {
             "name": "module-ballerinax-redis",
-            "module_version": "3.4.2-SNAPSHOT",
+            "module_version": "3.5.0-SNAPSHOT",
             "level": 100,
             "default_branch": "master",
             "version_key": "stdlibRedisVersion",
@@ -1906,7 +1906,7 @@
         },
         {
             "name": "persist-tools",
-            "module_version": "1.9.3-SNAPSHOT",
+            "module_version": "1.9.4-SNAPSHOT",
             "level": 14,
             "default_branch": "main",
             "version_key": "stdlibPersist-toolsVersion",
