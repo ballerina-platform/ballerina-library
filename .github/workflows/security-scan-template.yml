@@ -305,6 +305,59 @@ jobs:
           sarif_file: scan-sarif-for-upload-examples.sarif
           category: bal-scan-examples
 
+      # Runs before the fail step (rather than being folded into it) so the summary is
+      # always written even when there's nothing to fail on -- and so it still renders
+      # if a later step is skipped, since summary content only comes from steps that
+      # actually ran.
+      - name: Write scan summary
+        if: always()
+        run: |
+          # Per-package rows go to a group's own table so the job summary mirrors the
+          # library vs. examples split used everywhere else (artifacts, categories).
+          summarize_group() {
+            local title="$1" list="$2"
+            local vuln=0 smell=0
+
+            if [ ! -s "$list" ]; then
+              echo "### $title"
+              echo
+              echo "No packages found."
+              echo
+              return
+            fi
+
+            echo "### $title"
+            echo
+            echo "| Package | Vulnerabilities | Code smells |"
+            echo "| --- | --- | --- |"
+            while IFS= read -r pkg; do
+              [ -z "$pkg" ] && continue
+              f="$pkg/target/report/scan_results.sarif"
+              # if: always() means this can run after "Run bal scan" failed partway
+              # through, leaving a later package's sarif missing -- report that package
+              # as unscanned rather than letting the arithmetic below choke on it.
+              if [ ! -f "$f" ]; then
+                echo "| $pkg | _scan did not complete_ | _scan did not complete_ |"
+                continue
+              fi
+              v=$(jq '[.runs[].results[] | select(.level == "warning")] | length' "$f")
+              s=$(jq '[.runs[].results[] | select(.level == "note")] | length' "$f")
+              echo "| $pkg | $v | $s |"
+              vuln=$((vuln + v))
+              smell=$((smell + s))
+            done < "$list"
+            echo "| **Total** | **$vuln** | **$smell** |"
+            echo
+          }
+
+          {
+            echo "## bal scan results"
+            echo
+            summarize_group "Library" library-packages.txt
+            summarize_group "Examples" example-packages.txt
+            echo "Full HTML reports: the \`bal-scan-report-library\` and \`bal-scan-report-examples\` artifacts on this run. Vulnerability findings are also uploaded to the Security > Code scanning tab under the \`bal-scan-library\` and \`bal-scan-examples\` categories."
+          } >> "$GITHUB_STEP_SUMMARY"
+
       # bal scan derives SARIF `level` from rule kind, not true severity:
       # VULNERABILITY rules -> warning, CODE_SMELL rules -> note, and nothing is ever
       # `error` (no rule is classified BUG yet). Fails on `warning` from either group --
