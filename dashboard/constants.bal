@@ -62,6 +62,7 @@ const HEADER_SEPARATOR_DRIVER_MODULES = "|:---:|:---:|:---:|:---:|";
 const HEADER_SEPARATOR_TOOLS = "|:---:|:---:|:---:|:---:|:---:|:---:|:---:|";
 
 const TITLE_LIBRARY_MODULES = "### Ballerina Modules";
+const TITLE_CENTRAL_ONLY_MODULES = "### Ballerina Central-Only Modules";
 const TITLE_EXTENDED_MODULES = "### Ballerina Extended Modules";
 const TITLE_HANDWRITTEN_CONNECTORS = "### Ballerina Handwritten Connector Modules";
 const TITLE_GENERATED_CONNECTORS = "### Ballerina Generated Connector Modules";
@@ -69,7 +70,8 @@ const TITLE_DRIVER_MODULES = "### Ballerina Driver Modules";
 const TITLE_TOOLS = "### Ballerina Tools";
 
 const DESCRIPTION_LIBRARY_MODULES = "These modules are published under the `ballerina` organization and packed with the Ballerina distribution.";
-const DESCRIPTION_EXTENDED_MODULES = "These modules are protocol modules that are not packed with the Ballerina distribution.";
+const DESCRIPTION_CENTRAL_ONLY_MODULES = "These modules are published under the `ballerina` organization but are not packed with the Ballerina distribution. They are published to Ballerina Central and resolved from there at build time.";
+const DESCRIPTION_EXTENDED_MODULES = "These modules extend the Ballerina library capabilities. They are published under the `ballerinax` organization and are not packed with the Ballerina distribution.";
 const DESCRIPTION_HANDWRITTEN_CONNECTORS = "These are the handwritten Ballerina connector modules that are used to connect to third-party services. They are published under the `ballerinax` organization ";
 const DESCRIPTION_GENERATED_CONNECTORS = "These are the generated Ballerina connector modules that are used to connect to third-party services. They are published under the `ballerinax` organization. The modules are generated using the Ballerina OpenAPI tool using the third-party service's OpenAPI definition. Since these are auto-generated, they only contain a smoke test suite rather than a comprehensive test suite. Due to this nature, the code coverage and load test results are not applicable for these modules. Some repositories such as `sap.s4hana.sales` contain multiple connectors which are highly co-related. These have multiple releases and thus not indicated here.";
 const DESCRIPTION_DRIVER_MODULES = "These Ballerina modules bundle database drivers, making it easier to use Ballerina database connectors. They are published under the `ballerinax` organization. Only daily build, latest release, and security checks are applicable to these modules.";
