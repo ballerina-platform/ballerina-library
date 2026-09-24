@@ -30,7 +30,10 @@ jobs:
           BAL_VERSION="nightly"
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             EXTRACTED="$(grep -E '^\s*ballerinaLangVersion\s*=' gradle.properties | head -n 1 | cut -d= -f2- | xargs || true)"
-            if [[ -n "${EXTRACTED}" ]]; then
+            # A timestamped snapshot ballerinaLangVersion has no distribution zip published, so it
+            # can't be resolved by setup-ballerina - mirror the ballerina-gradle-plugin's own
+            # isTimeStampVersion check (any hyphen) and keep the "nightly" default for that case.
+            if [[ -n "${EXTRACTED}" && "${EXTRACTED}" != *-* ]]; then
               BAL_VERSION="${EXTRACTED}"
             fi
           fi

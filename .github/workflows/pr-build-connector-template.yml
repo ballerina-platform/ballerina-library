@@ -28,8 +28,14 @@ jobs:
 
             - name: Get Ballerina Version
               run: |
-                BAL_VERSION=$(grep -w 'ballerinaLangVersion' gradle.properties | cut -d= -f2 | rev | cut --complement -d- -f1 | rev)
-                if [ -z "$BAL_VERSION" ]; then
+                LANG_VERSION=$(grep -w 'ballerinaLangVersion' gradle.properties | cut -d= -f2 | tr -d '[:space:]')
+                # The ballerina-gradle-plugin's own isTimeStampVersion check (any hyphen in the
+                # version) is what decides whether it builds this connector against the "nightly"
+                # Docker image instead of a released one - setup-ballerina needs to match that here,
+                # since no distribution zip is published for a timestamped snapshot version.
+                if [[ "$LANG_VERSION" == *-* ]]; then
+                  BAL_VERSION="nightly"
+                else
                   BAL_VERSION="latest"
                 fi
                 echo "BAL_VERSION=$BAL_VERSION" >> $GITHUB_ENV
@@ -100,11 +106,6 @@ jobs:
                 # that tier, not just the current distribution rebuilt under a newer JDK.
                 JAVA_TIERS=(11 17 21 25)
                 DEFAULT_LANG_VERSIONS=("" "2201.8.0" "2201.11.0" "2201.14.0-20260911-112100-0f421c6f")
-                # setup-ballerina downloads a real dist.ballerina.io release for a released
-                # lang-version, but the newest tier's lang-version above is a timestamped snapshot
-                # used only to resolve the ballerina-runtime Gradle dependency - no such distribution
-                # zip is published, so that tier's CLI must come from the "nightly" build instead.
-                SETUP_BALLERINA_VERSIONS=("" "2201.8.0" "2201.11.0" "nightly")
 
                 CURRENT_JAVA="${{ steps.current.outputs.java-version }}"
                 CURRENT_INDEX=0
@@ -121,7 +122,17 @@ jobs:
                   # (seq prints nothing, without erroring, when current is already the newest)
                   for i in $(seq $(( CURRENT_INDEX + 1 )) "$LAST_INDEX"); do
                     JV="${JAVA_TIERS[$i]}"
-                    LEG="{\"java-version\":\"$JV\",\"lang-version\":\"${DEFAULT_LANG_VERSIONS[$i]}\",\"setup-ballerina-version\":\"${SETUP_BALLERINA_VERSIONS[$i]}\"}"
+                    LV="${DEFAULT_LANG_VERSIONS[$i]}"
+                    # setup-ballerina downloads a real dist.ballerina.io release for a released
+                    # lang-version, but a timestamped snapshot (used to resolve the ballerina-runtime
+                    # Gradle dependency ahead of a real release) has no distribution zip published -
+                    # mirror the ballerina-gradle-plugin's own isTimeStampVersion check (any hyphen)
+                    # and fall back to the "nightly" build for that case.
+                    SETUP_VERSION="$LV"
+                    if [[ "$LV" == *-* ]]; then
+                      SETUP_VERSION="nightly"
+                    fi
+                    LEG="{\"java-version\":\"$JV\",\"lang-version\":\"$LV\",\"setup-ballerina-version\":\"$SETUP_VERSION\"}"
                     LEGS="${LEGS:+$LEGS,}$LEG"
                   done
                 fi
