@@ -57,6 +57,7 @@ isolated function getRepoBadges(Module module) returns RepoBadges|error {
     string[] workflowFileNames = [];
     string? buildWorkflow = ();
     string? graalvmCheckWorkflow = ();
+    github:Workflow? trivyWorkflow = ();
 
     foreach github:Workflow workflow in workflowResponse.workflows {
         string workflowFileName = getWorkflowFileName(workflow.path);
@@ -65,20 +66,7 @@ isolated function getRepoBadges(Module module) returns RepoBadges|error {
             buildWorkflow = workflowFileName;
         }
         if workflowFileName == WORKFLOW_TRIVY {
-            string workflowUrl = getWorkflowUrl(moduleName, workflowFileName);
-            if workflow.state == "disabled_inactivity" {
-                repoBadges.trivy = {
-                    name: "Trivy",
-                    badgeUrl: DISABLED_BADGE,
-                    htmlUrl: workflowUrl
-                };
-            } else {
-                repoBadges.trivy = {
-                    name: "Trivy",
-                    badgeUrl: getBadgeUrl(moduleName, workflowFileName, defaultBranch),
-                    htmlUrl: workflowUrl
-                };
-            }
+            trivyWorkflow = workflow;
         }
         if workflowFileName == WORKFLOW_PROCESS_LOAD_TESTS {
             repoBadges.loadTests = {
@@ -99,6 +87,18 @@ isolated function getRepoBadges(Module module) returns RepoBadges|error {
     if graalvmCheckWorkflow is () && workflowFileNames.indexOf(WORKFLOW_BAL_TEST_NATIVE) is int {
         graalvmCheckWorkflow = WORKFLOW_BAL_TEST_NATIVE;
     }
+    // A repository generated off the connector template only ever has
+    // WORKFLOW_CONNECTOR_SECURITY_SCAN, never the standard trivy-scan.yml name -- without
+    // this fallback, every such repo's Security Check badge would permanently show "N/A"
+    // even though the workflow runs correctly.
+    if trivyWorkflow is () {
+        foreach github:Workflow workflow in workflowResponse.workflows {
+            if getWorkflowFileName(workflow.path) == WORKFLOW_CONNECTOR_SECURITY_SCAN {
+                trivyWorkflow = workflow;
+                break;
+            }
+        }
+    }
 
     if buildWorkflow is string {
         repoBadges.buildStatus = {
@@ -113,6 +113,23 @@ isolated function getRepoBadges(Module module) returns RepoBadges|error {
             badgeUrl: getBadgeUrl(moduleName, graalvmCheckWorkflow, defaultBranch),
             htmlUrl: getWorkflowUrl(moduleName, graalvmCheckWorkflow)
         };
+    }
+    if trivyWorkflow is github:Workflow {
+        string trivyWorkflowFileName = getWorkflowFileName(trivyWorkflow.path);
+        string workflowUrl = getWorkflowUrl(moduleName, trivyWorkflowFileName);
+        if trivyWorkflow.state == "disabled_inactivity" {
+            repoBadges.trivy = {
+                name: "Trivy",
+                badgeUrl: DISABLED_BADGE,
+                htmlUrl: workflowUrl
+            };
+        } else {
+            repoBadges.trivy = {
+                name: "Trivy",
+                badgeUrl: getBadgeUrl(moduleName, trivyWorkflowFileName, defaultBranch),
+                htmlUrl: workflowUrl
+            };
+        }
     }
     return repoBadges;
 }

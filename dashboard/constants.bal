@@ -85,3 +85,4 @@ const WORKFLOW_BAL_TEST_GRAALVM = "build-with-bal-test-graalvm.yml";
 // Fallback workflow files, used by the repositories created off the connector templates
 const WORKFLOW_CONNECTOR_BUILD = "ci.yml";
 const WORKFLOW_BAL_TEST_NATIVE = "build-with-bal-test-native.yml";
+const WORKFLOW_CONNECTOR_SECURITY_SCAN = "security-scan.yml";
