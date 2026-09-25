@@ -58,20 +58,23 @@ jobs:
           IFS=' ' read -ra BUILD_FLAGS <<< "${ADDITIONAL_BUILD_FLAGS//$'\n'/ }"
           ./gradlew build -x test "${BUILD_FLAGS[@]}"
 
-      # Guarantees at least one file always matches below only for the case that needs
-      # it: a module with no native subproject and no externalJars (e.g.
-      # module-ballerinax-aws.dynamodb) produces zero files for both patterns, and
-      # upload-artifact creates no artifact at all when nothing matches
-      # (if-no-files-found: warn only suppresses the failure, not the missing artifact)
-      # -- which would then fail download-artifact in both scan jobs with "Artifact not
-      # found". Gated on the real globs matching nothing so every other module doesn't
-      # permanently carry this dummy file too. Must NOT be a dotfile: upload-artifact
-      # excludes hidden files by default (include-hidden-files defaults to false), so a
-      # filename like ".keep" would silently fail to fix the problem it's there to fix.
+      # Gated on ballerina/lib specifically, not on both glob patterns together: Trivy's
+      # scan-ref below hardcodes ballerina/lib, so download-artifact must always
+      # recreate that exact directory, even for a module whose only real output is a
+      # jar matched solely by **/build/libs/*.jar elsewhere -- upload-artifact only
+      # recreates the paths a glob actually matched, so checking both patterns together
+      # (an earlier version of this fix) left ballerina/lib missing entirely for that
+      # case, breaking Trivy with "lstat ballerina/lib: no such file or directory"
+      # (caught by re-running module-ballerina-cache/io end-to-end). A module with no
+      # native subproject and no externalJars at all (e.g. module-ballerinax-aws.dynamodb)
+      # is still covered, since ballerina/lib is empty for it too. Must NOT be a
+      # dotfile: upload-artifact excludes hidden files by default (include-hidden-files
+      # defaults to false), so a filename like ".keep" would silently fail to fix the
+      # problem it's there to fix.
       - name: Ensure build output is never empty
         run: |
           mkdir -p ballerina/lib
-          if [ -z "$(find ballerina/lib -type f 2>/dev/null)" ] && [ -z "$(find . -path '*/build/libs/*.jar' 2>/dev/null)" ]; then
+          if [ -z "$(find ballerina/lib -type f 2>/dev/null)" ]; then
             touch ballerina/lib/artifact-placeholder
           fi
 
