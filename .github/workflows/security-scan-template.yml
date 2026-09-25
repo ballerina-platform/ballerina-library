@@ -24,6 +24,10 @@ jobs:
     runs-on: ubuntu-22.04
     if: github.repository_owner == 'ballerina-platform'
     steps:
+      # No caller's build is expected to shell out to git post-checkout (verified against
+      # the callers in this org), so the credential helper GitHub would otherwise persist
+      # in .git/config is dropped everywhere in this workflow as a deliberate hardening
+      # step, not an oversight.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -47,21 +51,29 @@ jobs:
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
           ADDITIONAL_BUILD_FLAGS: ${{ inputs.additional-build-flags }}
         run: |
-          read -ra BUILD_FLAGS <<< "$ADDITIONAL_BUILD_FLAGS"
+          # `read` stops at the first newline regardless of IFS, so a caller passing a
+          # multi-line YAML block scalar would silently lose every flag after the first
+          # line -- normalize embedded newlines to spaces first so the whole value is one
+          # line by the time `read` sees it.
+          IFS=' ' read -ra BUILD_FLAGS <<< "${ADDITIONAL_BUILD_FLAGS//$'\n'/ }"
           ./gradlew build -x test "${BUILD_FLAGS[@]}"
 
-      # Guarantees at least one file always matches below: a module with no native
-      # subproject and no externalJars (e.g. module-ballerinax-aws.dynamodb) produces
-      # zero files for both patterns, and upload-artifact creates no artifact at all
-      # when nothing matches (if-no-files-found: warn only suppresses the failure, not
-      # the missing artifact) -- which would then fail download-artifact in both scan
-      # jobs with "Artifact not found". Must NOT be a dotfile: upload-artifact excludes
-      # hidden files by default (include-hidden-files defaults to false), so a filename
-      # like ".keep" would silently fail to fix the problem it's there to fix.
+      # Guarantees at least one file always matches below only for the case that needs
+      # it: a module with no native subproject and no externalJars (e.g.
+      # module-ballerinax-aws.dynamodb) produces zero files for both patterns, and
+      # upload-artifact creates no artifact at all when nothing matches
+      # (if-no-files-found: warn only suppresses the failure, not the missing artifact)
+      # -- which would then fail download-artifact in both scan jobs with "Artifact not
+      # found". Gated on the real globs matching nothing so every other module doesn't
+      # permanently carry this dummy file too. Must NOT be a dotfile: upload-artifact
+      # excludes hidden files by default (include-hidden-files defaults to false), so a
+      # filename like ".keep" would silently fail to fix the problem it's there to fix.
       - name: Ensure build output is never empty
         run: |
           mkdir -p ballerina/lib
-          touch ballerina/lib/artifact-placeholder
+          if [ -z "$(find ballerina/lib -type f 2>/dev/null)" ] && [ -z "$(find . -path '*/build/libs/*.jar' 2>/dev/null)" ]; then
+            touch ballerina/lib/artifact-placeholder
+          fi
 
       # Shared with the trivy-scan and bal-scan jobs below so the package is only built
       # once: ballerina/lib is what Trivy scans, and **/build/libs/*.jar covers every
@@ -77,6 +89,11 @@ jobs:
             **/build/libs/*.jar
           if-no-files-found: warn
           retention-days: 1
+          # Preserves full Trivy scan coverage vs. the old single-job design, which
+          # scanned the live filesystem (including any dotfile) directly -- without this,
+          # a hidden file matched by the globs above would be silently dropped from the
+          # artifact before trivy-scan ever downloads it.
+          include-hidden-files: true
 
   trivy-scan:
     name: Trivy Vulnerability Scan
@@ -149,9 +166,14 @@ jobs:
           declare -a LIBRARY_PACKAGES=()
           [ -d "$SCAN_PATH" ] && LIBRARY_PACKAGES+=("$SCAN_PATH")
 
-          IFS=',' read -ra EXTRA <<< "$ADDITIONAL_SCAN_PATHS"
+          # Newlines are normalized to commas first so a caller passing a multi-line YAML
+          # block scalar (one path per line) isn't silently truncated to just its first
+          # line by `read`. Trimmed with sed rather than `xargs`, which parses its input
+          # for shell-style quoting -- a stray apostrophe in a path would otherwise abort
+          # this whole step with "unterminated quote".
+          IFS=',' read -ra EXTRA <<< "${ADDITIONAL_SCAN_PATHS//$'\n'/,}"
           for p in "${EXTRA[@]}"; do
-            p="$(echo "$p" | xargs)"
+            p="$(printf '%s' "$p" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
             [ -n "$p" ] && LIBRARY_PACKAGES+=("$p")
           done
 
@@ -176,10 +198,28 @@ jobs:
         id: resolve-bal
         uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
 
+      # setup-ballerina can only download a real dist.ballerina.io release or a nightly
+      # build, not a timestamped snapshot version. Mirrors the ballerina-gradle-plugin's
+      # own isTimeStampVersion check (any hyphen in the lang version, e.g.
+      # 2201.14.0-20260917-124200-7f273e6a) used elsewhere in this repo for the same
+      # problem -- without this, a repo whose gradle.properties pins that kind of
+      # snapshot fails "Set up Ballerina" trying to download a distribution that was
+      # never published.
+      - name: Resolve setup-ballerina version
+        id: resolve-setup-version
+        env:
+          LANG_VERSION: ${{ steps.resolve-bal.outputs.lang-version }}
+        run: |
+          SETUP_VERSION="$LANG_VERSION"
+          if [[ "$LANG_VERSION" == *-* ]]; then
+            SETUP_VERSION="nightly"
+          fi
+          echo "version=$SETUP_VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Set up Ballerina
-        uses: ballerina-platform/setup-ballerina@v1.1.3
+        uses: ballerina-platform/setup-ballerina@v1.1.5
         with:
-          version: ${{ steps.resolve-bal.outputs.lang-version }}
+          version: ${{ steps.resolve-setup-version.outputs.version }}
 
       - name: Pull the bal scan tool
         run: bal tool pull scan
@@ -257,8 +297,12 @@ jobs:
             while IFS= read -r pkg; do
               [ -z "$pkg" ] && continue
               name="$(echo "$pkg" | tr '/' '_')"
+              # SARIF permits a result with zero locations (e.g. a package/manifest-level
+              # finding); .locations[]? guards against that, since iterating a null
+              # without it would abort this whole step under the default bash -eo
+              # pipefail, failing the job for one location-less finding elsewhere.
               jq --arg prefix "$pkg/" '
-                (.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |= ($prefix + .)
+                (.runs[].results[].locations[]?.physicalLocation.artifactLocation.uri) |= ($prefix + .)
               ' "$pkg/target/report/scan_results.sarif" > "$tmpdir/$name.sarif"
             done < "$list"
 
@@ -340,7 +384,12 @@ jobs:
                 echo "| $pkg | _scan did not complete_ | _scan did not complete_ |"
                 continue
               fi
-              v=$(jq '[.runs[].results[] | select(.level == "warning")] | length' "$f")
+              # Anything other than `note` is fail-worthy, not just `warning`: today bal
+              # scan only ever emits warning (VULNERABILITY) or note (CODE_SMELL), but
+              # this way a future rule kind mapped to a different level (e.g. `error`)
+              # still counts as a vulnerability by default instead of being silently
+              # invisible to both the summary and the gate below.
+              v=$(jq '[.runs[].results[] | select(.level != "note")] | length' "$f")
               s=$(jq '[.runs[].results[] | select(.level == "note")] | length' "$f")
               echo "| $pkg | $v | $s |"
               vuln=$((vuln + v))
@@ -358,13 +407,14 @@ jobs:
             echo "Full HTML reports: the \`bal-scan-report-library\` and \`bal-scan-report-examples\` artifacts on this run. Vulnerability findings are also uploaded to the Security > Code scanning tab under the \`bal-scan-library\` and \`bal-scan-examples\` categories."
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # bal scan derives SARIF `level` from rule kind, not true severity:
-      # VULNERABILITY rules -> warning, CODE_SMELL rules -> note, and nothing is ever
-      # `error` (no rule is classified BUG yet). Fails on `warning` from either group --
-      # a real vulnerability in an example is still a real vulnerability, just reported
-      # separately from the library's own -- while `note` (code smells) are visible in
-      # the uploaded reports but never fail the job, since existing style debt
-      # shouldn't break nightly runs across the org.
+      # bal scan derives SARIF `level` from rule kind, not true severity: VULNERABILITY
+      # rules -> warning, CODE_SMELL rules -> note. Fails on anything other than `note`
+      # from either group (not just `warning` specifically), so a future rule kind
+      # mapped to a different level (e.g. `error`) still fails loud by default instead of
+      # silently passing -- a real vulnerability in an example is still a real
+      # vulnerability, just reported separately from the library's own -- while `note`
+      # (code smells) are visible in the uploaded reports but never fail the job, since
+      # existing style debt shouldn't break nightly runs across the org.
       - name: Fail the job if vulnerabilities are found
         run: |
           # Diagnostics go to stderr so the $(...) capture below only ever sees the
@@ -376,11 +426,20 @@ jobs:
             while IFS= read -r pkg; do
               [ -z "$pkg" ] && continue
               f="$pkg/target/report/scan_results.sarif"
-              v=$(jq '[.runs[].results[] | select(.level == "warning")] | length' "$f")
+              # A $(...) command substitution doesn't inherit errexit, so without this
+              # guard a jq failure here wouldn't abort the loop -- it would just leave
+              # v/s empty, arithmetic-expand to 0, and this function would report success
+              # (0 vulnerabilities) to the caller instead of failing loud. Currently
+              # unreachable in practice, since "Run bal scan" already validates every
+              # SARIF file the same way before this step runs -- but that's an incidental
+              # ordering guarantee, not one this function enforces itself.
+              test -f "$f" || { echo "::error::$f is missing for package '$pkg'"; exit 1; }
+              jq -e '.runs[0]' "$f" > /dev/null || { echo "::error::$f has no runs for package '$pkg'"; exit 1; }
+              v=$(jq '[.runs[].results[] | select(.level != "note")] | length' "$f")
               s=$(jq '[.runs[].results[] | select(.level == "note")] | length' "$f")
               echo "$pkg: $v vulnerability finding(s), $s code smell finding(s)" >&2
               if [ "$v" -gt 0 ]; then
-                jq '[.runs[].results[] | select(.level == "warning")]' "$f" >&2
+                jq '[.runs[].results[] | select(.level != "note")]' "$f" >&2
               fi
               vuln=$((vuln + v))
               smell=$((smell + s))
@@ -388,8 +447,15 @@ jobs:
             echo "$vuln $smell"
           }
 
-          read -r LIB_VULN LIB_SMELL <<< "$(count_group library library-packages.txt)"
-          read -r EX_VULN EX_SMELL <<< "$(count_group examples example-packages.txt)"
+          # `exit 1` inside count_group only exits the command-substitution subshell, not
+          # this script -- read -r ... <<< "$(count_group ...)" would silently swallow
+          # that failure (read still succeeds against whatever partial output was
+          # written, leaving the missing variable empty) rather than aborting. Capturing
+          # into a variable first and checking $? explicitly propagates it correctly.
+          LIB_OUTPUT="$(count_group library library-packages.txt)" || exit 1
+          read -r LIB_VULN LIB_SMELL <<< "$LIB_OUTPUT"
+          EX_OUTPUT="$(count_group examples example-packages.txt)" || exit 1
+          read -r EX_VULN EX_SMELL <<< "$EX_OUTPUT"
 
           echo "Library: $LIB_VULN vulnerability finding(s), $LIB_SMELL code smell finding(s). See the bal-scan-report-library artifact for details."
           echo "Examples: $EX_VULN vulnerability finding(s), $EX_SMELL code smell finding(s). See the bal-scan-report-examples artifact for details."

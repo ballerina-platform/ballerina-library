@@ -11,6 +11,18 @@ on:
         required: false
         type: string
         default: ""
+      # Forwarded through so an existing caller with a non-standard layout (no
+      # top-level ballerina/ package, e.g. json-schema-tools, asyncapi-tools) can still
+      # override them here -- without these, such a caller has no way to avoid
+      # security-scan-template.yml's "No Ballerina packages found to scan" failure.
+      scan-path:
+        required: false
+        type: string
+        default: "ballerina"
+      additional-scan-paths:
+        required: false
+        type: string
+        default: ""
 
 jobs:
   forward:
@@ -18,3 +30,5 @@ jobs:
     secrets: inherit
     with:
       additional-build-flags: ${{ inputs.additional-build-flags }}
+      scan-path: ${{ inputs.scan-path }}
+      additional-scan-paths: ${{ inputs.additional-scan-paths }}
