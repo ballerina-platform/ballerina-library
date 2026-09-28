@@ -9,6 +9,9 @@ on:
         type: choice
         options:
           - Generated Connector Template (Standard)
+          - Library Template
+          - Library Template (Native)
+          - Connector Template
       target_repo:
         description: 'The repository where the selected template will be applied.'
         required: true
@@ -34,6 +37,17 @@ on:
         description: 'The CODEOWNERS of the repository'
         required: true
         default: ''
+      distribution:
+        description: 'Connector Template only: build against a released Ballerina distribution (connector workflows) or the timestamped lang version (stdlib workflows and release pipeline).'
+        default: 'Released'
+        type: choice
+        options:
+          - Released
+          - Timestamped
+      compiler_plugin:
+        description: 'Library Template (Native) and Connector Template only: add a compiler plugin module.'
+        default: false
+        type: boolean
 
 jobs:
   apply_templates:
@@ -49,6 +63,41 @@ jobs:
           echo "Target Branch: ${{ github.event.inputs.target_branch }}"
           echo "Library Name: ${{ github.event.inputs.library_name }}"
           echo "Code Owners: ${{ github.event.inputs.code_owners }}"
+          echo "Distribution: ${{ github.event.inputs.distribution }}"
+          echo "Compiler Plugin: ${{ github.event.inputs.compiler_plugin }}"
+
+      - name: Resolve template
+        env:
+          TEMPLATE_TYPE: ${{ github.event.inputs.template_type }}
+          DISTRIBUTION: ${{ github.event.inputs.distribution }}
+          COMPILER_PLUGIN: ${{ github.event.inputs.compiler_plugin }}
+        run: |
+          FEATURES=""
+          case "$TEMPLATE_TYPE" in
+            "Generated Connector Template (Standard)") TEMPLATE="generated-connector-template" ;;
+            "Library Template") TEMPLATE="library-template" ;;
+            "Library Template (Native)") TEMPLATE="library-native-template" ;;
+            "Connector Template")
+              TEMPLATE="connector-template"
+              if [[ "$DISTRIBUTION" == "Timestamped" ]]; then
+                FEATURES="timestamped-distribution"
+              else
+                FEATURES="released-distribution"
+              fi
+              ;;
+            *) echo "::error::Unknown template type: $TEMPLATE_TYPE"; exit 1 ;;
+          esac
+          if [[ "$COMPILER_PLUGIN" == "true" ]]; then
+            if [[ "$TEMPLATE" != "library-native-template" && "$TEMPLATE" != "connector-template" ]]; then
+              echo "::error::The compiler plugin is supported only by the Library Template (Native) and the Connector Template"
+              exit 1
+            fi
+            FEATURES="${FEATURES:+$FEATURES,}compiler-plugin"
+          fi
+          echo "TEMPLATE=$TEMPLATE" >> $GITHUB_ENV
+          echo "FEATURES=$FEATURES" >> $GITHUB_ENV
+          echo "Template: $TEMPLATE, Features: $FEATURES"
+
       - name: Checkout template repository
         uses: actions/checkout@v3
         with:
@@ -69,10 +118,11 @@ jobs:
       - name: Apply templates and replace placeholders
         run: |
           bal run template-repo/repo-templates/scripts/apply_template.bal -- \
-            template-repo/repo-templates/generated-connector-template target-repo \
+            "template-repo/repo-templates/$TEMPLATE" target-repo \
             "${{ github.event.inputs.module_name }}" "${{ github.event.inputs.target_repo }}" \
             "${{ github.event.inputs.module_version }}" "${{ github.event.inputs.ballerina_version }}" \
-            --name="${{ github.event.inputs.library_name }}" --codeOwners="${{ github.event.inputs.code_owners }}"
+            --name="${{ github.event.inputs.library_name }}" --codeOwners="${{ github.event.inputs.code_owners }}" \
+            --features="$FEATURES"
           cd target-repo
           git config user.name "ballerina-bot"
           git config user.email "ballerina-bot@ballerina.org"
