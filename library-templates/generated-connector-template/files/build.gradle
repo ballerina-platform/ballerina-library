@@ -57,7 +57,7 @@ allprojects {
 
 def moduleVersion = project.version.replace("-SNAPSHOT", "")
 
-task build {
+tasks.named('build') {
     dependsOn(':{{MODULE_NAME_CC}}-ballerina:build')
 }
 
