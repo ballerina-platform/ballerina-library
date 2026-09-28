@@ -33,10 +33,12 @@ jobs:
                 # version) is what decides whether it builds this connector against the "nightly"
                 # Docker image instead of a released one - setup-ballerina needs to match that here,
                 # since no distribution zip is published for a timestamped snapshot version.
-                if [[ "$LANG_VERSION" == *-* ]]; then
+                if [[ -z "$LANG_VERSION" ]]; then
+                  BAL_VERSION="latest"
+                elif [[ "$LANG_VERSION" == *-* ]]; then
                   BAL_VERSION="nightly"
                 else
-                  BAL_VERSION="latest"
+                  BAL_VERSION="$LANG_VERSION"
                 fi
                 echo "BAL_VERSION=$BAL_VERSION" >> $GITHUB_ENV
                 echo "Ballerina Version: $BAL_VERSION"
