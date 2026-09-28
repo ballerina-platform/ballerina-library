@@ -33,6 +33,7 @@ def ballerinaDist = "${project.rootDir}/target/ballerina-runtime"
 // TODO: Add the paths of the example Ballerina packages relative to this directory, e.g. "order-manager/order-service"
 def examples = []
 def packageName = "{{MODULE_NAME_CC}}"
+def graalvmFlag = project.hasProperty("balGraalVMTest") ? "--graalvm" : ""
 
 clean {
     examples.forEach { example ->
@@ -48,9 +49,9 @@ task testExamples {
                 execHelper.execOperations.exec {
                     workingDir project.projectDir
                     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                        commandLine 'cmd', '/c', "${ballerinaDist}/bin/bal.bat test --offline ${example} && exit %%ERRORLEVEL%%"
+                        commandLine 'cmd', '/c', "${ballerinaDist}/bin/bal.bat test --offline ${graalvmFlag} ${example} && exit %%ERRORLEVEL%%"
                     } else {
-                        commandLine 'sh', '-c', "${ballerinaDist}/bin/bal test --offline ${example}"
+                        commandLine 'sh', '-c', "${ballerinaDist}/bin/bal test --offline ${graalvmFlag} ${example}"
                     }
                 }
             } catch (Exception e) {
@@ -76,9 +77,9 @@ task buildExamples {
                 execHelper.execOperations.exec {
                     workingDir project.projectDir
                     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                        commandLine 'cmd', '/c', "${ballerinaDist}/bin/bal.bat build ${example} && exit %%ERRORLEVEL%%"
+                        commandLine 'cmd', '/c', "${ballerinaDist}/bin/bal.bat build --offline ${example} && exit %%ERRORLEVEL%%"
                     } else {
-                        commandLine 'sh', '-c', "${ballerinaDist}/bin/bal build ${example}"
+                        commandLine 'sh', '-c', "${ballerinaDist}/bin/bal build --offline ${example}"
                     }
                 }
             } catch (Exception e) {

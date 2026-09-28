@@ -20,15 +20,17 @@ import ballerina/lang.regexp;
 import ballerina/log;
 import ballerina/time;
 
-// Define file extensions to be accepted as template files
 public type TemplateFileType "bal"|"md"|"json"|"yaml"|"yml"|"toml"|"gradle"|"properties"|"gitignore"|"gitattributes"
     |"txt"|"sh"|"bat"|"java"|"xml"|"LICENSE"|"CODEOWNERS";
 
 const FILES_DIR = "files";
 const FEATURES_DIR = "features";
+const TEMPLATE_CONFIG_FILE = "template.json";
 
 // Local build outputs that may exist inside a template directory but must never be copied
 final string[] SKIP_DIRS = [".git", ".gradle", "build", "target"];
+
+final regexp:RegExp PLACEHOLDER_PATTERN = re `\{\{[#/]?[A-Z_]+\}\}`;
 
 # Optional arguments of the template generator.
 #
@@ -39,6 +41,13 @@ public type Options record {|
     string name = "";
     string codeOwners = "";
     string features = "";
+|};
+
+# The optional `template.json` configuration of a template.
+#
+# + exactlyOneOf - Groups of features of which exactly one must be enabled
+type TemplateConfig record {|
+    string[][] exactlyOneOf = [];
 |};
 
 # This function generates a module repository from the given template with the given metadata.
@@ -74,10 +83,11 @@ public function main(string templateDir, string targetDir, string moduleName, st
     }
     string[] featureDirs = check getFeatureDirs(templateDir, features);
 
+    string moduleNameCc = moduleName[0].toLowerAscii() + moduleName.substring(1);
     map<string> placeholders = {
         "MODULE_NAME_PC": options.name == "" ? capitalize(moduleName) : options.name,
-        "MODULE_NAME_CC": moduleName[0].toLowerAscii() + moduleName.substring(1),
-        "MODULE_PATH": re `\.`.replaceAll(moduleName, "/"),
+        "MODULE_NAME_CC": moduleNameCc,
+        "MODULE_PATH": re `\.`.replaceAll(moduleNameCc, "/"),
         "MODULE_CLASS_PREFIX": "".'join(...from string segment in regexp:split(re `\.`, moduleName)
             select capitalize(segment)),
         "REPO_NAME": repoName,
@@ -91,6 +101,14 @@ public function main(string templateDir, string targetDir, string moduleName, st
 
     // Stage the output so that the pre-existing files in the target directory are never processed
     string stagingDir = check file:createTempDir();
+    error? result = generate(filesDir, featureDirs, stagingDir, targetDir, placeholders, enabledFlags);
+    check file:remove(stagingDir, file:RECURSIVE);
+    check result;
+    log:printInfo(string `Generated the module repository at: ${targetDir}`);
+}
+
+function generate(string filesDir, string[] featureDirs, string stagingDir, string targetDir,
+        map<string> placeholders, string[] enabledFlags) returns error? {
     check copyDirectory(filesDir, stagingDir);
     foreach string featureDir in featureDirs {
         check copyDirectory(featureDir, stagingDir);
@@ -98,8 +116,6 @@ public function main(string templateDir, string targetDir, string moduleName, st
     check processDirectory(stagingDir, placeholders, enabledFlags);
     check renamePaths(stagingDir, placeholders);
     check copyDirectory(stagingDir, targetDir);
-    check file:remove(stagingDir, file:RECURSIVE);
-    log:printInfo(string `Generated the module repository at: ${targetDir}`);
 }
 
 function getFeatureDirs(string templateDir, string[] features) returns string[]|error {
@@ -120,7 +136,25 @@ function getFeatureDirs(string templateDir, string[] features) returns string[]|
         }
         featureDirs.push(check file:joinPath(featuresDir, feature));
     }
+    check validateFeatureGroups(templateDir, features);
     return featureDirs;
+}
+
+function validateFeatureGroups(string templateDir, string[] features) returns error? {
+    string configPath = check file:joinPath(templateDir, TEMPLATE_CONFIG_FILE);
+    if !check file:test(configPath, file:EXISTS) {
+        return;
+    }
+    TemplateConfig config = check (check io:fileReadJson(configPath)).cloneWithType();
+    foreach string[] group in config.exactlyOneOf {
+        string[] enabled = from string feature in group
+            where features.indexOf(feature) is int
+            select feature;
+        if enabled.length() != 1 {
+            return error(string `Template ${templateDir} requires exactly one of the features ${group.toString()}, but got ${
+                enabled.toString()}`);
+        }
+    }
 }
 
 function copyDirectory(string sourceDir, string targetDir) returns error? {
@@ -156,6 +190,10 @@ function processFile(string filePath, map<string> placeholders, string[] enabled
     int? lastDotIndex = fileName.lastIndexOf(".");
     string ext = lastDotIndex is int ? fileName.substring(lastDotIndex + 1) : fileName;
     if ext !is TemplateFileType {
+        string|error content = string:fromBytes(check io:fileReadBytes(filePath));
+        if content is string && PLACEHOLDER_PATTERN.find(content) is regexp:Span {
+            return error(string `Placeholder found in ${filePath}, whose file type is not in TemplateFileType`);
+        }
         log:printInfo(string `Skipping file: ${fileName}`);
         return;
     }
@@ -164,7 +202,7 @@ function processFile(string filePath, map<string> placeholders, string[] enabled
     foreach [string, string] [placeholder, value] in placeholders.entries() {
         content = re `\{\{${placeholder}\}\}`.replaceAll(content, value);
     }
-    regexp:Span? unresolved = re `\{\{[#/]?[A-Z_]+\}\}`.find(content);
+    regexp:Span? unresolved = PLACEHOLDER_PATTERN.find(content);
     if unresolved is regexp:Span {
         return error(string `Unresolved placeholder '${unresolved.substring()}' in ${filePath}`);
     }
@@ -231,6 +269,10 @@ function renamePaths(string dir, map<string> placeholders) returns error? {
         string newName = name;
         foreach [string, string] [placeholder, value] in placeholders.entries() {
             newName = re `\{\{${placeholder}\}\}`.replaceAll(newName, value);
+        }
+        regexp:Span? unresolved = PLACEHOLDER_PATTERN.find(newName);
+        if unresolved is regexp:Span {
+            return error(string `Unresolved placeholder '${unresolved.substring()}' in the name of ${meta.absPath}`);
         }
         string newPath = check file:joinPath(dir, ...regexp:split(re `/`, newName));
         string newParent = check file:parentPath(newPath);

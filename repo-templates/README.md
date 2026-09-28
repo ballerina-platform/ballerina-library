@@ -33,7 +33,7 @@ The following placeholders are replaced in the file contents and the file and di
 | --- | --- | --- |
 | `{{MODULE_NAME_CC}}` | The module name with the first letter in lower case | `aws.s3` |
 | `{{MODULE_NAME_PC}}` | The descriptive name if given, otherwise the module name with the first letter in upper case | `AWS S3` |
-| `{{MODULE_PATH}}` | The module name with `.` replaced by `/`, used for the Java package directories | `aws/s3` |
+| `{{MODULE_PATH}}` | `{{MODULE_NAME_CC}}` with `.` replaced by `/`, used for the Java package directories | `aws/s3` |
 | `{{MODULE_CLASS_PREFIX}}` | The PascalCase of the dot-separated module name segments, used for the Java class names | `AwsS3` |
 | `{{REPO_NAME}}` | The repository name | `module-ballerinax-aws.s3` |
 | `{{MODULE_VERSION}}` | The initial module version | `0.1.0` |
@@ -77,7 +77,7 @@ Run the script from the root of this repository:
 bal run repo-templates/scripts/apply_template.bal -- <template-dir> <target-dir> <module-name> <repo-name> <module-version> <ballerina-version> [--name=<descriptive-name>] [--codeOwners=<code-owners>] [--features=<comma-separated-features>]
 ```
 
-The script copies the template files and the enabled feature overlays into a staging directory, replaces the placeholders there, and then copies the result into the target directory. The files already in the target directory, such as `.git`, are kept, and files with the same path are overwritten. The script fails on an unknown feature or an unresolved placeholder.
+The script copies the template files and the enabled feature overlays into a staging directory, replaces the placeholders there, and then copies the result into the target directory. The files already in the target directory, such as `.git`, are kept, and files with the same path are overwritten. The script fails on an unknown feature, a feature combination that the template does not allow, or an unresolved placeholder in a file or a file name.
 
 Examples:
 
@@ -123,7 +123,10 @@ Each template directory has the following structure:
 <template>/
   files/                 # The base files, always applied
   features/<feature>/    # Optional overlays, copied on top of the base files when the feature is enabled
+  template.json          # Optional constraints on the features
 ```
+
+The `exactlyOneOf` entry of `template.json` lists the groups of features of which exactly one must be enabled, such as the distribution features of the `connector-template`.
 
 The content that depends on a feature is written between whole-line markers, which can be placed inside the comments of the file type:
 
@@ -135,4 +138,4 @@ include ':{{MODULE_NAME_CC}}-compiler-plugin'
 
 The marker name is the feature name in upper snake case. The lines between the markers are kept only when the feature is enabled, and the marker lines are always removed. The markers can be nested. The markers of a feature that a template does not have are treated as disabled.
 
-To add a new placeholder, add it to the `placeholders` map in [`apply_template.bal`](scripts/apply_template.bal) and document it above. The script processes only the file types in `TemplateFileType`, so add the extension there when adding a new type of text file. Verify the changes by generating a repository for each affected combination of features and building it.
+To add a new placeholder, add it to the `placeholders` map in [`apply_template.bal`](scripts/apply_template.bal) and document it above. The script processes only the file types in `TemplateFileType`, and fails on a placeholder in any other file, so add the extension there when adding a new type of text file. Verify the changes by generating a repository for each affected combination of features and building it.

@@ -16,4 +16,8 @@ jobs:
     if: ${{ github.repository_owner == 'ballerina-platform' }}
     uses: ballerina-platform/ballerina-library/.github/workflows/build-with-bal-test-graalvm-connector-template.yml@main
     with:
-      additional-build-flags: "-x :{{MODULE_NAME_CC}}-examples:build"
+      additional-build-flags: >-
+        -x :{{MODULE_NAME_CC}}-examples:build
+        # {{#COMPILER_PLUGIN}}
+        -x :{{MODULE_NAME_CC}}-compiler-plugin-tests:test
+        # {{/COMPILER_PLUGIN}}
