@@ -67,12 +67,13 @@ jobs:
           version: latest
 
       - name: Apply templates and replace placeholders
-        if: ${{ github.event.inputs.template_type }} == 'Generated Connector Template (Standard)'
         run: |
-          cp -r template-repo/library-templates/generated-connector-template/files/. target-repo/
-          cd template-repo/library-templates/generated-connector-template/scripts/
-          bal run replace_placeholders.bal -- ../../../../target-repo/ ${{ github.event.inputs.module_name }} ${{ github.event.inputs.target_repo }} ${{ github.event.inputs.module_version }} ${{ github.event.inputs.ballerina_version }} "${{ github.event.inputs.library_name }}" "${{ github.event.inputs.code_owners }}"
-          cd ../../../../target-repo
+          bal run template-repo/repo-templates/scripts/apply_template.bal -- \
+            template-repo/repo-templates/generated-connector-template target-repo \
+            "${{ github.event.inputs.module_name }}" "${{ github.event.inputs.target_repo }}" \
+            "${{ github.event.inputs.module_version }}" "${{ github.event.inputs.ballerina_version }}" \
+            --name="${{ github.event.inputs.library_name }}" --codeOwners="${{ github.event.inputs.code_owners }}"
+          cd target-repo
           git config user.name "ballerina-bot"
           git config user.email "ballerina-bot@ballerina.org"
           git checkout -b apply-templates-${{ github.run_number }}
