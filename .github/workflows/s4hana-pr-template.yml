@@ -87,9 +87,13 @@ jobs:
 
       - name: Get Ballerina Version
         run: |
-          BAL_VERSION=$(grep -w 'ballerinaLangVersion' gradle.properties | cut -d= -f2 | rev | cut --complement -d- -f1 | rev)
-          if [ -z "$BAL_VERSION" ]; then
+          LANG_VERSION=$(grep -w 'ballerinaLangVersion' gradle.properties | cut -d= -f2 | tr -d '[:space:]')
+          if [[ -z "$LANG_VERSION" ]]; then
             BAL_VERSION="latest"
+          elif [[ "$LANG_VERSION" == *-* ]]; then
+            BAL_VERSION="nightly"
+          else
+            BAL_VERSION="$LANG_VERSION"
           fi
           echo "BAL_VERSION=$BAL_VERSION" >> $GITHUB_ENV
           echo "Ballerina Version: $BAL_VERSION"
