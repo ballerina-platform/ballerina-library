@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/ballerina-platform/{{REPO_NAME}}/actions/workflows/build-timestamped-master.yml/badge.svg)](https://github.com/ballerina-platform/{{REPO_NAME}}/actions/workflows/build-timestamped-master.yml)
 [![codecov](https://codecov.io/gh/ballerina-platform/{{REPO_NAME}}/branch/main/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/{{REPO_NAME}})
-[![Trivy](https://github.com/ballerina-platform/{{REPO_NAME}}/actions/workflows/trivy-scan.yml/badge.svg)](https://github.com/ballerina-platform/{{REPO_NAME}}/actions/workflows/trivy-scan.yml)
+[![Security Scan](https://github.com/ballerina-platform/{{REPO_NAME}}/actions/workflows/security-scan.yml/badge.svg)](https://github.com/ballerina-platform/{{REPO_NAME}}/actions/workflows/security-scan.yml)
 [![GraalVM Check](https://github.com/ballerina-platform/{{REPO_NAME}}/actions/workflows/build-with-bal-test-graalvm.yml/badge.svg)](https://github.com/ballerina-platform/{{REPO_NAME}}/actions/workflows/build-with-bal-test-graalvm.yml)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/{{REPO_NAME}}.svg)](https://github.com/ballerina-platform/{{REPO_NAME}}/commits/main)
 [![GitHub Issues](https://img.shields.io/github/issues/ballerina-platform/ballerina-library/module/{{MODULE_NAME_CC}}.svg?label=Open%20Issues)](https://github.com/ballerina-platform/ballerina-library/labels/module%2F{{MODULE_NAME_CC}})
