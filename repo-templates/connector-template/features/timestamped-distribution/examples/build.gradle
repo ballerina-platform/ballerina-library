@@ -49,7 +49,7 @@ task testExamples {
                 execHelper.execOperations.exec {
                     workingDir project.projectDir
                     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                        commandLine 'cmd', '/c', "${ballerinaDist}/bin/bal.bat test --offline ${graalvmFlag} ${example} && exit %%ERRORLEVEL%%"
+                        commandLine 'cmd', '/c', "${ballerinaDist}/bin/bal.bat test --offline ${graalvmFlag} ${example} && exit %ERRORLEVEL%"
                     } else {
                         commandLine 'sh', '-c', "${ballerinaDist}/bin/bal test --offline ${graalvmFlag} ${example}"
                     }
@@ -77,7 +77,7 @@ task buildExamples {
                 execHelper.execOperations.exec {
                     workingDir project.projectDir
                     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-                        commandLine 'cmd', '/c', "${ballerinaDist}/bin/bal.bat build --offline ${example} && exit %%ERRORLEVEL%%"
+                        commandLine 'cmd', '/c', "${ballerinaDist}/bin/bal.bat build --offline ${example} && exit %ERRORLEVEL%"
                     } else {
                         commandLine 'sh', '-c', "${ballerinaDist}/bin/bal build --offline ${example}"
                     }

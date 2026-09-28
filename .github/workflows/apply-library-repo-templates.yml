@@ -52,19 +52,20 @@ on:
 jobs:
   apply_templates:
     runs-on: ubuntu-22.04
+    env:
+      TEMPLATE_TYPE: ${{ github.event.inputs.template_type }}
+      TARGET_REPO: ${{ github.event.inputs.target_repo }}
+      MODULE_NAME: ${{ github.event.inputs.module_name }}
+      BALLERINA_VERSION: ${{ github.event.inputs.ballerina_version }}
+      MODULE_VERSION: ${{ github.event.inputs.module_version }}
+      TARGET_BRANCH: ${{ github.event.inputs.target_branch }}
+      LIBRARY_NAME: ${{ github.event.inputs.library_name }}
+      CODE_OWNERS: ${{ github.event.inputs.code_owners }}
+      DISTRIBUTION: ${{ github.event.inputs.distribution }}
+      COMPILER_PLUGIN: ${{ github.event.inputs.compiler_plugin }}
+      BRANCH: apply-templates-${{ github.run_number }}
     steps:
       - name: Print Inputs
-        env:
-          TEMPLATE_TYPE: ${{ github.event.inputs.template_type }}
-          TARGET_REPO: ${{ github.event.inputs.target_repo }}
-          MODULE_NAME: ${{ github.event.inputs.module_name }}
-          BALLERINA_VERSION: ${{ github.event.inputs.ballerina_version }}
-          MODULE_VERSION: ${{ github.event.inputs.module_version }}
-          TARGET_BRANCH: ${{ github.event.inputs.target_branch }}
-          LIBRARY_NAME: ${{ github.event.inputs.library_name }}
-          CODE_OWNERS: ${{ github.event.inputs.code_owners }}
-          DISTRIBUTION: ${{ github.event.inputs.distribution }}
-          COMPILER_PLUGIN: ${{ github.event.inputs.compiler_plugin }}
         run: |
           echo "Template Type: $TEMPLATE_TYPE"
           echo "Target Repository: $TARGET_REPO"
@@ -78,10 +79,6 @@ jobs:
           echo "Compiler Plugin: $COMPILER_PLUGIN"
 
       - name: Resolve template
-        env:
-          TEMPLATE_TYPE: ${{ github.event.inputs.template_type }}
-          DISTRIBUTION: ${{ github.event.inputs.distribution }}
-          COMPILER_PLUGIN: ${{ github.event.inputs.compiler_plugin }}
         run: |
           FEATURES=""
           case "$TEMPLATE_TYPE" in
@@ -118,6 +115,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: ballerina-platform/${{ github.event.inputs.target_repo }}
+          ref: ${{ github.event.inputs.target_branch }}
           path: target-repo
           token: ${{ secrets.BALLERINA_BOT_TOKEN }}
 
@@ -127,14 +125,6 @@ jobs:
           version: latest
 
       - name: Apply templates and replace placeholders
-        env:
-          TARGET_REPO: ${{ github.event.inputs.target_repo }}
-          MODULE_NAME: ${{ github.event.inputs.module_name }}
-          BALLERINA_VERSION: ${{ github.event.inputs.ballerina_version }}
-          MODULE_VERSION: ${{ github.event.inputs.module_version }}
-          LIBRARY_NAME: ${{ github.event.inputs.library_name }}
-          CODE_OWNERS: ${{ github.event.inputs.code_owners }}
-          BRANCH: apply-templates-${{ github.run_number }}
         run: |
           bal run template-repo/repo-templates/scripts/apply_template.bal -- \
             "template-repo/repo-templates/$TEMPLATE" target-repo \
@@ -151,10 +141,6 @@ jobs:
       - name: Create Pull Request
         env:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
-          TARGET_REPO: ${{ github.event.inputs.target_repo }}
-          TARGET_BRANCH: ${{ github.event.inputs.target_branch }}
-          TEMPLATE_TYPE: ${{ github.event.inputs.template_type }}
-          BRANCH: apply-templates-${{ github.run_number }}
         run: |
           gh pr create \
             --repo "ballerina-platform/$TARGET_REPO" \

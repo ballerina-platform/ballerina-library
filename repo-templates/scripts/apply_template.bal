@@ -32,6 +32,10 @@ final string[] SKIP_DIRS = [".git", ".gradle", "build", "target"];
 
 final regexp:RegExp PLACEHOLDER_PATTERN = re `\{\{[#/]?[A-Z_]+\}\}`;
 
+// Binary files that are copied as they are, without scanning them for placeholders
+final string[] BINARY_FILE_TYPES = ["jar", "zip", "gz", "png", "jpg", "jpeg", "gif", "ico", "jks", "p12", "pfx",
+    "class", "bala"];
+
 # Optional arguments of the template generator.
 #
 # + name - The descriptive name of the module to be used in the generated files. Defaults to the capitalized module name
@@ -62,6 +66,9 @@ type TemplateConfig record {|
 # + return - An error if an error occurs while generating the files
 public function main(string templateDir, string targetDir, string moduleName, string repoName, string moduleVersion,
         string balVersion, *Options options) returns error? {
+    if moduleName.trim() == "" {
+        return error("The module name must not be empty");
+    }
     string[] features = from string feature in regexp:split(re `,`, options.features)
         let string trimmed = feature.trim()
         where trimmed != ""
@@ -81,7 +88,14 @@ public function main(string templateDir, string targetDir, string moduleName, st
     if !check file:test(filesDir, file:IS_DIR) {
         return error(string `Template files directory not found: ${filesDir}`);
     }
-    string[] featureDirs = check getFeatureDirs(templateDir, features);
+    string[] availableFeatures = check getAvailableFeatures(templateDir);
+    check validateFeatures(templateDir, features, availableFeatures);
+    check validateFeatureGroups(templateDir, features, availableFeatures);
+    string featuresDir = check file:joinPath(templateDir, FEATURES_DIR);
+    string[] featureDirs = [];
+    foreach string feature in features {
+        featureDirs.push(check file:joinPath(featuresDir, feature));
+    }
 
     string moduleNameCc = moduleName[0].toLowerAscii() + moduleName.substring(1);
     map<string> placeholders = {
@@ -102,7 +116,10 @@ public function main(string templateDir, string targetDir, string moduleName, st
     // Stage the output so that the pre-existing files in the target directory are never processed
     string stagingDir = check file:createTempDir();
     error? result = generate(filesDir, featureDirs, stagingDir, targetDir, placeholders, enabledFlags);
-    check file:remove(stagingDir, file:RECURSIVE);
+    error? cleanup = file:remove(stagingDir, file:RECURSIVE);
+    if cleanup is error {
+        log:printWarn(string `Failed to remove the staging directory ${stagingDir}`, 'error = cleanup);
+    }
     check result;
     log:printInfo(string `Generated the module repository at: ${targetDir}`);
 }
@@ -118,7 +135,7 @@ function generate(string filesDir, string[] featureDirs, string stagingDir, stri
     check copyDirectory(stagingDir, targetDir);
 }
 
-function getFeatureDirs(string templateDir, string[] features) returns string[]|error {
+function getAvailableFeatures(string templateDir) returns string[]|error {
     string featuresDir = check file:joinPath(templateDir, FEATURES_DIR);
     string[] available = [];
     if check file:test(featuresDir, file:IS_DIR) {
@@ -128,25 +145,34 @@ function getFeatureDirs(string templateDir, string[] features) returns string[]|
             }
         }
     }
-    string[] featureDirs = [];
-    foreach string feature in features {
-        if available.indexOf(feature) is () {
-            return error(string `Unknown feature '${feature}' for template ${templateDir}. Available features: ${
-                available.toString()}`);
-        }
-        featureDirs.push(check file:joinPath(featuresDir, feature));
-    }
-    check validateFeatureGroups(templateDir, features);
-    return featureDirs;
+    return available;
 }
 
-function validateFeatureGroups(string templateDir, string[] features) returns error? {
+function validateFeatures(string templateDir, string[] features, string[] availableFeatures) returns error? {
+    foreach string feature in features {
+        if availableFeatures.indexOf(feature) is () {
+            return error(string `Unknown feature '${feature}' for template ${templateDir}. Available features: ${
+                availableFeatures.toString()}`);
+        }
+    }
+}
+
+function validateFeatureGroups(string templateDir, string[] features, string[] availableFeatures) returns error? {
     string configPath = check file:joinPath(templateDir, TEMPLATE_CONFIG_FILE);
     if !check file:test(configPath, file:EXISTS) {
         return;
     }
-    TemplateConfig config = check (check io:fileReadJson(configPath)).cloneWithType();
+    TemplateConfig|error config = readTemplateConfig(configPath);
+    if config is error {
+        return error(string `Invalid template configuration ${configPath}: ${config.message()}`, config);
+    }
     foreach string[] group in config.exactlyOneOf {
+        foreach string feature in group {
+            if availableFeatures.indexOf(feature) is () {
+                return error(string `Invalid template configuration ${configPath}: unknown feature '${feature
+                    }'. Available features: ${availableFeatures.toString()}`);
+            }
+        }
         string[] enabled = from string feature in group
             where features.indexOf(feature) is int
             select feature;
@@ -155,6 +181,11 @@ function validateFeatureGroups(string templateDir, string[] features) returns er
                 enabled.toString()}`);
         }
     }
+}
+
+function readTemplateConfig(string configPath) returns TemplateConfig|error {
+    json config = check io:fileReadJson(configPath);
+    return config.cloneWithType();
 }
 
 function copyDirectory(string sourceDir, string targetDir) returns error? {
@@ -190,9 +221,15 @@ function processFile(string filePath, map<string> placeholders, string[] enabled
     int? lastDotIndex = fileName.lastIndexOf(".");
     string ext = lastDotIndex is int ? fileName.substring(lastDotIndex + 1) : fileName;
     if ext !is TemplateFileType {
-        string|error content = string:fromBytes(check io:fileReadBytes(filePath));
-        if content is string && PLACEHOLDER_PATTERN.find(content) is regexp:Span {
-            return error(string `Placeholder found in ${filePath}, whose file type is not in TemplateFileType`);
+        if BINARY_FILE_TYPES.indexOf(ext.toLowerAscii()) is () {
+            // Non-ASCII bytes are masked so that files in any encoding are scanned
+            int[] codePoints = from byte b in check io:fileReadBytes(filePath)
+                select b < 128 ? b : 63;
+            regexp:Span? placeholder = PLACEHOLDER_PATTERN.find(check string:fromCodePointInts(codePoints));
+            if placeholder is regexp:Span {
+                return error(string `Placeholder '${placeholder.substring()}' found in ${filePath
+                    }, whose file type is not in TemplateFileType`);
+            }
         }
         log:printInfo(string `Skipping file: ${fileName}`);
         return;
