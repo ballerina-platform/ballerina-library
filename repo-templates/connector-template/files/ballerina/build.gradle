@@ -1,0 +1,146 @@
+/*
+ * Copyright (c) {{LICENSE_YEAR}}, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.process.ExecOperations
+
+import javax.inject.Inject
+
+abstract class BallerinaExecHelper {
+    @Inject abstract ExecOperations getExecOperations()
+}
+
+plugins {
+    id 'io.ballerina.plugin'
+}
+
+description = 'Ballerina - {{MODULE_NAME_PC}} Ballerina'
+
+def packageName = "{{MODULE_NAME_CC}}"
+def packageOrg = "ballerinax"
+def tomlVersion = stripBallerinaExtensionVersion("${project.version}")
+def ballerinaTomlFilePlaceHolder = new File("${project.rootDir}/build-config/resources/Ballerina.toml")
+def ballerinaTomlFile = new File("$project.projectDir/Ballerina.toml")
+def tomlFiles = "Ballerina.toml Dependencies.toml"
+// {{#COMPILER_PLUGIN}}
+def compilerPluginTomlFilePlaceHolder = new File("${project.rootDir}/build-config/resources/CompilerPlugin.toml")
+def compilerPluginTomlFile = new File("$project.projectDir/CompilerPlugin.toml")
+tomlFiles += " CompilerPlugin.toml"
+// {{/COMPILER_PLUGIN}}
+
+def stripBallerinaExtensionVersion(String extVersion) {
+    if (extVersion.matches(project.ext.timestampedVersionRegex)) {
+        def splitVersion = extVersion.split('-')
+        if (splitVersion.length > 3) {
+            def strippedValues = splitVersion[0..-4]
+            return strippedValues.join('-')
+        } else {
+            return extVersion
+        }
+    } else {
+        return extVersion.replace("${project.ext.snapshotVersion}", "")
+    }
+}
+
+ballerina {
+    packageOrganization = packageOrg
+    module = packageName
+    testCoverageParam = "--code-coverage --coverage-format=xml"
+    // {{#RELEASED_DISTRIBUTION}}
+    connector = true
+    // {{/RELEASED_DISTRIBUTION}}
+    // {{#TIMESTAMPED_DISTRIBUTION}}
+    langVersion = ballerinaLangVersion
+    // {{/TIMESTAMPED_DISTRIBUTION}}
+}
+
+configurations {
+    externalJars
+}
+
+dependencies {
+    // TODO: Add the third-party jars required at runtime, and add them as `platform.java21.dependency` entries in
+    // build-config/resources/Ballerina.toml with a version placeholder replaced in the updateTomlFiles task, e.g.
+    // externalJars(group: 'org.example', name: 'example-client', version: "${exampleClientVersion}") {
+    //     transitive = false
+    // }
+}
+
+task updateTomlFiles {
+    doLast {
+        def newConfig = ballerinaTomlFilePlaceHolder.text.replace("@project.version@", project.version)
+        newConfig = newConfig.replace("@toml.version@", tomlVersion)
+        ballerinaTomlFile.text = newConfig
+        // {{#COMPILER_PLUGIN}}
+
+        compilerPluginTomlFile.text = compilerPluginTomlFilePlaceHolder.text.replace("@project.version@", project.version)
+        // {{/COMPILER_PLUGIN}}
+    }
+}
+
+task commitTomlFiles {
+    def execHelper = project.objects.newInstance(BallerinaExecHelper)
+    doLast {
+        execHelper.execOperations.exec {
+            ignoreExitValue true
+            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                commandLine 'cmd', '/c', "git commit -m \"[Automated] Update the toml files\" ${tomlFiles}"
+            } else {
+                commandLine 'sh', '-c', "git commit -m '[Automated] Update the toml files' ${tomlFiles}"
+            }
+        }
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact source: createArtifactZip, extension: 'zip'
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/ballerina-platform/module-${packageOrg}-${packageName}")
+            credentials {
+                username = System.getenv("publishUser")
+                password = System.getenv("publishPAT")
+            }
+        }
+    }
+}
+
+// {{#TIMESTAMPED_DISTRIBUTION}}
+updateTomlFiles.dependsOn copyStdlibs
+// {{/TIMESTAMPED_DISTRIBUTION}}
+// {{#RELEASED_DISTRIBUTION}}
+build.dependsOn copyToLib
+test.dependsOn copyToLib
+// {{/RELEASED_DISTRIBUTION}}
+
+test.dependsOn ":${packageName}-native:build"
+build.dependsOn ":${packageName}-native:build"
+// {{#COMPILER_PLUGIN}}
+test.dependsOn ":${packageName}-compiler-plugin:build"
+build.dependsOn ":${packageName}-compiler-plugin:build"
+// {{/COMPILER_PLUGIN}}
+build.dependsOn "generatePomFileForMavenPublication"
+
+publishToMavenLocal.dependsOn build
+publish.dependsOn build

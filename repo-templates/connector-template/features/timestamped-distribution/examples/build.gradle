@@ -1,0 +1,96 @@
+/*
+ * Copyright (c) {{LICENSE_YEAR}}, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.process.ExecOperations
+
+import javax.inject.Inject
+
+abstract class BallerinaExecHelper {
+    @Inject abstract ExecOperations getExecOperations()
+}
+
+apply plugin: 'java'
+
+description = 'Ballerina - {{MODULE_NAME_PC}} Examples'
+
+def ballerinaDist = "${project.rootDir}/target/ballerina-runtime"
+// TODO: Add the paths of the example Ballerina packages relative to this directory, e.g. "order-manager/order-service"
+def examples = []
+def packageName = "{{MODULE_NAME_CC}}"
+
+clean {
+    examples.forEach { example ->
+        delete "${projectDir}/${example}/target"
+    }
+}
+
+task testExamples {
+    def execHelper = project.objects.newInstance(BallerinaExecHelper)
+    doLast {
+        examples.each { example ->
+            try {
+                execHelper.execOperations.exec {
+                    workingDir project.projectDir
+                    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                        commandLine 'cmd', '/c', "${ballerinaDist}/bin/bal.bat test --offline ${example} && exit %%ERRORLEVEL%%"
+                    } else {
+                        commandLine 'sh', '-c', "${ballerinaDist}/bin/bal test --offline ${example}"
+                    }
+                }
+            } catch (Exception e) {
+                println("Example '${example}' Build failed: " + e.message)
+                throw e
+            }
+        }
+    }
+}
+
+task buildExamples {
+    def execHelper = project.objects.newInstance(BallerinaExecHelper)
+    gradle.taskGraph.whenReady { graph ->
+        if (graph.hasTask(":${packageName}-examples:test")) {
+            buildExamples.enabled = false
+        } else {
+            testExamples.enabled = false
+        }
+    }
+    doLast {
+        examples.each { example ->
+            try {
+                execHelper.execOperations.exec {
+                    workingDir project.projectDir
+                    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                        commandLine 'cmd', '/c', "${ballerinaDist}/bin/bal.bat build ${example} && exit %%ERRORLEVEL%%"
+                    } else {
+                        commandLine 'sh', '-c', "${ballerinaDist}/bin/bal build ${example}"
+                    }
+                }
+            } catch (Exception e) {
+                println("Example '${example}' Build failed: " + e.message)
+                throw e
+            }
+        }
+    }
+}
+
+buildExamples.dependsOn ":${packageName}-ballerina:build"
+testExamples.dependsOn ":${packageName}-ballerina:build"
+
+build.dependsOn buildExamples
+test.dependsOn testExamples
