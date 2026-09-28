@@ -1,3 +1,7 @@
+# Deprecated: kept only so existing callers referencing trivy-scan-template.yml@main
+# keep working. This forwards to security-scan-template.yml, which is now the source
+# of truth. New callers should reference security-scan-template.yml directly instead.
+# Remove this file once every caller has migrated to security-scan-template.yml.
 name: Trivy
 
 on:
@@ -7,42 +11,24 @@ on:
         required: false
         type: string
         default: ""
+      # Forwarded through so an existing caller with a non-standard layout (no
+      # top-level ballerina/ package, e.g. json-schema-tools, asyncapi-tools) can still
+      # override them here -- without these, such a caller has no way to avoid
+      # security-scan-template.yml's "No Ballerina packages found to scan" failure.
+      scan-path:
+        required: false
+        type: string
+        default: "ballerina"
+      additional-scan-paths:
+        required: false
+        type: string
+        default: ""
 
 jobs:
-  ubuntu-build:
-    name: Build on Ubuntu
-    runs-on: ubuntu-22.04
-    if: github.repository_owner == 'ballerina-platform'
-    steps:
-      - uses: actions/checkout@v3
-      - name: Resolve Java version
-        id: resolve-java
-        uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
-      - name: Set up JDK ${{ steps.resolve-java.outputs.java-version }}
-        uses: actions/setup-java@v3
-        with:
-          distribution: "temurin"
-          java-version: ${{ steps.resolve-java.outputs.java-version }}
-
-      - name: Build with Gradle
-        env:
-          packageUser: ${{ github.actor }}
-          packagePAT: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew build -x test ${{ inputs.additional-build-flags }}
-
-      - name: Create lib directory if not exists
-        run: mkdir -p ballerina/lib
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        env:
-          TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
-          TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
-        with:
-          scan-type: "rootfs"
-          scan-ref: "${{ github.workspace }}/ballerina/lib"
-          format: "table"
-          timeout: "10m0s"
-          exit-code: "1"
-          scanners: "vuln"
-          cache-dir: "/tmp/trivy-cache"
+  forward:
+    uses: ./.github/workflows/security-scan-template.yml
+    secrets: inherit
+    with:
+      additional-build-flags: ${{ inputs.additional-build-flags }}
+      scan-path: ${{ inputs.scan-path }}
+      additional-scan-paths: ${{ inputs.additional-scan-paths }}
