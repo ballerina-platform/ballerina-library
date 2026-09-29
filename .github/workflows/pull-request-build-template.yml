@@ -160,9 +160,35 @@ jobs:
               id: resolve-bal
               uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
 
+            # `bal tool pull scan` needs Ballerina 2201.12.0 or later. Older repos can't run it and
+            # we don't install a second distribution just for the scan, so warn and skip the
+            # scan steps. An unparseable version is an error rather than a silent skip.
+            - name: Check bal scan support
+              id: check-bal-scan-support
+              env:
+                LANG_VERSION: ${{ steps.resolve-bal.outputs.lang-version }}
+                MIN_MINOR: "12"
+              run: |
+                MINOR="$(echo "$LANG_VERSION" | cut -d. -f2)"
+                if ! [[ "$MINOR" =~ ^[0-9]+$ ]]; then
+                  echo "::error::Could not parse a numeric minor version from lang version '$LANG_VERSION'"
+                  exit 1
+                fi
+                if [ "$MINOR" -lt "$MIN_MINOR" ]; then
+                  MSG="bal scan requires Ballerina 2201.$MIN_MINOR.0 or later; this repo uses $LANG_VERSION, so the scan was skipped."
+                  echo "::warning::$MSG"
+                  echo "## bal scan results" >> "$GITHUB_STEP_SUMMARY"
+                  echo >> "$GITHUB_STEP_SUMMARY"
+                  echo "$MSG" >> "$GITHUB_STEP_SUMMARY"
+                  echo "supported=false" >> "$GITHUB_OUTPUT"
+                else
+                  echo "supported=true" >> "$GITHUB_OUTPUT"
+                fi
+
             # Same nightly/snapshot handling as security-scan-template.yml, for the same
             # reason: setup-ballerina can't download a timestamped snapshot version.
             - name: Resolve setup-ballerina version
+              if: ${{ steps.check-bal-scan-support.outputs.supported == 'true' }}
               id: resolve-setup-version
               env:
                 LANG_VERSION: ${{ steps.resolve-bal.outputs.lang-version }}
@@ -174,14 +200,17 @@ jobs:
                 echo "version=$SETUP_VERSION" >> "$GITHUB_OUTPUT"
 
             - name: Set up Ballerina
+              if: ${{ steps.check-bal-scan-support.outputs.supported == 'true' }}
               uses: ballerina-platform/setup-ballerina@v1.1.5
               with:
                 version: ${{ steps.resolve-setup-version.outputs.version }}
 
             - name: Pull the bal scan tool
+              if: ${{ steps.check-bal-scan-support.outputs.supported == 'true' }}
               run: bal tool pull scan
 
             - name: Run bal scan
+              if: ${{ steps.check-bal-scan-support.outputs.supported == 'true' }}
               run: |
                 scan_group() {
                   local list="$1"
@@ -203,7 +232,7 @@ jobs:
             # Never fails the job (see the comment on this job) -- only ever writes the
             # summary, to the run's own Summary tab and, below, as a PR comment.
             - name: Write scan summary
-              if: always()
+              if: ${{ always() && steps.check-bal-scan-support.outputs.supported == 'true' }}
               run: |
                 summarize_group() {
                   local title="$1" list="$2"
@@ -254,7 +283,7 @@ jobs:
             # template is always called from -- the job's own Summary tab (written
             # above) is the fallback for that case.
             - name: Post scan summary as a PR comment
-              if: always() && github.event.pull_request.number
+              if: ${{ always() && steps.check-bal-scan-support.outputs.supported == 'true' && github.event.pull_request.number }}
               continue-on-error: true
               env:
                 GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
