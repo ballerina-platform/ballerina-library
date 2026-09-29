@@ -201,6 +201,34 @@ jobs:
         id: resolve-bal
         uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
 
+      # `bal tool pull scan` (and the scan tool itself) needs Ballerina 2201.12.0 or
+      # later. Repos still pinned to an older ballerinaLangVersion can't run it, and we
+      # deliberately don't install a second Ballerina distribution just for the scan --
+      # so warn and skip every scan step below instead of failing the nightly run. An
+      # unparseable version is an error rather than a skip, so a broken resolver can't
+      # silently switch the scan off everywhere.
+      - name: Check bal scan support
+        id: check-bal-scan-support
+        env:
+          LANG_VERSION: ${{ steps.resolve-bal.outputs.lang-version }}
+          MIN_MINOR: "12"
+        run: |
+          MINOR="$(echo "$LANG_VERSION" | cut -d. -f2)"
+          if ! [[ "$MINOR" =~ ^[0-9]+$ ]]; then
+            echo "::error::Could not parse a numeric minor version from lang version '$LANG_VERSION'"
+            exit 1
+          fi
+          if [ "$MINOR" -lt "$MIN_MINOR" ]; then
+            MSG="bal scan requires Ballerina 2201.$MIN_MINOR.0 or later; this repo uses $LANG_VERSION, so the scan was skipped."
+            echo "::warning::$MSG"
+            echo "## bal scan results" >> "$GITHUB_STEP_SUMMARY"
+            echo >> "$GITHUB_STEP_SUMMARY"
+            echo "$MSG" >> "$GITHUB_STEP_SUMMARY"
+            echo "supported=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "supported=true" >> "$GITHUB_OUTPUT"
+          fi
+
       # setup-ballerina can only download a real dist.ballerina.io release or a nightly
       # build, not a timestamped snapshot version. Mirrors the ballerina-gradle-plugin's
       # own isTimeStampVersion check (any hyphen in the lang version, e.g.
@@ -209,6 +237,7 @@ jobs:
       # snapshot fails "Set up Ballerina" trying to download a distribution that was
       # never published.
       - name: Resolve setup-ballerina version
+        if: ${{ steps.check-bal-scan-support.outputs.supported == 'true' }}
         id: resolve-setup-version
         env:
           LANG_VERSION: ${{ steps.resolve-bal.outputs.lang-version }}
@@ -220,11 +249,13 @@ jobs:
           echo "version=$SETUP_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set up Ballerina
+        if: ${{ steps.check-bal-scan-support.outputs.supported == 'true' }}
         uses: ballerina-platform/setup-ballerina@v1.1.5
         with:
           version: ${{ steps.resolve-setup-version.outputs.version }}
 
       - name: Pull the bal scan tool
+        if: ${{ steps.check-bal-scan-support.outputs.supported == 'true' }}
         run: bal tool pull scan
 
       # --format=sarif and the default (JSON) report are mutually exclusive per
@@ -236,6 +267,7 @@ jobs:
       # produce a report, so an empty/missing SARIF is treated as an error per package
       # rather than silently read as "no findings".
       - name: Run bal scan
+        if: ${{ steps.check-bal-scan-support.outputs.supported == 'true' }}
         run: |
           scan_group() {
             local group="$1" list="$2"
@@ -258,7 +290,7 @@ jobs:
           scan_group examples example-packages.txt
 
       - name: Upload library scan report
-        if: always()
+        if: ${{ always() && steps.check-bal-scan-support.outputs.supported == 'true' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: bal-scan-report-library
@@ -267,7 +299,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Upload examples scan report
-        if: always()
+        if: ${{ always() && steps.check-bal-scan-support.outputs.supported == 'true' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: bal-scan-report-examples
@@ -293,6 +325,7 @@ jobs:
       # success. Tool.driver.rules is deduped by id since different packages can each
       # report only the subset of rules that actually fired for them.
       - name: Rewrite SARIF paths relative to the repository root
+        if: ${{ steps.check-bal-scan-support.outputs.supported == 'true' }}
         run: |
           rewrite_group() {
             local group="$1" list="$2"
@@ -336,7 +369,7 @@ jobs:
       # were given).
       - name: Upload library SARIF to GitHub code scanning
         id: upload-library-sarif
-        if: hashFiles('scan-sarif-for-upload-library.sarif') != ''
+        if: ${{ steps.check-bal-scan-support.outputs.supported == 'true' && hashFiles('scan-sarif-for-upload-library.sarif') != '' }}
         continue-on-error: true
         uses: github/codeql-action/upload-sarif@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
         with:
@@ -348,7 +381,7 @@ jobs:
       # if a later step is skipped, since summary content only comes from steps that
       # actually ran.
       - name: Write scan summary
-        if: always()
+        if: ${{ always() && steps.check-bal-scan-support.outputs.supported == 'true' }}
         run: |
           # Per-package rows go to a group's own table so the job summary mirrors the
           # library vs. examples split used everywhere else (artifacts, categories).
@@ -418,6 +451,7 @@ jobs:
       # (code smells) are visible in the uploaded reports but never fail the job, since
       # existing style debt shouldn't break nightly runs across the org.
       - name: Fail the job if vulnerabilities are found
+        if: ${{ steps.check-bal-scan-support.outputs.supported == 'true' }}
         run: |
           # Diagnostics go to stderr so the $(...) capture below only ever sees the
           # final "vuln smell" line on stdout -- otherwise `read` would parse the
