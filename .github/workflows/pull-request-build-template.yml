@@ -114,7 +114,8 @@ jobs:
         runs-on: ubuntu-22.04
         permissions:
             contents: read
-            pull-requests: write
+            security-events: write
+            actions: read
         steps:
             -   name: Checkout Repository
                 uses: actions/checkout@v3
@@ -229,79 +230,102 @@ jobs:
                 scan_group library-packages.txt
                 scan_group example-packages.txt
 
-            # Never fails the job (see the comment on this job) -- only ever writes the
-            # summary, to the run's own Summary tab and, below, as a PR comment.
+            # bal scan reports artifactLocation.uri relative to the package directory it
+            # ran in, not the repository root -- GitHub resolves SARIF locations against
+            # the repo root and silently drops any result it can't map to a real file, so
+            # without this the upload registers as an analysis but produces zero visible
+            # annotations. Merges every package in a group into ONE SARIF run for the
+            # same reason security-scan-template.yml does: GitHub's code scanning doesn't
+            # support multiple SARIF runs under the same category. Same category names as
+            # that nightly job on purpose, so GitHub diffs this PR's findings against the
+            # right baseline instead of starting from nothing.
+            - name: Rewrite SARIF paths relative to the repository root
+              if: ${{ steps.check-bal-scan-support.outputs.supported == 'true' }}
+              run: |
+                rewrite_group() {
+                  local group="$1" list="$2"
+                  local tmpdir
+                  tmpdir="$(mktemp -d)"
+                  while IFS= read -r pkg; do
+                    [ -z "$pkg" ] && continue
+                    [ -f "$pkg/target/report/scan_results.sarif" ] || continue
+                    name="$(echo "$pkg" | tr '/' '_')"
+                    jq --arg prefix "$pkg/" '
+                      (.runs[].results[].locations[]?.physicalLocation.artifactLocation.uri) |= ($prefix + .)
+                    ' "$pkg/target/report/scan_results.sarif" > "$tmpdir/$name.sarif"
+                  done < "$list"
+
+                  if [ -n "$(ls -A "$tmpdir" 2>/dev/null)" ]; then
+                    jq -s '
+                      . as $all
+                      | {
+                          "$schema": $all[0]["$schema"],
+                          version: $all[0].version,
+                          runs: [{
+                            tool: ($all[0].runs[0].tool | .driver.rules = ($all | map(.runs[0].tool.driver.rules[]?) | unique_by(.id))),
+                            results: ($all | map(.runs[0].results[]?))
+                          }]
+                        }
+                    ' "$tmpdir"/*.sarif > "scan-sarif-for-upload-$group.sarif"
+                  fi
+                  rm -rf "$tmpdir"
+                }
+                rewrite_group library library-packages.txt
+                rewrite_group examples example-packages.txt
+
+            # Lets GitHub natively annotate this PR: inline on the Files changed diff,
+            # plus a Checks-tab entry with a real link, and (since the default branch
+            # already has a bal-scan-library baseline) a "new alerts" comparison scoped
+            # to what this PR actually introduces, not the whole repo's backlog.
+            # continue-on-error since a PR from a fork gets a read-only token under the
+            # plain `pull_request` trigger this template is always called from -- the
+            # job's own Summary tab (written below) is the fallback for that case.
+            - name: Upload library SARIF to GitHub code scanning
+              if: ${{ steps.check-bal-scan-support.outputs.supported == 'true' && hashFiles('scan-sarif-for-upload-library.sarif') != '' }}
+              continue-on-error: true
+              uses: github/codeql-action/upload-sarif@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
+              with:
+                sarif_file: scan-sarif-for-upload-library.sarif
+                category: bal-scan-library
+
+            - name: Upload examples SARIF to GitHub code scanning
+              if: ${{ steps.check-bal-scan-support.outputs.supported == 'true' && hashFiles('scan-sarif-for-upload-examples.sarif') != '' }}
+              continue-on-error: true
+              uses: github/codeql-action/upload-sarif@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
+              with:
+                sarif_file: scan-sarif-for-upload-examples.sarif
+                category: bal-scan-examples
+
+            # Never fails the job (see the comment on this job) -- a lightweight receipt
+            # in the run's own Summary tab; the actionable, diff-scoped view is the
+            # Checks tab / Files changed annotations from the uploads above.
             - name: Write scan summary
               if: ${{ always() && steps.check-bal-scan-support.outputs.supported == 'true' }}
               run: |
-                summarize_group() {
-                  local title="$1" list="$2"
+                count_group() {
+                  local list="$1"
                   local vuln=0 smell=0
-
-                  if [ ! -s "$list" ]; then
-                    echo "### $title"
-                    echo
-                    echo "No packages found."
-                    echo
-                    return
-                  fi
-
-                  echo "### $title"
-                  echo
-                  echo "| Package | Vulnerabilities | Code smells |"
-                  echo "| --- | --- | --- |"
                   while IFS= read -r pkg; do
                     [ -z "$pkg" ] && continue
                     f="$pkg/target/report/scan_results.sarif"
-                    if [ ! -f "$f" ]; then
-                      echo "| $pkg | _scan did not complete_ | _scan did not complete_ |"
-                      continue
-                    fi
+                    [ -f "$f" ] || continue
                     v=$(jq '[.runs[].results[] | select(.level != "note")] | length' "$f")
                     s=$(jq '[.runs[].results[] | select(.level == "note")] | length' "$f")
-                    echo "| $pkg | $v | $s |"
                     vuln=$((vuln + v))
                     smell=$((smell + s))
                   done < "$list"
-                  echo "| **Total** | **$vuln** | **$smell** |"
-                  echo
+                  echo "$vuln $smell"
                 }
-
+                read -r LIB_VULN LIB_SMELL <<< "$(count_group library-packages.txt)"
+                read -r EX_VULN EX_SMELL <<< "$(count_group example-packages.txt)"
                 {
-                  echo "<!-- bal-scan-pr-summary -->"
                   echo "## bal scan results (informational, does not block this PR)"
                   echo
-                  summarize_group "Library" library-packages.txt
-                  summarize_group "Examples" example-packages.txt
-                  echo "This check is informational only and never fails the build. The nightly Security Scan workflow gates on these findings across the whole repository."
-                } | tee bal-scan-summary.md >> "$GITHUB_STEP_SUMMARY"
-
-            # Upserts a single tracked comment (by the "<!-- bal-scan-pr-summary -->"
-            # marker) instead of posting a new one on every push, so the PR thread
-            # doesn't accumulate a comment per commit. continue-on-error since a PR from
-            # a fork gets a read-only token under the plain `pull_request` trigger this
-            # template is always called from -- the job's own Summary tab (written
-            # above) is the fallback for that case.
-            - name: Post scan summary as a PR comment
-              if: ${{ always() && steps.check-bal-scan-support.outputs.supported == 'true' && github.event.pull_request.number }}
-              continue-on-error: true
-              env:
-                GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                REPO: ${{ github.repository }}
-                PR_NUMBER: ${{ github.event.pull_request.number }}
-              run: |
-                EXISTING_ID=$(gh api --paginate "repos/$REPO/issues/$PR_NUMBER/comments" \
-                  --jq '.[] | select(.body | startswith("<!-- bal-scan-pr-summary -->")) | .id' | head -n1)
-
-                # -F (not -f) is required here: gh's -f/--raw-field takes the value
-                # literally as a string, while only -F/--field applies the "@filename
-                # reads the file's contents" magic -- verified the hard way, by posting
-                # a comment whose body was the literal text "@bal-scan-summary.md".
-                if [ -n "$EXISTING_ID" ]; then
-                  gh api -X PATCH "repos/$REPO/issues/comments/$EXISTING_ID" -F body=@bal-scan-summary.md
-                else
-                  gh api -X POST "repos/$REPO/issues/$PR_NUMBER/comments" -F body=@bal-scan-summary.md
-                fi
+                  echo "Library: **$LIB_VULN** vulnerability finding(s), **$LIB_SMELL** code smell finding(s)."
+                  echo "Examples: **$EX_VULN** vulnerability finding(s), **$EX_SMELL** code smell finding(s)."
+                  echo
+                  echo "See the Checks tab and the Files changed annotations for the actual findings, scoped to what this PR changed."
+                } >> "$GITHUB_STEP_SUMMARY"
 
     windows-build:
         name: Build on Windows
