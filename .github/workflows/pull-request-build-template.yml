@@ -147,9 +147,13 @@ jobs:
                   done < <(find examples \( -path '*/target/*' -o -path '*/.git/*' -o -path '*/build/*' \) -prune -o -iname 'Ballerina.toml' -print | sort)
                 fi
 
+                # A warning, not ::error::/exit 1: unlike security-scan-template.yml's
+                # nightly job (which should fail if it can't find anything to scan),
+                # this job is informational-only and must never fail the PR build.
+                # Every downstream step already tolerates an empty package-list file
+                # (scan_group/rewrite_group loop zero times, count_group reports 0/0).
                 if [ "${#LIBRARY_PACKAGES[@]}" -eq 0 ] && [ "${#EXAMPLE_PACKAGES[@]}" -eq 0 ]; then
-                  echo "::error::No Ballerina packages found to scan"
-                  exit 1
+                  echo "::warning::No Ballerina packages found to scan"
                 fi
 
                 printf '%s\n' "${LIBRARY_PACKAGES[@]}" > library-packages.txt
@@ -304,25 +308,38 @@ jobs:
               run: |
                 count_group() {
                   local list="$1"
-                  local vuln=0 smell=0
+                  local vuln=0 smell=0 incomplete=0
                   while IFS= read -r pkg; do
                     [ -z "$pkg" ] && continue
                     f="$pkg/target/report/scan_results.sarif"
-                    [ -f "$f" ] || continue
+                    # A file that doesn't exist, or exists but is malformed/has no
+                    # runs[0] (bal scan always exits 0 even when it fails to produce a
+                    # real report), is incomplete, not "zero findings" -- counting it
+                    # as zero would mask a real scan failure as a clean result, and
+                    # piping malformed JSON straight into jq would fail this step
+                    # (breaking the "never fails" contract) instead of just skipping it.
+                    if [ ! -f "$f" ] || ! jq -e '.runs[0]' "$f" > /dev/null 2>&1; then
+                      incomplete=$((incomplete + 1))
+                      continue
+                    fi
                     v=$(jq '[.runs[].results[] | select(.level != "note")] | length' "$f")
                     s=$(jq '[.runs[].results[] | select(.level == "note")] | length' "$f")
                     vuln=$((vuln + v))
                     smell=$((smell + s))
                   done < "$list"
-                  echo "$vuln $smell"
+                  echo "$vuln $smell $incomplete"
                 }
-                read -r LIB_VULN LIB_SMELL <<< "$(count_group library-packages.txt)"
-                read -r EX_VULN EX_SMELL <<< "$(count_group example-packages.txt)"
+                read -r LIB_VULN LIB_SMELL LIB_INCOMPLETE <<< "$(count_group library-packages.txt)"
+                read -r EX_VULN EX_SMELL EX_INCOMPLETE <<< "$(count_group example-packages.txt)"
                 {
                   echo "## bal scan results (informational, does not block this PR)"
                   echo
                   echo "Library: **$LIB_VULN** vulnerability finding(s), **$LIB_SMELL** code smell finding(s)."
                   echo "Examples: **$EX_VULN** vulnerability finding(s), **$EX_SMELL** code smell finding(s)."
+                  if [ "$LIB_INCOMPLETE" -gt 0 ] || [ "$EX_INCOMPLETE" -gt 0 ]; then
+                    echo
+                    echo "$((LIB_INCOMPLETE + EX_INCOMPLETE)) package(s) did not produce a valid scan result and are excluded from the counts above."
+                  fi
                   echo
                   echo "See the Checks tab and the Files changed annotations for the actual findings, scoped to what this PR changed."
                 } >> "$GITHUB_STEP_SUMMARY"
