@@ -335,6 +335,7 @@ jobs:
       # nothing to upload (e.g. scan-path doesn't exist and no additional-scan-paths
       # were given).
       - name: Upload library SARIF to GitHub code scanning
+        id: upload-library-sarif
         if: hashFiles('scan-sarif-for-upload-library.sarif') != ''
         continue-on-error: true
         uses: github/codeql-action/upload-sarif@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4
@@ -397,7 +398,15 @@ jobs:
             echo
             summarize_group "Library" library-packages.txt
             summarize_group "Examples" example-packages.txt
-            echo "Full HTML reports: the \`bal-scan-report-library\` and \`bal-scan-report-examples\` artifacts on this run. Library vulnerability findings are also uploaded to the Security > Code scanning tab under the \`bal-scan-library\` category; examples findings are visible here and in the report artifact, but aren't uploaded to code scanning."
+
+            # continue-on-error: true on the upload step above means this can run after
+            # that upload failed (or was skipped, e.g. no library SARIF at all) --
+            # reflect its actual outcome instead of unconditionally claiming success.
+            LIBRARY_UPLOAD_STATUS="were not uploaded"
+            if [ "${{ steps.upload-library-sarif.outcome }}" = "success" ]; then
+              LIBRARY_UPLOAD_STATUS="were also uploaded"
+            fi
+            echo "Full HTML reports: the \`bal-scan-report-library\` and \`bal-scan-report-examples\` artifacts on this run. Library vulnerability findings $LIBRARY_UPLOAD_STATUS to the Security > Code scanning tab under the \`bal-scan-library\` category; examples findings are visible here and in the report artifact, but aren't uploaded to code scanning."
           } >> "$GITHUB_STEP_SUMMARY"
 
       # bal scan derives SARIF `level` from rule kind, not true severity: VULNERABILITY
