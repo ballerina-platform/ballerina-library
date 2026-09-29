@@ -213,11 +213,11 @@ jobs:
           LANG_VERSION: ${{ steps.resolve-bal.outputs.lang-version }}
           MIN_MINOR: "12"
         run: |
-          MINOR="$(echo "$LANG_VERSION" | cut -d. -f2)"
-          if ! [[ "$MINOR" =~ ^[0-9]+$ ]]; then
+          if ! [[ "$LANG_VERSION" =~ ^2201\.([0-9]+)\.[0-9]+(-[[:alnum:].-]+)?$ ]]; then
             echo "::error::Could not parse a numeric minor version from lang version '$LANG_VERSION'"
             exit 1
           fi
+          MINOR="${BASH_REMATCH[1]}"
           if [ "$MINOR" -lt "$MIN_MINOR" ]; then
             MSG="bal scan requires Ballerina 2201.$MIN_MINOR.0 or later; this repo uses $LANG_VERSION, so the scan was skipped."
             echo "::warning::$MSG"
