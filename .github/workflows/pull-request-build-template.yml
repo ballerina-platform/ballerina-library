@@ -264,10 +264,14 @@ jobs:
                 EXISTING_ID=$(gh api --paginate "repos/$REPO/issues/$PR_NUMBER/comments" \
                   --jq '.[] | select(.body | startswith("<!-- bal-scan-pr-summary -->")) | .id' | head -n1)
 
+                # -F (not -f) is required here: gh's -f/--raw-field takes the value
+                # literally as a string, while only -F/--field applies the "@filename
+                # reads the file's contents" magic -- verified the hard way, by posting
+                # a comment whose body was the literal text "@bal-scan-summary.md".
                 if [ -n "$EXISTING_ID" ]; then
-                  gh api -X PATCH "repos/$REPO/issues/comments/$EXISTING_ID" -f body=@bal-scan-summary.md
+                  gh api -X PATCH "repos/$REPO/issues/comments/$EXISTING_ID" -F body=@bal-scan-summary.md
                 else
-                  gh api -X POST "repos/$REPO/issues/$PR_NUMBER/comments" -f body=@bal-scan-summary.md
+                  gh api -X POST "repos/$REPO/issues/$PR_NUMBER/comments" -F body=@bal-scan-summary.md
                 fi
 
     windows-build:
