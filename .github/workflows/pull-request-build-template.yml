@@ -19,6 +19,16 @@ on:
         required: false
         type: string
         default: ""
+      scan-path:
+        description: "Path to the main Ballerina package to run 'bal scan' against"
+        required: false
+        type: string
+        default: "ballerina"
+      additional-scan-paths:
+        description: "Comma-separated list of additional Ballerina package paths to scan with 'bal scan', beyond scan-path and any examples/*/ packages found automatically"
+        required: false
+        type: string
+        default: ""
     secrets:
       CODECOV_TOKEN:
         required: false
@@ -64,6 +74,201 @@ jobs:
               with:
                 token: ${{ secrets.CODECOV_TOKEN }}
                 slug: ballerina-platform/${{ github.event.repository.name }}
+
+            # Lets the bal-scan job below reuse this build's output instead of running its
+            # own full ./gradlew build -x test, which would otherwise double the build cost
+            # of every PR. Purely additive: doesn't change this job's own pass/fail
+            # semantics or its check name ("Build on Ubuntu"), which existing
+            # required-status-check config in consuming repos depends on. Same
+            # empty-artifact guard and include-hidden-files as security-scan-template.yml's
+            # own build job, for the same reasons (Trivy there / bal scan here both need
+            # ballerina/lib to exist after download-artifact, and hidden files aren't
+            # included by default).
+            - name: Ensure build output is never empty
+              run: |
+                mkdir -p ballerina/lib
+                if [ -z "$(find ballerina/lib -type f 2>/dev/null)" ]; then
+                  touch ballerina/lib/artifact-placeholder
+                fi
+
+            - name: Upload build output
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                name: pr-build-output
+                path: |
+                  ballerina/lib/**
+                  **/build/libs/*.jar
+                if-no-files-found: warn
+                retention-days: 1
+                include-hidden-files: true
+
+    # Informational only -- never fails the PR build. The nightly Security Scan
+    # workflow (security-scan-template.yml) already gates on bal scan findings across
+    # the whole repo; failing every PR on pre-existing vulnerabilities/smells unrelated
+    # to that PR's own change would be the wrong gate to add here. This job exists so a
+    # contributor sees bal scan results on their own PR immediately, without waiting for
+    # the next nightly run.
+    bal-scan:
+        name: Ballerina Static Code Analysis (informational)
+        needs: ubuntu-build
+        runs-on: ubuntu-22.04
+        permissions:
+            contents: read
+            pull-requests: write
+        steps:
+            -   name: Checkout Repository
+                uses: actions/checkout@v3
+
+            -   name: Download build output
+                uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+                with:
+                    name: pr-build-output
+
+            # Same split and discovery logic as security-scan-template.yml's bal-scan job.
+            - name: Discover Ballerina packages to scan
+              env:
+                SCAN_PATH: ${{ inputs.scan-path }}
+                ADDITIONAL_SCAN_PATHS: ${{ inputs.additional-scan-paths }}
+              run: |
+                declare -a LIBRARY_PACKAGES=()
+                [ -d "$SCAN_PATH" ] && LIBRARY_PACKAGES+=("$SCAN_PATH")
+
+                IFS=',' read -ra EXTRA <<< "${ADDITIONAL_SCAN_PATHS//$'\n'/,}"
+                for p in "${EXTRA[@]}"; do
+                  p="$(printf '%s' "$p" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+                  [ -n "$p" ] && LIBRARY_PACKAGES+=("$p")
+                done
+
+                declare -a EXAMPLE_PACKAGES=()
+                if [ -d "examples" ]; then
+                  while IFS= read -r toml; do
+                    EXAMPLE_PACKAGES+=("$(dirname "$toml")")
+                  done < <(find examples \( -path '*/target/*' -o -path '*/.git/*' -o -path '*/build/*' \) -prune -o -iname 'Ballerina.toml' -print | sort)
+                fi
+
+                if [ "${#LIBRARY_PACKAGES[@]}" -eq 0 ] && [ "${#EXAMPLE_PACKAGES[@]}" -eq 0 ]; then
+                  echo "::error::No Ballerina packages found to scan"
+                  exit 1
+                fi
+
+                printf '%s\n' "${LIBRARY_PACKAGES[@]}" > library-packages.txt
+                printf '%s\n' "${EXAMPLE_PACKAGES[@]}" > example-packages.txt
+                echo "Library package(s):"; cat library-packages.txt
+                echo "Example package(s):"; cat example-packages.txt
+
+            - name: Resolve Ballerina version
+              id: resolve-bal
+              uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
+
+            # Same nightly/snapshot handling as security-scan-template.yml, for the same
+            # reason: setup-ballerina can't download a timestamped snapshot version.
+            - name: Resolve setup-ballerina version
+              id: resolve-setup-version
+              env:
+                LANG_VERSION: ${{ steps.resolve-bal.outputs.lang-version }}
+              run: |
+                SETUP_VERSION="$LANG_VERSION"
+                if [[ "$LANG_VERSION" == *-* ]]; then
+                  SETUP_VERSION="nightly"
+                fi
+                echo "version=$SETUP_VERSION" >> "$GITHUB_OUTPUT"
+
+            - name: Set up Ballerina
+              uses: ballerina-platform/setup-ballerina@v1.1.5
+              with:
+                version: ${{ steps.resolve-setup-version.outputs.version }}
+
+            - name: Pull the bal scan tool
+              run: bal tool pull scan
+
+            - name: Run bal scan
+              run: |
+                scan_group() {
+                  local list="$1"
+                  while IFS= read -r pkg; do
+                    [ -z "$pkg" ] && continue
+                    echo "::group::bal scan $pkg"
+                    (cd "$pkg" && bal scan --format=sarif) || true
+
+                    f="$pkg/target/report/scan_results.sarif"
+                    if [ ! -f "$f" ] || ! jq -e '.runs[0]' "$f" > /dev/null 2>&1; then
+                      echo "::warning::$f was not produced for package '$pkg'; skipping it in the summary"
+                    fi
+                    echo "::endgroup::"
+                  done < "$list"
+                }
+                scan_group library-packages.txt
+                scan_group example-packages.txt
+
+            # Never fails the job (see the comment on this job) -- only ever writes the
+            # summary, to the run's own Summary tab and, below, as a PR comment.
+            - name: Write scan summary
+              if: always()
+              run: |
+                summarize_group() {
+                  local title="$1" list="$2"
+                  local vuln=0 smell=0
+
+                  if [ ! -s "$list" ]; then
+                    echo "### $title"
+                    echo
+                    echo "No packages found."
+                    echo
+                    return
+                  fi
+
+                  echo "### $title"
+                  echo
+                  echo "| Package | Vulnerabilities | Code smells |"
+                  echo "| --- | --- | --- |"
+                  while IFS= read -r pkg; do
+                    [ -z "$pkg" ] && continue
+                    f="$pkg/target/report/scan_results.sarif"
+                    if [ ! -f "$f" ]; then
+                      echo "| $pkg | _scan did not complete_ | _scan did not complete_ |"
+                      continue
+                    fi
+                    v=$(jq '[.runs[].results[] | select(.level != "note")] | length' "$f")
+                    s=$(jq '[.runs[].results[] | select(.level == "note")] | length' "$f")
+                    echo "| $pkg | $v | $s |"
+                    vuln=$((vuln + v))
+                    smell=$((smell + s))
+                  done < "$list"
+                  echo "| **Total** | **$vuln** | **$smell** |"
+                  echo
+                }
+
+                {
+                  echo "<!-- bal-scan-pr-summary -->"
+                  echo "## bal scan results (informational, does not block this PR)"
+                  echo
+                  summarize_group "Library" library-packages.txt
+                  summarize_group "Examples" example-packages.txt
+                  echo "This check is informational only and never fails the build. The nightly Security Scan workflow gates on these findings across the whole repository."
+                } | tee bal-scan-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+            # Upserts a single tracked comment (by the "<!-- bal-scan-pr-summary -->"
+            # marker) instead of posting a new one on every push, so the PR thread
+            # doesn't accumulate a comment per commit. continue-on-error since a PR from
+            # a fork gets a read-only token under the plain `pull_request` trigger this
+            # template is always called from -- the job's own Summary tab (written
+            # above) is the fallback for that case.
+            - name: Post scan summary as a PR comment
+              if: always() && github.event.pull_request.number
+              continue-on-error: true
+              env:
+                GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                REPO: ${{ github.repository }}
+                PR_NUMBER: ${{ github.event.pull_request.number }}
+              run: |
+                EXISTING_ID=$(gh api --paginate "repos/$REPO/issues/$PR_NUMBER/comments" \
+                  --jq '.[] | select(.body | startswith("<!-- bal-scan-pr-summary -->")) | .id' | head -n1)
+
+                if [ -n "$EXISTING_ID" ]; then
+                  gh api -X PATCH "repos/$REPO/issues/comments/$EXISTING_ID" -f body=@bal-scan-summary.md
+                else
+                  gh api -X POST "repos/$REPO/issues/$PR_NUMBER/comments" -f body=@bal-scan-summary.md
+                fi
 
     windows-build:
         name: Build on Windows
