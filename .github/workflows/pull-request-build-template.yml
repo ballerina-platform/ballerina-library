@@ -252,11 +252,18 @@ jobs:
                   tmpdir="$(mktemp -d)"
                   while IFS= read -r pkg; do
                     [ -z "$pkg" ] && continue
-                    [ -f "$pkg/target/report/scan_results.sarif" ] || continue
+                    f="$pkg/target/report/scan_results.sarif"
+                    # Same validity check count_group uses: a missing/malformed file
+                    # (or one with no runs[0]) piped straight into jq would parse-error
+                    # under the default bash -eo pipefail, failing this step -- and the
+                    # whole job -- instead of just skipping that one package.
+                    { [ -f "$f" ] && jq -e '.runs[0]' "$f" > /dev/null 2>&1; } || continue
                     name="$(echo "$pkg" | tr '/' '_')"
+                    # .results[]? (not .results[]) guards a run with no results array
+                    # at all, which is valid SARIF but would otherwise iterate over null.
                     jq --arg prefix "$pkg/" '
-                      (.runs[].results[].locations[]?.physicalLocation.artifactLocation.uri) |= ($prefix + .)
-                    ' "$pkg/target/report/scan_results.sarif" > "$tmpdir/$name.sarif"
+                      (.runs[].results[]?.locations[]?.physicalLocation.artifactLocation.uri) |= ($prefix + .)
+                    ' "$f" > "$tmpdir/$name.sarif"
                   done < "$list"
 
                   if [ -n "$(ls -A "$tmpdir" 2>/dev/null)" ]; then
