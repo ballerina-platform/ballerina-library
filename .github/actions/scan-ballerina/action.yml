@@ -55,7 +55,7 @@ runs:
           WANTED=0.12.0
           PULL_ENV=(BALLERINA_DEV_CENTRAL=true)
         fi
-        ACTIVE="$(bal tool list | awk -F'|' '$2 ~ /^ *scan *$/ { split($3, v, " "); print v[1] }')"
+        ACTIVE="$(bal tool list | awk -F'|' '$2 ~ /^ *scan *$/ { if (match($3, /[0-9]+\.[0-9]+\.[0-9]+[^ ]*/)) print substr($3, RSTART, RLENGTH) }')"
         # bal tool pull fails when the tool is already active, as it is on the second call in a job.
         if [ -z "$ACTIVE" ] || { [ -n "$WANTED" ] && [ "$ACTIVE" != "$WANTED" ]; }; then
           if [ -n "$WANTED" ]; then
@@ -65,7 +65,7 @@ runs:
             bal tool pull scan
           fi
         fi
-        echo "Using bal scan $(bal tool list | awk -F'|' '$2 ~ /^ *scan *$/ { split($3, v, " "); print v[1] }') on Ballerina $DIST"
+        echo "Using bal scan $(bal tool list | awk -F'|' '$2 ~ /^ *scan *$/ { if (match($3, /[0-9]+\.[0-9]+\.[0-9]+[^ ]*/)) print substr($3, RSTART, RLENGTH) }') on Ballerina $DIST"
 
         PACKAGES=()
         IFS=',' read -ra ENTRIES <<< "${SCAN_PATHS//$'\n'/,}"
