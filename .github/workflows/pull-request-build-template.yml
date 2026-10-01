@@ -19,6 +19,16 @@ on:
         required: false
         type: string
         default: ""
+      scan-path:
+        description: "Path to the main Ballerina package to run 'bal scan' against"
+        required: false
+        type: string
+        default: "ballerina"
+      additional-scan-paths:
+        description: "Comma-separated list of additional Ballerina package paths to scan with 'bal scan', beyond scan-path and any examples/*/ packages found automatically"
+        required: false
+        type: string
+        default: ""
     secrets:
       CODECOV_TOKEN:
         required: false
@@ -219,3 +229,91 @@ jobs:
                 run: |
                   ./gradlew.bat build -x test ${{ inputs.additional-windows-build-flags }}
                   ./gradlew.bat test ${{ inputs.additional-windows-test-flags }}
+
+    # Informational: findings never fail this job. No job-level permissions, since a nested job requesting
+    # more than the caller's token allows stops the whole PR workflow from starting.
+    bal-scan:
+        name: Ballerina Static Code Analysis
+        runs-on: ubuntu-22.04
+        concurrency:
+          group: ${{ github.workflow }}-${{ github.event.pull_request.number }}-bal-scan
+          cancel-in-progress: true
+        steps:
+            # Inline annotations only land on changed lines; the files API caps at 3000, so a truncated list scans anyway.
+            -   name: Check for Ballerina changes
+                id: changes
+                env:
+                    GH_TOKEN: ${{ github.token }}
+                    PR_NUMBER: ${{ github.event.pull_request.number }}
+                    CHANGED_FILES: ${{ github.event.pull_request.changed_files }}
+                run: |
+                  FILES="$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" --jq '.[].filename')"
+                  LISTED="$(printf '%s' "$FILES" | grep -c '' || true)"
+                  if [ "$LISTED" -lt "$CHANGED_FILES" ] || printf '%s\n' "$FILES" | grep -qE '(\.bal|(^|/)Ballerina\.toml)$'; then
+                    echo "bal-changed=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "bal-changed=false" >> "$GITHUB_OUTPUT"
+                    echo "::notice::bal scan skipped: this PR changes no Ballerina source files"
+                  fi
+
+            -   name: Checkout Repository
+                if: steps.changes.outputs.bal-changed == 'true'
+                uses: actions/checkout@v7
+                with:
+                    persist-credentials: false
+
+            -   name: Resolve Java version
+                id: resolve-java
+                if: steps.changes.outputs.bal-changed == 'true'
+                uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
+
+            -   name: Resolve bal scan version
+                id: resolve-scan
+                if: steps.changes.outputs.bal-changed == 'true'
+                uses: ballerina-platform/ballerina-library/.github/actions/resolve-bal-scan-version@main
+                with:
+                    lang-version: ${{ steps.resolve-java.outputs.lang-version }}
+                    target-branch: ${{ github.base_ref }}
+                    default-branch: ${{ github.event.repository.default_branch }}
+
+            -   name: Set up JDK ${{ steps.resolve-java.outputs.java-version }}
+                if: steps.resolve-scan.outputs.supported == 'true'
+                uses: actions/setup-java@v6
+                with:
+                    distribution: 'temurin'
+                    java-version: ${{ steps.resolve-java.outputs.java-version }}
+
+            # `check` is skipped since ubuntu-build already runs checkstyle and spotbugs.
+            -   name: Build the Package
+                if: steps.resolve-scan.outputs.supported == 'true'
+                env:
+                    packageUser: ${{ github.actor }}
+                    packagePAT: ${{ secrets.GITHUB_TOKEN }}
+                    ADDITIONAL_BUILD_FLAGS: ${{ inputs.additional-ubuntu-build-flags }}
+                run: |
+                  IFS=' ' read -ra BUILD_FLAGS <<< "${ADDITIONAL_BUILD_FLAGS//$'\n'/ }"
+                  ./gradlew build -x test -x check "${BUILD_FLAGS[@]}"
+
+            -   name: Set up Ballerina
+                if: steps.resolve-scan.outputs.supported == 'true'
+                uses: ballerina-platform/setup-ballerina@v1.1.5
+                with:
+                    version: ${{ steps.resolve-scan.outputs.version }}
+
+            -   name: Scan library
+                if: steps.resolve-scan.outputs.supported == 'true'
+                uses: ballerina-platform/ballerina-library/.github/actions/scan-ballerina@main
+                with:
+                    paths: |
+                        ${{ inputs.scan-path }}
+                        ${{ inputs.additional-scan-paths }}
+                    category: bal-scan-library
+                    exclude-tests: false
+
+            -   name: Scan examples
+                if: steps.resolve-scan.outputs.supported == 'true'
+                uses: ballerina-platform/ballerina-library/.github/actions/scan-ballerina@main
+                with:
+                    paths: examples
+                    category: bal-scan-examples
+                    exclude-tests: false
