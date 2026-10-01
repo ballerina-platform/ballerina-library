@@ -236,7 +236,7 @@ jobs:
         name: Ballerina Static Code Analysis
         runs-on: ubuntu-22.04
         concurrency:
-          group: ${{ github.head_ref }}-bal-scan
+          group: ${{ github.workflow }}-${{ github.event.pull_request.number }}-bal-scan
           cancel-in-progress: true
         steps:
             # Inline annotations only land on changed lines; the files API caps at 3000, so a truncated list scans anyway.

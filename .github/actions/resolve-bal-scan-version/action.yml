@@ -56,7 +56,7 @@ runs:
         fi
 
         if [ "$SCAN_WITH_LATEST" = "true" ]; then
-          LATEST="$(curl -fsS 'https://api.central.ballerina.io/2.0/update-tool/distributions/latest?version=2201.0.0' | jq -r '.major // empty')"
+          LATEST="$(curl -fsS --connect-timeout 10 --max-time 30 --retry 3 --retry-delay 5 --retry-connrefused 'https://api.central.ballerina.io/2.0/update-tool/distributions/latest?version=2201.0.0' | jq -r '.major // empty')"
           if [ -z "$LATEST" ]; then
             echo "::error::Could not look up the latest Ballerina release"
             exit 1
