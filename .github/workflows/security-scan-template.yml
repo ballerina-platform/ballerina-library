@@ -124,6 +124,8 @@ jobs:
           lang-version: ${{ steps.resolve-bal.outputs.lang-version }}
           target-branch: ${{ github.ref_name }}
           default-branch: ${{ github.event.repository.default_branch }}
+          # A caller can add a `scan-with-branch-version` boolean workflow_dispatch input to opt out of latest.
+          use-latest: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.scan-with-branch-version != 'true' }}
 
       - name: Set up Ballerina
         id: setup-ballerina

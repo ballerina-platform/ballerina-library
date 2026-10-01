@@ -11,6 +11,10 @@ inputs:
     description: The repository's default branch; looked up through the API when empty
     required: false
     default: ''
+  use-latest:
+    description: Scan with the latest Ballerina release regardless of the target branch
+    required: false
+    default: 'false'
   github-token:
     description: Token used to look up the default branch when it isn't given
     required: false
@@ -31,6 +35,7 @@ runs:
         LANG_VERSION: ${{ inputs.lang-version }}
         TARGET_BRANCH: ${{ inputs.target-branch }}
         DEFAULT_BRANCH: ${{ inputs.default-branch }}
+        USE_LATEST: ${{ inputs.use-latest }}
         GH_TOKEN: ${{ inputs.github-token }}
       run: |
         MIN_SCAN_MINOR=12
@@ -44,11 +49,13 @@ runs:
         IS_SNAPSHOT=false
         [[ "$LANG_VERSION" == *-* ]] && IS_SNAPSHOT=true
 
-        if [ -z "$DEFAULT_BRANCH" ]; then
-          DEFAULT_BRANCH="$(gh api "repos/$GITHUB_REPOSITORY" --jq .default_branch)"
+        SCAN_WITH_LATEST="$USE_LATEST"
+        if [ "$SCAN_WITH_LATEST" != "true" ]; then
+          [ -z "$DEFAULT_BRANCH" ] && DEFAULT_BRANCH="$(gh api "repos/$GITHUB_REPOSITORY" --jq .default_branch)"
+          [ "$TARGET_BRANCH" = "$DEFAULT_BRANCH" ] && SCAN_WITH_LATEST=true
         fi
 
-        if [ "$TARGET_BRANCH" = "$DEFAULT_BRANCH" ]; then
+        if [ "$SCAN_WITH_LATEST" = "true" ]; then
           LATEST="$(curl -fsS 'https://api.central.ballerina.io/2.0/update-tool/distributions/latest?version=2201.0.0' | jq -r '.major // empty')"
           if [ -z "$LATEST" ]; then
             echo "::error::Could not look up the latest Ballerina release"
@@ -61,7 +68,7 @@ runs:
           else
             VERSION="$LATEST"
           fi
-          echo "Default branch '$DEFAULT_BRANCH': scanning with $VERSION (package lang version $LANG_VERSION, latest release $LATEST)"
+          echo "Scanning '$TARGET_BRANCH' with $VERSION (package lang version $LANG_VERSION, latest release $LATEST)"
         else
           if [ "$MINOR" -lt "$MIN_SCAN_MINOR" ]; then
             MSG="bal scan skipped: branch '$TARGET_BRANCH' is on Ballerina $LANG_VERSION, and bal scan requires 2201.$MIN_SCAN_MINOR.0 or later."
