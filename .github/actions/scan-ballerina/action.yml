@@ -17,6 +17,10 @@ inputs:
     description: "Fail when a finding is at or above this severity: none, low, medium or high"
     required: false
     default: none
+  exclude-tests:
+    description: Drop findings in the packages' test sources (tests/ and modules/*/tests/)
+    required: false
+    default: 'true'
   tool-version:
     description: bal scan tool version to use; empty picks the latest one compatible with the installed distribution
     required: false
@@ -44,6 +48,7 @@ runs:
         CATEGORY: ${{ inputs.category }}
         FAIL_ON: ${{ inputs.fail-on-severity }}
         TOOL_VERSION: ${{ inputs.tool-version }}
+        EXCLUDE_TESTS: ${{ inputs.exclude-tests }}
       run: |
         case "$FAIL_ON" in none|low|medium|high) ;; *) echo "::error::fail-on-severity must be none, low, medium or high, got '$FAIL_ON'"; exit 1 ;; esac
 
@@ -92,8 +97,12 @@ runs:
           f="$pkg/target/report/scan_results.sarif"
           # bal scan can exit 0 without writing a report.
           if [ -f "$f" ] && jq -e '.runs[0]' "$f" > /dev/null 2>&1; then
-            jq --arg prefix "$pkg/" '(.runs[].results[]?.locations[]?.physicalLocation.artifactLocation.uri) |= ($prefix + .)' \
-              "$f" > "$WORK/$(echo "$pkg" | tr '/' '_').sarif"
+            jq --arg prefix "$pkg/" --argjson exclude_tests "$([ "$EXCLUDE_TESTS" = "true" ] && echo true || echo false)" '
+              (if $exclude_tests then .runs[].results |= map(select(
+                (.locations[0].physicalLocation.artifactLocation.uri // "") | test("^(modules/[^/]+/)?tests/") | not))
+              else . end)
+              | (.runs[].results[]?.locations[]?.physicalLocation.artifactLocation.uri) |= ($prefix + .)
+            ' "$f" > "$WORK/$(echo "$pkg" | tr '/' '_').sarif"
           else
             echo "::warning::bal scan did not produce a report for package '$pkg'"
             MISSING=1
