@@ -308,6 +308,7 @@ jobs:
                         ${{ inputs.scan-path }}
                         ${{ inputs.additional-scan-paths }}
                     category: bal-scan-library
+                    exclude-tests: false
 
             -   name: Scan examples
                 if: steps.resolve-scan.outputs.supported == 'true'
@@ -315,3 +316,4 @@ jobs:
                 with:
                     paths: examples
                     category: bal-scan-examples
+                    exclude-tests: false
