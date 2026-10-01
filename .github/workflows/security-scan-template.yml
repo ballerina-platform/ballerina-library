@@ -205,9 +205,9 @@ jobs:
         with:
           version: latest
 
-      # The tool is pulled from dev central to pick up unreleased scan rules. Pulled
-      # tools are cached per central instance, so BALLERINA_DEV_CENTRAL must also be set
-      # on "Run bal scan" for it to resolve the same tool.
+      # The tool is pulled from dev central to pick up unreleased scan rules.
+      # BALLERINA_DEV_CENTRAL is also set on "Run bal scan" so the package's dependencies,
+      # and the static analysis rules their compiler plugins ship, resolve from dev central too.
       - name: Pull the latest bal scan tool from dev central
         env:
           BALLERINA_DEV_CENTRAL: true
