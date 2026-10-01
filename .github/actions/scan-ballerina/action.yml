@@ -101,7 +101,8 @@ runs:
               (if $exclude_tests then .runs[].results |= map(select(
                 (.locations[0].physicalLocation.artifactLocation.uri // "") | test("^(modules/[^/]+/)?tests/") | not))
               else . end)
-              | (.runs[].results[]?.locations[]?.physicalLocation.artifactLocation.uri) |= ($prefix + .)
+              | (.runs[].results[]?.locations[]?.physicalLocation.artifactLocation.uri) |=
+                  (if test("^(/|[a-zA-Z][a-zA-Z0-9+.-]*:)") or startswith($prefix) then . else $prefix + . end)
             ' "$f" > "$WORK/$(echo "$pkg" | tr '/' '_').sarif"
           else
             echo "::warning::bal scan did not produce a report for package '$pkg'"
