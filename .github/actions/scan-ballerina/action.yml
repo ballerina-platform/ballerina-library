@@ -20,7 +20,7 @@ inputs:
   tool-version:
     description: bal scan tool version to use; empty pulls the latest
     required: false
-    default: ''
+    default: 0.12.0
 outputs:
   sarif-file:
     description: The merged SARIF file; empty when no package was scanned
@@ -47,11 +47,12 @@ runs:
       run: |
         case "$FAIL_ON" in none|low|medium|high) ;; *) echo "::error::fail-on-severity must be none, low, medium or high, got '$FAIL_ON'"; exit 1 ;; esac
 
+        # Temporary: 0.12.0 is only on dev Central. Scoped to the pull so dependencies resolve from production.
         if [ -n "$TOOL_VERSION" ]; then
-          bal tool pull "scan:$TOOL_VERSION"
+          BALLERINA_DEV_CENTRAL=true bal tool pull "scan:$TOOL_VERSION"
           bal tool use "scan:$TOOL_VERSION"
         else
-          bal tool pull scan
+          BALLERINA_DEV_CENTRAL=true bal tool pull scan
         fi
 
         PACKAGES=()
@@ -98,12 +99,9 @@ runs:
           exit 1
         fi
 
-        # Code scanning accepts one run per category, so packages are merged. Rules gain the help text,
-        # security tag and security-severity GitHub needs; without a ruleKind (tool < 0.12.0), any level
-        # above note is a vulnerability.
+        # Code scanning accepts one run per category, so packages are merged.
         SARIF="$WORK.sarif"
         jq -s '
-          def severity_score: {"error": "8.0", "warning": "5.5", "note": "2.0"}[. // "warning"];
           def enrich:
             (.fullDescription.text // .shortDescription.text // .id) as $desc
             | .help //= {
@@ -111,11 +109,9 @@ runs:
                 markdown: ($desc + (if .helpUri then "\n\n[Rule documentation](" + .helpUri + ")" else "" end))
               }
             | .fullDescription //= {text: $desc}
-            | if (.properties.ruleKind // (if .defaultConfiguration.level == "note" then "CODE_SMELL" else "VULNERABILITY" end)) == "VULNERABILITY"
-              then .properties.tags = (((.properties.tags // []) + ["security"]) | unique)
-                | .properties["security-severity"] //= (.defaultConfiguration.level | severity_score)
-              else .properties.tags = (((.properties.tags // []) + ["maintainability"]) | unique)
-              end;
+            | if .properties.ruleKind == "VULNERABILITY" then .properties.tags = (((.properties.tags // []) + ["security"]) | unique)
+              elif .properties.ruleKind == "CODE_SMELL" then .properties.tags = (((.properties.tags // []) + ["maintainability"]) | unique)
+              else . end;
           . as $all
           | {
               "$schema": $all[0]["$schema"],
