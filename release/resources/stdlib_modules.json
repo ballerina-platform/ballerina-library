@@ -110,7 +110,7 @@
         },
         {
             "name": "module-ballerina-avro",
-            "module_version": "1.2.4-SNAPSHOT",
+            "module_version": "1.2.5-SNAPSHOT",
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibAvroVersion",
