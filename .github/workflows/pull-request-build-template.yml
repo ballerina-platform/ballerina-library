@@ -253,7 +253,6 @@ jobs:
                     echo "bal-changed=true" >> "$GITHUB_OUTPUT"
                   else
                     echo "bal-changed=false" >> "$GITHUB_OUTPUT"
-                    echo "bal scan skipped: this PR changes no Ballerina source files." >> "$GITHUB_STEP_SUMMARY"
                     echo "::notice::bal scan skipped: this PR changes no Ballerina source files"
                   fi
 
@@ -295,158 +294,24 @@ jobs:
                   IFS=' ' read -ra BUILD_FLAGS <<< "${ADDITIONAL_BUILD_FLAGS//$'\n'/ }"
                   ./gradlew build -x test -x check "${BUILD_FLAGS[@]}"
 
-            -   name: Discover Ballerina packages to scan
-                if: steps.resolve-scan.outputs.supported == 'true'
-                env:
-                    SCAN_PATH: ${{ inputs.scan-path }}
-                    ADDITIONAL_SCAN_PATHS: ${{ inputs.additional-scan-paths }}
-                run: |
-                  declare -a LIBRARY_PACKAGES=()
-                  [ -d "$SCAN_PATH" ] && LIBRARY_PACKAGES+=("$SCAN_PATH")
-
-                  IFS=',' read -ra EXTRA <<< "${ADDITIONAL_SCAN_PATHS//$'\n'/,}"
-                  for p in "${EXTRA[@]}"; do
-                    p="$(printf '%s' "$p" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
-                    [ -n "$p" ] && LIBRARY_PACKAGES+=("$p")
-                  done
-
-                  declare -a EXAMPLE_PACKAGES=()
-                  if [ -d "examples" ]; then
-                    while IFS= read -r toml; do
-                      EXAMPLE_PACKAGES+=("$(dirname "$toml")")
-                    done < <(find examples \( -path '*/target/*' -o -path '*/.git/*' -o -path '*/build/*' \) -prune -o -iname 'Ballerina.toml' -print | sort)
-                  fi
-
-                  printf '%s\n' "${LIBRARY_PACKAGES[@]}" > library-packages.txt
-                  printf '%s\n' "${EXAMPLE_PACKAGES[@]}" > example-packages.txt
-                  echo "Library package(s):"; cat library-packages.txt
-                  echo "Example package(s):"; cat example-packages.txt
-
             -   name: Set up Ballerina
                 if: steps.resolve-scan.outputs.supported == 'true'
                 uses: ballerina-platform/setup-ballerina@v1.1.5
                 with:
                     version: ${{ steps.resolve-scan.outputs.version }}
 
-            -   name: Pull the bal scan tool
+            -   name: Scan library
                 if: steps.resolve-scan.outputs.supported == 'true'
-                run: bal tool pull scan
-
-            -   name: Run bal scan
-                if: steps.resolve-scan.outputs.supported == 'true'
-                run: |
-                  for list in library-packages.txt example-packages.txt; do
-                    while IFS= read -r pkg; do
-                      [ -z "$pkg" ] && continue
-                      echo "::group::bal scan $pkg"
-                      (cd "$pkg" && bal scan --format=sarif) || true
-                      f="$pkg/target/report/scan_results.sarif"
-                      if [ ! -f "$f" ] || ! jq -e '.runs[0]' "$f" > /dev/null 2>&1; then
-                        echo "::warning::bal scan did not produce a report for package '$pkg'"
-                      fi
-                      echo "::endgroup::"
-                    done < "$list"
-                  done
-
-            # Paths are rewritten to the repo root and packages merged into one run per category, as in the nightly scan.
-            -   name: Prepare SARIF for code scanning
-                if: steps.resolve-scan.outputs.supported == 'true'
-                run: |
-                  rewrite_group() {
-                    local group="$1" list="$2"
-                    local tmpdir
-                    tmpdir="$(mktemp -d)"
-                    while IFS= read -r pkg; do
-                      [ -z "$pkg" ] && continue
-                      f="$pkg/target/report/scan_results.sarif"
-                      { [ -f "$f" ] && jq -e '.runs[0]' "$f" > /dev/null 2>&1; } || continue
-                      name="$(echo "$pkg" | tr '/' '_')"
-                      jq --arg prefix "$pkg/" '
-                        (.runs[].results[]?.locations[]?.physicalLocation.artifactLocation.uri) |= ($prefix + .)
-                      ' "$f" > "$tmpdir/$name.sarif"
-                    done < "$list"
-
-                    if [ -n "$(ls -A "$tmpdir")" ]; then
-                      jq -s '
-                        . as $all
-                        | {
-                            "$schema": $all[0]["$schema"],
-                            version: $all[0].version,
-                            runs: [{
-                              tool: ($all[0].runs[0].tool | .driver.rules = ($all | map(.runs[0].tool.driver.rules[]?) | unique_by(.id))),
-                              results: ($all | map(.runs[0].results[]?))
-                            }]
-                          }
-                      ' "$tmpdir"/*.sarif > "bal-scan-$group.sarif"
-                    fi
-                    rm -rf "$tmpdir"
-                  }
-                  rewrite_group library library-packages.txt
-                  rewrite_group examples example-packages.txt
-
-            # Same category as the nightly scan, so the PR is compared against the default branch's baseline.
-            -   name: Upload library SARIF to code scanning
-                id: upload-library
-                if: steps.resolve-scan.outputs.supported == 'true' && hashFiles('bal-scan-library.sarif') != ''
-                continue-on-error: true
-                uses: github/codeql-action/upload-sarif@v4
+                uses: ballerina-platform/ballerina-library/.github/actions/scan-ballerina@main
                 with:
-                    sarif_file: bal-scan-library.sarif
+                    paths: |
+                        ${{ inputs.scan-path }}
+                        ${{ inputs.additional-scan-paths }}
                     category: bal-scan-library
 
-            -   name: Upload examples SARIF to code scanning
-                id: upload-examples
-                if: steps.resolve-scan.outputs.supported == 'true' && hashFiles('bal-scan-examples.sarif') != ''
-                continue-on-error: true
-                uses: github/codeql-action/upload-sarif@v4
+            -   name: Scan examples
+                if: steps.resolve-scan.outputs.supported == 'true'
+                uses: ballerina-platform/ballerina-library/.github/actions/scan-ballerina@main
                 with:
-                    sarif_file: bal-scan-examples.sarif
+                    paths: examples
                     category: bal-scan-examples
-
-            -   name: Write scan summary
-                if: always() && steps.resolve-scan.outputs.supported == 'true'
-                env:
-                    LIBRARY_UPLOAD: ${{ steps.upload-library.outcome }}
-                    EXAMPLES_UPLOAD: ${{ steps.upload-examples.outcome }}
-                run: |
-                  summarize_group() {
-                    local title="$1" list="$2" upload="$3"
-                    local vuln=0 smell=0
-                    echo "### $title"
-                    echo
-                    if [ ! -s "$list" ] || [ -z "$(tr -d '[:space:]' < "$list")" ]; then
-                      echo "No packages found."
-                      echo
-                      return
-                    fi
-                    echo "| Package | Vulnerabilities | Code smells |"
-                    echo "| --- | --- | --- |"
-                    while IFS= read -r pkg; do
-                      [ -z "$pkg" ] && continue
-                      f="$pkg/target/report/scan_results.sarif"
-                      if [ ! -f "$f" ] || ! jq -e '.runs[0]' "$f" > /dev/null 2>&1; then
-                        echo "| $pkg | _scan did not complete_ | _scan did not complete_ |"
-                        continue
-                      fi
-                      v=$(jq '[.runs[].results[]? | select(.level != "note")] | length' "$f")
-                      s=$(jq '[.runs[].results[]? | select(.level == "note")] | length' "$f")
-                      echo "| $pkg | $v | $s |"
-                      vuln=$((vuln + v))
-                      smell=$((smell + s))
-                    done < "$list"
-                    echo "| **Total** | **$vuln** | **$smell** |"
-                    echo
-                    if [ "$upload" = "success" ]; then
-                      echo "Uploaded to code scanning: findings on lines changed by this PR are annotated inline."
-                    else
-                      echo "Not uploaded to code scanning, so there are no inline annotations for this group."
-                    fi
-                    echo
-                  }
-
-                  {
-                    echo "## bal scan results (informational)"
-                    echo
-                    summarize_group "Library" library-packages.txt "$LIBRARY_UPLOAD"
-                    summarize_group "Examples" example-packages.txt "$EXAMPLES_UPLOAD"
-                  } >> "$GITHUB_STEP_SUMMARY"

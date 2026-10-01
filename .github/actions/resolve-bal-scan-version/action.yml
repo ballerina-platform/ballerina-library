@@ -66,7 +66,6 @@ runs:
           if [ "$MINOR" -lt "$MIN_SCAN_MINOR" ]; then
             MSG="bal scan skipped: branch '$TARGET_BRANCH' is on Ballerina $LANG_VERSION, and bal scan requires 2201.$MIN_SCAN_MINOR.0 or later."
             echo "::warning::$MSG"
-            echo "$MSG" >> "$GITHUB_STEP_SUMMARY"
             echo "supported=false" >> "$GITHUB_OUTPUT"
             echo "version=" >> "$GITHUB_OUTPUT"
             exit 0

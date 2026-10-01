@@ -1,0 +1,175 @@
+name: 'Scan Ballerina'
+description: 'Runs bal scan on Ballerina packages, uploads the findings to GitHub code scanning and optionally fails on a severity threshold'
+inputs:
+  paths:
+    description: Newline or comma separated paths; each is a Ballerina package or a directory searched for packages. Missing paths are ignored
+    required: false
+    default: ballerina
+  category:
+    description: Code scanning category the findings are uploaded under
+    required: false
+    default: bal-scan
+  upload:
+    description: Upload the findings to GitHub code scanning
+    required: false
+    default: 'true'
+  fail-on-severity:
+    description: "Fail when a finding is at or above this severity: none, low, medium or high"
+    required: false
+    default: none
+  tool-version:
+    description: bal scan tool version to use; empty pulls the latest
+    required: false
+    default: ''
+outputs:
+  sarif-file:
+    description: The merged SARIF file; empty when no package was scanned
+    value: ${{ steps.scan.outputs.sarif-file }}
+  high-count:
+    description: Number of high severity findings
+    value: ${{ steps.scan.outputs.high-count }}
+  medium-count:
+    description: Number of medium severity findings
+    value: ${{ steps.scan.outputs.medium-count }}
+  low-count:
+    description: Number of low severity findings
+    value: ${{ steps.scan.outputs.low-count }}
+runs:
+  using: composite
+  steps:
+    - id: scan
+      shell: bash
+      env:
+        SCAN_PATHS: ${{ inputs.paths }}
+        CATEGORY: ${{ inputs.category }}
+        FAIL_ON: ${{ inputs.fail-on-severity }}
+        TOOL_VERSION: ${{ inputs.tool-version }}
+      run: |
+        case "$FAIL_ON" in none|low|medium|high) ;; *) echo "::error::fail-on-severity must be none, low, medium or high, got '$FAIL_ON'"; exit 1 ;; esac
+
+        if [ -n "$TOOL_VERSION" ]; then
+          bal tool pull "scan:$TOOL_VERSION"
+          bal tool use "scan:$TOOL_VERSION"
+        else
+          bal tool pull scan
+        fi
+
+        PACKAGES=()
+        IFS=',' read -ra ENTRIES <<< "${SCAN_PATHS//$'\n'/,}"
+        for p in "${ENTRIES[@]}"; do
+          p="$(printf '%s' "$p" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's:/*$::')"
+          [ -n "$p" ] && [ -d "$p" ] || continue
+          while IFS= read -r toml; do
+            PACKAGES+=("$(dirname "$toml")")
+          done < <(find "$p" \( -name target -o -name build -o -name .git \) -prune -o -name Ballerina.toml -print | sort)
+        done
+
+        WORK="$RUNNER_TEMP/bal-scan-$CATEGORY"
+        rm -rf "$WORK" && mkdir -p "$WORK"
+        if [ "${#PACKAGES[@]}" -eq 0 ]; then
+          echo "::notice::No Ballerina packages found for category '$CATEGORY'"
+          echo "sarif-file=" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        MISSING=0
+        for pkg in "${PACKAGES[@]}"; do
+          echo "::group::bal scan $pkg"
+          (cd "$pkg" && bal scan --format=sarif) || true
+          f="$pkg/target/report/scan_results.sarif"
+          # bal scan can exit 0 without writing a report.
+          if [ -f "$f" ] && jq -e '.runs[0]' "$f" > /dev/null 2>&1; then
+            jq --arg prefix "$pkg/" '(.runs[].results[]?.locations[]?.physicalLocation.artifactLocation.uri) |= ($prefix + .)' \
+              "$f" > "$WORK/$(echo "$pkg" | tr '/' '_').sarif"
+          else
+            echo "::warning::bal scan did not produce a report for package '$pkg'"
+            MISSING=1
+          fi
+          echo "::endgroup::"
+        done
+
+        if [ -z "$(ls -A "$WORK")" ]; then
+          if [ "$FAIL_ON" = "none" ]; then
+            echo "::warning::bal scan did not produce a report for any package in category '$CATEGORY'"
+            echo "sarif-file=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "::error::bal scan did not produce a report for any package in category '$CATEGORY'"
+          exit 1
+        fi
+
+        # Code scanning accepts one run per category, so packages are merged. Rules gain the help text,
+        # security tag and security-severity GitHub needs; without a ruleKind (tool < 0.12.0), any level
+        # above note is a vulnerability.
+        SARIF="$WORK.sarif"
+        jq -s '
+          def severity_score: {"error": "8.0", "warning": "5.5", "note": "2.0"}[. // "warning"];
+          def enrich:
+            (.fullDescription.text // .shortDescription.text // .id) as $desc
+            | .help //= {
+                text: ($desc + (if .helpUri then "\n\nSee " + .helpUri else "" end)),
+                markdown: ($desc + (if .helpUri then "\n\n[Rule documentation](" + .helpUri + ")" else "" end))
+              }
+            | .fullDescription //= {text: $desc}
+            | if (.properties.ruleKind // (if .defaultConfiguration.level == "note" then "CODE_SMELL" else "VULNERABILITY" end)) == "VULNERABILITY"
+              then .properties.tags = (((.properties.tags // []) + ["security"]) | unique)
+                | .properties["security-severity"] //= (.defaultConfiguration.level | severity_score)
+              else .properties.tags = (((.properties.tags // []) + ["maintainability"]) | unique)
+              end;
+          . as $all
+          | {
+              "$schema": $all[0]["$schema"],
+              version: $all[0].version,
+              runs: [{
+                tool: ($all[0].runs[0].tool
+                  | .driver.rules = ($all | map(.runs[0].tool.driver.rules[]?) | unique_by(.id) | map(enrich))),
+                results: ($all | map(.runs[0].results[]?))
+              }]
+            }
+          | .runs[0].tool.driver.rules as $rules
+          | .runs[0].results |= map(.ruleId as $id | .ruleIndex = ([$rules[].id] | index($id)))
+        ' "$WORK"/*.sarif > "$SARIF"
+
+        count() { jq --arg l "$1" '[.runs[0].results[] | select(.level == $l)] | length' "$SARIF"; }
+        HIGH="$(count error)"; MEDIUM="$(count warning)"; LOW="$(count note)"
+        echo "bal scan '$CATEGORY': $HIGH high, $MEDIUM medium, $LOW low severity finding(s) in ${#PACKAGES[@]} package(s)"
+        {
+          echo "sarif-file=$SARIF"
+          echo "high-count=$HIGH"
+          echo "medium-count=$MEDIUM"
+          echo "low-count=$LOW"
+          echo "missing-report=$MISSING"
+        } >> "$GITHUB_OUTPUT"
+
+    - if: inputs.upload == 'true' && steps.scan.outputs.sarif-file != ''
+      continue-on-error: true
+      uses: github/codeql-action/upload-sarif@v4
+      with:
+        sarif_file: ${{ steps.scan.outputs.sarif-file }}
+        category: ${{ inputs.category }}
+
+    - if: inputs.fail-on-severity != 'none' && steps.scan.outputs.sarif-file != ''
+      shell: bash
+      env:
+        FAIL_ON: ${{ inputs.fail-on-severity }}
+        CATEGORY: ${{ inputs.category }}
+        HIGH: ${{ steps.scan.outputs.high-count }}
+        MEDIUM: ${{ steps.scan.outputs.medium-count }}
+        LOW: ${{ steps.scan.outputs.low-count }}
+        MISSING: ${{ steps.scan.outputs.missing-report }}
+      run: |
+        case "$FAIL_ON" in
+          high) FAILING=$HIGH ;;
+          medium) FAILING=$((HIGH + MEDIUM)) ;;
+          low) FAILING=$((HIGH + MEDIUM + LOW)) ;;
+        esac
+        STATUS=0
+        if [ "$FAILING" -gt 0 ]; then
+          echo "::error::bal scan found $FAILING finding(s) at or above $FAIL_ON severity in '$CATEGORY'"
+          STATUS=1
+        fi
+        if [ "$MISSING" = "1" ]; then
+          echo "::error::bal scan did not produce a report for every package in '$CATEGORY'"
+          STATUS=1
+        fi
+        exit $STATUS
