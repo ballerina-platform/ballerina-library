@@ -242,17 +242,40 @@ jobs:
           group: ${{ github.head_ref }}-bal-scan
           cancel-in-progress: true
         steps:
+            # Inline annotations only land on lines the PR changes, so a PR touching no Ballerina
+            # source can't get any and skips the build and scan entirely.
+            -   name: Check for Ballerina changes
+                id: changes
+                env:
+                    GH_TOKEN: ${{ github.token }}
+                    PR_NUMBER: ${{ github.event.pull_request.number }}
+                    CHANGED_FILES: ${{ github.event.pull_request.changed_files }}
+                run: |
+                  FILES="$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" --jq '.[].filename')"
+                  LISTED="$(printf '%s' "$FILES" | grep -c '' || true)"
+                  # The files API caps at 3000 entries; scan anyway when the list is incomplete.
+                  if [ "$LISTED" -lt "$CHANGED_FILES" ] || printf '%s\n' "$FILES" | grep -qE '(\.bal|(^|/)Ballerina\.toml)$'; then
+                    echo "bal-changed=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "bal-changed=false" >> "$GITHUB_OUTPUT"
+                    echo "bal scan skipped: this PR changes no Ballerina source files." >> "$GITHUB_STEP_SUMMARY"
+                    echo "::notice::bal scan skipped: this PR changes no Ballerina source files"
+                  fi
+
             -   name: Checkout Repository
+                if: steps.changes.outputs.bal-changed == 'true'
                 uses: actions/checkout@v7
                 with:
                     persist-credentials: false
 
             -   name: Resolve Java version
                 id: resolve-java
+                if: steps.changes.outputs.bal-changed == 'true'
                 uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
 
             -   name: Resolve bal scan version
                 id: resolve-scan
+                if: steps.changes.outputs.bal-changed == 'true'
                 uses: ballerina-platform/ballerina-library/.github/actions/resolve-bal-scan-version@main
                 with:
                     lang-version: ${{ steps.resolve-java.outputs.lang-version }}
@@ -267,7 +290,8 @@ jobs:
                     java-version: ${{ steps.resolve-java.outputs.java-version }}
 
             # bal scan needs the jars the Gradle build produces to resolve the platform
-            # dependencies in Ballerina.toml.
+            # dependencies in Ballerina.toml. `check` (checkstyle, spotbugs) is skipped since
+            # ubuntu-build already runs it and the scan doesn't need its output.
             -   name: Build the Package
                 if: steps.resolve-scan.outputs.supported == 'true'
                 env:
@@ -276,7 +300,7 @@ jobs:
                     ADDITIONAL_BUILD_FLAGS: ${{ inputs.additional-ubuntu-build-flags }}
                 run: |
                   IFS=' ' read -ra BUILD_FLAGS <<< "${ADDITIONAL_BUILD_FLAGS//$'\n'/ }"
-                  ./gradlew build -x test "${BUILD_FLAGS[@]}"
+                  ./gradlew build -x test -x check "${BUILD_FLAGS[@]}"
 
             -   name: Discover Ballerina packages to scan
                 if: steps.resolve-scan.outputs.supported == 'true'
