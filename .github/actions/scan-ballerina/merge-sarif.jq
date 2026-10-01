@@ -40,37 +40,33 @@ def help_markdown($desc):
     (.helpUri // empty | "", "[Rule documentation](\(.))")
   ] | join("\n"));
 
-# bal scan puts the rule's title in each result's message and a sentence in shortDescription; GitHub shows
-# shortDescription as the alert heading, so the two are swapped while the message is still the generic title.
-def titled($titles):
-  ($titles[.id] // null) as $title
-  | if $title and .fullDescription and $title != .shortDescription.text then
-      .properties.sentence = .shortDescription.text | .shortDescription = {text: $title}
-    else . end;
+# bal scan up to 0.12.x reports the rule's title as every result's message, not one about the finding.
+def generic_messages:
+  (.semanticVersion // "" | capture("^(?<major>[0-9]+)\\.(?<minor>[0-9]+)") | [(.major | tonumber), (.minor | tonumber)] <= [0, 12])
+  // false;
 
-def enrich($titles):
+def enrich:
   (.fullDescription.text // .shortDescription.text // .id) as $desc
   | .help //= {text: $desc, markdown: help_markdown($desc)}
-  | titled($titles)
   | .fullDescription //= {text: $desc}
   | if .properties.ruleKind == "VULNERABILITY" then .properties.tags = (((.properties.tags // []) + ["security"]) | unique)
     elif .properties.ruleKind == "CODE_SMELL" then .properties.tags = (((.properties.tags // []) + ["maintainability"]) | unique)
     else . end;
 
 . as $all
-| ($all | map(.runs[0].results[]?)) as $results
-| ($results | group_by(.ruleId) | map(select(map(.message.text) | unique | length == 1) | {key: .[0].ruleId, value: .[0].message.text}) | from_entries) as $titles
-| ($all | map(.runs[0].tool.driver.rules[]?) | unique_by(.id) | map(enrich($titles))) as $rules
-| ($rules | map({key: .id, value: .properties.sentence}) | from_entries) as $sentences
+| ($all[0].runs[0].tool.driver | generic_messages) as $generic
+| ($all | map(.runs[0].tool.driver.rules[]?) | unique_by(.id)) as $tool_rules
+| ($tool_rules | map(select(.fullDescription.text) | {key: .id, value: .fullDescription.text}) | from_entries) as $descriptions
+| ($tool_rules | map(enrich)) as $rules
 | {
     "$schema": $all[0]["$schema"],
     version: $all[0].version,
     runs: [{
-      tool: ($all[0].runs[0].tool | .driver.rules = ($rules | map(del(.properties.sentence)))),
-      results: ($results | map(
+      tool: ($all[0].runs[0].tool | .driver.rules = $rules),
+      results: ($all | map(.runs[0].results[]?) | map(
         .ruleId as $id
         | .ruleIndex = ([$rules[].id] | index($id))
-        | if $sentences[$id] and .message.text == $titles[$id] then .message.text = $sentences[$id] else . end
+        | if $generic and $descriptions[$id] then .message.text = $descriptions[$id] else . end
       ))
     }]
   }
