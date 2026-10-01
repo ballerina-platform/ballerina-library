@@ -270,7 +270,7 @@ jobs:
             -   name: Resolve bal scan version
                 id: resolve-scan
                 if: steps.changes.outputs.bal-changed == 'true'
-                uses: ballerina-platform/ballerina-library/.github/actions/resolve-bal-scan-version@main
+                uses: ballerina-platform/ballerina-library/.github/actions/resolve-bal-scan-version@bal-scan-e2e
                 with:
                     lang-version: ${{ steps.resolve-java.outputs.lang-version }}
                     target-branch: ${{ github.base_ref }}
@@ -302,7 +302,7 @@ jobs:
 
             -   name: Scan library
                 if: steps.resolve-scan.outputs.supported == 'true'
-                uses: ballerina-platform/ballerina-library/.github/actions/scan-ballerina@main
+                uses: ballerina-platform/ballerina-library/.github/actions/scan-ballerina@bal-scan-e2e
                 with:
                     paths: |
                         ${{ inputs.scan-path }}
@@ -311,7 +311,7 @@ jobs:
 
             -   name: Scan examples
                 if: steps.resolve-scan.outputs.supported == 'true'
-                uses: ballerina-platform/ballerina-library/.github/actions/scan-ballerina@main
+                uses: ballerina-platform/ballerina-library/.github/actions/scan-ballerina@bal-scan-e2e
                 with:
                     paths: examples
                     category: bal-scan-examples
