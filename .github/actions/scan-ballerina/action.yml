@@ -18,9 +18,9 @@ inputs:
     required: false
     default: none
   tool-version:
-    description: bal scan tool version to use; empty pulls the latest
+    description: bal scan tool version to use; empty picks the latest one compatible with the installed distribution
     required: false
-    default: 0.12.0
+    default: ''
 outputs:
   sarif-file:
     description: The merged SARIF file; empty when no package was scanned
@@ -47,12 +47,16 @@ runs:
       run: |
         case "$FAIL_ON" in none|low|medium|high) ;; *) echo "::error::fail-on-severity must be none, low, medium or high, got '$FAIL_ON'"; exit 1 ;; esac
 
-        # Temporary: 0.12.0 is only on dev Central. Scoped to the pull so dependencies resolve from production.
+        DIST="$(bal version | sed -n 's/^Ballerina \([0-9][0-9.]*\).*/\1/p')"
         if [ -n "$TOOL_VERSION" ]; then
-          BALLERINA_DEV_CENTRAL=true bal tool pull "scan:$TOOL_VERSION"
+          bal tool pull "scan:$TOOL_VERSION"
           bal tool use "scan:$TOOL_VERSION"
+        # Temporary: 0.12.0 is only on dev Central and needs 2201.13.2+. Scoped to the pull so dependencies resolve from production.
+        elif [ "$(printf '%s\n%s\n' 2201.13.2 "$DIST" | sort -V | head -n1)" = "2201.13.2" ]; then
+          BALLERINA_DEV_CENTRAL=true bal tool pull scan:0.12.0
+          bal tool use scan:0.12.0
         else
-          BALLERINA_DEV_CENTRAL=true bal tool pull scan
+          bal tool pull scan
         fi
 
         PACKAGES=()
