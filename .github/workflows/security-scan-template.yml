@@ -17,6 +17,11 @@ on:
         required: false
         type: string
         default: ""
+      scan-examples:
+        description: "Run 'bal scan' on the packages under examples/"
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   build:
@@ -146,7 +151,7 @@ jobs:
 
       # Runs even when the library gate fails, so examples findings are still reported.
       - name: Scan examples
-        if: ${{ !cancelled() && steps.setup-ballerina.outcome == 'success' }}
+        if: ${{ !cancelled() && inputs.scan-examples && steps.setup-ballerina.outcome == 'success' }}
         uses: ballerina-platform/ballerina-library/.github/actions/scan-ballerina@bal-scan-e2e
         with:
           paths: examples
