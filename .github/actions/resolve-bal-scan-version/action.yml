@@ -1,0 +1,82 @@
+name: 'Resolve bal scan Version'
+description: 'Decides whether bal scan can run and which Ballerina distribution setup-ballerina should install for it'
+inputs:
+  lang-version:
+    description: The ballerinaLangVersion the package is built with (e.g. the lang-version output of resolve-java-version)
+    required: true
+  target-branch:
+    description: The branch the code is scanned for (the PR base branch, or the branch a scheduled/dispatched run is on)
+    required: true
+  default-branch:
+    description: The repository's default branch; looked up through the API when empty
+    required: false
+    default: ''
+  github-token:
+    description: Token used to look up the default branch when it isn't given
+    required: false
+    default: ${{ github.token }}
+outputs:
+  supported:
+    description: "'true' if bal scan can run, 'false' if it must be skipped"
+    value: ${{ steps.resolve.outputs.supported }}
+  version:
+    description: The version input for setup-ballerina (a release version or 'nightly'); empty when unsupported
+    value: ${{ steps.resolve.outputs.version }}
+runs:
+  using: composite
+  steps:
+    - id: resolve
+      shell: bash
+      env:
+        LANG_VERSION: ${{ inputs.lang-version }}
+        TARGET_BRANCH: ${{ inputs.target-branch }}
+        DEFAULT_BRANCH: ${{ inputs.default-branch }}
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        # bal tool pull scan only works on 2201.12.0 or later.
+        MIN_SCAN_MINOR=12
+
+        if ! [[ "$LANG_VERSION" =~ ^2201\.([0-9]+)\.[0-9]+(-.+)?$ ]]; then
+          echo "::error::Could not parse Ballerina lang version '$LANG_VERSION' (expected 2201.<minor>.<patch>[-<suffix>])"
+          exit 1
+        fi
+        MINOR="${BASH_REMATCH[1]}"
+        BASE_VERSION="${LANG_VERSION%%-*}"
+        IS_SNAPSHOT=false
+        [[ "$LANG_VERSION" == *-* ]] && IS_SNAPSHOT=true
+
+        if [ -z "$DEFAULT_BRANCH" ]; then
+          DEFAULT_BRANCH="$(gh api "repos/$GITHUB_REPOSITORY" --jq .default_branch)"
+        fi
+
+        if [ "$TARGET_BRANCH" = "$DEFAULT_BRANCH" ]; then
+          LATEST="$(curl -fsS 'https://api.central.ballerina.io/2.0/update-tool/distributions/latest?version=2201.0.0' | jq -r '.major // empty')"
+          if [ -z "$LATEST" ]; then
+            echo "::error::Could not look up the latest Ballerina release"
+            exit 1
+          fi
+          # A repo pinned to a snapshot of an unreleased update needs a newer distribution than the latest release.
+          NEWEST="$(printf '%s\n%s\n' "$BASE_VERSION" "$LATEST" | sort -V | tail -n1)"
+          if [ "$IS_SNAPSHOT" = "true" ] && [ "$NEWEST" != "$LATEST" ]; then
+            VERSION="nightly"
+          else
+            VERSION="$LATEST"
+          fi
+          echo "Default branch '$DEFAULT_BRANCH': scanning with $VERSION (package lang version $LANG_VERSION, latest release $LATEST)"
+        else
+          if [ "$MINOR" -lt "$MIN_SCAN_MINOR" ]; then
+            MSG="bal scan skipped: branch '$TARGET_BRANCH' is on Ballerina $LANG_VERSION, and bal scan requires 2201.$MIN_SCAN_MINOR.0 or later."
+            echo "::warning::$MSG"
+            echo "$MSG" >> "$GITHUB_STEP_SUMMARY"
+            echo "supported=false" >> "$GITHUB_OUTPUT"
+            echo "version=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # setup-ballerina can only install published releases or the nightly build, not timestamped snapshots.
+          VERSION="$LANG_VERSION"
+          [ "$IS_SNAPSHOT" = "true" ] && VERSION="nightly"
+          echo "Branch '$TARGET_BRANCH' is not the default branch: scanning with its own version $VERSION"
+        fi
+
+        echo "supported=true" >> "$GITHUB_OUTPUT"
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
