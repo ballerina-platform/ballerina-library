@@ -122,30 +122,7 @@ runs:
 
         # Code scanning accepts one run per category, so packages are merged.
         SARIF="$WORK.sarif"
-        jq -s '
-          def enrich:
-            (.fullDescription.text // .shortDescription.text // .id) as $desc
-            | .help //= {
-                text: ($desc + (if .helpUri then "\n\nSee " + .helpUri else "" end)),
-                markdown: ($desc + (if .helpUri then "\n\n[Rule documentation](" + .helpUri + ")" else "" end))
-              }
-            | .fullDescription //= {text: $desc}
-            | if .properties.ruleKind == "VULNERABILITY" then .properties.tags = (((.properties.tags // []) + ["security"]) | unique)
-              elif .properties.ruleKind == "CODE_SMELL" then .properties.tags = (((.properties.tags // []) + ["maintainability"]) | unique)
-              else . end;
-          . as $all
-          | {
-              "$schema": $all[0]["$schema"],
-              version: $all[0].version,
-              runs: [{
-                tool: ($all[0].runs[0].tool
-                  | .driver.rules = ($all | map(.runs[0].tool.driver.rules[]?) | unique_by(.id) | map(enrich))),
-                results: ($all | map(.runs[0].results[]?))
-              }]
-            }
-          | .runs[0].tool.driver.rules as $rules
-          | .runs[0].results |= map(.ruleId as $id | .ruleIndex = ([$rules[].id] | index($id)))
-        ' "$WORK"/*.sarif > "$SARIF"
+        jq -s -f "$GITHUB_ACTION_PATH/merge-sarif.jq" "$WORK"/*.sarif > "$SARIF"
 
         count() { jq --arg l "$1" '[.runs[0].results[] | select(.level == $l)] | length' "$SARIF"; }
         HIGH="$(count error)"; MEDIUM="$(count warning)"; LOW="$(count note)"
