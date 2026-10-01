@@ -197,34 +197,20 @@ jobs:
           echo "Library package(s):"; cat library-packages.txt
           echo "Example package(s):"; cat example-packages.txt
 
-      - name: Resolve Ballerina version
-        id: resolve-bal
-        uses: ballerina-platform/ballerina-library/.github/actions/resolve-java-version@main
-
-      # setup-ballerina can only download a real dist.ballerina.io release or a nightly
-      # build, not a timestamped snapshot version. Mirrors the ballerina-gradle-plugin's
-      # own isTimeStampVersion check (any hyphen in the lang version, e.g.
-      # 2201.14.0-20260917-124200-7f273e6a) used elsewhere in this repo for the same
-      # problem -- without this, a repo whose gradle.properties pins that kind of
-      # snapshot fails "Set up Ballerina" trying to download a distribution that was
-      # never published.
-      - name: Resolve setup-ballerina version
-        id: resolve-setup-version
-        env:
-          LANG_VERSION: ${{ steps.resolve-bal.outputs.lang-version }}
-        run: |
-          SETUP_VERSION="$LANG_VERSION"
-          if [[ "$LANG_VERSION" == *-* ]]; then
-            SETUP_VERSION="nightly"
-          fi
-          echo "version=$SETUP_VERSION" >> "$GITHUB_OUTPUT"
-
+      # Always scans with the latest released distribution rather than the module's
+      # pinned ballerinaLangVersion, so the scan tool's newest rules are never blocked
+      # by an older lang version the module happens to be on.
       - name: Set up Ballerina
         uses: ballerina-platform/setup-ballerina@v1.1.5
         with:
-          version: ${{ steps.resolve-setup-version.outputs.version }}
+          version: latest
 
-      - name: Pull the bal scan tool
+      # The tool is pulled from dev central to pick up unreleased scan rules. Pulled
+      # tools are cached per central instance, so BALLERINA_DEV_CENTRAL must also be set
+      # on "Run bal scan" for it to resolve the same tool.
+      - name: Pull the latest bal scan tool from dev central
+        env:
+          BALLERINA_DEV_CENTRAL: true
         run: bal tool pull scan
 
       # --format=sarif and the default (JSON) report are mutually exclusive per
@@ -236,6 +222,8 @@ jobs:
       # produce a report, so an empty/missing SARIF is treated as an error per package
       # rather than silently read as "no findings".
       - name: Run bal scan
+        env:
+          BALLERINA_DEV_CENTRAL: true
         run: |
           scan_group() {
             local group="$1" list="$2"
