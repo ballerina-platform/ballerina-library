@@ -33,7 +33,6 @@ runs:
         DEFAULT_BRANCH: ${{ inputs.default-branch }}
         GH_TOKEN: ${{ inputs.github-token }}
       run: |
-        # bal tool pull scan only works on 2201.12.0 or later.
         MIN_SCAN_MINOR=12
 
         if ! [[ "$LANG_VERSION" =~ ^2201\.([0-9]+)\.[0-9]+(-.+)?$ ]]; then
@@ -55,7 +54,7 @@ runs:
             echo "::error::Could not look up the latest Ballerina release"
             exit 1
           fi
-          # A repo pinned to a snapshot of an unreleased update needs a newer distribution than the latest release.
+          # A snapshot of an unreleased update needs a newer distribution than the latest release.
           NEWEST="$(printf '%s\n%s\n' "$BASE_VERSION" "$LATEST" | sort -V | tail -n1)"
           if [ "$IS_SNAPSHOT" = "true" ] && [ "$NEWEST" != "$LATEST" ]; then
             VERSION="nightly"
@@ -72,7 +71,7 @@ runs:
             echo "version=" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          # setup-ballerina can only install published releases or the nightly build, not timestamped snapshots.
+          # setup-ballerina can only install published releases or nightly, not timestamped snapshots.
           VERSION="$LANG_VERSION"
           [ "$IS_SNAPSHOT" = "true" ] && VERSION="nightly"
           echo "Branch '$TARGET_BRANCH' is not the default branch: scanning with its own version $VERSION"

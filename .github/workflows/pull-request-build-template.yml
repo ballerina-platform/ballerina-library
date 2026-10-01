@@ -230,11 +230,8 @@ jobs:
                   ./gradlew.bat build -x test ${{ inputs.additional-windows-build-flags }}
                   ./gradlew.bat test ${{ inputs.additional-windows-test-flags }}
 
-    # Informational: findings never fail this job. It builds on its own instead of waiting
-    # for ubuntu-build, so results land early, and uploads SARIF to code scanning, which makes
-    # GitHub annotate the findings inline on the PR diff. The nightly Security Scan is what gates.
-    # No job-level `permissions`: callers don't grant any, and a nested job requesting more than
-    # the caller's token allows would stop the whole PR workflow from starting.
+    # Informational: findings never fail this job. No job-level permissions, since a nested job requesting
+    # more than the caller's token allows stops the whole PR workflow from starting.
     bal-scan:
         name: Ballerina Static Code Analysis
         runs-on: ubuntu-22.04
@@ -242,8 +239,7 @@ jobs:
           group: ${{ github.head_ref }}-bal-scan
           cancel-in-progress: true
         steps:
-            # Inline annotations only land on lines the PR changes, so a PR touching no Ballerina
-            # source can't get any and skips the build and scan entirely.
+            # Inline annotations only land on changed lines; the files API caps at 3000, so a truncated list scans anyway.
             -   name: Check for Ballerina changes
                 id: changes
                 env:
@@ -253,7 +249,6 @@ jobs:
                 run: |
                   FILES="$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" --jq '.[].filename')"
                   LISTED="$(printf '%s' "$FILES" | grep -c '' || true)"
-                  # The files API caps at 3000 entries; scan anyway when the list is incomplete.
                   if [ "$LISTED" -lt "$CHANGED_FILES" ] || printf '%s\n' "$FILES" | grep -qE '(\.bal|(^|/)Ballerina\.toml)$'; then
                     echo "bal-changed=true" >> "$GITHUB_OUTPUT"
                   else
@@ -289,9 +284,7 @@ jobs:
                     distribution: 'temurin'
                     java-version: ${{ steps.resolve-java.outputs.java-version }}
 
-            # bal scan needs the jars the Gradle build produces to resolve the platform
-            # dependencies in Ballerina.toml. `check` (checkstyle, spotbugs) is skipped since
-            # ubuntu-build already runs it and the scan doesn't need its output.
+            # `check` is skipped since ubuntu-build already runs checkstyle and spotbugs.
             -   name: Build the Package
                 if: steps.resolve-scan.outputs.supported == 'true'
                 env:
@@ -339,7 +332,6 @@ jobs:
                 if: steps.resolve-scan.outputs.supported == 'true'
                 run: bal tool pull scan
 
-            # A package that fails to scan is reported and skipped rather than failing the job.
             -   name: Run bal scan
                 if: steps.resolve-scan.outputs.supported == 'true'
                 run: |
@@ -356,9 +348,7 @@ jobs:
                     done < "$list"
                   done
 
-            # bal scan reports paths relative to the package, but code scanning resolves them
-            # against the repo root and drops results it can't map. Each group is merged into
-            # one SARIF run since code scanning rejects multiple runs under one category.
+            # Paths are rewritten to the repo root and packages merged into one run per category, as in the nightly scan.
             -   name: Prepare SARIF for code scanning
                 if: steps.resolve-scan.outputs.supported == 'true'
                 run: |
@@ -394,8 +384,7 @@ jobs:
                   rewrite_group library library-packages.txt
                   rewrite_group examples example-packages.txt
 
-            # bal-scan-library matches the nightly scan's category, so GitHub compares the PR
-            # against the default branch's baseline and comments only on what the PR introduces.
+            # Same category as the nightly scan, so the PR is compared against the default branch's baseline.
             -   name: Upload library SARIF to code scanning
                 id: upload-library
                 if: steps.resolve-scan.outputs.supported == 'true' && hashFiles('bal-scan-library.sarif') != ''
