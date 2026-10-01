@@ -11,10 +11,7 @@ on:
         required: false
         type: string
         default: ""
-      # Forwarded through so an existing caller with a non-standard layout (no
-      # top-level ballerina/ package, e.g. json-schema-tools, asyncapi-tools) can still
-      # override them here -- without these, such a caller has no way to avoid
-      # security-scan-template.yml's "No Ballerina packages found to scan" failure.
+      # Lets a caller without a top-level ballerina/ package (e.g. json-schema-tools) point bal scan at its packages.
       scan-path:
         required: false
         type: string
