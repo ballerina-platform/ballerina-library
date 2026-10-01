@@ -48,16 +48,24 @@ runs:
         case "$FAIL_ON" in none|low|medium|high) ;; *) echo "::error::fail-on-severity must be none, low, medium or high, got '$FAIL_ON'"; exit 1 ;; esac
 
         DIST="$(bal version | sed -n 's/^Ballerina \([0-9][0-9.]*\).*/\1/p')"
-        if [ -n "$TOOL_VERSION" ]; then
-          bal tool pull "scan:$TOOL_VERSION"
-          bal tool use "scan:$TOOL_VERSION"
+        WANTED="$TOOL_VERSION"
+        PULL_ENV=()
         # Temporary: 0.12.0 is only on dev Central and needs 2201.13.2+. Scoped to the pull so dependencies resolve from production.
-        elif [ "$(printf '%s\n%s\n' 2201.13.2 "$DIST" | sort -V | head -n1)" = "2201.13.2" ]; then
-          BALLERINA_DEV_CENTRAL=true bal tool pull scan:0.12.0
-          bal tool use scan:0.12.0
-        else
-          bal tool pull scan
+        if [ -z "$WANTED" ] && [ "$(printf '%s\n%s\n' 2201.13.2 "$DIST" | sort -V | head -n1)" = "2201.13.2" ]; then
+          WANTED=0.12.0
+          PULL_ENV=(BALLERINA_DEV_CENTRAL=true)
         fi
+        ACTIVE="$(bal tool list | awk -F'|' '$2 ~ /^ *scan *$/ { split($3, v, " "); print v[1] }')"
+        # bal tool pull fails when the tool is already active, as it is on the second call in a job.
+        if [ -z "$ACTIVE" ] || { [ -n "$WANTED" ] && [ "$ACTIVE" != "$WANTED" ]; }; then
+          if [ -n "$WANTED" ]; then
+            env "${PULL_ENV[@]}" bal tool pull "scan:$WANTED"
+            bal tool use "scan:$WANTED"
+          else
+            bal tool pull scan
+          fi
+        fi
+        echo "Using bal scan $(bal tool list | awk -F'|' '$2 ~ /^ *scan *$/ { split($3, v, " "); print v[1] }') on Ballerina $DIST"
 
         PACKAGES=()
         IFS=',' read -ra ENTRIES <<< "${SCAN_PATHS//$'\n'/,}"
