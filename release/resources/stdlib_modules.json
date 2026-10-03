@@ -1570,7 +1570,7 @@
         },
         {
             "name": "module-ballerinax-paypal.orders",
-            "module_version": "2.0.3-SNAPSHOT",
+            "module_version": "2.0.4-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPaypal.ordersVersion",
@@ -1590,7 +1590,7 @@
         },
         {
             "name": "module-ballerinax-paypal.subscriptions",
-            "module_version": "1.0.3-SNAPSHOT",
+            "module_version": "1.0.4-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibPaypal.subscriptionsVersion",
