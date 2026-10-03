@@ -35,6 +35,7 @@ const string REGENERATION_BRANCH = "regenerate-connector";
 
 const decimal WORKFLOW_START_WAIT_TIME = 5;
 const decimal WORKFLOW_POLL_INTERVAL = 5;
+const int MAX_POLL_ATTEMPTS = 360;
 
 configurable string token = os:getEnv(ACCESS_TOKEN_ENV);
 
@@ -97,9 +98,17 @@ isolated function waitForRegeneration(ProcessingModule[] processingModules) retu
     printInfo(string `Waiting for module regeneration to complete`);
     int processedCount = 0;
     int totalModules = processingModules.length();
+    int pollAttempts = 0;
     (Module|error)[] regeneratedModules = [];
     while processedCount < totalModules {
+        if pollAttempts >= MAX_POLL_ATTEMPTS {
+            foreach ProcessingModule processingModule in processingModules {
+                regeneratedModules.push(error(string `Timed out waiting for module regeneration: ${processingModule.module.name}`));
+            }
+            break;
+        }
         runtime:sleep(WORKFLOW_POLL_INTERVAL);
+        pollAttempts += 1;
         // Cloning the array to avoid concurrent modification
         ProcessingModule[] newProcessingModules = processingModules.clone();
         foreach ProcessingModule processingModule in newProcessingModules {
