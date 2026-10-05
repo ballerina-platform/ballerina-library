@@ -661,7 +661,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "module_version": "1.18.2-SNAPSHOT",
+            "module_version": "1.18.3-SNAPSHOT",
             "level": 9,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
@@ -1766,7 +1766,7 @@
         },
         {
             "name": "module-ballerinax-mssql.driver",
-            "module_version": "1.7.1-SNAPSHOT",
+            "module_version": "1.7.2-SNAPSHOT",
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibMssqlDriverVersion",
