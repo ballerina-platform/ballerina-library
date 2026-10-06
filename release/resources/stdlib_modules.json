@@ -78,7 +78,7 @@
         },
         {
             "name": "module-ballerina-url",
-            "module_version": "2.6.3-SNAPSHOT",
+            "module_version": "2.6.4-SNAPSHOT",
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibUrlVersion",
