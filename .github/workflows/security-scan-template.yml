@@ -62,9 +62,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: build-output
-          # The Ballerina.toml/CompilerPlugin.toml the build regenerated for the current
-          # version: the committed copies point at the last release's jar names, so the
-          # bal-scan job cannot resolve the freshly built (-SNAPSHOT) jars without them.
           path: |
             ballerina/lib/**
             **/build/libs/*.jar
