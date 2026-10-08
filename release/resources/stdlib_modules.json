@@ -6,7 +6,7 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibIoVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-avro",
                 "module-ballerina-crypto",
@@ -26,7 +26,7 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibJavaArraysVersion",
-            "release": true,
+            "release": false,
             "dependents": [],
             "is_multiple_connectors": false
         },
@@ -36,7 +36,7 @@
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibMathVectorVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-ai"
             ],
@@ -48,7 +48,7 @@
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibPersistVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerinax-persist.googlesheets",
                 "module-ballerinax-persist.inmemory",
@@ -63,7 +63,7 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibTimeVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-constraint",
                 "module-ballerina-crypto",
@@ -82,7 +82,7 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibUrlVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-oauth2"
             ],
@@ -94,7 +94,7 @@
             "level": 1,
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
-            "release": true,
+            "release": false,
             "dependents": [],
             "is_multiple_connectors": false
         },
@@ -104,7 +104,7 @@
             "level": 1,
             "default_branch": "main",
             "version_key": "stdlibZipVersion",
-            "release": true,
+            "release": false,
             "dependents": [],
             "is_multiple_connectors": false
         },
@@ -114,7 +114,7 @@
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibAvroVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerinax-confluent.cavroserdes",
                 "module-ballerinax-kafka"
@@ -127,7 +127,7 @@
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibConstraintVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-cache",
                 "module-ballerina-data.csv",
@@ -160,7 +160,7 @@
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibLogVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-auth",
                 "module-ballerina-file",
@@ -183,7 +183,7 @@
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibOsVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-file"
             ],
@@ -195,7 +195,7 @@
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibPdfVersion",
-            "release": true,
+            "release": false,
             "dependents": [],
             "is_multiple_connectors": false
         },
@@ -205,7 +205,7 @@
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibProtobufVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-grpc"
             ],
@@ -217,7 +217,7 @@
             "level": 2,
             "default_branch": "main",
             "version_key": "stdlibRandomVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-ai",
                 "module-ballerina-grpc",
@@ -237,7 +237,7 @@
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibXsltVersion",
-            "release": true,
+            "release": false,
             "dependents": [],
             "is_multiple_connectors": false
         },
@@ -259,7 +259,7 @@
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibFileVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-data.csv",
                 "module-ballerina-data.jsondata",
@@ -278,7 +278,7 @@
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibLdapVersion",
-            "release": true,
+            "release": false,
             "dependents": [],
             "is_multiple_connectors": false
         },
@@ -288,7 +288,7 @@
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibMimeVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-email",
                 "module-ballerina-http"
@@ -323,7 +323,7 @@
             "level": 3,
             "default_branch": "main",
             "version_key": "stdlibUuidVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-mqtt",
                 "module-ballerina-task",
@@ -351,7 +351,7 @@
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibDataJsonDataVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-ftp",
                 "module-ballerina-http",
@@ -379,7 +379,7 @@
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibEdiVersion",
-            "release": true,
+            "release": false,
             "dependents": [],
             "is_multiple_connectors": false
         },
@@ -389,7 +389,7 @@
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibMqttVersion",
-            "release": true,
+            "release": false,
             "dependents": [],
             "is_multiple_connectors": false
         },
@@ -399,7 +399,7 @@
             "level": 4,
             "default_branch": "master",
             "version_key": "stdlibTaskVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-cache",
                 "module-ballerina-ftp",
@@ -414,7 +414,7 @@
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibTomlVersion",
-            "release": true,
+            "release": false,
             "dependents": [],
             "is_multiple_connectors": false
         },
@@ -424,7 +424,7 @@
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibXlsxVersion",
-            "release": true,
+            "release": false,
             "dependents": [],
             "is_multiple_connectors": false
         },
@@ -434,7 +434,7 @@
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibYamlVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-ai.np"
             ],
@@ -446,7 +446,7 @@
             "level": 5,
             "default_branch": "master",
             "version_key": "stdlibCacheVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-auth",
                 "module-ballerina-jwt",
@@ -470,7 +470,7 @@
             "level": 5,
             "default_branch": "main",
             "version_key": "stdlibMessagingVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerinax-rabbitmq"
             ],
@@ -482,7 +482,7 @@
             "level": 5,
             "default_branch": "main",
             "version_key": "stdlibSmbVersion",
-            "release": true,
+            "release": false,
             "dependents": [],
             "is_multiple_connectors": false
         },
@@ -492,7 +492,7 @@
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibAuthVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-http"
             ],
@@ -504,7 +504,7 @@
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibJwtVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-http"
             ],
@@ -516,7 +516,7 @@
             "level": 6,
             "default_branch": "master",
             "version_key": "stdlibOAuth2Version",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-email",
                 "module-ballerina-http"
@@ -529,7 +529,7 @@
             "level": 7,
             "default_branch": "master",
             "version_key": "stdlibEmailVersion",
-            "release": true,
+            "release": false,
             "dependents": [],
             "is_multiple_connectors": false
         },
@@ -561,7 +561,7 @@
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibAiVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-ai.np"
             ],
@@ -595,7 +595,7 @@
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibSoapVersion",
-            "release": true,
+            "release": false,
             "dependents": [],
             "is_multiple_connectors": false
         },
@@ -605,7 +605,7 @@
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibTransactionVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerina-sql",
                 "module-ballerinax-persist.googlesheets",
@@ -633,7 +633,7 @@
             "level": 8,
             "default_branch": "master",
             "version_key": "stdlibWebsubVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "openapi-tools"
             ],
@@ -645,7 +645,7 @@
             "level": 8,
             "default_branch": "main",
             "version_key": "stdlibWebsubhubVersion",
-            "release": true,
+            "release": false,
             "dependents": [],
             "is_multiple_connectors": false
         },
@@ -655,7 +655,7 @@
             "level": 9,
             "default_branch": "main",
             "version_key": "stdlibAi.npVersion",
-            "release": true,
+            "release": false,
             "dependents": [],
             "is_multiple_connectors": false
         },
@@ -665,7 +665,7 @@
             "level": 9,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "graphql-tools",
                 "openapi-tools"
@@ -678,7 +678,7 @@
             "level": 9,
             "default_branch": "master",
             "version_key": "stdlibSqlVersion",
-            "release": true,
+            "release": false,
             "dependents": [
                 "module-ballerinax-aws.redshift",
                 "module-ballerinax-java.jdbc",
