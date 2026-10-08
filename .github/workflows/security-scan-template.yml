@@ -65,6 +65,8 @@ jobs:
           path: |
             ballerina/lib/**
             **/build/libs/*.jar
+            ballerina/Ballerina.toml
+            ballerina/CompilerPlugin.toml
           if-no-files-found: warn
           retention-days: 1
           include-hidden-files: true
