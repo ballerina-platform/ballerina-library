@@ -1,0 +1,97 @@
+/*
+ * Copyright (c) {{LICENSE_YEAR}}, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+plugins {
+    id 'java'
+    id 'checkstyle'
+    id 'com.github.spotbugs'
+}
+
+description = 'Ballerina - {{MODULE_NAME_PC}} Java Native'
+
+dependencies {
+    checkstyle project(':checkstyle')
+    checkstyle "com.puppycrawl.tools:checkstyle:${checkstylePluginVersion}"
+
+    implementation group: 'org.ballerinalang', name: 'ballerina-runtime', version: "${ballerinaLangVersion}"
+}
+
+checkstyle {
+    toolVersion "${checkstylePluginVersion}"
+    configFile rootProject.file("build-config/checkstyle/build/checkstyle.xml")
+    configProperties = ["suppressionFile" : file("${rootDir}/build-config/checkstyle/build/suppressions.xml")]
+}
+
+checkstyleMain.dependsOn(":checkstyle:downloadCheckstyleRuleFiles")
+
+def excludePattern = '**/module-info.java'
+tasks.withType(Checkstyle) {
+    exclude excludePattern
+}
+
+spotbugsMain {
+    def classLoader = plugins["com.github.spotbugs"].class.classLoader
+    def SpotBugsConfidence = classLoader.findLoadedClass("com.github.spotbugs.snom.Confidence")
+    def SpotBugsEffort = classLoader.findLoadedClass("com.github.spotbugs.snom.Effort")
+    effort = SpotBugsEffort.MAX
+    reportLevel = SpotBugsConfidence.LOW
+    reportsDir = layout.buildDirectory.dir("reports/spotbugs")
+    reports {
+        html.enabled true
+        text.enabled = true
+    }
+    def excludeFile = file("${rootDir}/spotbugs-exclude.xml")
+    if (excludeFile.exists()) {
+        excludeFilter = excludeFile
+    }
+}
+
+spotbugsTest {
+    enabled = false
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId project.group
+            artifactId "{{MODULE_NAME_CC}}-native"
+            version = project.version
+            artifact jar
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/ballerina-platform/{{REPO_NAME}}")
+            credentials {
+                username = System.getenv("publishUser")
+                password = System.getenv("publishPAT")
+            }
+        }
+    }
+}
+
+compileJava {
+    doFirst {
+        options.compilerArgs = [
+                '--module-path', classpath.asPath,
+        ]
+        classpath = files()
+    }
+}
