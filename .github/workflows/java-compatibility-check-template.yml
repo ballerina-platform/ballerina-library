@@ -57,7 +57,7 @@ jobs:
                       11) LANG_VERSION="" ;;
                       17) LANG_VERSION="2201.8.0" ;;
                       21) LANG_VERSION="2201.11.0" ;;
-                      25) LANG_VERSION="2201.14.0-20260911-112100-0f421c6f" ;;
+                      25) LANG_VERSION="2201.14.0" ;;
                       *)
                         echo "::error::java-version '$JAVA_VERSION' has no default lang-version mapping; pass an explicit lang-version input"
                         exit 1
@@ -108,7 +108,7 @@ jobs:
                       11) LANG_VERSION="" ;;
                       17) LANG_VERSION="2201.8.0" ;;
                       21) LANG_VERSION="2201.11.0" ;;
-                      25) LANG_VERSION="2201.14.0-20260911-112100-0f421c6f" ;;
+                      25) LANG_VERSION="2201.14.0" ;;
                       *)
                         echo "::error::java-version '$JAVA_VERSION' has no default lang-version mapping; pass an explicit lang-version input"
                         exit 1
