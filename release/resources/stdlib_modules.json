@@ -466,7 +466,7 @@
         },
         {
             "name": "module-ballerina-messaging",
-            "module_version": "1.0.1-SNAPSHOT",
+            "module_version": "1.0.2-SNAPSHOT",
             "level": 5,
             "default_branch": "main",
             "version_key": "stdlibMessagingVersion",
@@ -661,7 +661,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "module_version": "1.19.0-SNAPSHOT",
+            "module_version": "1.19.1-SNAPSHOT",
             "level": 9,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
