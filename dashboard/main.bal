@@ -20,7 +20,7 @@ import ballerina/lang.array;
 import ballerina/log;
 
 public function main() returns error? {
-    List moduleNameList = check getSortedModuleNameList();
+    ModuleNameList moduleNameList = check getSortedModuleNameList();
     List moduleDetails = check initializeModuleDetails(moduleNameList);
 
     Module[] libraryModules = moduleDetails.library_modules;
@@ -48,20 +48,21 @@ public function main() returns error? {
     moduleDetails.library_modules = libraryModules.sort(array:ASCENDING, a => a.level);
 
     check writeToFile(STDLIB_MODULES_JSON, moduleDetails);
-    check updateDashboard(moduleDetails);
+    check updateDashboard(moduleDetails, moduleNameList.central_only_modules);
 }
 
 //  Sorts the Ballerina library module list in ascending order
-function getSortedModuleNameList() returns List|error {
-    List moduleList = check (check io:fileReadJson(MODULE_LIST_JSON)).fromJsonWithType();
+function getSortedModuleNameList() returns ModuleNameList|error {
+    ModuleNameList moduleList = check (check io:fileReadJson(MODULE_LIST_JSON)).fromJsonWithType();
 
-    List sortedList = {
+    ModuleNameList sortedList = {
         library_modules: sortModuleArray(moduleList.library_modules),
         extended_modules: sortModuleArray(moduleList.extended_modules),
         handwritten_connectors: sortModuleArray(moduleList.handwritten_connectors),
         generated_connectors: sortModuleArray(moduleList.generated_connectors),
         driver_modules: sortModuleArray(moduleList.driver_modules),
-        tools: sortModuleArray(moduleList.tools)
+        tools: sortModuleArray(moduleList.tools),
+        central_only_modules: moduleList.central_only_modules.sort()
     };
 
     check writeToFile(MODULE_LIST_JSON, sortedList);
@@ -74,7 +75,7 @@ function sortModuleArray(Module[] moduleArray) returns Module[] {
         select module;
 }
 
-function initializeModuleDetails(List moduleNameList) returns List|error {
+function initializeModuleDetails(ModuleNameList moduleNameList) returns List|error {
     return {
         library_modules: check initializeModuleList(moduleNameList.library_modules),
         extended_modules: check initializeModuleList(moduleNameList.extended_modules),
@@ -271,7 +272,7 @@ function removeModulesInIntermediatePaths(DiGraph dependencyGraph, string source
 }
 
 // Updates the stdlib dashboard in README.md
-function updateDashboard(List moduleDetails) returns error? {
+function updateDashboard(List moduleDetails, string[] centralOnlyModules) returns error? {
     string readmeFile = check io:fileReadString(README_FILE);
     string[] readmeFileLines = re `\n`.split(readmeFile);
     string updatedReadmeFile = "";
@@ -283,7 +284,10 @@ function updateDashboard(List moduleDetails) returns error? {
         }
     }
 
-    updatedReadmeFile += check getLibraryModulesDashboard(moduleDetails.library_modules);
+    LibraryModulesByPackaging partitionedModules =
+        partitionByDistributionPackaging(moduleDetails.library_modules, centralOnlyModules);
+    updatedReadmeFile += check getLibraryModulesDashboard(partitionedModules.packaged);
+    updatedReadmeFile += check getCentralOnlyModulesDashboard(partitionedModules.centralOnly);
     updatedReadmeFile += check getExtendedModulesDashboard(moduleDetails.extended_modules);
     updatedReadmeFile += check getHandwrittenConnectorDashboard(moduleDetails.handwritten_connectors);
     updatedReadmeFile += check getGeneratedConnectorDashboard(moduleDetails.generated_connectors);
@@ -297,21 +301,45 @@ function updateDashboard(List moduleDetails) returns error? {
     log:printInfo("Dashboard Updated");
 }
 
+// Splits the library modules into those packed with the distribution and those published to
+// Ballerina Central only, so each is rendered under its own dashboard table.
+isolated function partitionByDistributionPackaging(Module[] libraryModules, string[] centralOnlyModules)
+        returns LibraryModulesByPackaging {
+    Module[] packaged = from Module module in libraryModules
+        where centralOnlyModules.indexOf(module.name) is ()
+        select module;
+    Module[] centralOnly = from Module module in libraryModules
+        where centralOnlyModules.indexOf(module.name) !is ()
+        select module;
+    return {packaged, centralOnly};
+}
+
 isolated function getLibraryModulesDashboard(Module[] modules) returns string|error {
+    return getDashboard(TITLE_LIBRARY_MODULES, DESCRIPTION_LIBRARY_MODULES, HEADER_LIBRARY_MODULES_DASHBOARD,
+            HEADER_SEPARATOR_LIBRARY_MODULES, check getLeveledDashboardRows(modules));
+}
+
+isolated function getCentralOnlyModulesDashboard(Module[] modules) returns string|error {
+    return getDashboard(TITLE_CENTRAL_ONLY_MODULES, DESCRIPTION_CENTRAL_ONLY_MODULES,
+            HEADER_LIBRARY_MODULES_DASHBOARD, HEADER_SEPARATOR_LIBRARY_MODULES,
+            check getLeveledDashboardRows(modules));
+}
+
+isolated function getLeveledDashboardRows(Module[] modules) returns string|error {
     string data = "";
-    string levelColumn = "1";
-    int currentLevel = 1;
+    // The level is printed only on the first row of each level. It is derived from the module's own level
+    // rather than a running counter, which would mislabel a list that does not start at level 1.
+    int currentLevel = 0;
     foreach Module module in modules {
-        int? moduleLevel = module.level;
-        if moduleLevel is int && moduleLevel > currentLevel {
+        string levelColumn = "";
+        int moduleLevel = module.level ?: currentLevel;
+        if moduleLevel > currentLevel {
             currentLevel = moduleLevel;
             levelColumn = currentLevel.toString();
         }
         data += check getLibraryDashboardRow(module, levelColumn) + "\n";
-        levelColumn = "";
     }
-    return getDashboard(TITLE_LIBRARY_MODULES, DESCRIPTION_LIBRARY_MODULES, HEADER_LIBRARY_MODULES_DASHBOARD,
-            HEADER_SEPARATOR_LIBRARY_MODULES, data);
+    return data;
 }
 
 isolated function getExtendedModulesDashboard(Module[] modules) returns string|error {
