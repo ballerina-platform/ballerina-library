@@ -387,7 +387,7 @@
         },
         {
             "name": "module-ballerina-mqtt",
-            "module_version": "1.4.3-SNAPSHOT",
+            "module_version": "1.4.4-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibMqttVersion",
@@ -665,7 +665,7 @@
         },
         {
             "name": "module-ballerina-graphql",
-            "module_version": "1.19.1-SNAPSHOT",
+            "module_version": "1.19.2-SNAPSHOT",
             "level": 9,
             "default_branch": "master",
             "version_key": "stdlibGraphqlVersion",
