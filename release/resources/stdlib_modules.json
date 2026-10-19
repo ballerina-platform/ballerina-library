@@ -95,7 +95,9 @@
             "default_branch": "master",
             "version_key": "stdlibXmldataVersion",
             "release": true,
-            "dependents": [],
+            "dependents": [
+                "module-ballerina-mcp"
+            ],
             "is_multiple_connectors": false
         },
         {
@@ -436,7 +438,7 @@
             "version_key": "stdlibYamlVersion",
             "release": true,
             "dependents": [
-                "module-ballerina-ai.np"
+                "module-ballerina-mcp"
             ],
             "is_multiple_connectors": false
         },
@@ -541,8 +543,8 @@
             "version_key": "stdlibHttpVersion",
             "release": true,
             "dependents": [
-                "module-ballerina-ai",
                 "module-ballerina-grpc",
+                "module-ballerina-mcp",
                 "module-ballerina-otel",
                 "module-ballerina-soap",
                 "module-ballerinai-transaction",
@@ -556,18 +558,6 @@
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerina-ai",
-            "module_version": "1.16.1-SNAPSHOT",
-            "level": 8,
-            "default_branch": "main",
-            "version_key": "stdlibAiVersion",
-            "release": true,
-            "dependents": [
-                "module-ballerina-ai.np"
-            ],
-            "is_multiple_connectors": false
-        },
-        {
             "name": "module-ballerina-grpc",
             "module_version": "1.16.2-SNAPSHOT",
             "level": 8,
@@ -576,6 +566,18 @@
             "release": true,
             "dependents": [
                 "openapi-tools"
+            ],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerina-mcp",
+            "module_version": "1.4.1-SNAPSHOT",
+            "level": 8,
+            "default_branch": "main",
+            "version_key": "stdlibMcpVersion",
+            "release": true,
+            "dependents": [
+                "module-ballerina-ai"
             ],
             "is_multiple_connectors": false
         },
@@ -650,13 +652,15 @@
             "is_multiple_connectors": false
         },
         {
-            "name": "module-ballerina-ai.np",
-            "module_version": "0.5.1-SNAPSHOT",
+            "name": "module-ballerina-ai",
+            "module_version": "1.16.1-SNAPSHOT",
             "level": 9,
             "default_branch": "main",
-            "version_key": "stdlibAi.npVersion",
+            "version_key": "stdlibAiVersion",
             "release": true,
-            "dependents": [],
+            "dependents": [
+                "module-ballerina-ai.np"
+            ],
             "is_multiple_connectors": false
         },
         {
@@ -685,6 +689,16 @@
                 "module-ballerinax-oracledb",
                 "module-ballerinax-snowflake"
             ],
+            "is_multiple_connectors": false
+        },
+        {
+            "name": "module-ballerina-ai.np",
+            "module_version": "0.5.1-SNAPSHOT",
+            "level": 10,
+            "default_branch": "main",
+            "version_key": "stdlibAiNpVersion",
+            "release": true,
+            "dependents": [],
             "is_multiple_connectors": false
         }
     ],
