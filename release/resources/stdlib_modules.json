@@ -143,7 +143,7 @@
         },
         {
             "name": "module-ballerina-crypto",
-            "module_version": "2.13.0-SNAPSHOT",
+            "module_version": "2.13.1-SNAPSHOT",
             "level": 2,
             "default_branch": "master",
             "version_key": "stdlibCryptoVersion",
@@ -257,7 +257,7 @@
         },
         {
             "name": "module-ballerina-file",
-            "module_version": "1.14.0-SNAPSHOT",
+            "module_version": "1.14.1-SNAPSHOT",
             "level": 3,
             "default_branch": "master",
             "version_key": "stdlibFileVersion",
@@ -377,7 +377,7 @@
         },
         {
             "name": "module-ballerina-edi",
-            "module_version": "1.7.1-SNAPSHOT",
+            "module_version": "1.7.2-SNAPSHOT",
             "level": 4,
             "default_branch": "main",
             "version_key": "stdlibEdiVersion",
@@ -1022,7 +1022,7 @@
         },
         {
             "name": "module-ballerinax-sap",
-            "module_version": "1.4.0-SNAPSHOT",
+            "module_version": "1.4.1-SNAPSHOT",
             "level": 100,
             "default_branch": "main",
             "version_key": "stdlibSapVersion",
