@@ -48,8 +48,8 @@ function getBuildStatusBadgeTest() returns error? {
 function getTrivyBadgeTest() returns error? {
     RepoBadges repoBadgesIo = check getRepoBadges(ioModule);
     RepoBadges repoBadgesTwilio = check getRepoBadges(twilioModule);
-    test:assertEquals(getBadge(repoBadgesIo.trivy), "[![Trivy](https://img.shields.io/github/actions/workflow/status/ballerina-platform/module-ballerina-io/trivy-scan.yml?branch=master&label=)](https://github.com/ballerina-platform/module-ballerina-io/actions/workflows/trivy-scan.yml)");
-    test:assertEquals(getBadge(repoBadgesTwilio.trivy), "[![Trivy](https://img.shields.io/badge/-N%2FA-yellow)](https://github.com/ballerina-platform/module-ballerinax-twilio/actions/workflows/trivy-scan.yml)");
+    test:assertEquals(getBadge(repoBadgesIo.trivy), "[![Security Scan](https://img.shields.io/github/actions/workflow/status/ballerina-platform/module-ballerina-io/trivy-scan.yml?branch=master&label=)](https://github.com/ballerina-platform/module-ballerina-io/actions/workflows/trivy-scan.yml)");
+    test:assertEquals(getBadge(repoBadgesTwilio.trivy), "[![Security Scan](https://img.shields.io/badge/-N%2FA-yellow)](https://github.com/ballerina-platform/module-ballerinax-twilio/actions/workflows/trivy-scan.yml)");
 }
 
 @test:Config

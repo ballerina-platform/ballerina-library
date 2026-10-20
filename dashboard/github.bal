@@ -57,7 +57,9 @@ isolated function getRepoBadges(Module module) returns RepoBadges|error {
     string[] workflowFileNames = [];
     string? buildWorkflow = ();
     string? graalvmCheckWorkflow = ();
+    // The Security Scan workflow (Trivy + bal scan), and the legacy trivy-scan.yml name it replaces.
     github:Workflow? trivyWorkflow = ();
+    github:Workflow? legacyTrivyWorkflow = ();
 
     foreach github:Workflow workflow in workflowResponse.workflows {
         string workflowFileName = getWorkflowFileName(workflow.path);
@@ -65,8 +67,10 @@ isolated function getRepoBadges(Module module) returns RepoBadges|error {
         if workflowFileName == WORKFLOW_MASTER_BUILD || workflowFileName == WORKFLOW_MASTER_CI_BUILD {
             buildWorkflow = workflowFileName;
         }
-        if workflowFileName == WORKFLOW_TRIVY {
+        if workflowFileName == WORKFLOW_CONNECTOR_SECURITY_SCAN {
             trivyWorkflow = workflow;
+        } else if workflowFileName == WORKFLOW_TRIVY {
+            legacyTrivyWorkflow = workflow;
         }
         if workflowFileName == WORKFLOW_PROCESS_LOAD_TESTS {
             repoBadges.loadTests = {
@@ -87,17 +91,11 @@ isolated function getRepoBadges(Module module) returns RepoBadges|error {
     if graalvmCheckWorkflow is () && workflowFileNames.indexOf(WORKFLOW_BAL_TEST_NATIVE) is int {
         graalvmCheckWorkflow = WORKFLOW_BAL_TEST_NATIVE;
     }
-    // A repository generated off the connector template only ever has
-    // WORKFLOW_CONNECTOR_SECURITY_SCAN, never the standard trivy-scan.yml name -- without
-    // this fallback, every such repo's Security Check badge would permanently show "N/A"
-    // even though the workflow runs correctly.
+    // Repositories are being renamed from trivy-scan.yml to security-scan.yml. Prefer the new name, and fall
+    // back to the legacy one for repositories that have not been migrated yet. Without this, the Security
+    // Check badge would show "N/A" even though the workflow runs correctly.
     if trivyWorkflow is () {
-        foreach github:Workflow workflow in workflowResponse.workflows {
-            if getWorkflowFileName(workflow.path) == WORKFLOW_CONNECTOR_SECURITY_SCAN {
-                trivyWorkflow = workflow;
-                break;
-            }
-        }
+        trivyWorkflow = legacyTrivyWorkflow;
     }
 
     if buildWorkflow is string {
@@ -119,13 +117,13 @@ isolated function getRepoBadges(Module module) returns RepoBadges|error {
         string workflowUrl = getWorkflowUrl(moduleName, trivyWorkflowFileName);
         if trivyWorkflow.state == "disabled_inactivity" {
             repoBadges.trivy = {
-                name: "Trivy",
+                name: "Security Scan",
                 badgeUrl: DISABLED_BADGE,
                 htmlUrl: workflowUrl
             };
         } else {
             repoBadges.trivy = {
-                name: "Trivy",
+                name: "Security Scan",
                 badgeUrl: getBadgeUrl(moduleName, trivyWorkflowFileName, defaultBranch),
                 htmlUrl: workflowUrl
             };
