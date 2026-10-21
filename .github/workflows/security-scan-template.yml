@@ -143,8 +143,9 @@ jobs:
 
       - name: Scan library
         if: steps.resolve-scan.outputs.supported == 'true'
-        uses: ballerina-platform/ballerina-library/.github/actions/scan-ballerina@main
+        uses: ballerina-platform/scan-ballerina@v0.1.0
         with:
+          platforms: github-code-scanning
           paths: |
             ${{ inputs.scan-path }}
             ${{ inputs.additional-scan-paths }}
@@ -153,9 +154,10 @@ jobs:
 
       # Runs even when the library gate fails, so examples findings are still reported.
       - name: Scan examples
-        if: ${{ !cancelled() && inputs.scan-examples && steps.setup-ballerina.outcome == 'success' }}
-        uses: ballerina-platform/ballerina-library/.github/actions/scan-ballerina@main
+        if: ${{ !cancelled() && inputs.scan-examples && steps.setup-ballerina.outcome == 'success' && hashFiles('examples/**') != '' }}
+        uses: ballerina-platform/scan-ballerina@v0.1.0
         with:
+          platforms: github-code-scanning
           paths: examples
           category: bal-scan-examples
           fail-on-severity: medium
