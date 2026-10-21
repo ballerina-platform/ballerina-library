@@ -1,0 +1,51 @@
+/*
+ * Copyright (c) {{LICENSE_YEAR}}, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+plugins {
+    id "de.undercouch.download"
+}
+
+apply plugin: 'java'
+
+task downloadCheckstyleRuleFiles(type: Download) {
+    src([
+            'https://raw.githubusercontent.com/wso2/code-quality-tools/v1.4/checkstyle/jdk-17/checkstyle.xml',
+            'https://raw.githubusercontent.com/wso2/code-quality-tools/v1.4/checkstyle/jdk-17/suppressions.xml'
+    ])
+    overwrite false
+    onlyIfNewer true
+    dest layout.buildDirectory.get().asFile
+}
+
+jar {
+    enabled = false
+}
+
+clean {
+    enabled = false
+}
+
+artifacts.add('default', layout.buildDirectory.file("checkstyle.xml")) {
+    builtBy('downloadCheckstyleRuleFiles')
+}
+
+artifacts.add('default', layout.buildDirectory.file("suppressions.xml")) {
+    builtBy('downloadCheckstyleRuleFiles')
+}
+
+test.mustRunAfter(downloadCheckstyleRuleFiles)

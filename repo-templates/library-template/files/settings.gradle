@@ -1,0 +1,34 @@
+pluginManagement {
+    plugins {
+        id "net.researchgate.release" version "${releasePluginVersion}"
+        id "io.ballerina.plugin" version "${ballerinaGradlePluginVersion}"
+    }
+
+    repositories {
+        gradlePluginPortal()
+        maven {
+            url = 'https://maven.pkg.github.com/ballerina-platform/*'
+            credentials {
+                username System.getenv("packageUser")
+                password System.getenv("packagePAT")
+            }
+        }
+    }
+}
+
+plugins {
+    id "com.gradle.develocity" version "3.19.2"
+}
+
+rootProject.name = '{{MODULE_NAME_CC}}'
+
+include ':{{MODULE_NAME_CC}}-ballerina'
+
+project(':{{MODULE_NAME_CC}}-ballerina').projectDir = file('ballerina')
+
+develocity {
+    buildScan {
+        termsOfUseUrl = 'https://gradle.com/help/legal-terms-of-use'
+        termsOfUseAgree = 'yes'
+    }
+}

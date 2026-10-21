@@ -1,0 +1,48 @@
+pluginManagement {
+    plugins {
+        id "com.github.spotbugs" version "${spotbugsPluginVersion}"
+        id "de.undercouch.download" version "${downloadPluginVersion}"
+        id "net.researchgate.release" version "${releasePluginVersion}"
+        id "io.ballerina.plugin" version "${ballerinaGradlePluginVersion}"
+    }
+
+    repositories {
+        gradlePluginPortal()
+        maven {
+            url = 'https://maven.pkg.github.com/ballerina-platform/*'
+            credentials {
+                username System.getenv("packageUser")
+                password System.getenv("packagePAT")
+            }
+        }
+    }
+}
+
+plugins {
+    id "com.gradle.develocity" version "3.19.2"
+}
+
+rootProject.name = '{{MODULE_NAME_CC}}'
+
+include ':checkstyle'
+include ':{{MODULE_NAME_CC}}-native'
+include ':{{MODULE_NAME_CC}}-ballerina'
+// {{#COMPILER_PLUGIN}}
+include ':{{MODULE_NAME_CC}}-compiler-plugin'
+include ':{{MODULE_NAME_CC}}-compiler-plugin-tests'
+// {{/COMPILER_PLUGIN}}
+
+project(':checkstyle').projectDir = file("build-config${File.separator}checkstyle")
+project(':{{MODULE_NAME_CC}}-native').projectDir = file('native')
+project(':{{MODULE_NAME_CC}}-ballerina').projectDir = file('ballerina')
+// {{#COMPILER_PLUGIN}}
+project(':{{MODULE_NAME_CC}}-compiler-plugin').projectDir = file('compiler-plugin')
+project(':{{MODULE_NAME_CC}}-compiler-plugin-tests').projectDir = file('compiler-plugin-tests')
+// {{/COMPILER_PLUGIN}}
+
+develocity {
+    buildScan {
+        termsOfUseUrl = 'https://gradle.com/help/legal-terms-of-use'
+        termsOfUseAgree = 'yes'
+    }
+}

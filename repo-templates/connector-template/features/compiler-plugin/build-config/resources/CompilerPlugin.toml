@@ -1,0 +1,6 @@
+[plugin]
+id = "{{MODULE_NAME_CC}}-compiler-plugin"
+class = "io.ballerina.lib.{{MODULE_NAME_CC}}.compiler.{{MODULE_CLASS_PREFIX}}CompilerPlugin"
+
+[[dependency]]
+path = "../compiler-plugin/build/libs/{{MODULE_NAME_CC}}-compiler-plugin-@project.version@.jar"
