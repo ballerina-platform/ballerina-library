@@ -198,14 +198,14 @@ Before a connector is signed off, check that its package is set up for the WSO2 
 
 ### What the Integration Store Shows and Where It Comes From
 
-The WSO2 Integration Store reads everything about a connector from its package on Ballerina Central, so nothing is entered in the Store itself. The package's `Ballerina.toml` and `README.md` decide what users see:
+The WSO2 Integration Store reads everything about a connector from its package on Ballerina Central, so nothing is entered in the Store itself. The package metadata and documentation published to Ballerina Central decide what users see:
 
 - **Display name:** the `Name/` keyword.
 - **Logo:** the icon set in `Ballerina.toml`.
 - **Filters:** the `Area/`, `Vendor/` and `Type/` keywords.
-- **Card description:** the first paragraph of the README.
+- **Card description:** the package `summary` returned by Ballerina Central.
 - **Detail page:** the `## Overview` and `### Key features` sections of the README.
-- **Documentation button:** a page for the connector on the WSO2 docs site.
+- **Documentation button:** the connector's page on the WSO2 docs site, found through the docs sitemap. If none exists, the button shows `View on Ballerina Central` and opens the package page instead.
 
 Only packages in the `ballerina` and `ballerinax` orgs are listed.
 
@@ -281,7 +281,7 @@ This module supports [Azure Event Hub REST API 2014-01](https://docs.microsoft.c
 - The heading must be `## Overview`.
 - Key features is a `###` heading directly under it, with `-`, `*` or `+` bullets and nothing else.
 - Any other `###` subsections under Overview are not shown on the Store page.
-- The first paragraph of the README is used as the card description.
+- The Store shows Central's package `summary` as the card description. Check which documentation file supplies it for your package.
 - Code blocks inside the overview are stripped on the Store page, so keep essential information out of them.
 - With no Overview section, the Store falls back to the text before the first `##` heading. Don't rely on this.
 
@@ -297,5 +297,6 @@ This module supports [Azure Event Hub REST API 2014-01](https://docs.microsoft.c
 - Check the Examples link. The template builds it from `{{REPO_NAME}}`, so confirm it includes the GitHub org and resolves.
 - Keep links working; use full URLs.
 - If the README has a compatibility table, keep it current, so the Ballerina distribution and API versions match `Ballerina.toml`.
-- If your real content is in `Package.md` or `Module.md`, move it into `README.md` so the Store can use it.
+- If your real content is in `Package.md` or `Module.md`, check which file Central uses for the package summary and overview before moving it.
+- After the release, check that the Documentation button opens the connector's docs page, or shows `View on Ballerina Central` if the docs page is not live yet.
 - Don't add images to the `## Overview` section. In other sections, use relative paths for images (for example `./images/setup.png`) and add alt text.
