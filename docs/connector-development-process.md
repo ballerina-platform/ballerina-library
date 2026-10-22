@@ -3,7 +3,7 @@
 _Authors_: @shafreenAnfar @ThisaruGuruge @NipunaRanasinghe @niveathika @TharmiganK \
 _Reviewers_: @daneshk @ThisaruGuruge @NipunaRanasinghe \
 _Created_: 2024/04/17 \
-_Updated_: 2025/11/17
+_Updated_: 2026/10/22
 
 ## Overview
 
@@ -187,6 +187,114 @@ When it comes to connectors, we can group them as follows to check GraalVM compa
 - Other - These connectors have one or more direct Java dependencies. Therefore, it is required to verify GraalVM compatibility for these connectors and mark them as GraalVM compatible.
 
 For more information, follow the [GraalVM Compatibility in Ballerina Libraries](https://github.com/ballerina-platform/ballerina-library/blob/main/docs/graalvm-compatibility-in-ballerina-libraries.md) guide.
+
+## WSO2 Integration Store Readiness
+
+Before a connector is signed off, check that its package is set up for the WSO2 Integration Store, so it appears with the right name, filters, icon and description.
+
+### What the Integration Store Shows and Where It Comes From
+
+The WSO2 Integration Store reads everything about a connector from its package on Ballerina Central, so nothing is entered in the Store itself. The package's `Ballerina.toml` and `README.md` decide what users see:
+
+- **Display name:** the `Name/` keyword.
+- **Logo:** the icon set in `Ballerina.toml`.
+- **Filters:** the `Area/`, `Vendor/` and `Type/` keywords.
+- **Card description:** the first paragraph of the README.
+- **Detail page:** the `## Overview` and `### Key features` sections of the README.
+- **Documentation button:** a page for the connector on the WSO2 docs site.
+
+Only packages in the `ballerina` and `ballerinax` orgs are listed.
+
+### Package Metadata (Ballerina.toml)
+
+Set four keyword tags and an icon. If the repo generates `Ballerina.toml` from `build-config/resources/Ballerina.toml`, edit the template and run the generate task, not the generated file. Example:
+
+```toml
+[package]
+org = "ballerinax"
+name = "azure.eventhub"
+version = "4.0.0"
+keywords = ["Vendor/Microsoft", "Area/Messaging", "Type/Connector", "Name/Azure Event Hubs"]
+icon = "icon.png"
+repository = "https://github.com/ballerina-platform/module-ballerinax-azure.eventhub"
+```
+
+#### Keyword Tags
+
+| Tag | Count | Rule |
+| --- | --- | --- |
+| `Vendor/<Brand>` | exactly one | Public brand name; use the parent brand for suites (`Vendor/Google`, not `Vendor/Gmail`) |
+| `Area/<name>` | exactly one | Pick one from this list, by the platform's main purpose:<ul><li>AI & Machine Learning</li><li>Cloud & Infrastructure</li><li>Communication</li><li>CRM & Sales</li><li>Data Formats & Utilities</li><li>Database</li><li>Developer Tools</li><li>E-Commerce</li><li>ERP & Business Operations</li><li>Finance & Accounting</li><li>Healthcare</li><li>HRMS</li><li>Marketing & Social Media</li><li>Messaging</li><li>Network & Protocols</li><li>Productivity & Collaboration</li><li>Security & Identity</li><li>Storage & File Management</li></ul>Shorthand such as `Area/AI` or `Area/CRM` is invalid. |
+| `Type/<name>` | at least one | Pick at least one from this list:<ul><li>Connector</li><li>Data Loader</li><li>Driver</li><li>Embedding Provider</li><li>Knowledge Base</li><li>Library</li><li>Model Provider</li><li>Short Term Memory Store</li><li>Trigger</li><li>Vector Store</li></ul>Use `Type/Connector` for service connectors. |
+| `Name/<display name>` | exactly one | The name shown on the connector card and detail page. Set it for every connector, as described below. |
+
+**Rules for all tags**
+
+- A missing `Vendor/`, `Area/` or `Type/` tag means the connector will not appear under that filter.
+- Other free-form keywords are searchable but are not used for filters.
+- Values are matched exactly and are case-sensitive. Avoid trailing spaces.
+
+**Writing the `Name/` tag**
+
+Write the name the way people say it:
+
+- Use the official brand capitalization, for example `Name/AWS S3` and `Name/Azure Event Hubs`.
+- Leave out the organization and the word "connector", for example `Name/Twilio`, not `Name/Twilio Connector`.
+- Keep it consistent with the package name, so `aws.s3` becomes `Name/AWS S3`.
+
+Without a `Name/` tag, the Store shows the package name with each part capitalized, so `azure.eventhub` appears as "Azure Eventhub".
+
+#### Icon
+
+- Put `icon.png` in the `ballerina/` package directory, and set `icon = "icon.png"`. The connector template ships this line commented out (`# icon = "icon.png" # TODO`), so uncomment it.
+- Only PNG is supported. Use a square image, at least 200 x 200 px, with a transparent background that looks right on both dark and light pages.
+- Use the vendor's product logo where licensing allows; otherwise use the shared WSO2 or Ballerina icon.
+- Without an icon, the Store shows a coloured placeholder with the first letter of the connector name.
+- After the release, check that the icon appears on Central and in the Store.
+
+### Package Documentation (README.md)
+
+The Integration Store detail page shows only the overview and key features. Setup, quickstart and examples are read on Central and the docs site.
+
+#### Overview and Key Features
+
+```markdown
+## Overview
+
+The connector for Azure Event Hub provides access to Azure Event Hub from Ballerina. It lets you ingest, buffer, store and process high-frequency data in real time. It supports Event Hub service operations, Event Hub management operations and publisher policy operations.
+
+This module supports [Azure Event Hub REST API 2014-01](https://docs.microsoft.com/en-us/rest/api/eventhub/).
+
+### Key features
+
+- Send events to Azure Event Hub
+- Manage event hub namespaces and consumer groups
+- Support for batch event publishing
+- Integration with event-driven messaging workflows
+```
+
+- Only the Overview and Key features sections are shown on the Store page. Other sections are read on Central and the docs site.
+- The heading must be `## Overview`.
+- Key features is a `###` heading directly under it, with `-`, `*` or `+` bullets and nothing else.
+- Any other `###` subsections under Overview are not shown on the Store page.
+- The first paragraph of the README is used as the card description.
+- Code blocks inside the overview are stripped on the Store page, so keep essential information out of them.
+- With no Overview section, the Store falls back to the text before the first `##` heading. Don't rely on this.
+
+#### Other Sections
+
+- `## Setup guide`: how to get credentials and configure the service.
+- `## Quickstart`: minimal working code.
+- `## Examples`: link to the repo's `examples/` folder with a working URL.
+
+#### Before You Release
+
+- Remove all `TODO` placeholder comments before release (they look like `[//]: # (TODO: ...)`). The connector template ships a README with only TODO comments under each heading, which gives the Store nothing to show.
+- Check the Examples link. The template builds it from `{{REPO_NAME}}`, so confirm it includes the GitHub org and resolves.
+- Keep links working; use full URLs.
+- If the README has a compatibility table, keep it current, so the Ballerina distribution and API versions match `Ballerina.toml`.
+- If your real content is in `Package.md` or `Module.md`, move it into `README.md` so the Store can use it.
+- Don't add images to the `## Overview` section. In other sections, use relative paths for images (for example `./images/setup.png`) and add alt text.
 
 ## Observability
 
