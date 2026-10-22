@@ -22,6 +22,16 @@ on:
         required: false
         type: boolean
         default: true
+      scan-exclude-tests:
+        description: "Drop 'bal scan' findings in tests/ and modules/*/tests/"
+        required: false
+        type: boolean
+        default: false
+      scan-artifacts:
+        description: "Save the merged 'bal scan' SARIF file as a workflow artifact"
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   build:
@@ -151,6 +161,8 @@ jobs:
             ${{ inputs.additional-scan-paths }}
           category: bal-scan-library
           fail-on-severity: medium
+          exclude-tests: ${{ inputs.scan-exclude-tests }}
+          artifacts: ${{ inputs.scan-artifacts }}
 
       # Runs even when the library gate fails, so examples findings are still reported.
       - name: Scan examples
@@ -161,3 +173,5 @@ jobs:
           paths: examples
           category: bal-scan-examples
           fail-on-severity: medium
+          exclude-tests: ${{ inputs.scan-exclude-tests }}
+          artifacts: ${{ inputs.scan-artifacts }}
