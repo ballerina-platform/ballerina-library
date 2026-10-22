@@ -7,7 +7,7 @@ _Updated_: 2026/10/22
 
 ## Overview
 
-This section discusses the connector development process from inception to realization. The goal is to ensure we deliver the best possible connector experience. The sequence of each step might be adjusted slightly, but the overall process remains unchanged. Once a library completes each step and reaches the end, we can designate it as a generally available connector. Each connector owner is responsible for ensuring their libraries undergo these steps before signing off.
+This section discusses the connector development process from inception to realization. The goal is to ensure we deliver the best possible connector experience. The sequence of each step might be adjusted slightly, but the overall process remains unchanged. Once a library completes each step and reaches the end, we can designate it as a generally available connector. Each connector owner is responsible for ensuring their libraries undergo these steps, including [WSO2 Integration Store Readiness](#wso2-integration-store-readiness), before signing off.
 
 ## Naming Convention
 
@@ -188,6 +188,10 @@ When it comes to connectors, we can group them as follows to check GraalVM compa
 
 For more information, follow the [GraalVM Compatibility in Ballerina Libraries](https://github.com/ballerina-platform/ballerina-library/blob/main/docs/graalvm-compatibility-in-ballerina-libraries.md) guide.
 
+## Observability
+
+Once the connector is developed, it is important to check if it includes the appropriate metrics for Grafana and works well with Jaeger tracing. For HTTP-based connectors, this should already be in place, as they utilize the http:Client underneath. However, this may not be the case for other types of connectors. In such instances, it is important to add any missing metrics and tracing information.
+
 ## WSO2 Integration Store Readiness
 
 Before a connector is signed off, check that its package is set up for the WSO2 Integration Store, so it appears with the right name, filters, icon and description.
@@ -207,7 +211,7 @@ Only packages in the `ballerina` and `ballerinax` orgs are listed.
 
 ### Package Metadata (Ballerina.toml)
 
-Set four keyword tags and an icon. If the repo generates `Ballerina.toml` from `build-config/resources/Ballerina.toml`, edit the template and run the generate task, not the generated file. Example:
+Set the keyword tags below and an icon. The connector template ships with `keywords = []`, so the tags must be added. If the repo generates `Ballerina.toml` from `build-config/resources/Ballerina.toml`, edit the template and run the generate task, not the generated file. Example:
 
 ```toml
 [package]
@@ -289,13 +293,9 @@ This module supports [Azure Event Hub REST API 2014-01](https://docs.microsoft.c
 
 #### Before You Release
 
-- Remove all `TODO` placeholder comments before release (they look like `[//]: # (TODO: ...)`). The connector template ships a README with only TODO comments under each heading, which gives the Store nothing to show.
+- Remove all `TODO` placeholder comments before release (they look like `[//]: # (TODO: ...)`). The connector template ships a README with a TODO comment under each heading, which gives the Store nothing to show until they are replaced.
 - Check the Examples link. The template builds it from `{{REPO_NAME}}`, so confirm it includes the GitHub org and resolves.
 - Keep links working; use full URLs.
 - If the README has a compatibility table, keep it current, so the Ballerina distribution and API versions match `Ballerina.toml`.
 - If your real content is in `Package.md` or `Module.md`, move it into `README.md` so the Store can use it.
 - Don't add images to the `## Overview` section. In other sections, use relative paths for images (for example `./images/setup.png`) and add alt text.
-
-## Observability
-
-Once the connector is developed, it is important to check if it includes the appropriate metrics for Grafana and works well with Jaeger tracing. For HTTP-based connectors, this should already be in place, as they utilize the http:Client underneath. However, this may not be the case for other types of connectors. In such instances, it is important to add any missing metrics and tracing information.
