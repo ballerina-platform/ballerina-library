@@ -29,6 +29,16 @@ on:
         required: false
         type: string
         default: ""
+      scan-exclude-tests:
+        description: "Drop 'bal scan' findings in tests/ and modules/*/tests/"
+        required: false
+        type: boolean
+        default: false
+      scan-artifacts:
+        description: "Save the merged 'bal scan' SARIF file as a workflow artifact"
+        required: false
+        type: boolean
+        default: true
     secrets:
       CODECOV_TOKEN:
         required: false
@@ -302,18 +312,22 @@ jobs:
 
             -   name: Scan library
                 if: steps.resolve-scan.outputs.supported == 'true'
-                uses: ballerina-platform/ballerina-library/.github/actions/scan-ballerina@main
+                uses: ballerina-platform/scan-ballerina@v0.1.0
                 with:
+                    platforms: github-code-scanning
                     paths: |
                         ${{ inputs.scan-path }}
                         ${{ inputs.additional-scan-paths }}
                     category: bal-scan-library
-                    exclude-tests: false
+                    exclude-tests: ${{ inputs.scan-exclude-tests }}
+                    artifacts: ${{ inputs.scan-artifacts }}
 
             -   name: Scan examples
-                if: steps.resolve-scan.outputs.supported == 'true'
-                uses: ballerina-platform/ballerina-library/.github/actions/scan-ballerina@main
+                if: steps.resolve-scan.outputs.supported == 'true' && hashFiles('examples/**') != ''
+                uses: ballerina-platform/scan-ballerina@v0.1.0
                 with:
+                    platforms: github-code-scanning
                     paths: examples
                     category: bal-scan-examples
-                    exclude-tests: false
+                    exclude-tests: ${{ inputs.scan-exclude-tests }}
+                    artifacts: ${{ inputs.scan-artifacts }}
