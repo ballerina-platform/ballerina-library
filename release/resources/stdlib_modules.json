@@ -653,7 +653,7 @@
         },
         {
             "name": "module-ballerina-ai",
-            "module_version": "1.16.1-SNAPSHOT",
+            "module_version": "1.16.2-SNAPSHOT",
             "level": 9,
             "default_branch": "main",
             "version_key": "stdlibAiVersion",
@@ -1862,7 +1862,7 @@
     "tools": [
         {
             "name": "asyncapi-tools",
-            "module_version": "0.12.1-SNAPSHOT",
+            "module_version": "0.13.2-SNAPSHOT",
             "level": 10,
             "default_branch": "main",
             "version_key": "stdlibAsyncapi-toolsVersion",
