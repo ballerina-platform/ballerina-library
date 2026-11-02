@@ -32,7 +32,6 @@ The HTTP library specification illustrates the problems, but the same patterns a
 2. **The most normative areas are the vaguest.** The request routing section says "Perhaps a part of the request URI can be matched, yet they won't be picked unless the longest is matched". It does not define the precedence between literal segments, path parameters and rest parameters, trailing slash and percent-encoding handling, when `404` versus `405` is returned, or which ambiguous resource declarations are rejected at compile time.
 3. **Several audiences share one document.** Style advice ("Avoid caller unless you have specific requirement"), near-identical authentication examples for every combination of approach and auth type, `Config.toml` logging recipes, and long static code rule explanations sit between the rules and hide them.
 4. **API signatures and doc comments are copied.** Copies of remote method signatures and their doc comments drift from the source, and the specification then contradicts the API Docs.
-5. **There is no change history.** The `_Updated_` date shows when the specification last changed, but not what changed or which library version a statement applies to.
 
 The cost is concrete: users cannot rely on documented behaviour, reviewers cannot judge whether a behaviour change needs a specification update, and a reported bug cannot be classified as an implementation bug or a specification gap without reading the code.
 
@@ -78,7 +77,6 @@ _Owners_, _Reviewers_, _Created_, _Updated_, _Edition_
 ## 3..N. <Features>        one numbered section per feature, using the feature template
 ## N+1. Security considerations
 ## N+2. Static code rules  (if the library ships rules)
-## Changes                 revision history
 ## References
 ```
 
@@ -86,7 +84,8 @@ _Owners_, _Reviewers_, _Created_, _Updated_, _Edition_
 - **Terminology** defines terms such as "network-level failure" or "resource" once, and the rest of the document uses them consistently.
 - **Security considerations** states the security-relevant behaviour and defaults, e.g. TLS hostname verification, request size limits, and what the library does not protect against.
 - **Static code rules** lists each rule shipped by the library as a table row with the rule ID, the condition that triggers it, and its kind. The rationale, impact and remediation of each rule belong in the rule documentation, not in the specification.
-- **Changes** lists normative changes per library version, newest first, e.g. `- 2.19.0: Specified the retry behaviour of the HTTP client (#2766)`. Editorial changes are not listed.
+
+The specification does not contain a change history. Changes to observable behaviour, including changes to the specification, are recorded in the `CHANGELOG.md` of the library, and the specification of a released version is available under the Git tag of that release. A second change list in the specification would duplicate the changelog and drift from it.
 
 ### 4. Feature template
 
@@ -147,7 +146,7 @@ The client resends a request when it fails, waiting between attempts.
 
 ### 6. Change process
 
-1. A change that alters observable behaviour MUST update the specification in the same pull request, and add an entry to the changes section. This restates the existing rule in the [library development process](library-development-process.md) that code and specification stay in sync.
+1. A change that alters observable behaviour MUST update the specification in the same pull request, and add an entry to `CHANGELOG.md`. This restates the existing rule in the [library development process](library-development-process.md) that code and specification stay in sync.
 2. When the implementation and the specification disagree, the owners decide which one is correct. If the implementation is wrong, a `Type/Bug` issue is created. If the specification is wrong or silent, the specification is fixed, and if the fix changes documented behaviour, it goes through the proposal process.
 3. Reviewers apply the following checklist to every specification change:
    - [ ] Every new or changed configuration field has a type, default and meaning, including special values.
@@ -157,7 +156,7 @@ The client resends a request when it fails, waiting between attempts.
    - [ ] No signatures or doc comments are copied from the source.
    - [ ] Rules that are hard to follow on their own are illustrated with examples, and each example agrees with the rules.
    - [ ] No tutorial content, recommendations or examples that only repeat another example with different options are added.
-   - [ ] Normative changes are listed in the changes section.
+   - [ ] Normative changes are recorded in `CHANGELOG.md`.
 
 ### 7. Migration
 
@@ -169,6 +168,7 @@ The migration of the HTTP library specification ([module-ballerina-http#2768](ht
 
 - **Keep the current hybrid format.** Rejected. The specification cannot serve as the contract while behaviour is described only by example, and the motivation shows the cost to users.
 - **Split each specification into `spec.md` and `guide.md`.** Rejected. A per-library guide duplicates `README.md`/`Module.md`, BBEs and ballerina.io content, and adds another document that drifts without a clear owner or rendering location.
+- **Keep a changes section in the specification.** Rejected. Libraries already record changes in `CHANGELOG.md`, and released specifications are available under their Git tags. A second list would drift from the changelog.
 - **Generate the specification from API Docs.** Rejected. API Docs describe individual symbols, and cannot express cross-cutting behaviour such as routing precedence, the order in which client features apply, or error mapping.
 
 ## Risks and Assumptions
@@ -179,5 +179,5 @@ The migration of the HTTP library specification ([module-ballerina-http#2768](ht
 ## Future Work
 
 - **Conformance traceability**: Linking test cases to the specification sections they verify, so that coverage of the specification can be measured.
-- **Linting**: Checking the structure, heading numbering and the presence of the changes section in CI.
+- **Linting**: Checking the structure and heading numbering in CI.
 - **Template repository update**: Adding a specification skeleton that follows this guide to the library repository template.
