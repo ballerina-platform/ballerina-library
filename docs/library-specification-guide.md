@@ -8,7 +8,7 @@ _Status_: Submitted
 
 ## Summary
 
-Every Ballerina library has a specification at `docs/spec/spec.md`, and the [library development process](library-development-process.md) treats it as the contract: "any deviation from the specification is considered a bug". In practice, most specifications are written as feature guides. They describe features by example, mix tutorials and best practices with rules, and copy API signatures that drift from the source. This proposal defines what a library specification contains, what it must not contain, where the excluded content goes, and how each feature is specified, so that a specification can actually serve as the contract.
+Every Ballerina library has a specification at `docs/spec/spec.md`, and the [library development process](library-development-process.md) treats it as the contract: "any deviation from the specification is considered a bug". In practice, most specifications are written as feature guides. They describe much of the behaviour only through examples, mix tutorials and best practices with rules, and copy API signatures that drift from the source. This proposal defines what a library specification contains, what it must not contain, where the excluded content goes, and how each feature is specified, so that a specification can actually serve as the contract.
 
 ## Goals
 
@@ -59,7 +59,7 @@ API Docs must not contradict the specification. Doc comments may summarise a rul
 
 - The key words MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD, SHOULD NOT, RECOMMENDED, MAY and OPTIONAL are interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174) when, and only when, they appear in all capitals.
 - Sentences without these key words that state behaviour in the present tense, e.g. "The client returns the last response", are also normative. Key words are used where the obligation or permission needs emphasis.
-- Examples, notes and the overview section are informative. Notes are written as `> **Note:** ...` blockquotes.
+- Examples, notes and the overview section are informative. Notes are written as `> **Note:** ...` blockquotes. An example is either placed under an `Example` heading or introduced by a sentence such as "For example, ...", so that it is always distinguishable from the rules.
 - Behaviour that is deliberately left open MUST be marked as _implementation-defined_ (the implementation chooses and documents it) or _unspecified_ (users must not rely on it). Anything not covered by the specification is a specification gap and is reported as a bug.
 
 ### 3. Document structure
@@ -98,7 +98,7 @@ Each feature section contains the following subsections, in this order. Subsecti
 4. **Compile-time validation**: The conditions the compiler plugin rejects or warns about, with the diagnostic code of each condition.
 5. **Errors**: The error type returned or raised for each failure condition, and whether the error is returned to the caller, logged, or results in a specific response.
 6. **Interactions**: How the feature combines with other features, including the order in which they apply, e.g. "the circuit breaker wraps the retry client, so a call and its retries count as one request".
-7. **Example** (informative): One minimal example that illustrates the rules. Examples demonstrate the rules and never replace them.
+7. **Examples** (informative): Examples that illustrate the rules of the feature. A specification without examples is hard to read, so authors SHOULD add an example wherever a rule is difficult to follow on its own, such as the overall usage of a feature, matching or precedence rules, data binding, computed values like wait times, and interactions between features. An example may also be placed directly after the rule it illustrates instead of at the end of the section. Each example is minimal, states which rules it illustrates, and its outcome agrees with the rules. Examples demonstrate the rules and never replace them: every behaviour shown in an example MUST also be stated as a rule.
 
 The following is an abridged section written using the template.
 
@@ -136,7 +136,7 @@ The client resends a request when it fails, waiting between attempts.
 1. Specify observable behaviour, not implementation. Class names, internal functions and data structures do not appear unless they are part of the public API.
 2. Do not copy signatures or doc comments from the source. Refer to the symbol by name, e.g. `http:Client` `get` method, and specify the behaviour that a signature cannot express.
 3. Do not include recommendations, best practices or tutorials. Rules that are security-relevant are stated as rules, e.g. "the listener MUST reject a request whose header section exceeds `maxHeaderSize`", in the relevant feature section or in security considerations.
-4. Do not repeat an example for every combination of options. One example per feature is sufficient, and variations go to BBEs.
+4. Add examples wherever they make the rules easier to understand, and keep each one minimal. Each example illustrates a different rule or case. Do not repeat an example for every combination of options, such as every authentication type with every auth provider; such variations go to BBEs.
 5. Use the terms defined in the terminology section consistently, and do not introduce synonyms.
 6. Write default values and special values exactly, e.g. "`0` is treated as `60`", never "a sensible default is used".
 7. Use consistent Markdown:
@@ -155,7 +155,8 @@ The client resends a request when it fails, waiting between attempts.
    - [ ] Errors are specified with their types.
    - [ ] Interactions with existing features are specified.
    - [ ] No signatures or doc comments are copied from the source.
-   - [ ] No tutorial content, recommendations or repeated examples are added.
+   - [ ] Rules that are hard to follow on their own are illustrated with examples, and each example agrees with the rules.
+   - [ ] No tutorial content, recommendations or examples that only repeat another example with different options are added.
    - [ ] Normative changes are listed in the changes section.
 
 ### 7. Migration
