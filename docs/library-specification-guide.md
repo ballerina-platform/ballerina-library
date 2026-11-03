@@ -128,7 +128,7 @@ The client resends a request when it fails, waiting between attempts.
 - The client `timeout` applies to each attempt separately.
 - When a circuit breaker is configured, it wraps the retry client, so a call and all its retries count as one request.
 
-#### 5.4.5. Example
+#### Example
 ...
 ````
 
@@ -162,7 +162,7 @@ The client resends a request when it fails, waiting between attempts.
 
 ### 7. Migration
 
-Existing specifications are migrated incrementally, starting with the HTTP library. Each migration is done section by section in pull requests that do not change library behaviour, and therefore does not need a proposal, as described in rule 2 of section 6. Content removed from a specification is moved to its new home (section 1) in the same pull request, or linked in the pull request description when it already exists there. Gaps found during migration are fixed in the specification when the implementation behaviour is intended, and reported as `Type/Bug` issues when it is not.
+Existing specifications are migrated incrementally, starting with the HTTP library. Each migration is done section by section in pull requests that do not change library behaviour, and therefore does not need a proposal, as described in rule 2 of [Change process](#6-change-process). Content removed from a specification is moved to its new home, as defined in [Document roles](#1-document-roles), in the same pull request, or linked in the pull request description when it already exists there. Gaps found during migration are fixed in the specification when the implementation behaviour is intended, and reported as `Type/Bug` issues when it is not.
 
 The migration of the HTTP library specification ([module-ballerina-http#2768](https://github.com/ballerina-platform/module-ballerina-http/pull/2768)) applies this guide, and can be used as a reference.
 
