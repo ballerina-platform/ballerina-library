@@ -95,7 +95,7 @@ Each feature section contains the following subsections, in this order. Subsecti
 
 1. **Description** (informative): One or two sentences stating what the feature does.
 2. **Configuration**: A table of every configuration field with its type, default value and meaning. The default of a required field is written as `Required`, and that of an optional field (`T name?`) as `absent`, instead of an invented value. The meaning MUST cover every special value, such as `0`, `()`, an empty array, or a negative number, and how out-of-range values are handled. The public record definition MAY be included when the shape itself matters.
-3. **Behaviour**: Normative rules. Processing logic, such as matching, binding, retrying or dispatching, is written as numbered steps. The rules MUST cover the outcome on success, on each failure, at boundaries (first, last, exhausted, empty), and ordering where it is observable.
+3. **Behaviour**: Normative rules. Processing logic, such as matching, binding, retrying or dispatching, is written as numbered steps. The rules MUST cover the outcome on success, on each failure, at boundaries (first, last, exhausted, empty), and ordering where it is observable. Behaviour may be split into subsections named after their topic, such as `Lifecycle` or `Resource selection`, in place of a single `Behaviour` subsection.
 4. **Compile-time validation**: The conditions the compiler plugin rejects or warns about, with the diagnostic code of each condition.
 5. **Errors**: The error type returned or raised for each failure condition, and whether the error is returned to the caller, logged, or results in a specific response.
 6. **Interactions**: How the feature combines with other features, including the order in which they apply, e.g. "the circuit breaker wraps the retry client, so a call and its retries count as one request".
@@ -141,7 +141,7 @@ The client resends a request when it fails, waiting between attempts.
 5. Use the terms defined in the terminology section consistently, and do not introduce synonyms.
 6. Write default values and special values exactly, e.g. "`0` is treated as `60`", never "a sensible default is used".
 7. Use consistent Markdown:
-   - One `#` heading for the title, and numbered `##` to `#####` headings for sections, with the number followed by a period, e.g. `#### 5.4.3. Behaviour`. The `Introduction`, `Contents` and `References` headings, and `Example` headings within a feature section, are not numbered.
+   - One `#` heading for the title, and numbered `##` to `#####` headings for sections, with the number followed by a period, e.g. `#### 5.4.3. Behaviour`. The `Introduction`, `Contents` and `References` headings, the `Notation` heading within the introduction, and `Example` headings within a feature section, are not numbered.
    - Do not hard-wrap paragraphs.
    - Use fenced code blocks with a language identifier.
 8. Section numbers may change when sections are inserted. Cross-references use Markdown links to section anchors, and the author updates links broken by renumbering in the same change.
