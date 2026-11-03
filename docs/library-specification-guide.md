@@ -74,7 +74,9 @@ _Owners_, _Reviewers_, _Created_, _Updated_, _Edition_
 ## Contents
 ## 1. Overview             informative description of the library and its concepts
 ## 2. Terminology          terms used with a specific meaning in the specification
-## 3..N. <Features>        one numbered section per feature, using the feature template
+## 3. <Feature>            one numbered section per feature, using the feature template
+...
+## N. <Feature>
 ## N+1. Security considerations
 ## N+2. Static code rules  (if the library ships rules)
 ## References
@@ -92,7 +94,7 @@ The specification does not contain a change history. Changes to observable behav
 Each feature section contains the following subsections, in this order. Subsections that do not apply are omitted. Large features may be split into subsections that each follow the template.
 
 1. **Description** (informative): One or two sentences stating what the feature does.
-2. **Configuration**: A table of every configuration field with its type, default value and meaning. The meaning MUST cover every special value, such as `0`, `()`, an empty array, or a negative number, and how out-of-range values are handled. The public record definition MAY be included when the shape itself matters.
+2. **Configuration**: A table of every configuration field with its type, default value and meaning. The default of a required field is written as `Required`, and that of an optional field (`T name?`) as `absent`, instead of an invented value. The meaning MUST cover every special value, such as `0`, `()`, an empty array, or a negative number, and how out-of-range values are handled. The public record definition MAY be included when the shape itself matters.
 3. **Behaviour**: Normative rules. Processing logic, such as matching, binding, retrying or dispatching, is written as numbered steps. The rules MUST cover the outcome on success, on each failure, at boundaries (first, last, exhausted, empty), and ordering where it is observable.
 4. **Compile-time validation**: The conditions the compiler plugin rejects or warns about, with the diagnostic code of each condition.
 5. **Errors**: The error type returned or raised for each failure condition, and whether the error is returned to the caller, logged, or results in a specific response.
@@ -139,7 +141,7 @@ The client resends a request when it fails, waiting between attempts.
 5. Use the terms defined in the terminology section consistently, and do not introduce synonyms.
 6. Write default values and special values exactly, e.g. "`0` is treated as `60`", never "a sensible default is used".
 7. Use consistent Markdown:
-   - One `#` heading for the title, and numbered `##` to `#####` headings for sections, with the number followed by a period, e.g. `#### 5.4.3. Behaviour`.
+   - One `#` heading for the title, and numbered `##` to `#####` headings for sections, with the number followed by a period, e.g. `#### 5.4.3. Behaviour`. The `Introduction`, `Contents` and `References` headings, and `Example` headings within a feature section, are not numbered.
    - Do not hard-wrap paragraphs.
    - Use fenced code blocks with a language identifier.
 8. Section numbers may change when sections are inserted. Cross-references use Markdown links to section anchors, and the author updates links broken by renumbering in the same change.
@@ -147,7 +149,7 @@ The client resends a request when it fails, waiting between attempts.
 ### 6. Change process
 
 1. A change that alters observable behaviour MUST update the specification in the same pull request, and add an entry to `CHANGELOG.md`. This restates the existing rule in the [library development process](library-development-process.md) that code and specification stay in sync.
-2. When the implementation and the specification disagree, the owners decide which one is correct. If the implementation is wrong, a `Type/Bug` issue is created. If the specification is wrong or silent, the specification is fixed, and if the fix changes documented behaviour, it goes through the proposal process.
+2. When the implementation and the specification disagree, the owners decide which one is correct. If the implementation is wrong, a `Type/Bug` issue is created. If the specification is wrong or silent, the specification is fixed. A fix that changes documented behaviour goes through the proposal process. A fix that corrects, completes or clarifies the specification to match the existing intended behaviour does not need a proposal, because it does not change what users can rely on. Such a fix is reviewed with the checklist below. This narrows the rule in the [library development process](library-development-process.md) that every specification update needs a proposal, which is meant for new or changed behaviour.
 3. Reviewers apply the following checklist to every specification change:
    - [ ] Every new or changed configuration field has a type, default and meaning, including special values.
    - [ ] Behaviour on failure, at boundaries and on exhaustion is specified.
@@ -160,7 +162,7 @@ The client resends a request when it fails, waiting between attempts.
 
 ### 7. Migration
 
-Existing specifications are migrated incrementally, starting with the HTTP library. Each migration is done section by section in pull requests that do not change library behaviour. Content removed from a specification is moved to its new home (section 1) in the same pull request, or linked in the pull request description when it already exists there. Gaps found during migration are fixed in the specification when the implementation behaviour is intended, and reported as `Type/Bug` issues when it is not.
+Existing specifications are migrated incrementally, starting with the HTTP library. Each migration is done section by section in pull requests that do not change library behaviour, and therefore does not need a proposal, as described in rule 2 of section 6. Content removed from a specification is moved to its new home (section 1) in the same pull request, or linked in the pull request description when it already exists there. Gaps found during migration are fixed in the specification when the implementation behaviour is intended, and reported as `Type/Bug` issues when it is not.
 
 The migration of the HTTP library specification ([module-ballerina-http#2768](https://github.com/ballerina-platform/module-ballerina-http/pull/2768)) applies this guide, and can be used as a reference.
 
