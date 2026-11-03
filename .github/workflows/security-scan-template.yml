@@ -87,6 +87,17 @@ jobs:
         with:
           name: build-output
 
+      # Native jars built by the repo (e.g. shadow jars bundling their dependencies) live under
+      # **/build/libs, outside ballerina/lib; gather them so their bundled dependencies are scanned too.
+      - name: Collect jars to scan
+        run: |
+          mkdir -p trivy-scan-input
+          cp -R ballerina/lib/. trivy-scan-input/ 2>/dev/null || true
+          find . -path ./trivy-scan-input -prune -o -path '*/build/libs/*.jar' \
+            ! -name '*-sources.jar' ! -name '*-javadoc.jar' -type f -print0 \
+            | xargs -0 -I{} cp -n {} trivy-scan-input/ 2>/dev/null || true
+          ls -1 trivy-scan-input
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@v0.36.0
         env:
@@ -94,7 +105,7 @@ jobs:
           TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
         with:
           scan-type: "rootfs"
-          scan-ref: "${{ github.workspace }}/ballerina/lib"
+          scan-ref: "${{ github.workspace }}/trivy-scan-input"
           format: "table"
           timeout: "10m0s"
           exit-code: "1"
