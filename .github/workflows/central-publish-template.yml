@@ -69,6 +69,10 @@ jobs:
           scanners: "vuln"
           cache-dir: "/tmp/trivy-cache"
 
+      - name: Set Up Sigstore Signing
+        id: sigstore
+        uses: ballerina-platform/ballerina-library/.github/actions/setup-sigstore-signing@main
+
       - name: Ballerina Central Dev Push
         if: ${{ inputs.environment == 'DEV CENTRAL' }}
         env:
@@ -80,7 +84,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
         run: |
           sed -i 's/version=\(.*\)-SNAPSHOT/version=\1/g' gradle.properties
-          ./gradlew clean build -PpublishToCentral=true ${{ inputs.additional-publish-flags }}
+          ./gradlew clean build -PpublishToCentral=true ${{ steps.sigstore.outputs.gradle-flag }} ${{ inputs.additional-publish-flags }}
 
       - name: Ballerina Central Stage Push
         if: ${{ inputs.environment == 'STAGE CENTRAL' }}
@@ -93,4 +97,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
         run: |
           sed -i 's/version=\(.*\)-SNAPSHOT/version=\1/g' gradle.properties
-          ./gradlew clean build -PpublishToCentral=true ${{ inputs.additional-publish-flags }}
+          ./gradlew clean build -PpublishToCentral=true ${{ steps.sigstore.outputs.gradle-flag }} ${{ inputs.additional-publish-flags }}
