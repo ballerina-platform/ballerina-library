@@ -1,0 +1,48 @@
+name: Update Specifications
+
+env:
+  SPEC_FOLDER_PATH: 'docs/spec'
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/spec/**'
+
+jobs:
+  update_specs:
+    name: Update Specifications
+    if: github.repository_owner == 'ballerina-platform'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+      - name: Get Repo Name
+        id: repo_name
+        run: |
+          MODULE=${{ github.event.repository.name }}
+          echo "short_name=${MODULE##*-}" >> $GITHUB_OUTPUT
+
+      - name: Trigger Workflow
+        run: |
+          curl --request POST \
+          'https://api.github.com/repos/ballerina-platform/ballerina-dev-website/dispatches' \
+          -H 'Accept: application/vnd.github.v3+json' \
+          -H 'Authorization: Bearer ${{ secrets.BALLERINA_BOT_TOKEN }}' \
+          --data "{
+            \"event_type\": \"update-stdlib-specs\",
+            \"client_payload\": {
+              \"module_name\": \"${{ github.event.repository.name }}\",
+              \"short_name\": \"${{ steps.repo_name.outputs.short_name }}\",
+              \"file_dir\": \"${{ github.event.repository.name }}/${{ env.SPEC_FOLDER_PATH }}\",
+              \"release_date\": \"${{ steps.date.outputs.date }}\"
+            }
+          }"

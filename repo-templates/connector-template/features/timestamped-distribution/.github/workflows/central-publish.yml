@@ -1,0 +1,23 @@
+name: Publish to the Ballerina Central
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: Select environment
+        required: true
+        options:
+          - DEV CENTRAL
+          - STAGE CENTRAL
+
+jobs:
+  call_workflow:
+    name: Run Central Publish Workflow
+    if: ${{ github.repository_owner == 'ballerina-platform' }}
+    uses: ballerina-platform/ballerina-library/.github/workflows/central-publish-template.yml@main
+    secrets: inherit
+    with:
+      environment: ${{ github.event.inputs.environment }}
+      additional-build-flags: "-x :{{MODULE_NAME_CC}}-examples:build"
+      additional-publish-flags: "-x :{{MODULE_NAME_CC}}-examples:build"

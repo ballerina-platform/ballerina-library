@@ -1,0 +1,5 @@
+{
+    "exactlyOneOf": [
+        ["released-distribution", "timestamped-distribution"]
+    ]
+}

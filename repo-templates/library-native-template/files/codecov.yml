@@ -1,0 +1,13 @@
+# {{#COMPILER_PLUGIN}}
+ignore:
+  - "compiler-plugin-tests"
+
+# {{/COMPILER_PLUGIN}}
+coverage:
+  precision: 2
+  round: down
+  range: "60...80"
+  status:
+    project:
+      default:
+        target: 80

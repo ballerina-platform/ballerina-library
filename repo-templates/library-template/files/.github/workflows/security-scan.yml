@@ -1,0 +1,25 @@
+name: Security Scan
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 20 * * *"
+
+jobs:
+  call_workflow:
+    name: Run Security Scan Workflow
+    if: ${{ github.repository_owner == 'ballerina-platform' }}
+    # A reusable workflow's permissions can only narrow the caller's default token
+    # permissions, never widen them -- without this explicit ceiling, a connector repo
+    # with a restrictive default (increasingly common hardening) would never actually
+    # grant security-events: write two hops down, and the SARIF upload steps'
+    # continue-on-error: true would swallow that failure silently (job green, no
+    # code-scanning findings ever produced).
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    # No secrets: inherit -- the called workflow only reads secrets.GITHUB_TOKEN,
+    # which GitHub grants to a called reusable workflow automatically, without
+    # needing to inherit every other secret this caller has access to.
+    uses: ballerina-platform/ballerina-library/.github/workflows/security-scan-template.yml@main
