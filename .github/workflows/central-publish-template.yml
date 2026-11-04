@@ -55,12 +55,29 @@ jobs:
       - name: Create lib directory if not exists
         run: mkdir -p ballerina/lib
 
+      # get.trivy.dev, which the Trivy install script downloads from, no longer resolves.
+      # Install Trivy from its GitHub release and verify the checksum instead.
+      - name: Install Trivy
+        env:
+          TRIVY_VERSION: "0.76.1"
+        run: |
+          base="https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}"
+          tarball="trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
+          bin_dir="${HOME}/.local/bin/trivy-bin"
+          curl -sSfLO "${base}/${tarball}"
+          curl -sSfL "${base}/trivy_${TRIVY_VERSION}_checksums.txt" | grep " ${tarball}\$" | sha256sum -c -
+          mkdir -p "${bin_dir}"
+          tar -xzf "${tarball}" -C "${bin_dir}" trivy
+          rm "${tarball}"
+          echo "${bin_dir}" >> "${GITHUB_PATH}"
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         env:
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
           TRIVY_JAVA_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db
         with:
+          skip-setup-trivy: true
           scan-type: "rootfs"
           scan-ref: "${{ github.workspace }}/ballerina/lib"
           format: "table"
