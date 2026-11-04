@@ -146,6 +146,7 @@ The client resends a request when it fails, waiting between attempts.
 7. Use consistent Markdown:
    - One `#` heading for the title, and numbered `##` to `#####` headings for sections, with the number followed by a period, e.g. `#### 5.4.3. Behaviour`. The `Introduction`, `Contents` and `References` headings, and the `Notation` heading within the introduction, are not numbered. Every heading is unique within the document, so that its anchor is stable.
    - An example under a heading is a numbered subsection of the section it illustrates, one level below that section, named `Example: <topic>`, e.g. `#### 5.4.5. Example: Wait times`. It is always a leaf, never deeper than `######`, and the contents omit it. An example introduced inline by "For example, ..." has no heading.
+   - The `Contents` section follows the introduction and lists every heading after it in document order, except examples: every numbered section at every level, and `References`. It is a bulleted list with one item per heading, written as `- [<heading text>](#<anchor>)` with the heading text exactly as it appears, numbers included, and each level indented four spaces more than its parent. `Introduction` and `Contents` are not listed.
    - Do not hard-wrap paragraphs.
    - Use fenced code blocks with a language identifier.
 8. Section anchors carry the section number, and BBEs, guides and issues link to them, so section numbers are kept stable: a new section is added after the existing sections of its parent. A section is inserted, renumbering the ones after it, only when that cannot be avoided, such as a missing section that belongs in the middle of the structure; the author then updates every link in the same change. Cross-references within the specification use Markdown links to section anchors.
@@ -162,6 +163,7 @@ The client resends a request when it fails, waiting between attempts.
    - [ ] No signatures or doc comments are copied from the source.
    - [ ] Rules that are hard to follow on their own are illustrated with examples, and each example agrees with the rules.
    - [ ] No tutorial content, recommendations or examples that only repeat another example with different options are added.
+   - [ ] The contents list every heading except examples, in the format of the writing rules.
    - [ ] Normative changes are recorded in `CHANGELOG.md`.
 
 ### 7. Migration
