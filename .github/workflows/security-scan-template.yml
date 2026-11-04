@@ -22,6 +22,11 @@ on:
         required: false
         type: boolean
         default: true
+      setup-ballerina:
+        description: "Install Ballerina before the Gradle build, for connector repos whose build runs the bal CLI (version check, example builds)"
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -40,6 +45,12 @@ jobs:
         with:
           distribution: "temurin"
           java-version: ${{ steps.resolve-java.outputs.java-version }}
+
+      - name: Set up Ballerina
+        if: inputs.setup-ballerina
+        uses: ballerina-platform/setup-ballerina@v1.1.5
+        with:
+          version: ${{ steps.resolve-java.outputs.lang-version }}
 
       - name: Build with Gradle
         env:
