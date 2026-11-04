@@ -163,7 +163,7 @@ The client resends a request when it fails, waiting between attempts.
    - [ ] No signatures or doc comments are copied from the source.
    - [ ] Rules that are hard to follow on their own are illustrated with examples, and each example agrees with the rules.
    - [ ] No tutorial content, recommendations or examples that only repeat another example with different options are added.
-   - [ ] The contents list every heading except examples, in the format of the writing rules.
+   - [ ] The contents list every numbered section at every level and `References`, except examples; `Introduction` and `Contents` are not listed.
    - [ ] Normative changes are recorded in `CHANGELOG.md`.
 
 ### 7. Migration
