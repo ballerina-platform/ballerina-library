@@ -25,8 +25,6 @@ jobs:
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew build -x test -x :${{ inputs.hana-connector-group }}-examples:build -x:${{ inputs.hana-connector-group }}-sanitation:build
 
-      # get.trivy.dev, which the Trivy install script downloads from, no longer resolves.
-      # Install Trivy from its GitHub release and verify the checksum instead.
       - name: Install Trivy
         env:
           TRIVY_VERSION: "0.76.1"

@@ -87,8 +87,6 @@ jobs:
         with:
           name: build-output
 
-      # get.trivy.dev, which the Trivy install script downloads from, no longer resolves.
-      # Install Trivy from its GitHub release and verify the checksum instead.
       - name: Install Trivy
         env:
           TRIVY_VERSION: "0.76.1"
