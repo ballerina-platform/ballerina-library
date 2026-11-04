@@ -58,7 +58,8 @@ API Docs must not contradict the specification. Doc comments may summarise a rul
 
 - The key words MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD, SHOULD NOT, RECOMMENDED, MAY and OPTIONAL are interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119) and [RFC 8174](https://www.rfc-editor.org/rfc/rfc8174) when, and only when, they appear in all capitals.
 - Sentences without these key words that state behaviour in the present tense, e.g. "The client returns the last response", are also normative. Key words are used where the obligation or permission needs emphasis.
-- Examples, notes and the overview section are informative. Notes are written as `> **Note:** ...` blockquotes. An example is either placed under an `Example` heading or introduced by a sentence such as "For example, ...", so that it is always distinguishable from the rules.
+- Examples, notes and the overview section are informative. An example is either placed under a numbered example heading or introduced by a sentence such as "For example, ...", so that it is always distinguishable from the rules.
+- A note is a `> **Note:** ...` blockquote that gives a consequence of the rules, a rationale, or a pointer elsewhere. It never contains a rule: behaviour is stated in the rules, best practices and tips belong in guides and BBEs, and security risks are stated in the security considerations section. The only other blockquote prefix is `> **Deprecated:** ...`, described in the feature template.
 - Behaviour that is deliberately left open MUST be marked as _implementation-defined_ (the implementation chooses and documents it) or _unspecified_ (users must not rely on it). Anything not covered by the specification is a specification gap and is reported as a bug.
 
 ### 3. Document structure
@@ -99,7 +100,9 @@ Each feature section contains the following subsections, in this order. Subsecti
 4. **Compile-time validation**: The conditions the compiler plugin rejects or warns about, with the diagnostic code of each condition.
 5. **Errors**: The error type returned or raised for each failure condition, and whether the error is returned to the caller, logged, or results in a specific response.
 6. **Interactions**: How the feature combines with other features, including the order in which they apply, e.g. "the circuit breaker wraps the retry client, so a call and its retries count as one request".
-7. **Examples** (informative): Examples that illustrate the rules of the feature. A specification without examples is hard to read, so authors SHOULD add an example wherever a rule is difficult to follow on its own, such as the overall usage of a feature, matching or precedence rules, data binding, computed values like wait times, and interactions between features. An example may also be placed directly after the rule it illustrates instead of at the end of the section. Each example is minimal, states which rules it illustrates, and its outcome agrees with the rules. Examples demonstrate the rules and never replace them: every behaviour shown in an example MUST also be stated as a rule.
+7. **Examples** (informative): Examples that illustrate the rules of the feature. A specification without examples is hard to read, so authors SHOULD add an example wherever a rule is difficult to follow on its own, such as the overall usage of a feature, matching or precedence rules, data binding, computed values like wait times, and interactions between features. An example may also be placed directly after the rule it illustrates instead of at the end of the section. Each example is minimal, states which rules it illustrates, and its outcome agrees with the rules. An example may be a counter-example, such as an input that is rejected or a resource that is not selected, stating the outcome and the rule that causes it. Examples demonstrate the rules and never replace them: every behaviour shown in an example MUST also be stated as a rule.
+
+A deprecated feature still works, so its behaviour stays part of the contract until it is removed. Its section or subsection starts with a `> **Deprecated:** since <version>. Use <replacement>.` note, and a deprecated configuration field states `Deprecated since <version>. Use <replacement>.` at the start of its meaning. Its rules remain normative. Removing a deprecated feature changes documented behaviour and follows the change process.
 
 The following is an abridged section written using the template.
 
@@ -128,7 +131,7 @@ The client resends a request when it fails, waiting between attempts.
 - The client `timeout` applies to each attempt separately.
 - When a circuit breaker is configured, it wraps the retry client, so a call and all its retries count as one request.
 
-#### Example
+#### 5.4.5. Example: Wait times
 ...
 ````
 
@@ -137,14 +140,15 @@ The client resends a request when it fails, waiting between attempts.
 1. Specify observable behaviour, not implementation. Class names, internal functions and data structures do not appear unless they are part of the public API.
 2. Do not copy signatures or doc comments from the source. Refer to the symbol by name, e.g. `http:Client` `get` method, and specify the behaviour that a signature cannot express.
 3. Do not include recommendations, best practices or tutorials. Rules that are security-relevant are stated as rules, e.g. "the listener MUST reject a request whose header section exceeds `maxHeaderSize`", in the relevant feature section or in security considerations.
-4. Add examples wherever they make the rules easier to understand, and keep each one minimal. Each example illustrates a different rule or case. Do not repeat an example for every combination of options, such as every authentication type with every auth provider; such variations go to BBEs.
-5. Use the terms defined in the terminology section consistently, and do not introduce synonyms.
+4. Add examples wherever they make the rules easier to understand. An example is a few lines that show one behaviour or one case; complete programs and walkthroughs belong in BBEs. Each example illustrates a different rule or case. Do not repeat an example for every combination of options, such as every authentication type with every auth provider; such variations go to BBEs.
+5. Use one term for one meaning: the term defined in the terminology section, without synonyms, and never one term for two meanings.
 6. Write default values and special values exactly, e.g. "`0` is treated as `60`", never "a sensible default is used".
 7. Use consistent Markdown:
-   - One `#` heading for the title, and numbered `##` to `#####` headings for sections, with the number followed by a period, e.g. `#### 5.4.3. Behaviour`. The `Introduction`, `Contents` and `References` headings, the `Notation` heading within the introduction, and `Example` headings within a feature section, are not numbered.
+   - One `#` heading for the title, and numbered `##` to `#####` headings for sections, with the number followed by a period, e.g. `#### 5.4.3. Behaviour`. The `Introduction`, `Contents` and `References` headings, and the `Notation` heading within the introduction, are not numbered. Every heading is unique within the document, so that its anchor is stable.
+   - An example under a heading is a numbered subsection of the section it illustrates, one level below that section, named `Example: <topic>`, e.g. `#### 5.4.5. Example: Wait times`. It is always a leaf, never deeper than `######`, and the contents omit it. An example introduced inline by "For example, ..." has no heading.
    - Do not hard-wrap paragraphs.
    - Use fenced code blocks with a language identifier.
-8. Section numbers may change when sections are inserted. Cross-references use Markdown links to section anchors, and the author updates links broken by renumbering in the same change.
+8. Section anchors carry the section number, and BBEs, guides and issues link to them, so section numbers are kept stable: a new section is added after the existing sections of its parent. A section is inserted, renumbering the ones after it, only when that cannot be avoided, such as a missing section that belongs in the middle of the structure; the author then updates every link in the same change. Cross-references within the specification use Markdown links to section anchors.
 
 ### 6. Change process
 
