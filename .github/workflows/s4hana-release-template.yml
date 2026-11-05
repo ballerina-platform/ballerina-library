@@ -106,6 +106,10 @@ jobs:
           echo "Version: ${VERSION}"
           git checkout -b release-${{ inputs.hana-connector-name }}-${VERSION}
 
+      - name: Set Up Sigstore Signing
+        id: sigstore
+        uses: ballerina-platform/ballerina-library/.github/actions/setup-sigstore-signing@main
+
       - name: Publish Package
         env:
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
@@ -116,7 +120,7 @@ jobs:
           publishPAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
         run: |
           ./gradlew clean :${{ inputs.hana-connector-group }}-ballerina:${{ inputs.hana-connector-name }}:release -x :${{ inputs.hana-connector-group }}-examples:test -Prelease.useAutomaticVersion=true 
-          ./gradlew -Pversion=${VERSION} -P${{ inputs.hana-connector-name }}Version=${VERSION} :${{ inputs.hana-connector-group }}-ballerina:${{ inputs.hana-connector-name }}:publish -x test -PpublishToCentral=true 
+          ./gradlew -Pversion=${VERSION} -P${{ inputs.hana-connector-name }}Version=${VERSION} :${{ inputs.hana-connector-group }}-ballerina:${{ inputs.hana-connector-name }}:publish -x test -PpublishToCentral=true ${{ steps.sigstore.outputs.gradle-flag }}
 
       - name: GitHub Release and Release Sync PR
         env:

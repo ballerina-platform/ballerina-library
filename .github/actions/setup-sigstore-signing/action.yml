@@ -1,0 +1,21 @@
+name: 'Set Up Sigstore Signing'
+description: 'Installs cosign and enables keyless Sigstore signing of the pushed balas when the job can request an OIDC token'
+outputs:
+  gradle-flag:
+    description: Gradle flag that enables signing, or empty when the job cannot sign
+    value: ${{ steps.check.outputs.gradle-flag }}
+runs:
+  using: composite
+  steps:
+    - id: check
+      shell: bash
+      run: |
+        if [ -n "${ACTIONS_ID_TOKEN_REQUEST_URL}" ]; then
+          echo "gradle-flag=-PsigstoreSign=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "::warning::Pushing unsigned: grant 'id-token: write' to the calling workflow to sign the package with Sigstore"
+          echo "gradle-flag=" >> "$GITHUB_OUTPUT"
+        fi
+
+    - if: steps.check.outputs.gradle-flag != ''
+      uses: sigstore/cosign-installer@v3
