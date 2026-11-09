@@ -38,6 +38,10 @@ on:
             REFRESH_TOKEN:
                 required: false
 
+env:
+    # Quick build mode on PRs unless the caller passes its own options; scheduled and manual runs keep the default level.
+    DEFAULT_NATIVE_IMAGE_OPTIONS: ${{ inputs.native_image_options || (github.event_name == 'pull_request' && '-Ob' || '') }}
+
 jobs:
     determine-matrix:
         name: Determine Java/Lang Version Matrix
@@ -158,10 +162,10 @@ jobs:
               uses: actions/checkout@v3
 
             - name: Set default native-image options
-              if: ${{  inputs.native_image_options != '' }}
+              if: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS != '' }}
               run: |
                   CURRENT_DIR=$(pwd)
-                  echo "NativeImageArgs = ${{ inputs.native_image_options }}" > default_native.properties
+                  echo "NativeImageArgs = ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS }}" > default_native.properties
                   echo "NATIVE_IMAGE_CONFIG_FILE=$CURRENT_DIR/default_native.properties" >> $GITHUB_ENV
                   echo "NATIVE_IMAGE_CONFIG_FILE: $CURRENT_DIR/default_native.properties"
 
@@ -257,12 +261,12 @@ jobs:
               uses: actions/checkout@v3
 
             - name: Set default native-image options
-              if: ${{  inputs.native_image_options != '' }}
+              if: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS != '' }}
               run: |
                   $CURRENT_DIR = (Get-Location).tostring()
                   $DEFAULT_PROPS = $CURRENT_DIR + "\" + "default_native.properties"
                   $create_file = New-Item $DEFAULT_PROPS
-                  Set-Content $DEFAULT_PROPS "NativeImageArgs = ${{ inputs.native_image_options }}"
+                  Set-Content $DEFAULT_PROPS "NativeImageArgs = ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS }}"
                   "NATIVE_IMAGE_CONFIG_FILE=$DEFAULT_PROPS" >> $env:GITHUB_ENV
                   Write-Output "NATIVE_IMAGE_CONFIG_FILE: $DEFAULT_PROPS"
 
@@ -329,10 +333,10 @@ jobs:
               run: perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ matrix.lang-version }}/" gradle.properties
 
             - name: Set default native-image options
-              if: ${{  inputs.native_image_options != '' }}
+              if: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS != '' }}
               run: |
                   CURRENT_DIR=$(pwd)
-                  echo "NativeImageArgs = ${{ inputs.native_image_options }}" > default_native.properties
+                  echo "NativeImageArgs = ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS }}" > default_native.properties
                   echo "NATIVE_IMAGE_CONFIG_FILE=$CURRENT_DIR/default_native.properties" >> $GITHUB_ENV
                   echo "NATIVE_IMAGE_CONFIG_FILE: $CURRENT_DIR/default_native.properties"
 
@@ -389,12 +393,12 @@ jobs:
               run: perl -pi -e "s/^\s*ballerinaLangVersion=.*/ballerinaLangVersion=${{ matrix.lang-version }}/" gradle.properties
 
             - name: Set default native-image options
-              if: ${{  inputs.native_image_options != '' }}
+              if: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS != '' }}
               run: |
                   $CURRENT_DIR = (Get-Location).tostring()
                   $DEFAULT_PROPS = $CURRENT_DIR + "\" + "default_native.properties"
                   $create_file = New-Item $DEFAULT_PROPS
-                  Set-Content $DEFAULT_PROPS "NativeImageArgs = ${{ inputs.native_image_options }}"
+                  Set-Content $DEFAULT_PROPS "NativeImageArgs = ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS }}"
                   "NATIVE_IMAGE_CONFIG_FILE=$DEFAULT_PROPS" >> $env:GITHUB_ENV
                   Write-Output "NATIVE_IMAGE_CONFIG_FILE: $DEFAULT_PROPS"
 
