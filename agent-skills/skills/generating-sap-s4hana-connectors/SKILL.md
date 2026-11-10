@@ -1,5 +1,5 @@
 ---
-name: sap-s4hana-connector
+name: generating-sap-s4hana-connectors
 description: Build Ballerina connectors for SAP S/4HANA OData APIs (ballerinax/sap.s4hana.* packages in the module-ballerinax-sap.s4hana.<area> repos) from an api.sap.com spec, end to end - spec sanitization, operation IDs, client generation on ballerinax/sap 1.4.0, mock service and tests, docs.json/README with the communication-scenario setup guide, and repo registration (Gradle, workflows, README). Use this whenever the user wants a new S/4HANA connector or package (API_*_SRV, CE_*_0001, OData V2 or V4), wants to add an S/4HANA API to the inventory/qm/delivery/procurement/sales repos or a new area repo, wants to regenerate or re-sanitize an existing S/4HANA client, or mentions an S/4HANA API ID with "connector", even if they do not say "skill" or "generate".
 ---
 

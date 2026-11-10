@@ -1,5 +1,5 @@
 ---
-tags: [sap-s4hana-connector]
+tags: [generating-sap-s4hana-connectors]
 max_turns: 150
 timeout_seconds: 5400
 allowed_tools: [Read, Glob, Grep, Skill, Write, Edit, Bash]
