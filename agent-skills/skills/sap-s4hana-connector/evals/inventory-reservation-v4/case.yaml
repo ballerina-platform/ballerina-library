@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: inventory-reservation-v4
+expected_outcome: |
+  A new OData V4 package sap.s4hana.ce_apireservationdocument_0001 with the same operations as the published one, service path /sap/opu/odata4/..., registered, mock tests passing (including a create through the CSRF HEAD handshake), docs.json naming SAP_COM_0112, quickstart compiles.

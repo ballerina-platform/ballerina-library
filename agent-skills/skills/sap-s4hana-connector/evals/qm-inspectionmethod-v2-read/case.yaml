@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: qm-inspectionmethod-v2-read
+expected_outcome: |
+  A new package sap.s4hana.api_inspectionmethod_srv whose client has the same operations as the published connector, registered in Gradle/workflows/README, mock tests passing, docs.json naming SAP_COM_0110, and a quickstart that compiles.

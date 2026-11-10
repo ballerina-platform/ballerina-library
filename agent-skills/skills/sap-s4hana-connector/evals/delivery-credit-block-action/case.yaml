@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: delivery-credit-block-action
+expected_outcome: |
+  A new package sap.s4hana.api_del_doc_with_credit_block with the same operations as the published one (including the createCheckCreditBlock action), registered, mock tests passing including the action via the CSRF HEAD handshake, docs.json naming SAP_COM_0325, quickstart compiles.

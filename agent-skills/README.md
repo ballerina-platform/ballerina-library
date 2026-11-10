@@ -9,6 +9,7 @@ Skills that automate Ballerina library workflows. They are distributed as the `b
 | [`generating-connectors`](skills/generating-connectors) | Generates a complete Ballerina connector from an OpenAPI specification — a five-stage pipeline (sanitize → client → tests → examples → docs) producing a production-ready connector package. |
 | [`generate-connector-docs`](skills/generate-connector-docs) | Generates the full connector documentation set (overview, setup guide, action reference) plus a validated example guide with six low-code UI screenshots, from a full Ballerina Central package coordinate — publishing directly into a local docs-integrator checkout when one is available. |
 | [`making-graalvm-compatible`](skills/making-graalvm-compatible) | Takes a Ballerina library to a verified, warning-free `bal build --graalvm` / `bal test --graalvm` — build/test baseline, class-init fixes, reachability metadata (repo-sourced first, then the tracing agent), META-INF packing, and marking the package `graalvmCompatible`. |
+| [`sap-s4hana-connector`](skills/sap-s4hana-connector) | Builds a `ballerinax/sap.s4hana.*` connector package for an SAP S/4HANA OData API (V2 or V4) from its api.sap.com spec, inside one of the `module-ballerinax-sap.s4hana.<area>` repos: spec sanitization, operation IDs, client generation on `ballerinax/sap` 1.4.0, mock service and tests, `docs.json`/README with the communication-scenario setup guide, and repo registration (Gradle, workflows, README). |
 
 ## Prerequisites
 
@@ -146,6 +147,16 @@ Generate the connector documentation for ballerinax/mysql.
 ```
 
 Use `organization/package` or `organization/package:version`; bare package names are rejected. Output is preserved under `artifacts/<organization>-<package>/` in the Claude project directory, or published directly into a local docs-integrator checkout when one is available.
+
+Build an SAP S/4HANA connector package inside an area repo clone (the spec comes from api.sap.com):
+
+```text
+/ballerina-libdev:sap-s4hana-connector
+```
+
+```text
+Add the API_INSPECTIONMETHOD_SRV connector to the S/4HANA QM repo. The spec is ./API_INSPECTIONMETHOD_SRV.json.
+```
 
 See each skill's own `SKILL.md` for its full stage breakdown and configuration options.
 

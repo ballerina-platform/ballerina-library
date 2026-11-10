@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: sales-order-simulation-post
+expected_outcome: |
+  A new package sap.s4hana.api_sales_order_simulation_srv in the pre-revamp sales repo, with the same operations and types as the published one, generated on ballerinax/sap 1.4.0, registered in the sales repo's own styles (":build" dependsOn, "The `ballerinax/...` package" README list), mock tests passing including a POST simulation through the CSRF HEAD handshake, docs.json naming SAP_COM_0109, quickstart compiles.
