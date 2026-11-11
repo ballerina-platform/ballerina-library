@@ -19,11 +19,20 @@ versions, the README template with per-scenario screenshot keys, and the fixed p
 ```bash
 REF=<path to your clone of module-ballerinax-sap.s4hana.qm>
 NEW=<path for the new module-ballerinax-sap.s4hana.<area> clone>
-mkdir -p "$NEW"
+if [ -d "$NEW/.git" ]; then
+  # Upstream repo already exists and is cloned: work on a branch, extract into the clean tree.
+  git -C "$NEW" switch -c scaffold-repo
+else
+  # No upstream repo yet: start a local one; push it once the upstream repo exists.
+  mkdir -p "$NEW" && git -C "$NEW" init -b main && git -C "$NEW" switch -c scaffold-repo
+fi
 git -C "$REF" archive HEAD -- . \
   ':!ballerina/api_*' ':!docs/spec/*' ':!docs/setup/s4-3-*' ':!docs/setup/s4-4-*' ':!docs/setup/s4-5-*' \
   ':!examples/*/' | tar -x -C "$NEW"
 ```
+
+`git archive` exports files only, without `.git`, so the destination has to be a Git repository
+before the extraction: the commit-per-step workflow in `SKILL.md` needs it.
 
 Keep `docs/setup/s4-1-communication-system.png` and `s4-2-communication-system-users.png`, which
 are scenario independent. Keep `docs/sanitation/*.bal`, `docs/license.txt`,

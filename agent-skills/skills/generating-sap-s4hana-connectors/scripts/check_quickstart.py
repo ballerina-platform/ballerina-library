@@ -31,13 +31,16 @@ def main() -> int:
     pkg = repo / "ballerina" / args.module
     dist = args.dist
     if not dist:
-        m = re.search(r"^ballerinaLangVersion=(\S+)", (repo / "gradle.properties").read_text(), re.M)
+        m = re.search(r"^ballerinaLangVersion=(\S+)", (repo / "gradle.properties").read_text(encoding="utf-8"), re.M)
         dist = m.group(1) if m else "2201.13.0"
     bal = bal_for(dist)
-    toml = (pkg / "Ballerina.toml").read_text()
-    name = re.search(r'^name = "(.*)"', toml, re.M).group(1)
-    version = re.search(r'^version = "(.*)"', toml, re.M).group(1)
-    docs = json.loads((pkg / "docs.json").read_text())
+    toml = (pkg / "Ballerina.toml").read_text(encoding="utf-8")
+    name_m = re.search(r'^name = "(.*)"', toml, re.M)
+    version_m = re.search(r'^version = "(.*)"', toml, re.M)
+    if not name_m or not version_m:
+        sys.exit(f"{pkg / 'Ballerina.toml'} has no `name = \"...\"` and `version = \"...\"` lines")
+    name, version = name_m.group(1), version_m.group(1)
+    docs = json.loads((pkg / "docs.json").read_text(encoding="utf-8"))
 
     local = Path.home() / ".ballerina/repositories/local/bala/ballerinax" / name
     # An earlier local push of the same package may be in use elsewhere: keep a copy and put it back.
@@ -47,7 +50,11 @@ def main() -> int:
         shutil.copytree(local, backup)
     try:
         for cmd in (["pack"], ["push", "--repository=local"]):
-            res = subprocess.run([bal, *cmd], cwd=pkg, text=True, capture_output=True)
+            try:
+                res = subprocess.run([bal, *cmd], cwd=pkg, text=True, capture_output=True, timeout=600)
+            except subprocess.TimeoutExpired:
+                print(f"bal {cmd[0]} timed out after 600 s")
+                return 1
             if res.returncode != 0:
                 print(res.stdout + res.stderr)
                 return 1
@@ -75,8 +82,8 @@ public function main() returns error? {{
         with tempfile.TemporaryDirectory() as tmp:
             Path(tmp, "Ballerina.toml").write_text(
                 f'[package]\norg = "qs"\nname = "quickstart"\nversion = "0.1.0"\n\n'
-                f'[[dependency]]\norg = "ballerinax"\nname = "{name}"\nversion = "{version}"\nrepository = "local"\n')
-            Path(tmp, "main.bal").write_text(main_bal)
+                f'[[dependency]]\norg = "ballerinax"\nname = "{name}"\nversion = "{version}"\nrepository = "local"\n', encoding="utf-8")
+            Path(tmp, "main.bal").write_text(main_bal, encoding="utf-8")
             # --offline: everything is local; online, the build can wait on Central for an hour.
             try:
                 res = subprocess.run([bal, "build", "--offline"], cwd=tmp, text=True, capture_output=True, timeout=600)

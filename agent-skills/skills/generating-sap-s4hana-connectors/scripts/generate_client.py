@@ -117,14 +117,14 @@ def stage_client(repo: Path, api_id: str, module: str, gen_bal: str, build_bal: 
     run([sys.executable, str(HERE / "modernize_connection_config.py"), str(pkg)], repo)
     run([build_bal, "format", "."], pkg, env)
     run([build_bal, "build"], pkg, env)
-    client = (pkg / "client.bal").read_text()
+    client = (pkg / "client.bal").read_text(encoding="utf-8")
     n = len(re.findall(r"remote isolated function ", client))
     if re.search(r"resource isolated function ", client):
         sys.exit("client.bal has resource methods; S/4HANA connectors use remote methods (--client-methods remote)")
     expected = sum(1 for item in spec["paths"].values() for k in item if k in ("get", "post", "put", "patch", "delete"))
     print(f"client generated: {n} remote functions for {expected} spec operations" +
           ("" if n == expected else "  <-- MISMATCH: bal openapi skipped some operations; check its output above"))
-    types = (pkg / "types.bal").read_text()
+    types = (pkg / "types.bal").read_text(encoding="utf-8")
     escaped = sorted(set(re.findall(r"^public type (\w+(?:\\ \w+)+)", types, re.M)))
     if escaped:
         sys.exit(f"ESCAPED TYPE NAMES in types.bal: {escaped}. A spaced schema title got through; extend "
@@ -148,7 +148,7 @@ def main() -> int:
     module = args.module or args.api_id.lower()
     build_dist = args.build_dist
     if not build_dist:
-        props = (repo / "gradle.properties").read_text()
+        props = (repo / "gradle.properties").read_text(encoding="utf-8")
         m = re.search(r"^ballerinaLangVersion=(\S+)", props, re.M)
         build_dist = m.group(1) if m else "2201.13.0"
     build_bal = bal_for(build_dist)

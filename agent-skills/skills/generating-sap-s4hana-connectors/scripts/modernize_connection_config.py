@@ -91,11 +91,11 @@ def main() -> int:
     pkg = Path(sys.argv[1])
     for name, fix in (("types.bal", fix_types), ("client.bal", fix_client)):
         path = pkg / name
-        before = path.read_text()
+        before = path.read_text(encoding="utf-8")
         after = fix(before)
-        path.write_text(after)
+        path.write_text(after, encoding="utf-8")
         print(f"{name}: {'updated' if after != before else 'unchanged'}")
-    client = (pkg / "client.bal").read_text()
+    client = (pkg / "client.bal").read_text(encoding="utf-8")
     if "http:ClientConfiguration" in client or "ensureType(ClientHttp1Settings)" in client:
         print("ERROR: client.bal still has the old init; inspect it by hand", file=sys.stderr)
         return 1

@@ -13,8 +13,11 @@ generated from the api.sap.com spec with the repo's own sanitizer scripts and th
 package indistinguishable from its siblings. The scripts below reproduce the published
 connectors exactly; lean on them instead of hand-editing generated code.
 
-Scripts are in `scripts/` next to this file (call them with `python3`). Each prints what it did
-and exits non-zero on failure.
+`<skill-root>` below is the directory that holds this `SKILL.md` (with Claude Code,
+`${CLAUDE_SKILL_DIR}`). You will usually run commands from the area repo, so always call the
+scripts by that full path, `python3 <skill-root>/scripts/<script>.py`, never as a bare
+`scripts/...` relative to the current directory. Each script prints what it did and exits
+non-zero on failure.
 
 | Script | Does |
 |---|---|
@@ -36,7 +39,7 @@ and exits non-zero on failure.
 - **Repo.** Find the user's clone of the area repo (`module-ballerinax-sap.s4hana.<area>`;
   ask for the path if it is not in the current directory or the conversation). Run
   `spec_info.py` on the spec to see what the API is about, and if the area is unclear, ask the
-  user which repo it belongs in. If no repo fits, follow `references/new-repo.md`.
+  user which repo it belongs in. If no repo fits, follow `<skill-root>/references/new-repo.md`.
 - **Branch.** Create a branch for the package (for example `add-<module>`). Never commit to
   `main`. If the clone has a `fork` remote (the user's fork), that is where it gets pushed later.
 - **Distributions.** Generation uses Ballerina 2201.10.3; building and testing use the repo's
@@ -67,7 +70,7 @@ separate commits matter more than usual here.
 ### 1. Inspect the spec
 
 ```bash
-python3 scripts/spec_info.py <path>/<API_ID>.json
+python3 <skill-root>/scripts/spec_info.py <path>/<API_ID>.json
 ```
 
 Keep the output; later steps use `module`, `api_postfix`, `scenarios`, `title`, `list_paths`
@@ -77,7 +80,7 @@ user which arrangement exposes the service before writing the setup guide.
 ### 2. Register the package
 
 ```bash
-python3 scripts/register_package.py --repo <repo> --module <module> --api-id <API_ID> \
+python3 <skill-root>/scripts/register_package.py --repo <repo> --module <module> --api-id <API_ID> \
   --name "<Display Name>" --api-title "<title from spec_info>" \
   --keywords "<Business Object>" "<extra term>" \
   --description "The service allows to <what it does, in one sentence>."
@@ -106,8 +109,8 @@ pre-revamp repo's siblings lack them; keep them anyway and mention it with the o
 Copy the download to `docs/spec/<API_ID>.json` unchanged and commit it. Then:
 
 ```bash
-python3 scripts/generate_client.py --repo <repo> --api-id <API_ID> --stage sanitize   # commit
-python3 scripts/generate_client.py --repo <repo> --api-id <API_ID> --stage opid       # commit
+python3 <skill-root>/scripts/generate_client.py --repo <repo> --api-id <API_ID> --stage sanitize   # commit
+python3 <skill-root>/scripts/generate_client.py --repo <repo> --api-id <API_ID> --stage opid       # commit
 ```
 
 **Operation ID clashes.** The `opid` stage stops if two operations get the same ID or one gets
@@ -121,7 +124,7 @@ check that its client is unchanged.
 ### 4. Generate the client
 
 ```bash
-python3 scripts/generate_client.py --repo <repo> --api-id <API_ID> --stage client
+python3 <skill-root>/scripts/generate_client.py --repo <repo> --api-id <API_ID> --stage client
 ```
 
 It ends by printing `N remote functions for M spec operations`. A mismatch means `bal openapi`
@@ -141,9 +144,12 @@ Pick one list path (from `list_paths`) and, if the API supports create, one crea
 action. Then:
 
 ```bash
-python3 scripts/make_mock_spec.py <repo>/docs/spec/<API_ID>.json <repo>/docs/spec/<API_ID>_MOCK.json /A_Entity:get /A_Entity:post
-python3 scripts/generate_mock.py --repo <repo> --api-id <API_ID>
+python3 <skill-root>/scripts/make_mock_spec.py <repo>/docs/spec/<API_ID>.json <repo>/docs/spec/<API_ID>_MOCK.json /A_Entity:get /A_Entity:post
+python3 <skill-root>/scripts/generate_mock.py --repo <repo> --api-id <API_ID>
 ```
+
+`generate_mock.py` refuses to overwrite an existing `modules/mock` (it may already hold your
+sample data); pass `--force` only when you mean to regenerate it from scratch.
 
 Fill the generated resource bodies in `modules/mock/<module>_mock_service.bal` with realistic
 sample data:
@@ -156,14 +162,15 @@ sample data:
   master data a mock cannot know, the reference repos return an error response and the test
   asserts the error; either style is fine as long as the test is honest about it.
 
-Write `tests/test.bal` from `assets/test.bal.template` (a few older packages call it
+Write `tests/test.bal` from `<skill-root>/assets/test.bal.template` (a few older packages call it
 `tests.bal`; `test.bal` is what most use). Replace the `@...@` placeholders: the
 list method and return type come from `client.bal` (for example `listA_InspectionMethods` and
 `CollectionOfA_InspectionMethodWrapper`), `ENVELOPE_FIELD` is `d` for V2 and `value` for V4, and
 `@YEAR@` is the current year. The read test only asserts that a payload came back, so it also
 holds on a live tenant with no data; assert on the mock's sample values in an extra mock-only
 test if you want more. The template's live flag compares with `"true"`; older packages compare
-with `"false"` (a known inversion), so do not copy theirs.
+with `"false"` (a known inversion), so do not copy theirs. Before running the tests, check
+that no placeholder is left: `grep -n '@[A-Z_]*@' tests/test.bal` must print nothing.
 
 Add a create or action test when the mock has one, with `enable: !isTestOnLiveServer`:
 
@@ -224,8 +231,8 @@ Write `ballerina/<module>/docs.json`, matching the sibling packages' files:
 Then:
 
 ```bash
-python3 scripts/render_readmes.py <repo> <module>
-python3 scripts/check_quickstart.py <repo> <module>
+python3 <skill-root>/scripts/render_readmes.py <repo> <module>
+python3 <skill-root>/scripts/check_quickstart.py <repo> <module>
 ```
 
 `render_readmes.py` lists any `docs/setup/s4-3/4/5-...-sap-com-xxxx.png` screenshots that do

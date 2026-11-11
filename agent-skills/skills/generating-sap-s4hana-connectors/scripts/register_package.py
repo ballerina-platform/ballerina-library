@@ -55,12 +55,12 @@ def main() -> int:
 
     repo = Path(args.repo).resolve()
     m = args.module
-    settings = (repo / "settings.gradle").read_text()
+    settings = (repo / "settings.gradle").read_text(encoding="utf-8")
     area_match = re.search(r"include ':([\w.-]+)-ballerina'", settings)
     if not area_match:
         sys.exit("settings.gradle has no `include ':<area>-ballerina'`; is this an S/4HANA area repo?")
     area = area_match.group(1)
-    siblings = [s for s in re.findall(rf"include ':{area}-ballerina:(\w+)'", settings) if s != m]
+    siblings = [s for s in re.findall(rf"include ':{re.escape(area)}-ballerina:(\w+)'", settings) if s != m]
     if not siblings:
         sys.exit("No sibling package to copy from. For a brand-new repo, see references/new-repo.md.")
     sib = siblings[0]
@@ -71,7 +71,7 @@ def main() -> int:
     # Ballerina.toml
     toml = pkg / "Ballerina.toml"
     if not toml.exists():
-        tpl = (repo / "build-config/resources/Ballerina.toml").read_text()
+        tpl = (repo / "build-config/resources/Ballerina.toml").read_text(encoding="utf-8")
         tpl_kw = re.search(r"^keywords = \[(.*)\]$", tpl, re.M)
         area_kw = re.findall(r'"([^"]+)"', tpl_kw.group(1)) if tpl_kw else []
         base = [f"Name/SAP S/4HANA {args.name}", "Type/Connector", "Vendor/SAP", "Area/ERP & Business Operations",
@@ -79,67 +79,69 @@ def main() -> int:
         kws = base + [k for k in area_kw + args.keywords if k not in base and "/" not in k]
         text = tpl.replace("@package.name@", f"sap.s4hana.{m}").replace("@toml.version@", args.version)
         text = re.sub(r"^keywords = \[.*\]$", "keywords = [" + ", ".join(f'"{k}"' for k in kws) + "]", text, flags=re.M)
-        toml.write_text(text)
+        toml.write_text(text, encoding="utf-8")
         note(f"ballerina/{m}/Ballerina.toml")
 
     # build.gradle
     bg = pkg / "build.gradle"
     if not bg.exists():
-        text = (repo / "ballerina" / sib / "build.gradle").read_text()
+        text = (repo / "ballerina" / sib / "build.gradle").read_text(encoding="utf-8")
         # Repos differ: delivery uses the short name ("Inbound Delivery"), qm/sales the api.sap.com
         # title ("Inspection Method - Read"). Follow the siblings: title only if one of them uses it.
-        descs = [re.search(r"^description = '(.*)'$", (repo / "ballerina" / s / "build.gradle").read_text(), re.M)
+        descs = [re.search(r"^description = '(.*)'$", (repo / "ballerina" / s / "build.gradle").read_text(encoding="utf-8"), re.M)
                  for s in siblings if (repo / "ballerina" / s / "build.gradle").exists()]
         uses_title = any(d and " - " in d.group(1).removeprefix("Ballerina - ") for d in descs)
         label = args.gradle_title or (args.api_title if uses_title else args.name)
         text = re.sub(r"^description = '.*'$", f"description = 'Ballerina - SAP S/4HANA {label} API'", text, flags=re.M)
-        text = text.replace(sib, m)
-        bg.write_text(text)
+        # Only whole occurrences of the module name (sap.s4hana.<sib>, <sib>Version, release-<sib>-...),
+        # so a sibling whose name is a prefix of another word is not rewritten inside it.
+        text = re.sub(rf"(?<![a-z0-9_]){re.escape(sib)}(?![a-z0-9_])", m, text)
+        bg.write_text(text, encoding="utf-8")
         note(f"ballerina/{m}/build.gradle")
 
     # settings.gradle
     if f"include ':{area}-ballerina:{m}'" not in settings:
-        settings = insert_after_last(settings, rf"^include ':{area}-ballerina:\w+'", f"include ':{area}-ballerina:{m}'")
-        settings = insert_after_last(settings, rf"^project\(':{area}-ballerina:\w+'\)\.projectDir.*$",
+        settings = insert_after_last(settings, rf"^include ':{re.escape(area)}-ballerina:\w+'", f"include ':{area}-ballerina:{m}'")
+        settings = insert_after_last(settings, rf"^project\(':{re.escape(area)}-ballerina:\w+'\)\.projectDir.*$",
                                      f"project(':{area}-ballerina:{m}').projectDir = file(\"ballerina/{m}\")")
-        (repo / "settings.gradle").write_text(settings)
+        (repo / "settings.gradle").write_text(settings, encoding="utf-8")
         note("settings.gradle")
 
     # gradle.properties
     props_path = repo / "gradle.properties"
-    props = props_path.read_text()
-    if not re.search(rf"^{m}Version=", props, re.M):
+    props = props_path.read_text(encoding="utf-8")
+    if not re.search(rf"^{re.escape(m)}Version=", props, re.M):
         alt = "|".join(re.escape(s) for s in siblings)
         props = insert_after_last(props, rf"^({alt})Version=.*$", f"{m}Version={args.version}-SNAPSHOT")
-        props_path.write_text(props)
+        props_path.write_text(props, encoding="utf-8")
         note("gradle.properties")
 
     # ballerina/build.gradle
     bb_path = repo / "ballerina" / "build.gradle"
-    bb = bb_path.read_text()
+    bb = bb_path.read_text(encoding="utf-8")
     # Most repos depend on each package's commitTomlFiles task; sales uses :build. Copy the siblings.
-    task = re.search(rf"dependsOn\(':{area}-ballerina:\w+:(\w+)'\)", bb)
+    task = re.search(rf"dependsOn\(':{re.escape(area)}-ballerina:\w+:(\w+)'\)", bb)
     dep = f"dependsOn(':{area}-ballerina:{m}:{task.group(1) if task else 'commitTomlFiles'}')"
     if task and f"':{area}-ballerina:{m}:" not in bb:
-        bb = insert_after_last(bb, rf"^\s*dependsOn\(':{area}-ballerina:\w+:{task.group(1)}'\)", "    " + dep)
-        bb_path.write_text(bb)
+        bb = insert_after_last(bb, rf"^\s*dependsOn\(':{re.escape(area)}-ballerina:\w+:{task.group(1)}'\)", "    " + dep)
+        bb_path.write_text(bb, encoding="utf-8")
         note("ballerina/build.gradle")
 
     # workflow option lists
     for wf in sorted((repo / ".github" / "workflows").glob("*.yml")):
-        text = wf.read_text()
+        text = wf.read_text(encoding="utf-8")
         # [ \t] rather than \s: \s would also match the newline and the blank line that ends the list
         pat = rf"^([ \t]*)- ({'|'.join(re.escape(s) for s in siblings)})[ \t]*$"
         hits = list(re.finditer(pat, text, re.M))
-        if hits and not re.search(rf"^[ \t]*- {m}[ \t]*$", text, re.M):
+        if hits and not re.search(rf"^[ \t]*- {re.escape(m)}[ \t]*$", text, re.M):
             indent = hits[-1].group(1)
             text = insert_after_last(text, pat, f"{indent}- {m}")
-            wf.write_text(text)
+            wf.write_text(text, encoding="utf-8")
             note(f".github/workflows/{wf.name}")
 
     # README build table + optional list entry
     readme_path = repo / "README.md"
-    readme = readme_path.read_text()
+    readme = readme_path.read_text(encoding="utf-8")
     if f"| {m} " not in readme and f"|{m}|" not in readme.replace(" ", ""):
         row_pat = rf"^([ \t]*)\|[ \t]*({'|'.join(re.escape(s) for s in siblings)})[ \t]*\|.*$"
         rows = list(re.finditer(row_pat, readme, re.M))
@@ -172,10 +174,10 @@ def main() -> int:
             note("README.md package list entry (older 'The `ballerinax/...` package' style)")
         if not items and not old:
             print("  ! README package list not recognised; add the entry by hand in the siblings' style")
-    readme_path.write_text(readme)
+    readme_path.write_text(readme, encoding="utf-8")
 
     cl = repo / "changelog.md"
-    if cl.exists() and re.search(rf"\b{re.escape(m)}\b", cl.read_text()) and args.version == "1.0.0":
+    if cl.exists() and re.search(rf"\b{re.escape(m)}\b", cl.read_text(encoding="utf-8")) and args.version == "1.0.0":
         print(f"  ! changelog.md already lists {m}: it was released before. Rerun with --version set to the"
               " siblings' version (gradle.properties) unless it really starts over at 1.0.0.")
     if not changes:

@@ -21,9 +21,12 @@ DEFAULT_IMAGES = {
 
 
 def render(template: str, module: str, docs: dict) -> str:
+    # Collect the placeholders from the template first: docs.json text may itself contain @...@.
+    keys = [k for k in dict.fromkeys(re.findall(r"@([a-z-]+)@", template))
+            if k not in ("package-name", "service-name", "key-features")]
     out = template.replace("@package-name@", f"sap.s4hana.{module}").replace("@service-name@", module.upper())
     out = out.replace("@key-features@", "\n".join(f"- {k}" for k in docs.get("key-features", [])))
-    for key in re.findall(r"@([a-z-]+)@", out):
+    for key in keys:
         value = docs.get(key, DEFAULT_IMAGES.get(key))
         if value is None:
             raise KeyError(f"{module}/docs.json has no '{key}'")
@@ -36,13 +39,13 @@ def main() -> int:
         print(__doc__)
         return 0
     repo = Path(sys.argv[1]).resolve()
-    template = (repo / "build-config/resources/README.md").read_text()
+    template = (repo / "build-config/resources/README.md").read_text(encoding="utf-8")
     modules = sys.argv[2:] or sorted(p.parent.name for p in (repo / "ballerina").glob("*/docs.json"))
     setup = repo / "docs" / "setup"
     for m in modules:
-        docs = json.loads((repo / "ballerina" / m / "docs.json").read_text())
+        docs = json.loads((repo / "ballerina" / m / "docs.json").read_text(encoding="utf-8"))
         text = render(template, m, docs)
-        (repo / "ballerina" / m / "README.md").write_text(text)
+        (repo / "ballerina" / m / "README.md").write_text(text, encoding="utf-8")
         # Shared images live in module-ballerinax-sap; only this repo's own docs/setup files are checked.
         own = [img for r, img in re.findall(r"githubusercontent\.com/ballerina-platform/([\w.-]+)/main/docs/setup/([\w.-]+\.png)", text)
                if r != "module-ballerinax-sap"]

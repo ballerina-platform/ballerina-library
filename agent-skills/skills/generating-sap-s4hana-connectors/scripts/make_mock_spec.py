@@ -44,7 +44,11 @@ def main() -> int:
             sys.exit(f"{p} is not a path in the spec")
         item = spec["paths"][p]
         if methods:
-            item = {k: v for k, v in item.items() if k in methods.split(",") or k == "parameters"}
+            wanted = [x.strip().lower() for x in methods.split(",") if x.strip()]
+            unknown = [x for x in wanted if x not in item]
+            if unknown:
+                sys.exit(f"{p} has no {unknown} operation (it has {[k for k in item if k != 'parameters']})")
+            item = {k: v for k, v in item.items() if k in wanted or k == "parameters"}
         if re.search(r"[({]", p):
             print(f"WARNING: {p} has key parameters; the reference mocks avoid parameterized paths")
         keep[p] = item
