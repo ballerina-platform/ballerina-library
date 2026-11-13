@@ -30,10 +30,15 @@ on:
         type: string
         default: ""
       scan-exclude-tests:
-        description: "Drop 'bal scan' findings in tests/ and modules/*/tests/"
+        description: "Leave tests/ and modules/*/tests/ out of 'bal scan' (--exclude-tests), so their findings and suppressions are not reported"
         required: false
         type: boolean
         default: false
+      scan-suppressions:
+        description: "Apply 'bal scan' in-source suppressions (@scan:Suppress), leaving suppressed findings out of the counts and the gate"
+        required: false
+        type: boolean
+        default: true
       scan-artifacts:
         description: "Save the merged 'bal scan' SARIF file as a workflow artifact"
         required: false
@@ -344,6 +349,7 @@ jobs:
                     paths: ${{ steps.scan-paths.outputs.paths }}
                     category: bal-scan-library
                     exclude-tests: ${{ inputs.scan-exclude-tests }}
+                    suppressions: ${{ inputs.scan-suppressions }}
                     artifacts: ${{ inputs.scan-artifacts }}
 
             -   name: Scan examples
@@ -355,4 +361,5 @@ jobs:
                     paths: examples
                     category: bal-scan-examples
                     exclude-tests: ${{ inputs.scan-exclude-tests }}
+                    suppressions: ${{ inputs.scan-suppressions }}
                     artifacts: ${{ inputs.scan-artifacts }}
