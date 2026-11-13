@@ -194,7 +194,7 @@ jobs:
           suppressions: ${{ inputs.scan-suppressions }}
           artifacts: ${{ inputs.scan-artifacts }}
 
-      # Examples have no committed Dependencies.toml, so the Gradle build creates it before the scan.
+      # Examples have no committed Dependencies.toml and are not part of the Gradle build, so examples/build.sh creates it.
       # Runs even when the library gate fails, so examples findings are still reported.
       - name: Set up JDK ${{ steps.resolve-bal.outputs.java-version }}
         id: setup-java
@@ -214,6 +214,13 @@ jobs:
         run: |
           IFS=' ' read -ra BUILD_FLAGS <<< "${ADDITIONAL_BUILD_FLAGS//$'\n'/ }"
           ./gradlew clean build -x test -x check "${BUILD_FLAGS[@]}"
+          if [ -f examples/build.sh ]; then
+            bash examples/build.sh build
+          else
+            while IFS= read -r toml; do
+              (cd "$(dirname "$toml")" && bal build)
+            done < <(find examples -mindepth 2 -name Ballerina.toml -not -path '*/target/*')
+          fi
 
       - name: Scan examples
         if: ${{ !cancelled() && steps.build-examples.outcome == 'success' }}

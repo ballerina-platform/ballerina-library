@@ -298,7 +298,7 @@ jobs:
                     distribution: 'temurin'
                     java-version: ${{ steps.resolve-java.outputs.java-version }}
 
-            # `check` is skipped since ubuntu-build already runs checkstyle and spotbugs; the build also creates the examples' Dependencies.toml for bal scan.
+            # `check` is skipped since ubuntu-build already runs checkstyle and spotbugs.
             -   name: Build the Package
                 if: steps.resolve-scan.outputs.supported == 'true'
                 env:
@@ -352,8 +352,21 @@ jobs:
                     suppressions: ${{ inputs.scan-suppressions }}
                     artifacts: ${{ inputs.scan-artifacts }}
 
-            -   name: Scan examples
+            # Examples have no committed Dependencies.toml and are not part of the Gradle build, so examples/build.sh creates it.
+            -   name: Build examples
+                id: build-examples
                 if: steps.resolve-scan.outputs.supported == 'true' && hashFiles('examples/**') != ''
+                run: |
+                  if [ -f examples/build.sh ]; then
+                    bash examples/build.sh build
+                  else
+                    while IFS= read -r toml; do
+                      (cd "$(dirname "$toml")" && bal build)
+                    done < <(find examples -mindepth 2 -name Ballerina.toml -not -path '*/target/*')
+                  fi
+
+            -   name: Scan examples
+                if: steps.build-examples.outcome == 'success'
                 uses: ballerina-platform/scan-ballerina@v0
                 with:
                     platforms: github-code-scanning
