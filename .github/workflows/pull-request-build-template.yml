@@ -340,6 +340,19 @@ jobs:
                     echo "has-paths=$([ -n "$PATHS" ] && echo true || echo false)"
                   } >> "$GITHUB_OUTPUT"
 
+            # bal scan expects locked dependencies, so each package is built with the scan's distribution first.
+            -   name: Build library packages
+                if: steps.scan-paths.outputs.has-paths == 'true'
+                env:
+                    PATHS: ${{ steps.scan-paths.outputs.paths }}
+                run: |
+                  while IFS= read -r p; do
+                    [ -n "$p" ] || continue
+                    echo "::group::bal build $p"
+                    (cd "$p" && bal build)
+                    echo "::endgroup::"
+                  done <<< "$PATHS"
+
             -   name: Scan library
                 if: steps.scan-paths.outputs.has-paths == 'true'
                 uses: ballerina-platform/scan-ballerina@v0
@@ -352,8 +365,19 @@ jobs:
                     suppressions: ${{ inputs.scan-suppressions }}
                     artifacts: ${{ inputs.scan-artifacts }}
 
-            -   name: Scan examples
+            -   name: Build examples
+                id: build-examples
                 if: steps.resolve-scan.outputs.supported == 'true' && hashFiles('examples/**') != ''
+                run: |
+                  while IFS= read -r toml; do
+                    dir="$(dirname "$toml")"
+                    echo "::group::bal build $dir"
+                    (cd "$dir" && bal build)
+                    echo "::endgroup::"
+                  done < <(find examples -name Ballerina.toml -not -path '*/target/*')
+
+            -   name: Scan examples
+                if: steps.build-examples.outcome == 'success'
                 uses: ballerina-platform/scan-ballerina@v0
                 with:
                     platforms: github-code-scanning
