@@ -30,7 +30,7 @@ on:
         type: string
         default: ""
       scan-examples:
-        description: "Run 'bal scan' on the packages under examples/. Needs a buildExamples Gradle task (examples/build.gradle, included in settings.gradle) that builds them"
+        description: "Run 'bal scan' on the packages under examples/"
         required: false
         type: boolean
         default: false
@@ -357,20 +357,8 @@ jobs:
                     suppressions: ${{ inputs.scan-suppressions }}
                     artifacts: ${{ inputs.scan-artifacts }}
 
-            # Examples have no committed Dependencies.toml, so the library's buildExamples Gradle task creates it.
-            -   name: Build examples
-                id: build-examples
-                if: inputs.scan-examples && steps.resolve-scan.outputs.supported == 'true' && hashFiles('examples/**') != ''
-                env:
-                    packageUser: ${{ github.actor }}
-                    packagePAT: ${{ secrets.GITHUB_TOKEN }}
-                    ADDITIONAL_BUILD_FLAGS: ${{ inputs.additional-ubuntu-build-flags }}
-                run: |
-                  IFS=' ' read -ra BUILD_FLAGS <<< "${ADDITIONAL_BUILD_FLAGS//$'\n'/ }"
-                  ./gradlew buildExamples -x test -x check "${BUILD_FLAGS[@]}"
-
             -   name: Scan examples
-                if: steps.build-examples.outcome == 'success'
+                if: inputs.scan-examples && steps.resolve-scan.outputs.supported == 'true' && hashFiles('examples/**') != ''
                 uses: ballerina-platform/scan-ballerina@v0
                 with:
                     platforms: github-code-scanning

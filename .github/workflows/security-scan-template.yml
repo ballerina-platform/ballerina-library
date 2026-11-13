@@ -18,7 +18,7 @@ on:
         type: string
         default: ""
       scan-examples:
-        description: "Run 'bal scan' on the packages under examples/. Needs a buildExamples Gradle task (examples/build.gradle, included in settings.gradle) that builds them"
+        description: "Run 'bal scan' on the packages under examples/"
         required: false
         type: boolean
         default: false
@@ -82,6 +82,7 @@ jobs:
             **/build/libs/*.jar
             ballerina/Ballerina.toml
             ballerina/CompilerPlugin.toml
+            examples/**/Dependencies.toml
           if-no-files-found: warn
           retention-days: 1
           include-hidden-files: true
@@ -194,29 +195,9 @@ jobs:
           suppressions: ${{ inputs.scan-suppressions }}
           artifacts: ${{ inputs.scan-artifacts }}
 
-      # Examples have no committed Dependencies.toml, so the library's buildExamples Gradle task creates it.
       # Runs even when the library gate fails, so examples findings are still reported.
-      - name: Set up JDK ${{ steps.resolve-bal.outputs.java-version }}
-        id: setup-java
-        if: ${{ !cancelled() && inputs.scan-examples && steps.setup-ballerina.outcome == 'success' && hashFiles('examples/**') != '' }}
-        uses: actions/setup-java@v6
-        with:
-          distribution: "temurin"
-          java-version: ${{ steps.resolve-bal.outputs.java-version }}
-
-      - name: Build examples
-        id: build-examples
-        if: ${{ !cancelled() && steps.setup-java.outcome == 'success' }}
-        env:
-          packageUser: ${{ github.actor }}
-          packagePAT: ${{ secrets.GITHUB_TOKEN }}
-          ADDITIONAL_BUILD_FLAGS: ${{ inputs.additional-build-flags }}
-        run: |
-          IFS=' ' read -ra BUILD_FLAGS <<< "${ADDITIONAL_BUILD_FLAGS//$'\n'/ }"
-          ./gradlew buildExamples -x test -x check "${BUILD_FLAGS[@]}"
-
       - name: Scan examples
-        if: ${{ !cancelled() && steps.build-examples.outcome == 'success' }}
+        if: ${{ !cancelled() && inputs.scan-examples && steps.setup-ballerina.outcome == 'success' && hashFiles('examples/**') != '' }}
         uses: ballerina-platform/scan-ballerina@v0
         with:
           platforms: github-code-scanning
