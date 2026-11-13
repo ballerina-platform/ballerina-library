@@ -29,6 +29,26 @@ on:
         required: false
         type: string
         default: ""
+      scan-examples:
+        description: "Run 'bal scan' on the packages under examples/"
+        required: false
+        type: boolean
+        default: false
+      scan-exclude-tests:
+        description: "Leave tests/ and modules/*/tests/ out of 'bal scan' (--exclude-tests), so their findings and suppressions are not reported"
+        required: false
+        type: boolean
+        default: false
+      scan-suppressions:
+        description: "Apply 'bal scan' in-source suppressions (@scan:Suppress), leaving suppressed findings out of the counts and the gate"
+        required: false
+        type: boolean
+        default: true
+      scan-artifacts:
+        description: "Save the merged 'bal scan' SARIF file as a workflow artifact"
+        required: false
+        type: boolean
+        default: true
     secrets:
       CODECOV_TOKEN:
         required: false
@@ -292,7 +312,7 @@ jobs:
                     ADDITIONAL_BUILD_FLAGS: ${{ inputs.additional-ubuntu-build-flags }}
                 run: |
                   IFS=' ' read -ra BUILD_FLAGS <<< "${ADDITIONAL_BUILD_FLAGS//$'\n'/ }"
-                  ./gradlew build -x test -x check "${BUILD_FLAGS[@]}"
+                  ./gradlew clean build -x test -x check "${BUILD_FLAGS[@]}"
 
             -   name: Set up Ballerina
                 if: steps.resolve-scan.outputs.supported == 'true'
@@ -300,20 +320,51 @@ jobs:
                 with:
                     version: ${{ steps.resolve-scan.outputs.version }}
 
-            -   name: Scan library
+            # scan-ballerina fails on missing paths and scans the whole repository when given none.
+            -   name: Resolve scan paths
+                id: scan-paths
                 if: steps.resolve-scan.outputs.supported == 'true'
-                uses: ballerina-platform/ballerina-library/.github/actions/scan-ballerina@main
+                env:
+                    SCAN_PATH: ${{ inputs.scan-path }}
+                    ADDITIONAL_SCAN_PATHS: ${{ inputs.additional-scan-paths }}
+                run: |
+                  PATHS=""
+                  while IFS= read -r p; do
+                    p="$(printf '%s' "$p" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+                    [ -n "$p" ] || continue
+                    if [ -d "$p" ]; then
+                      PATHS+="$p"$'\n'
+                    else
+                      echo "::warning::Skipping scan path '$p': it is not a directory in this repository."
+                    fi
+                  done < <(printf '%s\n%s\n' "$SCAN_PATH" "$ADDITIONAL_SCAN_PATHS" | tr ',' '\n')
+                  {
+                    echo "paths<<SCAN_PATHS_EOF"
+                    printf '%s' "$PATHS"
+                    echo "SCAN_PATHS_EOF"
+                    echo "has-paths=$([ -n "$PATHS" ] && echo true || echo false)"
+                  } >> "$GITHUB_OUTPUT"
+
+            -   name: Scan library
+                if: steps.scan-paths.outputs.has-paths == 'true'
+                uses: ballerina-platform/scan-ballerina@v0
                 with:
-                    paths: |
-                        ${{ inputs.scan-path }}
-                        ${{ inputs.additional-scan-paths }}
+                    platforms: github-code-scanning
+                    ballerina-version: ${{ steps.resolve-scan.outputs.version }}
+                    paths: ${{ steps.scan-paths.outputs.paths }}
                     category: bal-scan-library
-                    exclude-tests: false
+                    exclude-tests: ${{ inputs.scan-exclude-tests }}
+                    suppressions: ${{ inputs.scan-suppressions }}
+                    artifacts: ${{ inputs.scan-artifacts }}
 
             -   name: Scan examples
-                if: steps.resolve-scan.outputs.supported == 'true'
-                uses: ballerina-platform/ballerina-library/.github/actions/scan-ballerina@main
+                if: inputs.scan-examples && steps.resolve-scan.outputs.supported == 'true' && hashFiles('examples/**') != ''
+                uses: ballerina-platform/scan-ballerina@v0
                 with:
+                    platforms: github-code-scanning
+                    ballerina-version: ${{ steps.resolve-scan.outputs.version }}
                     paths: examples
                     category: bal-scan-examples
-                    exclude-tests: false
+                    exclude-tests: ${{ inputs.scan-exclude-tests }}
+                    suppressions: ${{ inputs.scan-suppressions }}
+                    artifacts: ${{ inputs.scan-artifacts }}
