@@ -18,10 +18,10 @@ on:
         type: string
         default: ""
       scan-examples:
-        description: "Run 'bal scan' on the packages under examples/"
+        description: "Run 'bal scan' on the packages under examples/. Needs a buildExamples Gradle task (examples/build.gradle, included in settings.gradle) that builds them"
         required: false
         type: boolean
-        default: true
+        default: false
       scan-exclude-tests:
         description: "Leave tests/ and modules/*/tests/ out of 'bal scan' (--exclude-tests), so their findings and suppressions are not reported"
         required: false
@@ -194,7 +194,7 @@ jobs:
           suppressions: ${{ inputs.scan-suppressions }}
           artifacts: ${{ inputs.scan-artifacts }}
 
-      # Examples have no committed Dependencies.toml and are not part of the Gradle build, so examples/build.sh creates it.
+      # Examples have no committed Dependencies.toml, so the library's buildExamples Gradle task creates it.
       # Runs even when the library gate fails, so examples findings are still reported.
       - name: Set up JDK ${{ steps.resolve-bal.outputs.java-version }}
         id: setup-java
@@ -213,14 +213,7 @@ jobs:
           ADDITIONAL_BUILD_FLAGS: ${{ inputs.additional-build-flags }}
         run: |
           IFS=' ' read -ra BUILD_FLAGS <<< "${ADDITIONAL_BUILD_FLAGS//$'\n'/ }"
-          ./gradlew clean build -x test -x check "${BUILD_FLAGS[@]}"
-          if [ -f examples/build.sh ]; then
-            bash examples/build.sh build
-          else
-            while IFS= read -r toml; do
-              (cd "$(dirname "$toml")" && bal build)
-            done < <(find examples -mindepth 2 -name Ballerina.toml -not -path '*/target/*')
-          fi
+          ./gradlew buildExamples -x test -x check "${BUILD_FLAGS[@]}"
 
       - name: Scan examples
         if: ${{ !cancelled() && steps.build-examples.outcome == 'success' }}

@@ -29,6 +29,11 @@ on:
         required: false
         type: string
         default: ""
+      scan-examples:
+        description: "Run 'bal scan' on the packages under examples/. Needs a buildExamples Gradle task (examples/build.gradle, included in settings.gradle) that builds them"
+        required: false
+        type: boolean
+        default: false
       scan-exclude-tests:
         description: "Leave tests/ and modules/*/tests/ out of 'bal scan' (--exclude-tests), so their findings and suppressions are not reported"
         required: false
@@ -352,18 +357,17 @@ jobs:
                     suppressions: ${{ inputs.scan-suppressions }}
                     artifacts: ${{ inputs.scan-artifacts }}
 
-            # Examples have no committed Dependencies.toml and are not part of the Gradle build, so examples/build.sh creates it.
+            # Examples have no committed Dependencies.toml, so the library's buildExamples Gradle task creates it.
             -   name: Build examples
                 id: build-examples
-                if: steps.resolve-scan.outputs.supported == 'true' && hashFiles('examples/**') != ''
+                if: inputs.scan-examples && steps.resolve-scan.outputs.supported == 'true' && hashFiles('examples/**') != ''
+                env:
+                    packageUser: ${{ github.actor }}
+                    packagePAT: ${{ secrets.GITHUB_TOKEN }}
+                    ADDITIONAL_BUILD_FLAGS: ${{ inputs.additional-ubuntu-build-flags }}
                 run: |
-                  if [ -f examples/build.sh ]; then
-                    bash examples/build.sh build
-                  else
-                    while IFS= read -r toml; do
-                      (cd "$(dirname "$toml")" && bal build)
-                    done < <(find examples -mindepth 2 -name Ballerina.toml -not -path '*/target/*')
-                  fi
+                  IFS=' ' read -ra BUILD_FLAGS <<< "${ADDITIONAL_BUILD_FLAGS//$'\n'/ }"
+                  ./gradlew buildExamples -x test -x check "${BUILD_FLAGS[@]}"
 
             -   name: Scan examples
                 if: steps.build-examples.outcome == 'success'
