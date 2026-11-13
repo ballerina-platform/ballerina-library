@@ -181,19 +181,6 @@ jobs:
             echo "has-paths=$([ -n "$PATHS" ] && echo true || echo false)"
           } >> "$GITHUB_OUTPUT"
 
-      # bal scan expects locked dependencies, so each package is built with the scan's distribution first.
-      - name: Build library packages
-        if: steps.scan-paths.outputs.has-paths == 'true'
-        env:
-          PATHS: ${{ steps.scan-paths.outputs.paths }}
-        run: |
-          while IFS= read -r p; do
-            [ -n "$p" ] || continue
-            echo "::group::bal build $p"
-            (cd "$p" && bal build)
-            echo "::endgroup::"
-          done <<< "$PATHS"
-
       - name: Scan library
         if: steps.scan-paths.outputs.has-paths == 'true'
         uses: ballerina-platform/scan-ballerina@v0
@@ -207,17 +194,26 @@ jobs:
           suppressions: ${{ inputs.scan-suppressions }}
           artifacts: ${{ inputs.scan-artifacts }}
 
+      # Examples have no committed Dependencies.toml, so the Gradle build creates it before the scan.
       # Runs even when the library gate fails, so examples findings are still reported.
+      - name: Set up JDK ${{ steps.resolve-bal.outputs.java-version }}
+        id: setup-java
+        if: ${{ !cancelled() && inputs.scan-examples && steps.setup-ballerina.outcome == 'success' && hashFiles('examples/**') != '' }}
+        uses: actions/setup-java@v6
+        with:
+          distribution: "temurin"
+          java-version: ${{ steps.resolve-bal.outputs.java-version }}
+
       - name: Build examples
         id: build-examples
-        if: ${{ !cancelled() && inputs.scan-examples && steps.setup-ballerina.outcome == 'success' && hashFiles('examples/**') != '' }}
+        if: ${{ !cancelled() && steps.setup-java.outcome == 'success' }}
+        env:
+          packageUser: ${{ github.actor }}
+          packagePAT: ${{ secrets.GITHUB_TOKEN }}
+          ADDITIONAL_BUILD_FLAGS: ${{ inputs.additional-build-flags }}
         run: |
-          while IFS= read -r toml; do
-            dir="$(dirname "$toml")"
-            echo "::group::bal build $dir"
-            (cd "$dir" && bal build)
-            echo "::endgroup::"
-          done < <(find examples -name Ballerina.toml -not -path '*/target/*')
+          IFS=' ' read -ra BUILD_FLAGS <<< "${ADDITIONAL_BUILD_FLAGS//$'\n'/ }"
+          ./gradlew clean build -x test -x check "${BUILD_FLAGS[@]}"
 
       - name: Scan examples
         if: ${{ !cancelled() && steps.build-examples.outcome == 'success' }}
