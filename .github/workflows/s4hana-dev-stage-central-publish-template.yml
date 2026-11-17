@@ -57,10 +57,6 @@ jobs:
           distribution: "temurin"
           java-version: 21.0.3
 
-      - name: Set Up Sigstore Signing
-        id: sigstore
-        uses: ballerina-platform/ballerina-library/.github/actions/setup-sigstore-signing@main
-
       - name: Ballerina Central Dev Push
         if: ${{ inputs.environment == 'DEV CENTRAL' }}
         env:
@@ -71,7 +67,7 @@ jobs:
           packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
         run: |
-          ./gradlew clean :${{ inputs.hana-connector-group }}-ballerina:${{ matrix.directory }}:build -PpublishToCentral=true ${{ steps.sigstore.outputs.gradle-flag }}
+          ./gradlew clean :${{ inputs.hana-connector-group }}-ballerina:${{ matrix.directory }}:build -PpublishToCentral=true 
 
       - name: Ballerina Central Stage Push
         if: ${{ inputs.environment == 'STAGE CENTRAL' }}
@@ -83,4 +79,4 @@ jobs:
           packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.BALLERINA_BOT_TOKEN }}
         run: |
-          ./gradlew clean :${{ inputs.hana-connector-group }}-ballerina:${{ matrix.directory }}:build -PpublishToCentral=true ${{ steps.sigstore.outputs.gradle-flag }}
+          ./gradlew clean :${{ inputs.hana-connector-group }}-ballerina:${{ matrix.directory }}:build -PpublishToCentral=true 
