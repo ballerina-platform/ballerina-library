@@ -1,5 +1,5 @@
 name: 'Lock Example Dependencies'
-description: "Runs 'bal build' for the Ballerina packages under the given paths that have no Dependencies.toml, since bal scan fails a package whose dependencies are not locked"
+description: "Runs 'bal build' for the Ballerina packages under the given paths that have no committed Dependencies.toml, since bal scan fails a package whose dependencies are not locked"
 inputs:
   paths:
     description: Newline or comma-separated list of directories searched for Ballerina packages
@@ -44,6 +44,31 @@ runs:
           echo "$1"
         }
 
+        # A Dependencies.toml written by a build in this run, such as a Gradle build against the locally built library,
+        # can lock packages that are not on Central, so an uncommitted one is removed and a changed one restored.
+        IN_GIT=false
+        if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+          IN_GIT=true
+        else
+          echo "::warning::Not in a git work tree, so every existing Dependencies.toml is kept, including any written by a build in this run."
+        fi
+
+        has_lock() {
+          local lock="$1/Dependencies.toml"
+          [ -f "$lock" ] || return 1
+          [ "$IN_GIT" = true ] || return 0
+          if git ls-files --error-unmatch -- "$lock" > /dev/null 2>&1; then
+            if ! git diff --quiet -- "$lock"; then
+              echo "Restoring the committed '$lock'"
+              git checkout -q -- "$lock"
+            fi
+            return 0
+          fi
+          echo "Removing '$lock', which is not committed"
+          rm -f "$lock"
+          return 1
+        }
+
         # PKGS[i] is a package to lock, and ROOTS[i] the directory it is built from: its workspace or itself.
         ROOTS=()
         PKGS=()
@@ -52,7 +77,7 @@ runs:
           [ -n "$p" ] && [ -d "$p" ] || continue
           while IFS= read -r toml; do
             dir="$(dirname "$toml")"
-            if is_workspace "$dir" || [ -f "$dir/Dependencies.toml" ]; then
+            if is_workspace "$dir" || has_lock "$dir"; then
               continue
             fi
             ROOTS+=("$(build_root "$dir")")
@@ -62,7 +87,7 @@ runs:
         done < <(printf '%s\n' "$LOCK_PATHS" | tr ',' '\n')
 
         if [ "${#ROOTS[@]}" -eq 0 ]; then
-          echo "Every package has a Dependencies.toml."
+          echo "No package needs to be built."
           exit 0
         fi
 
