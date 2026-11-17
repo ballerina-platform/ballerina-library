@@ -82,7 +82,6 @@ jobs:
             **/build/libs/*.jar
             ballerina/Ballerina.toml
             ballerina/CompilerPlugin.toml
-            examples/**/Dependencies.toml
           if-no-files-found: warn
           retention-days: 1
           include-hidden-files: true

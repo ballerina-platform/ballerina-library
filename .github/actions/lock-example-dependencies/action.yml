@@ -1,5 +1,5 @@
 name: 'Lock Example Dependencies'
-description: "Runs 'bal build' for the Ballerina packages under the given paths that have no Dependencies.toml, since bal scan fails a package whose dependencies are not locked"
+description: "Runs 'bal build' for the Ballerina packages under the given paths that have no committed Dependencies.toml, since bal scan fails a package whose dependencies are not locked"
 inputs:
   paths:
     description: Newline or comma-separated list of directories searched for Ballerina packages
@@ -44,6 +44,35 @@ runs:
           echo "$1"
         }
 
+        # A Dependencies.toml written by a build in this run, such as a Gradle build against the locally built library,
+        # can lock packages that are not on Central, so an uncommitted one is removed and a changed one restored.
+        IN_GIT=false
+        if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+          IN_GIT=true
+        else
+          echo "::warning::Not in a git work tree, so every existing Dependencies.toml is kept, including any written by a build in this run."
+        fi
+
+        # Restores the Dependencies.toml $1 when it is committed and changed. Fails only when it is not committed.
+        restore_lock() {
+          git ls-files --error-unmatch -- "$1" > /dev/null 2>&1 || return 1
+          if ! git diff --quiet -- "$1"; then
+            echo "Restoring the committed '$1'"
+            git checkout -q -- "$1" || echo "::warning::Could not restore the committed '$1'."
+          fi
+          return 0
+        }
+
+        has_lock() {
+          local lock="$1/Dependencies.toml"
+          [ -f "$lock" ] || return 1
+          [ "$IN_GIT" = true ] || return 0
+          restore_lock "$lock" && return 0
+          echo "Removing '$lock', which is not committed"
+          rm -f "$lock"
+          return 1
+        }
+
         # PKGS[i] is a package to lock, and ROOTS[i] the directory it is built from: its workspace or itself.
         ROOTS=()
         PKGS=()
@@ -52,7 +81,7 @@ runs:
           [ -n "$p" ] && [ -d "$p" ] || continue
           while IFS= read -r toml; do
             dir="$(dirname "$toml")"
-            if is_workspace "$dir" || [ -f "$dir/Dependencies.toml" ]; then
+            if is_workspace "$dir" || has_lock "$dir"; then
               continue
             fi
             ROOTS+=("$(build_root "$dir")")
@@ -62,7 +91,7 @@ runs:
         done < <(printf '%s\n' "$LOCK_PATHS" | tr ',' '\n')
 
         if [ "${#ROOTS[@]}" -eq 0 ]; then
-          echo "Every package has a Dependencies.toml."
+          echo "No package needs to be built."
           exit 0
         fi
 
@@ -87,3 +116,10 @@ runs:
           fi
           echo "::endgroup::"
         done < <(printf '%s\n' "${ROOTS[@]}" | sort -u)
+
+        # A workspace build locks every member again, including those with a committed Dependencies.toml.
+        if [ "$IN_GIT" = true ]; then
+          while IFS= read -r lock; do
+            restore_lock "$lock"
+          done < <(git ls-files -m -- "${ROOTS[@]}" | grep -E '(^|/)Dependencies\.toml$')
+        fi
