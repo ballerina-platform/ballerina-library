@@ -53,17 +53,21 @@ runs:
           echo "::warning::Not in a git work tree, so every existing Dependencies.toml is kept, including any written by a build in this run."
         fi
 
+        # Restores the Dependencies.toml $1 when it is committed and changed. Fails only when it is not committed.
+        restore_lock() {
+          git ls-files --error-unmatch -- "$1" > /dev/null 2>&1 || return 1
+          if ! git diff --quiet -- "$1"; then
+            echo "Restoring the committed '$1'"
+            git checkout -q -- "$1" || echo "::warning::Could not restore the committed '$1'."
+          fi
+          return 0
+        }
+
         has_lock() {
           local lock="$1/Dependencies.toml"
           [ -f "$lock" ] || return 1
           [ "$IN_GIT" = true ] || return 0
-          if git ls-files --error-unmatch -- "$lock" > /dev/null 2>&1; then
-            if ! git diff --quiet -- "$lock"; then
-              echo "Restoring the committed '$lock'"
-              git checkout -q -- "$lock"
-            fi
-            return 0
-          fi
+          restore_lock "$lock" && return 0
           echo "Removing '$lock', which is not committed"
           rm -f "$lock"
           return 1
@@ -112,3 +116,10 @@ runs:
           fi
           echo "::endgroup::"
         done < <(printf '%s\n' "${ROOTS[@]}" | sort -u)
+
+        # A workspace build locks every member again, including those with a committed Dependencies.toml.
+        if [ "$IN_GIT" = true ]; then
+          while IFS= read -r lock; do
+            restore_lock "$lock"
+          done < <(git ls-files -m -- "${ROOTS[@]}" | grep -E '(^|/)Dependencies\.toml$')
+        fi
