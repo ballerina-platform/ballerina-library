@@ -1,0 +1,89 @@
+name: 'Lock Example Dependencies'
+description: "Runs 'bal build' for the Ballerina packages under the given paths that have no Dependencies.toml, since bal scan fails a package whose dependencies are not locked"
+inputs:
+  paths:
+    description: Newline or comma-separated list of directories searched for Ballerina packages
+    required: false
+    default: 'examples'
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        LOCK_PATHS: ${{ inputs.paths }}
+      run: |
+        set -uo pipefail
+
+        is_workspace() {
+          grep -Eq '^[[:space:]]*\[workspace\][[:space:]]*(#.*)?$' "$1/Ballerina.toml"
+        }
+
+        workspace_members() {
+          local members
+          if ! members="$(yq -p toml -o json -I0 '.workspace.packages // []' "$1/Ballerina.toml")"; then
+            echo "::warning::Could not read the packages of the workspace '$1', so its members are built on their own." >&2
+            return
+          fi
+          jq -r '.[] | tostring | sub("^\\./"; "") | sub("/+$"; "")' <<< "$members"
+        }
+
+        # A workspace member is locked by building its workspace, which writes the Dependencies.toml of each member.
+        # A package under a workspace that does not list it is built on its own.
+        build_root() {
+          local d="$1" rel
+          while [ "$d" != "." ] && [ "$d" != "/" ]; do
+            d="$(dirname "$d")"
+            if [ -f "$d/Ballerina.toml" ] && is_workspace "$d"; then
+              if [ "$d" = "." ]; then rel="${1#./}"; else rel="${1#"$d"/}"; fi
+              if workspace_members "$d" | grep -Fxq -- "$rel"; then
+                echo "$d"
+                return
+              fi
+            fi
+          done
+          echo "$1"
+        }
+
+        # PKGS[i] is a package to lock, and ROOTS[i] the directory it is built from: its workspace or itself.
+        ROOTS=()
+        PKGS=()
+        while IFS= read -r p; do
+          p="$(printf '%s' "$p" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+          [ -n "$p" ] && [ -d "$p" ] || continue
+          while IFS= read -r toml; do
+            dir="$(dirname "$toml")"
+            if is_workspace "$dir" || [ -f "$dir/Dependencies.toml" ]; then
+              continue
+            fi
+            ROOTS+=("$(build_root "$dir")")
+            PKGS+=("$dir")
+          done < <(find "$p" \( -name .git -o \( -name target -o -name build \) -type d \
+            ! -exec sh -c 'test -f "$1/Ballerina.toml"' sh {} \; \) -prune -o -name Ballerina.toml -type f -print)
+        done < <(printf '%s\n' "$LOCK_PATHS" | tr ',' '\n')
+
+        if [ "${#ROOTS[@]}" -eq 0 ]; then
+          echo "Every package has a Dependencies.toml."
+          exit 0
+        fi
+
+        warn_unlocked() {
+          echo "::warning::'bal build' failed in '$1', so its dependencies may not be locked in Dependencies.toml."
+        }
+
+        # A failed build is left for bal scan to report, so that the other packages are still scanned.
+        # bal clean first, since an up-to-date build in target/ does not write Dependencies.toml.
+        while IFS= read -r root; do
+          echo "::group::bal build $root"
+          if ! (cd "$root" && bal clean > /dev/null && bal build); then
+            warn_unlocked "$root"
+            # A workspace build stops at the first member that fails, so the members after it are built on their own.
+            for i in "${!ROOTS[@]}"; do
+              pkg="${PKGS[$i]}"
+              if [ "${ROOTS[$i]}" = "$root" ] && [ "$pkg" != "$root" ] && [ ! -f "$pkg/Dependencies.toml" ]; then
+                echo "Building '$pkg' on its own"
+                (cd "$pkg" && bal build) || warn_unlocked "$pkg"
+              fi
+            done
+          fi
+          echo "::endgroup::"
+        done < <(printf '%s\n' "${ROOTS[@]}" | sort -u)
