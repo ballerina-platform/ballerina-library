@@ -1,0 +1,62 @@
+name: 'Lock Example Dependencies'
+description: "Runs 'bal build' for the Ballerina packages under the given paths that have no Dependencies.toml, since bal scan fails a package whose dependencies are not locked"
+inputs:
+  paths:
+    description: Newline or comma-separated list of directories searched for Ballerina packages
+    required: false
+    default: 'examples'
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        LOCK_PATHS: ${{ inputs.paths }}
+      run: |
+        set -uo pipefail
+
+        is_workspace() {
+          grep -Eq '^[[:space:]]*\[workspace\][[:space:]]*(#.*)?$' "$1/Ballerina.toml"
+        }
+
+        # A workspace member is locked by building its workspace, which writes the Dependencies.toml of each member.
+        build_root() {
+          local d
+          d="$(dirname "$1")"
+          while [ "$d" != "." ] && [ "$d" != "/" ]; do
+            if [ -f "$d/Ballerina.toml" ] && is_workspace "$d"; then
+              echo "$d"
+              return
+            fi
+            d="$(dirname "$d")"
+          done
+          echo "$1"
+        }
+
+        ROOTS=()
+        while IFS= read -r p; do
+          p="$(printf '%s' "$p" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+          [ -n "$p" ] && [ -d "$p" ] || continue
+          while IFS= read -r toml; do
+            dir="$(dirname "$toml")"
+            if is_workspace "$dir" || [ -f "$dir/Dependencies.toml" ]; then
+              continue
+            fi
+            ROOTS+=("$(build_root "$dir")")
+          done < <(find "$p" \( -name .git -o \( -name target -o -name build \) -type d \
+            ! -exec sh -c 'test -f "$1/Ballerina.toml"' sh {} \; \) -prune -o -name Ballerina.toml -type f -print)
+        done < <(printf '%s\n' "$LOCK_PATHS" | tr ',' '\n')
+
+        if [ "${#ROOTS[@]}" -eq 0 ]; then
+          echo "Every package has a Dependencies.toml."
+          exit 0
+        fi
+
+        # A failed build is left for bal scan to report, so that the other packages are still scanned.
+        # bal clean first, since an up-to-date build in target/ does not write Dependencies.toml.
+        while IFS= read -r root; do
+          echo "::group::bal build $root"
+          if ! (cd "$root" && bal clean > /dev/null && bal build); then
+            echo "::warning::'bal build' failed in '$root', so its dependencies may not be locked in Dependencies.toml."
+          fi
+          echo "::endgroup::"
+        done < <(printf '%s\n' "${ROOTS[@]}" | sort -u)

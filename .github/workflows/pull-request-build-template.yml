@@ -33,7 +33,7 @@ on:
         description: "Run 'bal scan' on the packages under examples/"
         required: false
         type: boolean
-        default: false
+        default: true
       scan-exclude-tests:
         description: "Leave tests/ and modules/*/tests/ out of 'bal scan' (--exclude-tests), so their findings and suppressions are not reported"
         required: false
@@ -356,6 +356,10 @@ jobs:
                     exclude-tests: ${{ inputs.scan-exclude-tests }}
                     suppressions: ${{ inputs.scan-suppressions }}
                     artifacts: ${{ inputs.scan-artifacts }}
+
+            -   name: Lock example dependencies
+                if: inputs.scan-examples && steps.resolve-scan.outputs.supported == 'true' && hashFiles('examples/**') != ''
+                uses: ballerina-platform/ballerina-library/.github/actions/lock-example-dependencies@main
 
             -   name: Scan examples
                 if: inputs.scan-examples && steps.resolve-scan.outputs.supported == 'true' && hashFiles('examples/**') != ''
