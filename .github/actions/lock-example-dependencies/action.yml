@@ -18,16 +18,24 @@ runs:
           grep -Eq '^[[:space:]]*\[workspace\][[:space:]]*(#.*)?$' "$1/Ballerina.toml"
         }
 
+        workspace_members() {
+          yq -p toml -o json -I0 '.workspace.packages // []' "$1/Ballerina.toml" 2> /dev/null \
+            | jq -r '.[] | tostring | sub("^\\./"; "") | sub("/+$"; "")'
+        }
+
         # A workspace member is locked by building its workspace, which writes the Dependencies.toml of each member.
+        # A package under a workspace that does not list it is built on its own.
         build_root() {
-          local d
-          d="$(dirname "$1")"
+          local d="$1" rel
           while [ "$d" != "." ] && [ "$d" != "/" ]; do
-            if [ -f "$d/Ballerina.toml" ] && is_workspace "$d"; then
-              echo "$d"
-              return
-            fi
             d="$(dirname "$d")"
+            if [ -f "$d/Ballerina.toml" ] && is_workspace "$d"; then
+              if [ "$d" = "." ]; then rel="${1#./}"; else rel="${1#"$d"/}"; fi
+              if workspace_members "$d" | grep -Fxq -- "$rel"; then
+                echo "$d"
+                return
+              fi
+            fi
           done
           echo "$1"
         }
