@@ -70,18 +70,26 @@ runs:
           echo "::warning::'bal build' failed in '$1', so its dependencies may not be locked in Dependencies.toml."
         }
 
+        # bal clean before the build, since an up-to-date build in target/ does not write Dependencies.toml, and
+        # after it, so that bal scan does not run on the build cache it leaves in target/.
+        lock() {
+          local status=0
+          (cd "$1" && bal clean > /dev/null && bal build) || status=$?
+          (cd "$1" && bal clean > /dev/null) || echo "::warning::'bal clean' failed in '$1' after the build."
+          return "$status"
+        }
+
         # A failed build is left for bal scan to report, so that the other packages are still scanned.
-        # bal clean first, since an up-to-date build in target/ does not write Dependencies.toml.
         while IFS= read -r root; do
           echo "::group::bal build $root"
-          if ! (cd "$root" && bal clean > /dev/null && bal build); then
+          if ! lock "$root"; then
             warn_unlocked "$root"
             # A workspace build stops at the first member that fails, so the members after it are built on their own.
             for i in "${!ROOTS[@]}"; do
               pkg="${PKGS[$i]}"
               if [ "${ROOTS[$i]}" = "$root" ] && [ "$pkg" != "$root" ] && [ ! -f "$pkg/Dependencies.toml" ]; then
                 echo "Building '$pkg' on its own"
-                (cd "$pkg" && bal build) || warn_unlocked "$pkg"
+                lock "$pkg" || warn_unlocked "$pkg"
               fi
             done
           fi
