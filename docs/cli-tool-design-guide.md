@@ -145,7 +145,9 @@ A path that does not exist, or that cannot be loaded as a project, fails with a 
 
 **MOD-1 (MUST, G, E)** Every command that generates from or exports a package accepts `--module <name>`, selecting `<package root>/modules/<name>`. Without the flag, the default module (the package root) is used.
 
-**MOD-2 (MUST, G, E)** If the named module does not exist, the tool creates it. The plan (FF-4) lists the creation, and a dry run reports it.
+**MOD-2 (MUST, G)** If the named module does not exist, the tool creates it. The plan (FF-4) lists the creation, and a dry run reports it.
+
+**MOD-2a (MUST, E)** If the named module does not exist, the tool fails with exit code 3 and produces no output.
 
 **MOD-3 (MUST, All)** A `--module` value that is not a valid module name is a usage error (exit 2).
 
@@ -222,13 +224,13 @@ These Rules apply to every tool that writes files (G, E). FF-9 also applies to r
 | 7   | Dry run stops here (FF-7)                                                             | 0                    |
 | 8   | Write                                                                                 | 1                    |
 
-**FF-5 (MUST, G, E)** If the plan replaces existing files, the tool shows the full list of files and asks **once**: `Overwrite these file(s)? [y/N]`. The prompt goes to stderr and the default is **No**. A "no" answer exits with code 4 before anything is written. `--force` skips the prompt.
+**FF-5 (MUST, G, E)** If the plan replaces existing files, the tool shows the full list of files and asks **once**: `Overwrite these file(s)? [y/N]`. The prompt goes to stderr and the default is **No**. The prompt is an interaction, not a result or an error. It is always plain text, even when the output format is JSON (OUT-1 does not apply to it). A "no" answer exits with code 4 before anything is written. `--force` skips the prompt.
 
 **FF-6 (MUST, G, E)** The tool prompts only when stdin and stderr are both a terminal. Otherwise, if files would be replaced and `--force` is not given, it fails with exit code 4 and a message that points to `--force`.
 
-**FF-7 (MUST, G, E)** A dry run performs the checks of phases 1–6 (but never prompts), writes nothing, and reports the planned files as the OUT-11 result with `dryRun: true`, marking those that would be overwritten and any module to be created. A dry run with `--force` lists overwrites without prompting. It exits with the code the real run would have on a validation failure, otherwise 0\.
+**FF-7 (MUST, G, E)** A dry run performs the checks of phases 1–6 (but never prompts), writes nothing, and reports the planned files as the OUT-11 result with `dryRun: true`, marking those that would be overwritten and any module to be created. A dry run with `--force` lists overwrites without prompting. It exits with the code of the failing phase (1–5) if one of those phases fails. The overwrite check (phase 6) never fails a dry run: overwrites are listed as in the result and the exit code is 0\.
 
-**FF-8 (SHOULD, G, E)** Write into a temporary directory and move into place, so a failure or interrupt in phase 8 leaves the destination unchanged.
+**FF-8 (SHOULD, G, E)** Write into a temporary directory and move into place, so a failure or interrupt while writing leaves the destination unchanged. Moving several files is not atomic: if a move fails part-way, the tool does not roll back. It exits 1 and the error lists the files already written and the files not written.
 
 **FF-9 (MUST, G, E, R)** Files under `<package root>/target/` are build artifacts, not sources. A tool may create or replace them without a prompt and without `--force`, and they are not part of the overwrite check (FF-5, FF-6). They are still checked for writability (FF-4, phase 5\) and listed in the result (OUT-11). A tool that writes both sources and build artifacts applies FF-1 to FF-8 to the sources only.
 
@@ -302,7 +304,7 @@ JSON, one line per report:
 
 **OUT-11 (MUST, G, E)** The result lists `files`, each with a `path` and an `action` (`created`, `overwritten` or `merged`). `dryRun: true` is present only on a dry run (FF-7). This shape is a draft, to be validated against real tools.
 
-`$ bal openapi generate client petstore.yaml`  
+`$ bal openapi generate petstore.yaml --mode client`  
 `created  client.bal`  
 `created  types.bal`  
 `Generated 2 files.`
@@ -311,7 +313,7 @@ JSON, one line per report:
 
 A dry run:
 
-`$ bal openapi generate client petstore.yaml --dry-run`  
+`$ bal openapi generate petstore.yaml --mode client --dry-run`  
 `would create  client.bal`  
 `would create  types.bal`  
 `Dry run: nothing was written.`
@@ -342,9 +344,9 @@ A dry run:
 
 `bal openapi: error: client.bal already exists`  
 `Re-run with --force to overwrite.`  
-`Try: bal openapi generate client petstore.yaml --force`
+`Try: bal openapi generate petstore.yaml --mode client --force`
 
-`{"severity":"error","kind":"overwrite-refused","message":"client.bal already exists","suggestion":"Re-run with --force to overwrite.","command":"bal openapi generate client petstore.yaml --force"}`
+`{"severity":"error","kind":"overwrite-refused","message":"client.bal already exists","suggestion":"Re-run with --force to overwrite.","command":"bal openapi generate petstore.yaml --mode client --force"}`
 
 **ERR-5 (MUST, All)** A problem in an input file is a diagnostic. In text mode it is `<path>:<line>:<col>: <severity>: <message>`, so editors can parse it. In JSON it is an entry of the error's `diagnostics` array, with `path`, `line`, `column`, `severity` and `message`.
 
@@ -362,10 +364,10 @@ A dry run:
 **ERR-8 (MUST, All)** A usage error (exit 2\) in text mode is followed by a one-line synopsis and a pointer such as `Try 'bal <tool> --help' for more information.` The full help is not printed. The JSON error is unchanged. No other error prints usage text.
 
 `bal openapi: error: missing required argument <input>`  
-`Usage: bal openapi generate client <input> [options]`  
+`Usage: bal openapi generate <input> [options]`  
 `Try 'bal openapi generate --help' for more information.`
 
-`{"severity":"error","kind":"usage","message":"missing required argument <input>","suggestion":"Run 'bal openapi generate client --help' for the usage."}`
+`{"severity":"error","kind":"usage","message":"missing required argument <input>","suggestion":"Run 'bal openapi generate --help' for the usage."}`
 
 **ERR-9 (MUST, All)** A tool never guesses a near match. When a name does not match, it fails and lists the candidates (see SEL-3).
 
