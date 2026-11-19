@@ -1,0 +1,19 @@
+[package]
+org = "ballerina"
+name = "{{MODULE_NAME_CC}}"
+version = "{{MODULE_VERSION}}"
+authors = ["Ballerina"]
+keywords = [] # TODO: Add keywords
+# icon = "icon.png" # TODO: Add icon
+repository = "https://github.com/ballerina-platform/{{REPO_NAME}}"
+license = ["Apache-2.0"]
+distribution = "{{BAL_VERSION}}"
+
+[platform.java21]
+graalvmCompatible = true
+
+[[platform.java21.dependency]]
+groupId = "io.ballerina.lib"
+artifactId = "{{MODULE_NAME_CC}}-native"
+version = "{{MODULE_VERSION}}"
+path = "../native/build/libs/{{MODULE_NAME_CC}}-native-{{MODULE_VERSION}}-SNAPSHOT.jar"

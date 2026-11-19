@@ -1,0 +1,147 @@
+/*
+ * Copyright (c) {{LICENSE_YEAR}}, WSO2 LLC. (http://www.wso2.com).
+ *
+ * WSO2 LLC. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+plugins {
+    id 'java'
+    id 'checkstyle'
+    id 'com.github.spotbugs'
+    id 'jacoco'
+}
+
+jacoco {
+    toolVersion = "${jacocoVersion}"
+    reportsDirectory = layout.buildDirectory.dir("reports/jacoco")
+}
+
+description = 'Ballerina - {{MODULE_NAME_PC}} Compiler Plugin Tests'
+
+dependencies {
+    checkstyle project(':checkstyle')
+    checkstyle "com.puppycrawl.tools:checkstyle:${checkstylePluginVersion}"
+
+    implementation project(':{{MODULE_NAME_CC}}-compiler-plugin')
+
+    testImplementation group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
+    testImplementation group: 'org.ballerinalang', name: 'ballerina-tools-api', version: "${ballerinaLangVersion}"
+    testImplementation group: 'org.ballerinalang', name: 'ballerina-parser', version: "${ballerinaLangVersion}"
+    testImplementation group: 'org.testng', name: 'testng', version: "${testngVersion}"
+}
+
+tasks.withType(Checkstyle) {
+    exclude '**/module-info.java'
+}
+
+checkstyle {
+    toolVersion "${checkstylePluginVersion}"
+    configFile rootProject.file("build-config/checkstyle/build/checkstyle.xml")
+    configProperties = ["suppressionFile" : file("${rootDir}/build-config/checkstyle/build/suppressions.xml")]
+}
+
+checkstyleTest.dependsOn(":checkstyle:downloadCheckstyleRuleFiles")
+
+spotbugsTest {
+    def classLoader = plugins["com.github.spotbugs"].class.classLoader
+    def SpotBugsConfidence = classLoader.findLoadedClass("com.github.spotbugs.snom.Confidence")
+    def SpotBugsEffort = classLoader.findLoadedClass("com.github.spotbugs.snom.Effort")
+    effort = SpotBugsEffort.MAX
+    reportLevel = SpotBugsConfidence.LOW
+    reportsDir = layout.buildDirectory.dir("reports/spotbugs")
+    reports {
+        html.enabled true
+        text.enabled = true
+    }
+    def excludeFile = file("${rootDir}/spotbugs-exclude.xml")
+    if (excludeFile.exists()) {
+        excludeFilter = excludeFile
+    }
+}
+
+spotbugsMain {
+    enabled false
+}
+
+checkstyleMain {
+    enabled false
+}
+
+compileJava {
+    doFirst {
+        options.compilerArgs = [
+                '--module-path', classpath.asPath,
+        ]
+        classpath = files()
+    }
+}
+
+// {{#RELEASED_DISTRIBUTION}}
+// The connector is built on Docker, so a local distribution is assembled for the compiler plugin tests.
+// The observe packages are required since the connector bala is built with observability included.
+configurations {
+    ballerinaDistribution
+    ballerinaDistributionLibs
+}
+
+dependencies {
+    ballerinaDistribution("org.ballerinalang:jballerina-tools:${ballerinaLangVersion}") {
+        transitive = false
+    }
+    ballerinaDistributionLibs "io.ballerina.stdlib:observe-ballerina:${observeVersion}"
+    ballerinaDistributionLibs "io.ballerina:observe-ballerina:${observeInternalVersion}"
+}
+
+task unpackBallerinaDistribution(type: Copy) {
+    from({ zipTree(configurations.ballerinaDistribution.singleFile) }) {
+        eachFile { fcd ->
+            fcd.relativePath = new RelativePath(!fcd.file.isDirectory(), fcd.relativePath.segments.drop(1))
+        }
+        includeEmptyDirs = false
+    }
+    into "${rootDir}/target/ballerina-runtime"
+}
+
+task unpackBallerinaDistributionLibs(type: Copy) {
+    dependsOn unpackBallerinaDistribution
+    from({ configurations.ballerinaDistributionLibs.collect { zipTree(it) } }) {
+        include 'bala/**', 'cache/**'
+    }
+    into "${rootDir}/target/ballerina-runtime/repo"
+}
+
+test.dependsOn unpackBallerinaDistributionLibs
+// {{/RELEASED_DISTRIBUTION}}
+
+test {
+    // {{#TIMESTAMPED_DISTRIBUTION}}
+    systemProperty "ballerina.offline.flag", "true"
+    // {{/TIMESTAMPED_DISTRIBUTION}}
+    systemProperty "ballerina.home", "${rootDir}/target/ballerina-runtime"
+    useTestNG() {
+        suites 'src/test/resources/testng.xml'
+    }
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+    }
+    sourceSets project(':{{MODULE_NAME_CC}}-compiler-plugin').sourceSets.main
+}
+
+test.dependsOn ":{{MODULE_NAME_CC}}-ballerina:build"
