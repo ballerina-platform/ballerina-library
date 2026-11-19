@@ -147,7 +147,7 @@ A path that does not exist, or that cannot be loaded as a project, fails with a 
 
 **MOD-2 (MUST, G)** If the named module does not exist, the tool creates it. The plan (FF-4) lists the creation, and a dry run reports it.
 
-**MOD-2a (MUST, E)** If the named module does not exist, the tool fails with exit code 3 and produces no output.
+**MOD-2a (MUST, E)** If the named module does not exist, the tool fails with exit code 3, writes no output files, and reports the error (OUT-7).
 
 **MOD-3 (MUST, All)** A `--module` value that is not a valid module name is a usage error (exit 2).
 
@@ -390,7 +390,7 @@ The table is closed. A tool MUST NOT define other codes.
 | 0    | Success           | The run succeeded, or a dry run passed all checks                                                                                                      |
 | 1    | Runtime error     | Any other failure: invalid input content, unwritable destination, write failure, or a tool-specific failure such as findings exceeding a gate (ERR-12) |
 | 2    | Usage error       | Invalid invocation: unknown flag, missing required argument, flag without a value, invalid value, conflicting flags                                    |
-| 3    | Invalid target    | The target is not a valid package or standalone file, or a .bal file is inside a package                                                               |
+| 3    | Invalid target    | The target is not a valid package or standalone file, a .bal file is inside a package, or the named module does not exist                                                               |
 | 4    | Overwrite refused | The user answered No, or the tool could not prompt and `--force` was absent                                                                            |
 | 130  | Interrupted       | SIGINT                                                                                                                                                 |
 
