@@ -83,8 +83,10 @@ jobs:
 
       - name: Set default native-image options
         if: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS != '' }}
+        env:
+          NATIVE_IMAGE_ARGS: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS }}
         run: |
-          echo "NativeImageArgs = ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS }}" > "$RUNNER_TEMP/default_native.properties"
+          printf 'NativeImageArgs = %s\n' "$NATIVE_IMAGE_ARGS" > "$RUNNER_TEMP/default_native.properties"
           echo "NATIVE_IMAGE_CONFIG_FILE=$RUNNER_TEMP/default_native.properties" >> "$GITHUB_ENV"
           echo "NATIVE_IMAGE_CONFIG_FILE: $RUNNER_TEMP/default_native.properties"
 

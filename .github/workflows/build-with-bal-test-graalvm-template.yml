@@ -163,9 +163,11 @@ jobs:
 
             - name: Set default native-image options
               if: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS != '' }}
+              env:
+                  NATIVE_IMAGE_ARGS: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS }}
               run: |
                   CURRENT_DIR=$(pwd)
-                  echo "NativeImageArgs = ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS }}" > default_native.properties
+                  printf 'NativeImageArgs = %s\n' "$NATIVE_IMAGE_ARGS" > default_native.properties
                   echo "NATIVE_IMAGE_CONFIG_FILE=$CURRENT_DIR/default_native.properties" >> $GITHUB_ENV
                   echo "NATIVE_IMAGE_CONFIG_FILE: $CURRENT_DIR/default_native.properties"
 
@@ -262,11 +264,13 @@ jobs:
 
             - name: Set default native-image options
               if: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS != '' }}
+              env:
+                  NATIVE_IMAGE_ARGS: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS }}
               run: |
                   $CURRENT_DIR = (Get-Location).tostring()
                   $DEFAULT_PROPS = $CURRENT_DIR + "\" + "default_native.properties"
                   $create_file = New-Item $DEFAULT_PROPS
-                  Set-Content $DEFAULT_PROPS "NativeImageArgs = ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS }}"
+                  Set-Content $DEFAULT_PROPS "NativeImageArgs = $env:NATIVE_IMAGE_ARGS"
                   "NATIVE_IMAGE_CONFIG_FILE=$DEFAULT_PROPS" >> $env:GITHUB_ENV
                   Write-Output "NATIVE_IMAGE_CONFIG_FILE: $DEFAULT_PROPS"
 
@@ -334,9 +338,11 @@ jobs:
 
             - name: Set default native-image options
               if: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS != '' }}
+              env:
+                  NATIVE_IMAGE_ARGS: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS }}
               run: |
                   CURRENT_DIR=$(pwd)
-                  echo "NativeImageArgs = ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS }}" > default_native.properties
+                  printf 'NativeImageArgs = %s\n' "$NATIVE_IMAGE_ARGS" > default_native.properties
                   echo "NATIVE_IMAGE_CONFIG_FILE=$CURRENT_DIR/default_native.properties" >> $GITHUB_ENV
                   echo "NATIVE_IMAGE_CONFIG_FILE: $CURRENT_DIR/default_native.properties"
 
@@ -394,11 +400,13 @@ jobs:
 
             - name: Set default native-image options
               if: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS != '' }}
+              env:
+                  NATIVE_IMAGE_ARGS: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS }}
               run: |
                   $CURRENT_DIR = (Get-Location).tostring()
                   $DEFAULT_PROPS = $CURRENT_DIR + "\" + "default_native.properties"
                   $create_file = New-Item $DEFAULT_PROPS
-                  Set-Content $DEFAULT_PROPS "NativeImageArgs = ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS }}"
+                  Set-Content $DEFAULT_PROPS "NativeImageArgs = $env:NATIVE_IMAGE_ARGS"
                   "NATIVE_IMAGE_CONFIG_FILE=$DEFAULT_PROPS" >> $env:GITHUB_ENV
                   Write-Output "NATIVE_IMAGE_CONFIG_FILE: $DEFAULT_PROPS"
 
