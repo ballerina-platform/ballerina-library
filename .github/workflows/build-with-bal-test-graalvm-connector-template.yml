@@ -18,8 +18,9 @@ on:
         default: ""
 
 env:
-  # Quick build mode on PRs unless the caller passes its own options; scheduled and manual runs keep the default level.
-  DEFAULT_NATIVE_IMAGE_OPTIONS: ${{ inputs.native-image-options || (github.event_name == 'pull_request' && '-Ob' || '') }}
+  DEFAULT_NATIVE_IMAGE_OPTIONS: ${{ inputs.native-image-options }}
+  # Adds -Ob (quick build mode) on PRs unless the options already set an -O level; other events keep the default level.
+  NATIVE_IMAGE_QUICK_BUILD: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
@@ -82,11 +83,11 @@ jobs:
         run: sudo rm -rf ballerina/target
 
       - name: Set default native-image options
-        if: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS != '' }}
-        env:
-          NATIVE_IMAGE_ARGS: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS }}
+        if: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS != '' || env.NATIVE_IMAGE_QUICK_BUILD == 'true' }}
         run: |
-          printf 'NativeImageArgs = %s\n' "$NATIVE_IMAGE_ARGS" > "$RUNNER_TEMP/default_native.properties"
+          OPTIONS="$DEFAULT_NATIVE_IMAGE_OPTIONS"
+          if [[ "$NATIVE_IMAGE_QUICK_BUILD" == true && ! " $OPTIONS" =~ [[:space:]]-O ]]; then OPTIONS="-Ob${OPTIONS:+ $OPTIONS}"; fi
+          printf 'NativeImageArgs = %s\n' "$OPTIONS" > "$RUNNER_TEMP/default_native.properties"
           echo "NATIVE_IMAGE_CONFIG_FILE=$RUNNER_TEMP/default_native.properties" >> "$GITHUB_ENV"
           echo "NATIVE_IMAGE_CONFIG_FILE: $RUNNER_TEMP/default_native.properties"
 
