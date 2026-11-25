@@ -11,6 +11,16 @@ on:
         required: false
         type: string
         default: ""
+      native-image-options:
+        description: Default native-image options
+        required: false
+        type: string
+        default: ""
+
+env:
+  DEFAULT_NATIVE_IMAGE_OPTIONS: ${{ inputs.native-image-options }}
+  # Adds -Ob (quick build mode) on PRs unless the options already set an -O level; other events keep the default level.
+  NATIVE_IMAGE_QUICK_BUILD: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
@@ -71,6 +81,15 @@ jobs:
 
       - name: Remove Target Directory
         run: sudo rm -rf ballerina/target
+
+      - name: Set default native-image options
+        if: ${{ env.DEFAULT_NATIVE_IMAGE_OPTIONS != '' || env.NATIVE_IMAGE_QUICK_BUILD == 'true' }}
+        run: |
+          read -r OPTIONS <<< "$DEFAULT_NATIVE_IMAGE_OPTIONS"
+          if [[ "$NATIVE_IMAGE_QUICK_BUILD" == true && ! " $OPTIONS" =~ [[:space:]]-O ]]; then OPTIONS="-Ob${OPTIONS:+ $OPTIONS}"; fi
+          printf 'NativeImageArgs = %s\n' "$OPTIONS" > "$RUNNER_TEMP/default_native.properties"
+          echo "NATIVE_IMAGE_CONFIG_FILE=$RUNNER_TEMP/default_native.properties" >> "$GITHUB_ENV"
+          echo "NATIVE_IMAGE_CONFIG_FILE: $RUNNER_TEMP/default_native.properties"
 
       - name: Test with GraalVM
         run: |
